@@ -60,9 +60,66 @@ export function RegisterForm() {
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
         <div className="mx-auto mb-4">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" className="fill-primary" />
-              <path d="M12 6C9.24 6 7 8.24 7 11C7 12.76 7.93 14.31 9.25 15.24L8.7 17.31L10.5 16.66C10.96 16.88 11.48 17 12 17C14.76 17 17 14.76 17 12C17 8.24 14.76 6 12 6ZM13 13H11V11H13V13ZM13 10H11V8H13V10Z" className="fill-accent" />
+          <svg width="48" height="48" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
+              <style>{`
+                  .logo-a {
+                      font-family: 'Times New Roman', serif;
+                      font-size: 40px;
+                      font-weight: bold;
+                      fill: hsl(var(--primary));
+                      animation: logo-fade-in 1.5s ease-out;
+                      -webkit-animation: logo-fade-in 1.5s ease-out;
+                  }
+                  .logo-ring-1 {
+                      stroke: hsl(var(--accent));
+                      stroke-width: 1.5;
+                      fill: none;
+                      transform-origin: center;
+                      animation: logo-rotate-1 10s linear infinite;
+                      -webkit-animation: logo-rotate-1 10s linear infinite;
+                  }
+                  .logo-ring-2 {
+                      stroke: hsl(var(--primary));
+                      stroke-width: 1;
+                      fill: none;
+                      transform-origin: center;
+                      animation: logo-rotate-2 15s linear infinite reverse;
+                      -webkit-animation: logo-rotate-2 15s linear infinite reverse;
+                  }
+                  @keyframes logo-fade-in {
+                      from { opacity: 0; transform: translateY(10px) scale(0.9); }
+                      to { opacity: 1; transform: translateY(0) scale(1); }
+                  }
+                  @-webkit-keyframes logo-fade-in {
+                      from { opacity: 0; -webkit-transform: translateY(10px) scale(0.9); }
+                      to { opacity: 1; -webkit-transform: translateY(0) scale(1); }
+                  }
+                  @keyframes logo-rotate-1 {
+                      from { transform: rotate(0deg); }
+                      to { transform: rotate(360deg); }
+                  }
+                  @-webkit-keyframes logo-rotate-1 {
+                      from { -webkit-transform: rotate(0deg); }
+                      to { -webkit-transform: rotate(360deg); }
+                  }
+                  @keyframes logo-rotate-2 {
+                      from { transform: rotate(0deg); }
+                      to { transform: rotate(360deg); }
+                  }
+                  @-webkit-keyframes logo-rotate-2 {
+                      from { -webkit-transform: rotate(0deg); }
+                      to { -webkit-transform: rotate(360deg); }
+                  }
+              `}</style>
+              <g className="logo-ring-1">
+                  <ellipse cx="25" cy="25" rx="23" ry="15" />
+              </g>
+              <g className="logo-ring-2">
+                  <ellipse cx="25" cy="25" rx="15" ry="23" />
+              </g>
+              <text x="25" y="36" textAnchor="middle" className="logo-a">
+                  A
+              </text>
           </svg>
         </div>
         <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
