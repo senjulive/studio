@@ -1,13 +1,15 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   ArrowDownLeft,
   ArrowUpRight,
   Copy,
   Loader2,
+  Users,
 } from "lucide-react";
-import { QRCode } from "qrcode.react";
+import { QRCodeSVG as QRCode } from "qrcode.react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -157,10 +159,26 @@ export function WalletView() {
             </p>
           </CardContent>
         </Card>
-        <Card className="flex flex-col">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Referral Earnings
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$25.00</div>
+            <p className="text-xs text-muted-foreground">
+              <Link href="/dashboard/referrals" className="font-medium text-accent hover:underline">
+                View details &rarr;
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="flex flex-col lg:col-span-2">
             <CardHeader>
                 <CardTitle className="text-sm font-medium">Actions</CardTitle>
-                <CardDescription>Deposit or withdraw funds from your account.</CardDescription>
+                <CardDescription>Deposit or withdraw funds.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-grow items-center justify-center gap-4">
                  <Button className="w-full" onClick={() => setShowDepositDialog(true)}>
