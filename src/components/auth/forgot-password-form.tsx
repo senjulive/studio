@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
-import { Asterisk, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -57,26 +57,11 @@ export function ForgotPasswordForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-      <div className="mx-auto mb-4">
-            <svg
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="mx-auto"
-            >
-                <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19Z"
-                    className="fill-primary"
-                />
-                <path
-                    d="M12 8L15 12L12 16L9 12L12 8Z"
-                    className="fill-accent"
-                />
-            </svg>
+        <div className="mx-auto mb-4">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
+              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" className="fill-primary" />
+              <path d="M12 6C9.24 6 7 8.24 7 11C7 12.76 7.93 14.31 9.25 15.24L8.7 17.31L10.5 16.66C10.96 16.88 11.48 17 12 17C14.76 17 17 14.76 17 12C17 8.24 14.76 6 12 6ZM13 13H11V11H13V13ZM13 10H11V8H13V10Z" className="fill-accent" />
+          </svg>
         </div>
         <CardTitle className="text-2xl font-headline">Forgot Password?</CardTitle>
         <CardDescription>
