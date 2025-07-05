@@ -9,7 +9,7 @@ import {
   Loader2,
   Users,
 } from "lucide-react";
-import { QRCodeSVG as QRCode } from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -101,6 +101,7 @@ export function WalletView() {
   const [isWithdrawing, setIsWithdrawing] = React.useState(false);
   const [withdrawAmount, setWithdrawAmount] = React.useState("");
   const [withdrawAddress, setWithdrawAddress] = React.useState("");
+  const [activeTab, setActiveTab] = React.useState("usdt");
 
   const handleCopy = async (text: string) => {
     try {
@@ -129,16 +130,26 @@ export function WalletView() {
     setWithdrawAmount("");
     toast({
       title: "Withdrawal Initiated",
-      description: `Your withdrawal of ${withdrawAmount} has been processed.`,
+      description: `Your withdrawal of ${withdrawAmount} ${activeTab.toUpperCase()} has been processed.`,
     });
   };
 
+  const balances = {
+    usdt: 3490.75,
+    eth: 7.5,
+  };
+
+  const currentWalletAddress =
+    activeTab === "usdt" ? WALLET_ADDRESSES.USDT : WALLET_ADDRESSES.ETH;
+
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Virtual Balance
+            </CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -153,9 +164,11 @@ export function WalletView() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${balance.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              ${balance.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Available for trading and withdrawal
+              Across all your assets
             </p>
           </CardContent>
         </Card>
@@ -169,33 +182,77 @@ export function WalletView() {
           <CardContent>
             <div className="text-2xl font-bold">$25.00</div>
             <p className="text-xs text-muted-foreground">
-              <Link href="/dashboard/referrals" className="font-medium text-accent hover:underline">
-                View details &rarr;
+              <Link
+                href="/dashboard/referrals"
+                className="font-medium text-accent hover:underline"
+              >
+                View referrals &rarr;
               </Link>
             </p>
           </CardContent>
         </Card>
-        <Card className="flex flex-col lg:col-span-2">
-            <CardHeader>
-                <CardTitle className="text-sm font-medium">Actions</CardTitle>
-                <CardDescription>Deposit or withdraw funds.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-grow items-center justify-center gap-4">
-                 <Button className="w-full" onClick={() => setShowDepositDialog(true)}>
-                    <ArrowDownLeft className="mr-2 h-4 w-4" /> Deposit
-                </Button>
-                <Button className="w-full" variant="outline" onClick={() => setShowWithdrawDialog(true)}>
-                    <ArrowUpRight className="mr-2 h-4 w-4" /> Withdraw
-                </Button>
-            </CardContent>
-        </Card>
       </div>
+
+      <Tabs
+        defaultValue="usdt"
+        className="space-y-6"
+        onValueChange={setActiveTab}
+      >
+        <div className="flex items-center justify-between">
+          <TabsList>
+            <TabsTrigger value="usdt">USDT Wallet</TabsTrigger>
+            <TabsTrigger value="eth">ETH Wallet</TabsTrigger>
+          </TabsList>
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setShowDepositDialog(true)}>
+              <ArrowDownLeft className="mr-2 h-4 w-4" /> Deposit
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowWithdrawDialog(true)}
+            >
+              <ArrowUpRight className="mr-2 h-4 w-4" /> Withdraw
+            </Button>
+          </div>
+        </div>
+
+        <TabsContent value="usdt">
+          <Card>
+            <CardHeader>
+              <CardTitle>USDT Balance</CardTitle>
+              <CardDescription>
+                Your available Tether (TRC20) balance.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                ${balances.usdt.toLocaleString()}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="eth">
+          <Card>
+            <CardHeader>
+              <CardTitle>ETH Balance</CardTitle>
+              <CardDescription>
+                Your available Ethereum (ERC20) balance.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {balances.eth.toLocaleString()} ETH
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <Card>
         <CardHeader>
-          <CardTitle>Transaction History</CardTitle>
+          <CardTitle>Full Transaction History</CardTitle>
           <CardDescription>
-            A record of your recent deposits and withdrawals.
+            A record of all your deposits and withdrawals.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -216,7 +273,11 @@ export function WalletView() {
                     <div className="font-medium">{txn.type}</div>
                   </TableCell>
                   <TableCell>{txn.asset}</TableCell>
-                  <TableCell>{txn.amount.toFixed(2)}</TableCell>
+                  <TableCell>
+                    {txn.asset === "USDT"
+                      ? `$${txn.amount.toFixed(2)}`
+                      : `${txn.amount.toFixed(4)} ETH`}
+                  </TableCell>
                   <TableCell>
                     {new Date(txn.date).toLocaleDateString()}
                   </TableCell>
@@ -245,59 +306,37 @@ export function WalletView() {
       <Dialog open={showDepositDialog} onOpenChange={setShowDepositDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Deposit Funds</DialogTitle>
+            <DialogTitle>Deposit {activeTab.toUpperCase()}</DialogTitle>
             <DialogDescription>
-              Select a network and send funds to the address below.
+              Only send {activeTab.toUpperCase()} (
+              {activeTab === "usdt" ? "TRC20" : "ERC20"}) to this address.
             </DialogDescription>
           </DialogHeader>
-          <Tabs defaultValue="usdt" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="usdt">USDT (TRC20)</TabsTrigger>
-              <TabsTrigger value="eth">ETH (ERC20)</TabsTrigger>
-            </TabsList>
-            <TabsContent value="usdt">
-              <div className="flex flex-col items-center gap-4 py-4">
-                <QRCode value={WALLET_ADDRESSES.USDT} size={160} />
-                <p className="text-sm text-muted-foreground">
-                  Only send USDT (TRC20) to this address.
-                </p>
-                <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="usdt-address">Deposit Address</Label>
-                  <div className="flex items-center gap-2">
-                    <Input id="usdt-address" value={WALLET_ADDRESSES.USDT} readOnly />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleCopy(WALLET_ADDRESSES.USDT)}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <QRCodeSVG
+              value={currentWalletAddress}
+              size={160}
+              fgColor="hsl(var(--foreground))"
+              bgColor="transparent"
+            />
+            <div className="grid w-full items-center gap-1.5">
+              <Label htmlFor="deposit-address">Deposit Address</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="deposit-address"
+                  value={currentWalletAddress}
+                  readOnly
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleCopy(currentWalletAddress)}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
-            </TabsContent>
-            <TabsContent value="eth">
-              <div className="flex flex-col items-center gap-4 py-4">
-                <QRCode value={WALLET_ADDRESSES.ETH} size={160} />
-                <p className="text-sm text-muted-foreground">
-                  Only send ETH (ERC20) to this address.
-                </p>
-                <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="eth-address">Deposit Address</Label>
-                  <div className="flex items-center gap-2">
-                    <Input id="eth-address" value={WALLET_ADDRESSES.ETH} readOnly />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleCopy(WALLET_ADDRESSES.ETH)}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -305,7 +344,7 @@ export function WalletView() {
       <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Withdraw Funds</DialogTitle>
+            <DialogTitle>Withdraw {activeTab.toUpperCase()}</DialogTitle>
             <DialogDescription>
               Enter the address and amount to withdraw.
             </DialogDescription>
@@ -313,7 +352,9 @@ export function WalletView() {
           <form onSubmit={handleWithdraw}>
             <div className="grid gap-4 py-4">
               <div className="grid items-center gap-1.5">
-                <Label htmlFor="withdraw-address">Recipient Address</Label>
+                <Label htmlFor="withdraw-address">
+                  Recipient {activeTab.toUpperCase()} Address
+                </Label>
                 <Input
                   id="withdraw-address"
                   placeholder="Enter wallet address"
@@ -331,8 +372,14 @@ export function WalletView() {
                   onChange={(e) => setWithdrawAmount(e.target.value)}
                 />
               </div>
-               <Button type="submit" disabled={isWithdrawing} className="w-full">
-                {isWithdrawing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button
+                type="submit"
+                disabled={isWithdrawing}
+                className="w-full"
+              >
+                {isWithdrawing && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Confirm Withdrawal
               </Button>
             </div>

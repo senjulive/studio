@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Copy, Gift, Users } from "lucide-react";
-import { QRCodeSVG as QRCode } from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -145,7 +145,7 @@ export function ReferralSystem() {
               </CardHeader>
               <CardContent>
                 {referralLink ? (
-                  <QRCode value={referralLink} size={160} fgColor="hsl(var(--foreground))" bgColor="transparent" />
+                  <QRCodeSVG value={referralLink} size={160} fgColor="hsl(var(--foreground))" bgColor="transparent" />
                 ) : (
                   <div className="h-[160px] w-[160px] bg-muted rounded-md flex items-center justify-center">
                     <p className="text-sm text-muted-foreground">Loading QR Code...</p>
