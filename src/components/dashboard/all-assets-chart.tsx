@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
   Legend,
+  Line,
 } from "recharts";
 import {
   Card,
@@ -45,23 +46,32 @@ const cryptoColors: { [key: string]: string } = {
 
 
 export function AllAssetsChart({ coins }: AllAssetsChartProps) {
+  const filteredCoins = React.useMemo(() => {
+    const tickersToShow = ['BTC', 'ETH', 'USDT'];
+    return coins.filter(coin => tickersToShow.includes(coin.ticker));
+  }, [coins]);
+
+
   const chartData = React.useMemo(() => {
-    if (!coins || coins.length === 0 || !coins[0].priceHistory) return [];
+    if (!filteredCoins || filteredCoins.length === 0) return [];
     
-    const numPoints = coins[0].priceHistory.length;
+    const refCoin = filteredCoins.find(c => c.priceHistory && c.priceHistory.length > 0);
+    if (!refCoin) return [];
+
+    const numPoints = refCoin.priceHistory.length;
     const data = [];
     
     const initialPrices: { [key: string]: number } = {};
-    coins.forEach(coin => {
-      if (coin.priceHistory.length > 0) {
+    filteredCoins.forEach(coin => {
+      if (coin.priceHistory && coin.priceHistory.length > 0) {
         initialPrices[coin.ticker] = coin.priceHistory[0].value;
       }
     });
 
     for (let i = 0; i < numPoints; i++) {
       const dataPoint: { [key: string]: number | string } = { name: `Point ${i}` };
-      coins.forEach(coin => {
-        if(coin.priceHistory[i]) {
+      filteredCoins.forEach(coin => {
+        if(coin.priceHistory && coin.priceHistory[i]) {
             const initialPrice = initialPrices[coin.ticker];
             if (initialPrice > 0) {
                 const currentValue = coin.priceHistory[i].value;
@@ -74,11 +84,11 @@ export function AllAssetsChart({ coins }: AllAssetsChartProps) {
       data.push(dataPoint);
     }
     return data;
-  }, [coins]);
+  }, [filteredCoins]);
 
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
-  if (!coins || coins.length === 0) {
+  if (!filteredCoins || filteredCoins.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -97,9 +107,9 @@ export function AllAssetsChart({ coins }: AllAssetsChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>All Assets Overview</CardTitle>
+        <CardTitle>Key Asset Performance</CardTitle>
         <CardDescription>
-          Normalized performance of all major assets over time.
+          Normalized performance of BTC, ETH, and USDT over time.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -138,7 +148,7 @@ export function AllAssetsChart({ coins }: AllAssetsChartProps) {
                 verticalAlign="bottom"
                 wrapperStyle={{ paddingTop: "20px" }}
               />
-              {coins.map((coin) => (
+              {filteredCoins.filter(c => c.ticker !== 'USDT').map((coin) => (
                 <defs key={`def-${coin.id}`}>
                     <linearGradient id={`color-${coin.ticker}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={cryptoColors[coin.ticker] || '#8884d8'} stopOpacity={0.8} />
@@ -146,19 +156,38 @@ export function AllAssetsChart({ coins }: AllAssetsChartProps) {
                     </linearGradient>
                 </defs>
               ))}
-              {coins.map(coin => (
-                  <Area
-                    key={coin.id}
-                    type="monotone"
-                    dataKey={coin.ticker}
-                    stroke={cryptoColors[coin.ticker] || '#8884d8'}
-                    strokeWidth={2}
-                    fillOpacity={0.2}
-                    fill={`url(#color-${coin.ticker})`}
-                    dot={false}
-                    name={coin.name}
-                  />
-              ))}
+              <Area
+                key="BTC"
+                type="monotone"
+                dataKey="BTC"
+                stroke={cryptoColors['BTC']}
+                strokeWidth={2}
+                fillOpacity={0.3}
+                fill="url(#color-BTC)"
+                dot={false}
+                name="Bitcoin"
+              />
+              <Area
+                key="ETH"
+                type="natural"
+                dataKey="ETH"
+                stroke={cryptoColors['ETH']}
+                strokeWidth={2}
+                fillOpacity={0.1}
+                fill="url(#color-ETH)"
+                dot={false}
+                name="Ethereum"
+              />
+              <Line
+                key="USDT"
+                type="monotone"
+                dataKey="USDT"
+                name="Tether"
+                stroke={cryptoColors['USDT']}
+                strokeWidth={2}
+                strokeDasharray="3 3"
+                dot={false}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>
