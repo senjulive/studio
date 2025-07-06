@@ -67,11 +67,11 @@ export function WalletView() {
   if (!walletData) {
     return (
         <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
                 <Skeleton className="h-[120px] rounded-lg" />
                 <Skeleton className="h-[120px] rounded-lg" />
-                <Skeleton className="h-[120px] rounded-lg md:col-span-2 lg:col-span-1" />
             </div>
+            <Skeleton className="h-[240px] rounded-lg" />
             <Skeleton className="h-[400px] rounded-lg" />
         </div>
     )
@@ -79,7 +79,7 @@ export function WalletView() {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -126,10 +126,9 @@ export function WalletView() {
             </p>
           </CardContent>
         </Card>
-        <div className="md:col-span-2 lg:col-span-1">
-          <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
-        </div>
       </div>
+
+      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
 
       <Tabs
         defaultValue="usdt"
