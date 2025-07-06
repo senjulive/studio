@@ -24,7 +24,7 @@ export function TradingBotCard({
   const { toast } = useToast();
 
   const totalBalance =
-    (walletData?.balances?.usdt ?? 0) + (walletData?.balances?.eth ?? 0) * 2500;
+    (walletData?.balances?.usdt ?? 0);
   const canStart =
     totalBalance >= 100 && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
 
@@ -57,7 +57,7 @@ export function TradingBotCard({
       } else if ((walletData?.growth?.clicksLeft ?? 0) <= 0) {
         toast({
           title: "Limit Reached",
-          description: "You've used all your runs for today.",
+          description: "You have no grids remaining for today.",
           variant: "destructive"
         });
       }
@@ -114,7 +114,6 @@ export function TradingBotCard({
           },
         };
 
-        updateWallet(newWalletData);
         onUpdate(newWalletData);
 
         toast({
@@ -143,11 +142,11 @@ export function TradingBotCard({
     >
       <CardHeader className="flex-row items-start justify-between pb-4">
         <div className="space-y-1">
-          <CardTitle>AI Growth Engine</CardTitle>
+          <CardTitle>Astral Trading</CardTitle>
           <CardDescription>
             {(walletData?.growth?.clicksLeft ?? 0) > 0 
-                ? `${walletData.growth.clicksLeft} run${walletData.growth.clicksLeft > 1 ? 's' : ''} left today`
-                : 'No runs left for today'
+                ? `${walletData.growth.clicksLeft} grid${walletData.growth.clicksLeft > 1 ? 's' : ''} remaining`
+                : 'No grids remaining for today'
             }
           </CardDescription>
         </div>
@@ -179,10 +178,10 @@ export function TradingBotCard({
               <Zap className="h-8 w-8 mb-2" />
             )}
             <p className="font-semibold text-foreground mt-2">
-              {canStart ? 'Click to Start' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No runs left'}
+              {canStart ? 'Click to Start' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
             </p>
             <p className="text-xs">
-                {canStart ? 'Earn up to 3% on your available balance.' : 'Come back tomorrow for more runs.'}
+                {canStart ? 'Earn up to 3% on your available balance.' : 'Come back tomorrow for more grids.'}
             </p>
           </div>
         )}
