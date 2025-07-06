@@ -1,5 +1,7 @@
 'use client';
 
+import { addNotification } from '@/lib/notifications';
+
 // Simulates a robust, async, multi-user wallet system with data patching.
 
 const WALLETS_STORAGE_KEY = 'astral-wallets';
@@ -145,6 +147,13 @@ export async function createWallet(
             
             newWalletData.squad.squadLeader = leaderEmail;
             newWalletData.balances.usdt += 5; // New member also gets a $5 bonus
+            
+            // Notify the squad leader
+            addNotification(leaderEmail, {
+              title: "New Squad Member!",
+              content: `${username} (${email}) has joined your squad. You've both earned a $5 bonus!`,
+              href: "/dashboard/squad"
+            });
         }
     }
     

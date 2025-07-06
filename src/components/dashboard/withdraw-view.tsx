@@ -23,6 +23,7 @@ import {
 } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
+import { addNotification } from "@/lib/notifications";
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -92,6 +93,10 @@ export function WithdrawView() {
         currentUserEmail,
         `User initiated a withdrawal of ${amount} ${asset.toUpperCase()}.`
       );
+      await addNotification(currentUserEmail, {
+        title: "Withdrawal Request Received",
+        content: `Your request to withdraw $${amount} USDT is now pending review.`
+      });
     }
 
     await new Promise((resolve) => setTimeout(resolve, 2000));

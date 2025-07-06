@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getAllWallets, updateWallet, type WalletData } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
+import { addNotification } from "@/lib/notifications";
 
 const adminPanelSchema = z.object({
   amount: z.coerce
@@ -88,6 +89,11 @@ export function WalletManager() {
         selectedUserEmail,
         `Deposit received: ${values.amount.toFixed(2)} ${asset.toUpperCase()} has been credited to your account.`
       );
+      await addNotification(selectedUserEmail, {
+        title: "Deposit Approved",
+        content: `Your balance has been credited with $${values.amount.toFixed(2)} USDT.`,
+        href: "/dashboard"
+      });
     }
     
     const newWalletData: WalletData = {

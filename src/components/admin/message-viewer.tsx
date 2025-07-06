@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { addNotification } from "@/lib/notifications";
 
 export function MessageViewer() {
   const [chats, setChats] = React.useState<ChatHistory | null>(null);
@@ -46,6 +47,12 @@ export function MessageViewer() {
     setIsSending((prev) => ({ ...prev, [email]: true }));
 
     await sendAdminMessage(email, text);
+
+    await addNotification(email, {
+      title: "New Support Message",
+      content: "An administrator has replied to your support ticket.",
+      href: "/dashboard/support"
+    });
 
     const data = await getAllChats();
     setChats(data);

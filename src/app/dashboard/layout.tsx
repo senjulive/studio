@@ -34,11 +34,13 @@ import {
   ArrowUpRight,
   Shield,
   MessageSquare,
-  LineChart
+  LineChart,
+  Bell
 } from "lucide-react";
 import { logout, getCurrentUserEmail } from "@/lib/auth";
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/dashboard/notification-bell";
 
 const CryptoLogo = () => (
   <svg
@@ -190,6 +192,7 @@ export default function DashboardLayout({
           <div className="w-full flex-1">
              <h1 className="text-lg font-semibold md:text-2xl capitalize">{pathname === '/dashboard' ? 'Home' : pathname.split('/').pop()?.replace('-', ' ')}</h1>
           </div>
+          <NotificationBell />
         </header>
         <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
