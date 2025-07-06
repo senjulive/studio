@@ -185,7 +185,7 @@ export default function DashboardLayout({
         </header>
         <main
           className="relative flex-1 bg-cover bg-center"
-          style={{ backgroundImage: "url('/dashboard-bg.png')" }}
+          style={{ backgroundImage: "url('https://czbzm.wapaxo.com/filedownload/82572/pngwing-com-2-(czbzm.wapaxo.com).png')" }}
         >
           <div className="absolute inset-0 bg-black/60" />
           <div className="relative z-10 h-full overflow-y-auto p-4 md:p-6">
