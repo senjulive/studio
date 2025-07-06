@@ -22,27 +22,23 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { getOrCreateWallet } from "@/lib/wallet";
+import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 
 export function DepositView() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = React.useState("usdt");
-  const [walletAddresses, setWalletAddresses] = React.useState({
-    usdt: "",
-    eth: "",
-  });
+  const [walletData, setWalletData] = React.useState<WalletData | null>(null);
 
   React.useEffect(() => {
     async function fetchWallet() {
-      const addresses = await getOrCreateWallet();
-      if (addresses) {
-        setWalletAddresses(addresses);
-      }
+      const data = await getOrCreateWallet();
+      setWalletData(data);
     }
     fetchWallet();
   }, []);
 
   const handleCopy = async (text: string) => {
+    if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
       toast({ title: "Address copied to clipboard" });
@@ -55,8 +51,11 @@ export function DepositView() {
     }
   };
 
-  const currentWalletAddress =
-    activeTab === "usdt" ? walletAddresses.usdt : walletAddresses.eth;
+  const currentWalletAddress = walletData
+    ? activeTab === "usdt"
+      ? walletData.addresses.usdt
+      : walletData.addresses.eth
+    : "";
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

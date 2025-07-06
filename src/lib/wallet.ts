@@ -19,32 +19,54 @@ export type WalletAddresses = {
     eth: string;
 };
 
+export type WalletData = {
+    addresses: WalletAddresses;
+    balances: {
+        usdt: number;
+        eth: number;
+    };
+    growth: {
+        clicksLeft: number;
+        lastReset: number; // timestamp
+    };
+};
+
 export type WithdrawalAddresses = {
     usdt?: string;
     eth?: string;
 };
 
 // Simulates creating a wallet on a backend server.
-export async function createWallet(): Promise<WalletAddresses> {
+export async function createWallet(): Promise<WalletData> {
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
 
     const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const ethChars = '0123456789abcdef';
 
-    const addresses: WalletAddresses = {
-        usdt: generateAddress('T', 33, trc20Chars),
-        eth: generateAddress('0x', 40, ethChars),
+    const walletData: WalletData = {
+        addresses: {
+            usdt: generateAddress('T', 33, trc20Chars),
+            eth: generateAddress('0x', 40, ethChars),
+        },
+        balances: {
+            usdt: 0,
+            eth: 0,
+        },
+        growth: {
+            clicksLeft: 4,
+            lastReset: Date.now(),
+        }
     };
 
     if (typeof window !== 'undefined') {
-        localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(addresses));
+        localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(walletData));
     }
 
-    return addresses;
+    return walletData;
 }
 
 // Simulates fetching a wallet from a backend server.
-export async function getWallet(): Promise<WalletAddresses | null> {
+export async function getWallet(): Promise<WalletData | null> {
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
     
     if (typeof window === 'undefined') {
@@ -53,7 +75,12 @@ export async function getWallet(): Promise<WalletAddresses | null> {
     const storedWallet = localStorage.getItem(WALLET_STORAGE_KEY);
     if (storedWallet) {
         try {
-            return JSON.parse(storedWallet);
+            // Basic migration for old wallet structure
+            const data = JSON.parse(storedWallet);
+            if (!data.balances || !data.growth) {
+              return null; // Force re-creation if old structure
+            }
+            return data as WalletData;
         } catch (e) {
             console.error("Failed to parse wallet from localStorage", e);
             return null;
@@ -63,12 +90,20 @@ export async function getWallet(): Promise<WalletAddresses | null> {
 }
 
 // Simulates the logic of getting a wallet or creating one if it doesn't exist.
-export async function getOrCreateWallet(): Promise<WalletAddresses> {
+export async function getOrCreateWallet(): Promise<WalletData> {
     let wallet = await getWallet();
     if (!wallet) {
         wallet = await createWallet();
     }
     return wallet;
+}
+
+// Simulates updating the wallet on a backend server.
+export async function updateWallet(data: WalletData): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 200)); // Simulate network delay
+    if (typeof window !== 'undefined') {
+        localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(data));
+    }
 }
 
 // Simulates fetching withdrawal addresses from a backend.
