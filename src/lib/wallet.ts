@@ -60,14 +60,12 @@ export async function getAllWallets(): Promise<Record<string, WalletData>> {
     return storedWallets ? JSON.parse(storedWallets) : {};
 }
 
-// Simulates creating a wallet for a new user on a backend server.
-export async function createWallet(email: string, referralCode?: string): Promise<WalletData> {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-
+// Helper to create a complete, new wallet data object
+const createNewWalletObject = (): WalletData => {
     const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const ethChars = '0123456789abcdef';
 
-    const newWalletData: WalletData = {
+    return {
         addresses: {
             usdt: generateAddress('T', 33, trc20Chars),
             eth: generateAddress('0x', 40, ethChars),
@@ -85,6 +83,14 @@ export async function createWallet(email: string, referralCode?: string): Promis
             members: [],
         },
     };
+}
+
+
+// Simulates creating a wallet for a new user on a backend server.
+export async function createWallet(email: string, referralCode?: string): Promise<WalletData> {
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+
+    const newWalletData = createNewWalletObject();
 
     if (typeof window !== 'undefined') {
         const allWallets = await getAllWallets();
@@ -97,9 +103,14 @@ export async function createWallet(email: string, referralCode?: string): Promis
 
             if (leaderEmail && allWallets[leaderEmail]?.squad) {
                 const leaderWallet = allWallets[leaderEmail];
+                // Ensure members array exists before pushing
+                if (!leaderWallet.squad.members) {
+                    leaderWallet.squad.members = [];
+                }
                 leaderWallet.squad.members.push(email);
-                leaderWallet.balances.usdt += 5; // Leader gets a $5 bonus
+                leaderWallet.balances.usdt = (leaderWallet.balances.usdt || 0) + 5; // Leader gets a $5 bonus
                 allWallets[leaderEmail] = leaderWallet; // Update leader's wallet
+                
                 newWalletData.squad.squadLeader = leaderEmail;
                 newWalletData.balances.usdt += 5; // New member also gets a $5 bonus
             }
@@ -119,51 +130,59 @@ export async function getWallet(email: string): Promise<WalletData | null> {
     return allWallets[email] || null;
 }
 
-// Simulates the logic of getting a wallet or creating one if it doesn't exist for a user.
+// This function now robustly handles wallet creation, patching, and daily resets.
 export async function getOrCreateWallet(email: string): Promise<WalletData> {
-    let wallet = await getWallet(email);
-    if (!wallet) {
-        wallet = await createWallet(email);
-    } else {
-        // This is a data migration patch for older wallets that don't have all properties.
-        let needsUpdate = false;
-        
-        if (!wallet.addresses) {
-            const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            const ethChars = '0123456789abcdef';
-            wallet.addresses = {
-               usdt: generateAddress('T', 33, trc20Chars),
-               eth: generateAddress('0x', 40, ethChars),
-           };
-           needsUpdate = true;
-        }
+    const existingWallet = await getWallet(email);
 
-        if (!wallet.balances) {
-            wallet.balances = { usdt: 0, eth: 0 };
-            needsUpdate = true;
-        }
-
-        if (!wallet.squad) {
-            wallet.squad = {
-                referralCode: generateReferralCode(),
-                members: [],
-            };
-            needsUpdate = true;
-        }
-
-        if (!wallet.growth) {
-            wallet.growth = {
-                clicksLeft: 4,
-                lastReset: Date.now(),
-            };
-            needsUpdate = true;
-        }
-        
-        if (needsUpdate) {
-            await updateWallet(email, wallet);
-        }
+    if (!existingWallet) {
+        return createWallet(email);
     }
-    return wallet;
+
+    // Create a default wallet structure to safely merge with.
+    // This generates new addresses/codes, but they will be overwritten by existing data.
+    const defaultWallet = createNewWalletObject(); 
+
+    // Deep merge existing wallet data onto the default structure.
+    // This ensures any missing properties are gracefully added.
+    const patchedWallet: WalletData = {
+      ...defaultWallet,
+      ...existingWallet,
+      addresses: {
+        ...defaultWallet.addresses,
+        ...(existingWallet.addresses || {}),
+      },
+      balances: {
+        ...defaultWallet.balances,
+        ...(existingWallet.balances || {}),
+      },
+      growth: {
+        ...defaultWallet.growth,
+        ...(existingWallet.growth || {}),
+      },
+      squad: {
+        ...defaultWallet.squad,
+        ...(existingWallet.squad || {}),
+      },
+    };
+
+    let needsUpdate = false;
+
+    // Check for daily reset of the growth engine.
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+    if (now - patchedWallet.growth.lastReset > oneDay) {
+        patchedWallet.growth.clicksLeft = 4;
+        patchedWallet.growth.lastReset = now;
+        needsUpdate = true;
+    }
+
+    // If any patching or updates occurred, save the wallet back to storage.
+    // This check prevents unnecessary writes.
+    if (needsUpdate || JSON.stringify(existingWallet) !== JSON.stringify(patchedWallet)) {
+        await updateWallet(email, patchedWallet);
+    }
+    
+    return patchedWallet;
 }
 
 // Simulates updating a specific user's wallet on a backend server.

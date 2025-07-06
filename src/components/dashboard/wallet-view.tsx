@@ -41,16 +41,7 @@ export function WalletView() {
     if (email) {
       setCurrentUserEmail(email);
       async function fetchWallet() {
-        let data = await getOrCreateWallet(email);
-
-        // Check for daily reset
-        const now = Date.now();
-        const oneDay = 24 * 60 * 60 * 1000;
-        if (data?.growth && now - data.growth.lastReset > oneDay) {
-          data.growth.clicksLeft = 4;
-          data.growth.lastReset = now;
-          await updateWallet(email, data);
-        }
+        const data = await getOrCreateWallet(email);
         setWalletData(data);
       }
       fetchWallet();
