@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -45,16 +46,9 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getOrCreateWallet } from "@/lib/wallet";
 
 const MOCK_TRANSACTIONS: any[] = [];
-
-const generateAddress = (prefix: string, length: number, chars: string) => {
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return prefix + result;
-};
 
 export function WalletView() {
   const { toast } = useToast();
@@ -71,14 +65,8 @@ export function WalletView() {
   });
 
   React.useEffect(() => {
-    const trc20Chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    const ethChars = "0123456789abcdef";
-
-    setWalletAddresses({
-      usdt: generateAddress("T", 33, trc20Chars),
-      eth: generateAddress("0x", 40, ethChars),
-    });
+    const addresses = getOrCreateWallet();
+    setWalletAddresses(addresses);
   }, []);
 
   const handleCopy = async (text: string) => {

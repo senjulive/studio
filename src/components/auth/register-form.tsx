@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -6,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,10 +29,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
+import { createWallet } from "@/lib/wallet";
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
+  const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -47,13 +51,17 @@ export function RegisterForm() {
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
+    
+    // Create a new wallet for the new user.
+    createWallet();
+    
     setIsLoading(false);
     console.log(values);
     toast({
       title: "Account Created",
-      description: "Your Astral Core account has been successfully created.",
+      description: "Your wallet is ready. Please sign in to continue.",
     });
-    form.reset();
+    router.push("/");
   };
 
   return (
