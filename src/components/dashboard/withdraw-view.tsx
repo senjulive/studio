@@ -95,7 +95,8 @@ export function WithdrawView() {
       );
       await addNotification(currentUserEmail, {
         title: "Withdrawal Request Received",
-        content: `Your request to withdraw $${amount} USDT is now pending review.`
+        content: `Your request to withdraw $${amount} USDT is now pending review.`,
+        href: "/dashboard/withdraw"
       });
     }
 
