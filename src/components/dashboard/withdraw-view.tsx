@@ -24,6 +24,7 @@ import {
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
+import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -115,7 +116,10 @@ export function WithdrawView() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Withdraw USDT (TRC20)</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+            <UsdtLogoIcon />
+            <span>Withdraw USDT (TRC20)</span>
+        </CardTitle>
         <CardDescription>
           Manage your withdrawal address and send funds to your external
           wallet.

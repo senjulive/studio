@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
+import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 const depositRequestSchema = z.object({
   amount: z.coerce
@@ -82,7 +83,10 @@ export function DepositView() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Request a USDT Deposit</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+            <UsdtLogoIcon />
+            <span>Request a USDT Deposit</span>
+        </CardTitle>
         <CardDescription>
           Submit a deposit request. An administrator will review and process it shortly.
         </CardDescription>
