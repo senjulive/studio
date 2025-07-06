@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -53,7 +52,7 @@ export function WalletView() {
         // Check for daily reset
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000;
-        if (now - data.growth.lastReset > oneDay) {
+        if (data?.growth && now - data.growth.lastReset > oneDay) {
           data.growth.clicksLeft = 4;
           data.growth.lastReset = now;
           await updateWallet(email, data);
@@ -64,7 +63,7 @@ export function WalletView() {
     }
   }, []);
 
-  const totalBalance = walletData ? walletData.balances.usdt + walletData.balances.eth * 2500 : 0; // Assuming ETH price for calculation
+  const totalBalance = walletData?.balances ? walletData.balances.usdt + walletData.balances.eth * 2500 : 0;
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (currentUserEmail) {

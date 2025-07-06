@@ -24,9 +24,9 @@ export function TradingBotCard({
   const { toast } = useToast();
 
   const totalBalance =
-    walletData.balances.usdt + walletData.balances.eth * 2500; // Assuming ETH price for calculation
+    (walletData?.balances?.usdt ?? 0) + (walletData?.balances?.eth ?? 0) * 2500;
   const canStart =
-    totalBalance >= 100 && walletData.growth.clicksLeft > 0 && !isAnimating;
+    totalBalance >= 100 && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
 
   const addLogLine = (text: string) => {
     setLogs((prev) => {
@@ -54,7 +54,7 @@ export function TradingBotCard({
           description: "You need at least $100 to run the bot.",
           variant: "destructive"
         });
-      } else if (walletData.growth.clicksLeft <= 0) {
+      } else if ((walletData?.growth?.clicksLeft ?? 0) <= 0) {
         toast({
           title: "Limit Reached",
           description: "You've used all your runs for today.",
@@ -106,11 +106,11 @@ export function TradingBotCard({
           ...walletData,
           balances: {
             ...walletData.balances,
-            usdt: walletData.balances.usdt + earnings,
+            usdt: (walletData.balances?.usdt ?? 0) + earnings,
           },
           growth: {
             ...walletData.growth,
-            clicksLeft: walletData.growth.clicksLeft - 1,
+            clicksLeft: (walletData.growth?.clicksLeft ?? 1) - 1,
           },
         };
 
@@ -145,7 +145,7 @@ export function TradingBotCard({
         <div className="space-y-1">
           <CardTitle>AI Growth Engine</CardTitle>
           <CardDescription>
-            {walletData.growth.clicksLeft > 0 
+            {(walletData?.growth?.clicksLeft ?? 0) > 0 
                 ? `${walletData.growth.clicksLeft} run${walletData.growth.clicksLeft > 1 ? 's' : ''} left today`
                 : 'No runs left for today'
             }

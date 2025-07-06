@@ -127,6 +127,22 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
     } else {
         // This is a data migration patch for older wallets that don't have all properties.
         let needsUpdate = false;
+        
+        if (!wallet.addresses) {
+            const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const ethChars = '0123456789abcdef';
+            wallet.addresses = {
+               usdt: generateAddress('T', 33, trc20Chars),
+               eth: generateAddress('0x', 40, ethChars),
+           };
+           needsUpdate = true;
+        }
+
+        if (!wallet.balances) {
+            wallet.balances = { usdt: 0, eth: 0 };
+            needsUpdate = true;
+        }
+
         if (!wallet.squad) {
             wallet.squad = {
                 referralCode: generateReferralCode(),
