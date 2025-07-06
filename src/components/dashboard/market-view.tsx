@@ -20,6 +20,7 @@ import {
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
+import { LiveTradingChart } from "./live-trading-chart";
 
 type CryptoData = {
   id: string;
@@ -94,11 +95,13 @@ const initialCryptoData: CryptoData[] = [
 export function MarketView() {
   const [data, setData] = React.useState<CryptoData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [selectedCoin, setSelectedCoin] = React.useState<CryptoData | null>(null);
 
   React.useEffect(() => {
     // Initial load with a delay to show skeletons
     const timer = setTimeout(() => {
         setData(initialCryptoData);
+        setSelectedCoin(initialCryptoData[0]);
         setIsLoading(false);
     }, 1500);
 
@@ -109,20 +112,27 @@ export function MarketView() {
     if(isLoading) return;
     
     const interval = setInterval(() => {
-      setData((prevData) =>
-        prevData.map((coin) => {
+      setData((prevData) => {
+        const newData = prevData.map((coin) => {
           const changeFactor = (Math.random() - 0.5) * 0.02; // small random change
           const newPrice = coin.price * (1 + changeFactor);
           const newChange24h = coin.change24h + (Math.random() - 0.5) * 0.1;
           const newHistory = [...coin.priceHistory.slice(1), { value: newPrice }];
 
-          return { ...coin, price: newPrice, change24h: newChange24h, priceHistory: newHistory };
-        })
-      );
+          const updatedCoin = { ...coin, price: newPrice, change24h: newChange24h, priceHistory: newHistory };
+
+          if (selectedCoin && selectedCoin.id === coin.id) {
+            setSelectedCoin(updatedCoin);
+          }
+          
+          return updatedCoin;
+        });
+        return newData;
+      });
     }, 2000); // Update every 2 seconds
 
     return () => clearInterval(interval);
-  }, [isLoading]);
+  }, [isLoading, selectedCoin]);
 
   const formatCurrency = (value: number, decimals = 2) =>
     `$${value.toLocaleString(undefined, {
@@ -160,7 +170,14 @@ export function MarketView() {
     }
 
     return data.map((coin) => (
-      <TableRow key={coin.id}>
+      <TableRow 
+        key={coin.id}
+        onClick={() => setSelectedCoin(coin)}
+        className={cn(
+          "cursor-pointer",
+          selectedCoin?.id === coin.id && "bg-muted/50 hover:bg-muted/60"
+        )}
+      >
         <TableCell>
           <div className="flex items-center gap-3">
             <Image
@@ -209,30 +226,37 @@ export function MarketView() {
 
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Live Crypto Market</CardTitle>
-        <CardDescription>
-          Real-time prices for top cryptocurrencies. Data updates automatically.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Asset</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">24h Change</TableHead>
-              <TableHead className="text-right">24h Volume</TableHead>
-              <TableHead className="text-right">Market Cap</TableHead>
-              <TableHead>Last 7 Days</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {renderRows()}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+        {isLoading ? (
+            <Skeleton className="h-[480px] w-full rounded-lg" />
+        ) : (
+            <LiveTradingChart coin={selectedCoin} />
+        )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Live Crypto Market</CardTitle>
+            <CardDescription>
+              Select a cryptocurrency to view its live chart. Data updates automatically.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Asset</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
+                  <TableHead className="text-right">24h Change</TableHead>
+                  <TableHead className="text-right">24h Volume</TableHead>
+                  <TableHead className="text-right">Market Cap</TableHead>
+                  <TableHead>Last 7 Days</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {renderRows()}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+    </div>
   );
 }
