@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
 import { login } from "@/lib/auth";
@@ -39,6 +40,8 @@ const CryptoLogo = () => (
     </svg>
 );
 
+const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
+
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
@@ -51,11 +54,31 @@ export function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
+      rememberMe: false,
     },
   });
+  
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const rememberedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY);
+        if (rememberedEmail) {
+            form.setValue('email', rememberedEmail);
+            form.setValue('rememberMe', true);
+        }
+    }
+  }, [form]);
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
+    
+    if (typeof window !== 'undefined') {
+        if (values.rememberMe) {
+            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
+        } else {
+            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+        }
+    }
+    
     await login(values.email);
     await getOrCreateWallet(values.email);
     
@@ -110,6 +133,25 @@ export function LoginForm() {
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="rememberMe"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Remember me
+                    </FormLabel>
+                  </div>
                 </FormItem>
               )}
             />
