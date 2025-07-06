@@ -15,6 +15,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Table,
@@ -24,12 +25,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TradingBotCard } from "./trading-bot-card";
@@ -40,8 +35,7 @@ const MOCK_TRANSACTIONS: any[] = [];
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
-  const [activeTab, setActiveTab] = React.useState("usdt");
-  
+
   React.useEffect(() => {
     const email = getCurrentUserEmail();
     if (email) {
@@ -75,9 +69,9 @@ export function WalletView() {
   if (!walletData) {
     return (
         <div className="space-y-6">
-            <Skeleton className="h-[120px] rounded-lg" />
+            <Skeleton className="h-[280px] rounded-lg" />
             <Skeleton className="h-[240px] rounded-lg" />
-            <Skeleton className="h-[400px] rounded-lg" />
+            <Skeleton className="h-[300px] rounded-lg" />
         </div>
     )
   }
@@ -85,90 +79,47 @@ export function WalletView() {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Available Assets
-          </CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          </svg>
+        <CardHeader>
+            <CardTitle>Portfolio Overview</CardTitle>
+            <CardDescription>Your total asset value and individual balances.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Across all your assets
-          </p>
+        <CardContent className="space-y-6">
+            <div>
+                <p className="text-sm text-muted-foreground">Total Value</p>
+                <p className="text-4xl font-bold tracking-tighter">
+                    ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-lg border bg-background p-4">
+                    <p className="text-sm font-medium text-muted-foreground">USDT Balance</p>
+                    <p className="text-2xl font-bold">
+                        ${walletData.balances.usdt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                </div>
+                <div className="rounded-lg border bg-background p-4">
+                    <p className="text-sm font-medium text-muted-foreground">ETH Balance</p>
+                    <p className="text-2xl font-bold">
+                        {walletData.balances.eth.toLocaleString(undefined, {minimumFractionDigits: 4, maximumFractionDigits: 8})} ETH
+                    </p>
+                </div>
+            </div>
         </CardContent>
-      </Card>
-
-      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
-
-      <Tabs
-        defaultValue="usdt"
-        className="space-y-6"
-        onValueChange={setActiveTab}
-      >
-        <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="usdt">USDT Wallet</TabsTrigger>
-            <TabsTrigger value="eth">ETH Wallet</TabsTrigger>
-          </TabsList>
-          <div className="flex items-center gap-2">
-            <Button asChild>
+        <CardFooter className="flex gap-2">
+             <Button asChild className="w-full">
               <Link href="/dashboard/deposit">
                 <ArrowDownLeft className="mr-2 h-4 w-4" /> Deposit
               </Link>
             </Button>
-            <Button variant="outline" asChild>
+            <Button variant="outline" asChild className="w-full">
               <Link href="/dashboard/withdraw">
                 <ArrowUpRight className="mr-2 h-4 w-4" /> Withdraw
               </Link>
             </Button>
-          </div>
-        </div>
-
-        <TabsContent value="usdt">
-          <Card>
-            <CardHeader>
-              <CardTitle>USDT Balance</CardTitle>
-              <CardDescription>
-                Your available Tether (TRC20) balance.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                ${walletData.balances.usdt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="eth">
-          <Card>
-            <CardHeader>
-              <CardTitle>ETH Balance</CardTitle>
-              <CardDescription>
-                Your available Ethereum (ERC20) balance.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {walletData.balances.eth.toLocaleString()} ETH
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        </CardFooter>
+      </Card>
+      
+      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
 
       <Card>
         <CardHeader>
@@ -191,7 +142,7 @@ export function WalletView() {
             <TableBody>
               {MOCK_TRANSACTIONS.length === 0 ? (
                 <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                         No transactions yet.
                     </TableCell>
                 </TableRow>
