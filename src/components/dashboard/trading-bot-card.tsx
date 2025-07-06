@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BotAnimationPreview } from "./bot-animation-preview";
+import { AstralLogo } from "../icons/astral-logo";
 
 export function TradingBotCard({
   walletData,
@@ -190,8 +191,10 @@ export function TradingBotCard({
           <div className="flex flex-col items-center justify-center text-center h-[9.25rem] rounded-lg bg-muted/50 p-4 animate-in fade-in-0 duration-300">
             {canStart ? (
               <BotAnimationPreview />
+            ) : totalBalance < 100 ? (
+                <Zap className="h-8 w-8 mb-2 text-muted-foreground" />
             ) : (
-              <Zap className="h-8 w-8 mb-2 text-muted-foreground" />
+                <AstralLogo className="h-10 w-10 mb-2 text-muted-foreground" />
             )}
             <p className="font-semibold text-card-foreground mt-2">
               {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}

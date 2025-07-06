@@ -158,7 +158,10 @@ export default function DashboardLayout({
         <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
           <SidebarTrigger />
           <div className="w-full flex-1">
-             <h1 className="text-lg font-semibold md:text-2xl capitalize">{pathname === '/dashboard' ? 'Home' : pathname.split('/').pop()?.replace('-', ' ')}</h1>
+             <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
+                {pathname === '/dashboard' && <AstralLogo className="h-6 w-6" />}
+                <span>{pathname === '/dashboard' ? 'Home' : pathname.split('/').pop()?.replace('-', ' ')}</span>
+            </h1>
           </div>
           <NotificationBell />
         </header>
