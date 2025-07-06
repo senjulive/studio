@@ -42,10 +42,12 @@ export type WalletData = {
         members: string[];
     };
     profile: {
+        username: string;
         fullName: string;
         idCardNo: string;
         contactNumber: string;
         country: string;
+        avatarUrl?: string;
     };
 };
 
@@ -84,10 +86,12 @@ const createNewWalletObject = (): WalletData => {
             members: [],
         },
         profile: {
+            username: '',
             fullName: '',
             idCardNo: '',
             contactNumber: '',
             country: '',
+            avatarUrl: '',
         },
     };
 }
@@ -95,6 +99,7 @@ const createNewWalletObject = (): WalletData => {
 // Simulates creating a wallet for a new user on a backend server.
 export async function createWallet(
     email: string,
+    username: string,
     contactNumber: string,
     country: string,
     referralCode?: string
@@ -113,6 +118,7 @@ export async function createWallet(
 
     const newWalletData = createNewWalletObject();
     
+    newWalletData.profile.username = username;
     newWalletData.profile.contactNumber = contactNumber;
     newWalletData.profile.country = country;
 
@@ -152,8 +158,7 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
 
     if (!existingWallet) {
         // If no wallet exists, create a fresh one and return it.
-        // We can't know contact/country here, so it'll be blank.
-        return createWallet(email, '', '');
+        return createWallet(email, '', '', '');
     }
 
     // Create a default wallet structure to safely merge with existing data.
