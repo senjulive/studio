@@ -100,7 +100,7 @@ export function TradingBotCard({
       if (percent < 100) {
         animationRequestId = requestAnimationFrame(updateAnimation);
       } else {
-        const rate = 0.00375; // This is 1.5% divided by 4 daily clicks
+        const rate = 0.02; // 2% profit per trade
         const earnings = totalBalance * rate;
 
         const newWalletData: WalletData = {
@@ -183,7 +183,7 @@ export function TradingBotCard({
               {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
             </p>
             <p className="text-xs text-muted-foreground">
-                {canStart ? 'Earn 0.375% per grid.' : 'Come back tomorrow for more grids.'}
+                {canStart ? 'Earn 2% per grid.' : 'Come back tomorrow for more grids.'}
             </p>
           </div>
         )}
