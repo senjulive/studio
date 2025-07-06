@@ -44,12 +44,16 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MOCK_TRANSACTIONS: any[] = [];
 
-const WALLET_ADDRESSES = {
-  USDT: "TQ1a1zP1Z5d6qF2w7gX8sR9j0kL3m4N5p6",
-  ETH: "0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t",
+const generateAddress = (prefix: string, length: number, chars: string) => {
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return prefix + result;
 };
 
 export function WalletView() {
@@ -61,6 +65,21 @@ export function WalletView() {
   const [withdrawAmount, setWithdrawAmount] = React.useState("");
   const [withdrawAddress, setWithdrawAddress] = React.useState("");
   const [activeTab, setActiveTab] = React.useState("usdt");
+  const [walletAddresses, setWalletAddresses] = React.useState({
+    usdt: "",
+    eth: "",
+  });
+
+  React.useEffect(() => {
+    const trc20Chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const ethChars = "0123456789abcdef";
+
+    setWalletAddresses({
+      usdt: generateAddress("T", 33, trc20Chars),
+      eth: generateAddress("0x", 40, ethChars),
+    });
+  }, []);
 
   const handleCopy = async (text: string) => {
     try {
@@ -99,7 +118,7 @@ export function WalletView() {
   };
 
   const currentWalletAddress =
-    activeTab === "usdt" ? WALLET_ADDRESSES.USDT : WALLET_ADDRESSES.ETH;
+    activeTab === "usdt" ? walletAddresses.usdt : walletAddresses.eth;
 
   return (
     <>
@@ -272,24 +291,33 @@ export function WalletView() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
-            <QRCodeSVG
-              value={currentWalletAddress}
-              size={160}
-              fgColor="hsl(var(--foreground))"
-              bgColor="transparent"
-            />
+            {currentWalletAddress ? (
+              <QRCodeSVG
+                value={currentWalletAddress}
+                size={160}
+                fgColor="hsl(var(--foreground))"
+                bgColor="transparent"
+              />
+            ) : (
+              <Skeleton className="h-[160px] w-[160px] rounded-md" />
+            )}
             <div className="grid w-full items-center gap-1.5">
               <Label htmlFor="deposit-address">Deposit Address</Label>
               <div className="flex items-center gap-2">
-                <Input
-                  id="deposit-address"
-                  value={currentWalletAddress}
-                  readOnly
-                />
+                {currentWalletAddress ? (
+                  <Input
+                    id="deposit-address"
+                    value={currentWalletAddress}
+                    readOnly
+                  />
+                ) : (
+                  <Skeleton className="h-10 w-full" />
+                )}
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => handleCopy(currentWalletAddress)}
+                  disabled={!currentWalletAddress}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
