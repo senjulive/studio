@@ -185,7 +185,7 @@ export function RegisterForm() {
         <p className="w-full text-muted-foreground">
           Already have an account?{" "}
           <Link href="/" className="font-semibold text-primary/90 hover:text-primary">
-            Sign In
+            Authorize Access
           </Link>
         </p>
       </CardFooter>

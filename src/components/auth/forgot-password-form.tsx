@@ -93,7 +93,7 @@ export function ForgotPasswordForm() {
           <Button variant="ghost" asChild>
             <Link href="/" className="text-muted-foreground hover:text-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4"/>
-                Back to Sign In
+                Back to Authorization
             </Link>
           </Button>
       </CardFooter>
