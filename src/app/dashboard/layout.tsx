@@ -1,5 +1,9 @@
+
+"use client";
+
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -32,11 +36,9 @@ import {
   ArrowUpRight,
   UserCog,
 } from "lucide-react";
+import { logout, getCurrentUserEmail } from "@/lib/auth";
+import * as React from "react";
 
-export const metadata: Metadata = {
-  title: "Dashboard - Astral Core",
-  description: "Your personal dashboard.",
-};
 
 const CryptoLogo = () => (
     <svg width="32" height="32" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
@@ -107,6 +109,20 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const [userEmail, setUserEmail] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setUserEmail(getCurrentUserEmail());
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
+  
+  const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -174,12 +190,12 @@ export default function DashboardLayout({
               <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="https://placehold.co/100x100.png" alt="@user" data-ai-hint="profile picture" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarFallback>{userInitial}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col overflow-hidden text-left">
                   <p className="truncate text-sm font-medium">User</p>
                   <p className="truncate text-xs text-sidebar-foreground/70">
-                    user@example.com
+                    {userEmail || '...'}
                   </p>
                 </div>
               </div>
@@ -189,7 +205,7 @@ export default function DashboardLayout({
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">User</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    user@example.com
+                    {userEmail || '...'}
                   </p>
                 </div>
               </DropdownMenuLabel>
@@ -209,11 +225,9 @@ export default function DashboardLayout({
                     <span>Admin Panel</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                </Link>
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

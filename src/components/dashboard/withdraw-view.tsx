@@ -22,6 +22,7 @@ import {
   saveWithdrawalAddress,
   type WithdrawalAddresses,
 } from "@/lib/wallet";
+import { getCurrentUserEmail } from "@/lib/auth";
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -30,19 +31,29 @@ export function WithdrawView() {
     React.useState<WithdrawalAddresses | null>(null);
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
+  const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
   const [isWithdrawing, setIsWithdrawing] = React.useState(false);
+  
+  React.useEffect(() => {
+    const email = getCurrentUserEmail();
+    if (email) {
+      setCurrentUserEmail(email);
+    }
+  }, []);
 
   React.useEffect(() => {
     async function fetchAddresses() {
-      setIsLoading(true);
-      const addresses = await getWithdrawalAddresses();
-      setSavedAddresses(addresses);
-      setIsLoading(false);
+      if (currentUserEmail) {
+        setIsLoading(true);
+        const addresses = await getWithdrawalAddresses(currentUserEmail);
+        setSavedAddresses(addresses);
+        setIsLoading(false);
+      }
     }
     fetchAddresses();
-  }, []);
+  }, [currentUserEmail]);
 
   const handleSaveAddress = async () => {
     if (!currentAddress) {
@@ -53,9 +64,11 @@ export function WithdrawView() {
       });
       return;
     }
+    if (!currentUserEmail) return;
+
     setIsSaving(true);
-    await saveWithdrawalAddress(activeTab, currentAddress);
-    const updatedAddresses = await getWithdrawalAddresses();
+    await saveWithdrawalAddress(currentUserEmail, activeTab, currentAddress);
+    const updatedAddresses = await getWithdrawalAddresses(currentUserEmail);
     setSavedAddresses(updatedAddresses);
     setIsSaving(false);
     toast({ title: "Address Saved", description: "Your withdrawal address has been saved." });

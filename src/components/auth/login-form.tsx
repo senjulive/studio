@@ -28,6 +28,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
+import { login } from "@/lib/auth";
+import { getOrCreateWallet } from "@/lib/wallet";
+
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -46,9 +49,14 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
+    // This would be a real auth check. Here, we just log in the user.
+    await login(values.email);
+    // Ensure a wallet exists for the user.
+    await getOrCreateWallet(values.email);
+
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+    
     setIsLoading(false);
-    console.log(values);
     toast({
       title: "Login Successful",
       description: "Welcome back to Astral Core!",

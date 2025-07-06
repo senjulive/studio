@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
+import { getAllWallets, updateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const adminPanelSchema = z.object({
@@ -45,16 +45,21 @@ type AdminPanelFormValues = z.infer<typeof adminPanelSchema>;
 
 export function AdminPanel() {
   const { toast } = useToast();
-  const [walletData, setWalletData] = React.useState<WalletData | null>(null);
+  const [allWallets, setAllWallets] = React.useState<Record<string, WalletData> | null>(null);
+  const [selectedUserEmail, setSelectedUserEmail] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isFetchingWallets, setIsFetchingWallets] = React.useState(true);
+
+  const refetchWallets = React.useCallback(async () => {
+      setIsFetchingWallets(true);
+      const data = await getAllWallets();
+      setAllWallets(data);
+      setIsFetchingWallets(false);
+  }, []);
 
   React.useEffect(() => {
-    async function fetchWallet() {
-      const data = await getOrCreateWallet();
-      setWalletData(data);
-    }
-    fetchWallet();
-  }, []);
+    refetchWallets();
+  }, [refetchWallets]);
 
   const form = useForm<AdminPanelFormValues>({
     resolver: zodResolver(adminPanelSchema),
@@ -64,15 +69,17 @@ export function AdminPanel() {
     },
   });
 
+  const selectedWalletData = selectedUserEmail && allWallets ? allWallets[selectedUserEmail] : null;
+
   const handleBalanceUpdate = async (values: AdminPanelFormValues, action: "add" | "remove") => {
-    if (!walletData) {
-        toast({ title: "Error", description: "Wallet data not loaded.", variant: "destructive" });
+    if (!selectedWalletData || !selectedUserEmail) {
+        toast({ title: "Error", description: "Please select a user.", variant: "destructive" });
         return;
     }
     
     setIsLoading(true);
 
-    const newBalances = { ...walletData.balances };
+    const newBalances = { ...selectedWalletData.balances };
     const amount = action === 'add' ? values.amount : -values.amount;
 
     if (values.asset === 'usdt') {
@@ -88,16 +95,18 @@ export function AdminPanel() {
     }
     
     const newWalletData: WalletData = {
-      ...walletData,
+      ...selectedWalletData,
       balances: newBalances,
     };
 
-    await updateWallet(newWalletData);
-    setWalletData(newWalletData);
+    await updateWallet(selectedUserEmail, newWalletData);
+    
+    // Optimistically update local state or refetch
+    await refetchWallets();
 
     toast({
       title: "Balance Updated",
-      description: `Successfully ${action}ed ${values.amount} ${values.asset.toUpperCase()}.`,
+      description: `Successfully ${action}ed ${values.amount} ${values.asset.toUpperCase()} for ${selectedUserEmail}.`,
     });
     
     form.reset({ asset: values.asset, amount: 0 });
@@ -112,37 +121,57 @@ export function AdminPanel() {
       <CardHeader>
         <CardTitle>Administrator Panel</CardTitle>
         <CardDescription>
-          Add or remove balance from the user's virtual wallet.
+          Add or remove balance from a selected user's virtual wallet.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {walletData ? (
-            <div className="mb-6 grid grid-cols-2 gap-4 text-center">
-                <div>
-                    <p className="text-sm text-muted-foreground">Current USDT Balance</p>
-                    <p className="text-2xl font-bold">${walletData.balances.usdt.toFixed(2)}</p>
-                </div>
-                 <div>
-                    <p className="text-sm text-muted-foreground">Current ETH Balance</p>
-                    <p className="text-2xl font-bold">{walletData.balances.eth.toFixed(4)} ETH</p>
-                </div>
-            </div>
-        ) : (
-            <div className="mb-6 grid grid-cols-2 gap-4">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-            </div>
-        )}
-
         <Form {...form}>
           <form className="space-y-6">
+            <FormItem>
+              <FormLabel>Select User</FormLabel>
+              <Select onValueChange={setSelectedUserEmail} value={selectedUserEmail} disabled={isFetchingWallets}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a user to manage" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {allWallets && Object.keys(allWallets).length > 0 ? (
+                    Object.keys(allWallets).map(email => (
+                      <SelectItem key={email} value={email}>{email}</SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-muted-foreground">No users found.</div>
+                  )}
+                </SelectContent>
+              </Select>
+            </FormItem>
+
+            {selectedWalletData ? (
+                <div className="mb-6 grid grid-cols-2 gap-4 text-center border rounded-lg p-4">
+                    <div>
+                        <p className="text-sm text-muted-foreground">Current USDT Balance</p>
+                        <p className="text-2xl font-bold">${selectedWalletData.balances.usdt.toFixed(2)}</p>
+                    </div>
+                     <div>
+                        <p className="text-sm text-muted-foreground">Current ETH Balance</p>
+                        <p className="text-2xl font-bold">{selectedWalletData.balances.eth.toFixed(4)} ETH</p>
+                    </div>
+                </div>
+            ) : (
+                <div className="mb-6 grid grid-cols-2 gap-4">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                </div>
+            )}
+
             <FormField
               control={form.control}
               name="asset"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Asset</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedUserEmail || isLoading}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select an asset" />
@@ -164,7 +193,7 @@ export function AdminPanel() {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0.00" {...field} />
+                    <Input type="number" placeholder="0.00" {...field} disabled={!selectedUserEmail || isLoading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,7 +203,7 @@ export function AdminPanel() {
                 <Button
                   onClick={form.handleSubmit(onSubmitAdd)}
                   className="w-full"
-                  disabled={isLoading}
+                  disabled={!selectedUserEmail || isLoading}
                 >
                   {isLoading ? <Loader2 className="animate-spin" /> : <PlusCircle />}
                   Add Balance
@@ -183,7 +212,7 @@ export function AdminPanel() {
                   onClick={form.handleSubmit(onSubmitRemove)}
                   variant="destructive"
                   className="w-full"
-                  disabled={isLoading}
+                  disabled={!selectedUserEmail || isLoading}
                 >
                   {isLoading ? <Loader2 className="animate-spin" /> : <MinusCircle />}
                   Remove Balance

@@ -34,34 +34,43 @@ import {
 import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TradingBotCard } from "./trading-bot-card";
+import { getCurrentUserEmail } from "@/lib/auth";
 
 const MOCK_TRANSACTIONS: any[] = [];
 
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
+  const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState("usdt");
   
   React.useEffect(() => {
-    async function fetchWallet() {
-      let data = await getOrCreateWallet();
+    const email = getCurrentUserEmail();
+    if (email) {
+      setCurrentUserEmail(email);
+      async function fetchWallet() {
+        let data = await getOrCreateWallet(email);
 
-      // Check for daily reset
-      const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000;
-      if (now - data.growth.lastReset > oneDay) {
-        data.growth.clicksLeft = 4;
-        data.growth.lastReset = now;
-        await updateWallet(data);
+        // Check for daily reset
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        if (now - data.growth.lastReset > oneDay) {
+          data.growth.clicksLeft = 4;
+          data.growth.lastReset = now;
+          await updateWallet(email, data);
+        }
+        setWalletData(data);
       }
-      setWalletData(data);
+      fetchWallet();
     }
-    fetchWallet();
   }, []);
 
   const totalBalance = walletData ? walletData.balances.usdt + walletData.balances.eth * 2500 : 0; // Assuming ETH price for calculation
 
-  const handleWalletUpdate = (newData: WalletData) => {
-    setWalletData(newData);
+  const handleWalletUpdate = async (newData: WalletData) => {
+    if (currentUserEmail) {
+      await updateWallet(currentUserEmail, newData);
+      setWalletData(newData);
+    }
   };
   
   if (!walletData) {

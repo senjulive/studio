@@ -1,9 +1,9 @@
 'use client';
 
-// This file now simulates async operations, as if it were talking to a server.
-// This makes it easier to replace with a real backend later.
+// This file now simulates async operations for a multi-user wallet system,
+// as if it were talking to a server. This makes it easier to replace with a real backend later.
 
-const WALLET_STORAGE_KEY = 'astral-wallet';
+const WALLETS_STORAGE_KEY = 'astral-wallets';
 const WITHDRAWAL_ADDRESSES_STORAGE_KEY = 'astral-withdrawal-addresses';
 
 const generateAddress = (prefix: string, length: number, chars: string): string => {
@@ -36,14 +36,24 @@ export type WithdrawalAddresses = {
     eth?: string;
 };
 
-// Simulates creating a wallet on a backend server.
-export async function createWallet(): Promise<WalletData> {
+// --- Multi-User Wallet Functions ---
+
+// Simulates fetching all wallets from a database. For admin use.
+export async function getAllWallets(): Promise<Record<string, WalletData>> {
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+    if (typeof window === 'undefined') return {};
+    const storedWallets = localStorage.getItem(WALLETS_STORAGE_KEY);
+    return storedWallets ? JSON.parse(storedWallets) : {};
+}
+
+// Simulates creating a wallet for a new user on a backend server.
+export async function createWallet(email: string): Promise<WalletData> {
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
 
     const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const ethChars = '0123456789abcdef';
 
-    const walletData: WalletData = {
+    const newWalletData: WalletData = {
         addresses: {
             usdt: generateAddress('T', 33, trc20Chars),
             eth: generateAddress('0x', 40, ethChars),
@@ -59,80 +69,66 @@ export async function createWallet(): Promise<WalletData> {
     };
 
     if (typeof window !== 'undefined') {
-        localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(walletData));
+        const allWallets = await getAllWallets();
+        allWallets[email] = newWalletData;
+        localStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(allWallets));
     }
 
-    return walletData;
+    return newWalletData;
 }
 
-// Simulates fetching a wallet from a backend server.
-export async function getWallet(): Promise<WalletData | null> {
+// Simulates fetching a specific user's wallet from a backend server.
+export async function getWallet(email: string): Promise<WalletData | null> {
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-    
-    if (typeof window === 'undefined') {
-        return null;
-    }
-    const storedWallet = localStorage.getItem(WALLET_STORAGE_KEY);
-    if (storedWallet) {
-        try {
-            // Basic migration for old wallet structure
-            const data = JSON.parse(storedWallet);
-            if (!data.balances || !data.growth) {
-              return null; // Force re-creation if old structure
-            }
-            return data as WalletData;
-        } catch (e) {
-            console.error("Failed to parse wallet from localStorage", e);
-            return null;
-        }
-    }
-    return null;
+    const allWallets = await getAllWallets();
+    return allWallets[email] || null;
 }
 
-// Simulates the logic of getting a wallet or creating one if it doesn't exist.
-export async function getOrCreateWallet(): Promise<WalletData> {
-    let wallet = await getWallet();
+// Simulates the logic of getting a wallet or creating one if it doesn't exist for a user.
+export async function getOrCreateWallet(email: string): Promise<WalletData> {
+    let wallet = await getWallet(email);
     if (!wallet) {
-        wallet = await createWallet();
+        wallet = await createWallet(email);
     }
     return wallet;
 }
 
-// Simulates updating the wallet on a backend server.
-export async function updateWallet(data: WalletData): Promise<void> {
+// Simulates updating a specific user's wallet on a backend server.
+export async function updateWallet(email: string, data: WalletData): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 200)); // Simulate network delay
     if (typeof window !== 'undefined') {
-        localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(data));
+        const allWallets = await getAllWallets();
+        allWallets[email] = data;
+        localStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(allWallets));
     }
 }
 
-// Simulates fetching withdrawal addresses from a backend.
-export async function getWithdrawalAddresses(): Promise<WithdrawalAddresses | null> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    if (typeof window === 'undefined') {
-        return null;
-    }
-    const storedAddresses = localStorage.getItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY);
-    if (storedAddresses) {
-        try {
-            return JSON.parse(storedAddresses);
-        } catch (e) {
-            console.error("Failed to parse withdrawal addresses from localStorage", e);
-            return null;
-        }
-    }
-    return {};
+
+// --- Multi-User Withdrawal Address Functions ---
+
+async function getAllWithdrawalAddresses(): Promise<Record<string, WithdrawalAddresses>> {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    if (typeof window === 'undefined') return {};
+    const stored = localStorage.getItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
 }
 
-// Simulates saving a withdrawal address to a backend.
-export async function saveWithdrawalAddress(asset: string, address: string): Promise<void> {
+// Simulates fetching withdrawal addresses for a specific user.
+export async function getWithdrawalAddresses(email: string): Promise<WithdrawalAddresses> {
+    const allAddresses = await getAllWithdrawalAddresses();
+    return allAddresses[email] || {};
+}
+
+// Simulates saving a withdrawal address for a specific user.
+export async function saveWithdrawalAddress(email: string, asset: string, address: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 500));
-    const currentAddresses = await getWithdrawalAddresses() || {};
-    const newAddresses: WithdrawalAddresses = {
-        ...currentAddresses,
-        [asset]: address,
-    };
+    const allAddresses = await getAllWithdrawalAddresses();
+    if (!allAddresses[email]) {
+        allAddresses[email] = {};
+    }
+    allAddresses[email][asset as keyof WithdrawalAddresses] = address;
+    
     if (typeof window !== 'undefined') {
-        localStorage.setItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY, JSON.stringify(newAddresses));
+        localStorage.setItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY, JSON.stringify(allAddresses));
     }
 }

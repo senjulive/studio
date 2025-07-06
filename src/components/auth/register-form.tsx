@@ -51,8 +51,11 @@ export function RegisterForm() {
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
     
-    // Create a new wallet for the new user. This now simulates a server call.
-    await createWallet();
+    // Create a new wallet for the new user, associated with their email.
+    await createWallet(values.email);
+    
+    // Simulate other registration steps
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     setIsLoading(false);
     console.log(values);

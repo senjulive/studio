@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
+import { getCurrentUserEmail } from "@/lib/auth";
 
 export function DepositView() {
   const { toast } = useToast();
@@ -30,11 +31,14 @@ export function DepositView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
 
   React.useEffect(() => {
-    async function fetchWallet() {
-      const data = await getOrCreateWallet();
-      setWalletData(data);
+    const email = getCurrentUserEmail();
+    if (email) {
+      async function fetchWallet() {
+        const data = await getOrCreateWallet(email);
+        setWalletData(data);
+      }
+      fetchWallet();
     }
-    fetchWallet();
   }, []);
 
   const handleCopy = async (text: string) => {
