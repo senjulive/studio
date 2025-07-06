@@ -37,7 +37,7 @@ export async function getChatHistoryForUser(email: string): Promise<Message[]> {
   return allChats[email] || [];
 }
 
-// Simulates sending a message. In a real app, this would go to a backend.
+// Simulates sending a message from a user.
 export async function sendMessage(email: string, text: string): Promise<Message> {
   await new Promise(resolve => setTimeout(resolve, 200));
   if (typeof window === 'undefined') {
@@ -63,7 +63,34 @@ export async function sendMessage(email: string, text: string): Promise<Message>
   return newMessage;
 }
 
-// New function for silent system notifications
+// Simulates an admin sending a message to a user.
+export async function sendAdminMessage(email: string, text: string): Promise<Message> {
+  await new Promise(resolve => setTimeout(resolve, 200));
+  if (typeof window === 'undefined') {
+    throw new Error('Cannot send message: not in a browser environment.');
+  }
+
+  const allChats = await getAllChats();
+  if (!allChats[email]) {
+    allChats[email] = [];
+  }
+
+  const newMessage: Message = {
+    id: `msg_${Date.now()}_${Math.random()}`,
+    text,
+    sender: 'admin',
+    timestamp: Date.now(),
+    silent: false,
+  };
+
+  allChats[email].push(newMessage);
+  localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
+  
+  return newMessage;
+}
+
+
+// Function for silent system notifications
 export async function sendSystemNotification(email: string, text: string): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 50));
   if (typeof window === 'undefined') {
@@ -78,9 +105,9 @@ export async function sendSystemNotification(email: string, text: string): Promi
   const systemMessage: Message = {
     id: `sys_${Date.now()}_${Math.random()}`,
     text: `[System Alert] ${text}`,
-    sender: 'admin', // From 'admin' so it's styled as an admin message.
+    sender: 'admin',
     timestamp: Date.now(),
-    silent: true, // This is a silent notification.
+    silent: true,
   };
 
   allChats[email].push(systemMessage);

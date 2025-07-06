@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { getAllWallets, updateWallet, type WalletData } from "@/lib/wallet";
+import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const adminPanelSchema = z.object({
@@ -86,13 +87,19 @@ export function WalletManager() {
         setIsLoading(false);
         return;
     }
+
+    if (action === 'add') {
+      await sendAdminMessage(
+        selectedUserEmail,
+        `Deposit received: ${values.amount.toFixed(2)} ${values.asset.toUpperCase()} has been credited to your account.`
+      );
+    }
     
     const newWalletData: WalletData = {
       ...selectedWalletData,
       balances: newBalances,
     };
 
-    // This needs the email, which is the key for the wallet
     await updateWallet(selectedUserEmail, newWalletData);
     
     await refetchWallets();
