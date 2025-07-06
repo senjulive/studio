@@ -28,6 +28,7 @@ import { TradingBotCard } from "./trading-bot-card";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { UsdtLogoIcon } from "@/components/icons/usdt-logo";
 import { cn } from "@/lib/utils";
+import { LiveTradingChart } from "./live-trading-chart";
 
 type Transaction = {
   id: string;
@@ -38,9 +39,20 @@ type Transaction = {
   status: "Completed" | "Pending" | "Failed";
 };
 
+type CryptoData = {
+  id: string;
+  name: string;
+  ticker: string;
+  iconUrl: string;
+  price: number;
+  change24h: number;
+  priceHistory: { value: number }[];
+};
+
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
+  const [usdtData, setUsdtData] = React.useState<CryptoData | null>(null);
 
   React.useEffect(() => {
     const email = getCurrentUserEmail();
@@ -52,6 +64,32 @@ export function WalletView() {
       }
       fetchWallet();
     }
+  }, []);
+
+  React.useEffect(() => {
+    const initialUsdtData: CryptoData = {
+      id: "tether-dashboard",
+      name: "Tether",
+      ticker: "USDT",
+      iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
+      price: 1.0,
+      change24h: 0.01,
+      priceHistory: Array.from({ length: 50 }, () => ({ value: 1 + (Math.random() - 0.5) * 0.01 })),
+    };
+    setUsdtData(initialUsdtData);
+
+    const interval = setInterval(() => {
+      setUsdtData((prevData) => {
+        if (!prevData) return null;
+        const changeFactor = (Math.random() - 0.5) * 0.001;
+        const newPrice = prevData.price * (1 + changeFactor);
+        const newChange24h = prevData.change24h + (Math.random() - 0.5) * 0.005;
+        const newHistory = [...prevData.priceHistory.slice(1), { value: newPrice }];
+        return { ...prevData, price: newPrice, change24h: newChange24h, priceHistory: newHistory };
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const transactions = React.useMemo(() => {
@@ -188,6 +226,8 @@ export function WalletView() {
       </Card>
       
       <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
+
+      <LiveTradingChart coin={usdtData} />
 
       <Card>
         <CardHeader>

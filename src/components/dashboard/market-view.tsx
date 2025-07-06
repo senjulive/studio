@@ -101,7 +101,8 @@ export function MarketView() {
     // Initial load with a delay to show skeletons
     const timer = setTimeout(() => {
         setData(initialCryptoData);
-        setSelectedCoin(initialCryptoData[0]);
+        const usdtCoin = initialCryptoData.find(c => c.ticker === 'USDT');
+        setSelectedCoin(usdtCoin || initialCryptoData[0]);
         setIsLoading(false);
     }, 1500);
 
