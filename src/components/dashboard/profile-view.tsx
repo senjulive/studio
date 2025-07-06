@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -10,7 +11,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   Dialog,
@@ -62,6 +62,32 @@ const getUserRank = (squadSize: number) => {
     }
     return { name: "Recruit", icon: User, color: "text-muted-foreground" };
 };
+
+const ProfileDetailItem = ({
+  icon,
+  label,
+  value,
+  isLoading,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  isLoading: boolean;
+}) => (
+  <div>
+    <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+      {icon}
+      {label}
+    </Label>
+    <div className="mt-1">
+      {isLoading ? (
+        <Skeleton className="h-6 w-3/4" />
+      ) : (
+        <p className="text-base font-medium text-foreground">{value || "Not set"}</p>
+      )}
+    </div>
+  </div>
+);
 
 export function ProfileView() {
   const { toast } = useToast();
@@ -179,83 +205,17 @@ export function ProfileView() {
             </CardTitle>
             <CardDescription>Your account details.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center space-x-4 rounded-md border p-4">
-              <User className="h-5 w-5 mt-px text-muted-foreground" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium leading-none">Username</p>
-                {isLoading ? (
-                    <Skeleton className="h-5 w-32" />
-                ) : (
-                    <p className="text-sm text-muted-foreground">{profile?.username || 'Not set'}</p>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center space-x-4 rounded-md border p-4">
-              <Mail className="h-5 w-5 mt-px text-muted-foreground" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium leading-none">Email</p>
-                {isLoading ? (
-                    <Skeleton className="h-5 w-48" />
-                ) : (
-                    <p className="text-sm text-muted-foreground">{userEmail}</p>
-                )}
-              </div>
-            </div>
-             <div className="flex items-center space-x-4 rounded-md border p-4">
-              <BadgeInfo className="h-5 w-5 mt-px text-muted-foreground" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium leading-none">Full Name</p>
-                {isLoading ? (
-                    <Skeleton className="h-5 w-32" />
-                ) : (
-                    <p className="text-sm text-muted-foreground">{profile?.fullName || 'Not set'}</p>
-                )}
-              </div>
-            </div>
-             <div className="flex items-center space-x-4 rounded-md border p-4">
-              <BadgeInfo className="h-5 w-5 mt-px text-muted-foreground" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium leading-none">ID Card No.</p>
-                {isLoading ? (
-                    <Skeleton className="h-5 w-32" />
-                ) : (
-                    <p className="text-sm text-muted-foreground">{profile?.idCardNo || 'Not set'}</p>
-                )}
-              </div>
-            </div>
-             <div className="flex items-center space-x-4 rounded-md border p-4">
-              <Phone className="h-5 w-5 mt-px text-muted-foreground" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium leading-none">Contact Number</p>
-                 {isLoading ? (
-                    <Skeleton className="h-5 w-32" />
-                ) : (
-                    <p className="text-sm text-muted-foreground">{profile?.contactNumber || 'Not set'}</p>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center space-x-4 rounded-md border p-4">
-              <MapPin className="h-5 w-5 mt-px text-muted-foreground" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium leading-none">Country</p>
-                 {isLoading ? (
-                    <Skeleton className="h-5 w-32" />
-                ) : (
-                    <p className="text-sm text-muted-foreground">{profile?.country || 'Not set'}</p>
-                )}
-              </div>
-            </div>
-             <div className="flex items-center space-x-4 rounded-md border p-4">
-              <Users className="h-5 w-5 mt-px text-muted-foreground" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium leading-none">Squad Members</p>
-                 {isLoading ? (
-                    <Skeleton className="h-5 w-32" />
-                ) : (
-                    <p className="text-sm text-muted-foreground">{squadSize} member{squadSize !== 1 && 's'}</p>
-                )}
-              </div>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
+                <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
+                <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
+                <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={userEmail} />
+                <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="ID Card No." value={profile?.idCardNo} />
+                <ProfileDetailItem isLoading={isLoading} icon={<Phone className="h-4 w-4" />} label="Contact Number" value={profile?.contactNumber} />
+                <ProfileDetailItem isLoading={isLoading} icon={<MapPin className="h-4 w-4" />} label="Country" value={profile?.country} />
+                <div className="sm:col-span-2">
+                    <ProfileDetailItem isLoading={isLoading} icon={<Users className="h-4 w-4" />} label="Squad Members" value={`${squadSize} member${squadSize !== 1 ? 's' : ''}`} />
+                </div>
             </div>
           </CardContent>
         </Card>
