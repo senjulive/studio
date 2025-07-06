@@ -14,6 +14,15 @@ const generateAddress = (prefix: string, length: number, chars: string): string 
     return prefix + result;
 };
 
+const generateReferralCode = (): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+}
+
 export type WalletAddresses = {
     usdt: string;
     eth: string;
@@ -28,6 +37,11 @@ export type WalletData = {
     growth: {
         clicksLeft: number;
         lastReset: number; // timestamp
+    };
+    squad: {
+        referralCode: string;
+        squadLeader?: string; // email of the leader
+        members: string[]; // emails of members
     };
 };
 
@@ -47,7 +61,7 @@ export async function getAllWallets(): Promise<Record<string, WalletData>> {
 }
 
 // Simulates creating a wallet for a new user on a backend server.
-export async function createWallet(email: string): Promise<WalletData> {
+export async function createWallet(email: string, referralCode?: string): Promise<WalletData> {
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
 
     const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -65,11 +79,32 @@ export async function createWallet(email: string): Promise<WalletData> {
         growth: {
             clicksLeft: 4,
             lastReset: Date.now(),
-        }
+        },
+        squad: {
+            referralCode: generateReferralCode(),
+            members: [],
+        },
     };
 
     if (typeof window !== 'undefined') {
         const allWallets = await getAllWallets();
+        
+        // Handle referral logic
+        if (referralCode) {
+            const leaderEmail = Object.keys(allWallets).find(
+                (key) => allWallets[key].squad.referralCode.toUpperCase() === referralCode.toUpperCase()
+            );
+
+            if (leaderEmail) {
+                const leaderWallet = allWallets[leaderEmail];
+                leaderWallet.squad.members.push(email);
+                leaderWallet.balances.usdt += 5; // Leader gets a $5 bonus
+                allWallets[leaderEmail] = leaderWallet; // Update leader's wallet
+                newWalletData.squad.squadLeader = leaderEmail;
+                newWalletData.balances.usdt += 5; // New member also gets a $5 bonus
+            }
+        }
+        
         allWallets[email] = newWalletData;
         localStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(allWallets));
     }

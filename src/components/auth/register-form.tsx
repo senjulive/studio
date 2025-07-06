@@ -52,7 +52,8 @@ export function RegisterForm() {
     setIsLoading(true);
     
     // Create a new wallet for the new user, associated with their email.
-    await createWallet(values.email);
+    // Pass the referral code to establish squad relationships.
+    await createWallet(values.email, values.referralCode);
     
     // Simulate other registration steps
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -184,9 +185,9 @@ export function RegisterForm() {
               name="referralCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Referral Code (Optional)</FormLabel>
+                  <FormLabel>Squad Code (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter referral code" {...field} />
+                    <Input placeholder="Enter squad code" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

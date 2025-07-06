@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Metadata } from "next";
@@ -31,7 +30,7 @@ import {
   Settings,
   LogOut,
   User,
-  Gift,
+  Users,
   ArrowDownLeft,
   ArrowUpRight,
   UserCog,
@@ -168,9 +167,9 @@ export default function DashboardLayout({
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="/dashboard/referrals">
-                  <Gift />
-                  Referrals
+                <Link href="/dashboard/squad">
+                  <Users />
+                  Squad
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
