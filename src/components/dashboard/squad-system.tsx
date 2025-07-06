@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Copy, Users, UserCheck } from "lucide-react";
+import { Copy, Users, UserCheck, QrCode } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,15 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -54,6 +63,7 @@ export function SquadSystem() {
   }, [referralCode]);
 
   const handleCopy = async (text: string) => {
+    if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
       toast({ title: "Copied to clipboard!" });
@@ -72,68 +82,105 @@ export function SquadSystem() {
 
   if (!walletData) {
     return (
-        <div className="grid gap-6 lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-2">
-                <Skeleton className="h-56 w-full" />
-                <Skeleton className="h-72 w-full" />
-            </div>
-            <div className="space-y-6">
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-64 w-full" />
-            </div>
+      <div className="grid gap-6 lg:grid-cols-5">
+        <div className="space-y-6 lg:col-span-3">
+          <Skeleton className="h-64 w-full" />
         </div>
+        <div className="space-y-6 lg:col-span-2">
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="space-y-6">
       {squadLeader && (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <UserCheck className="h-5 w-5 text-primary" />
-                    You're in a Squad!
-                </CardTitle>
-                <CardDescription>
-                    Your squad leader is <span className="font-semibold text-foreground">{squadLeader}</span>.
-                </CardDescription>
-            </CardHeader>
-        </Card>
+        <Alert>
+            <UserCheck className="h-4 w-4" />
+            <AlertTitle>You're in a Squad!</AlertTitle>
+            <AlertDescription>
+                Your squad leader is <span className="font-semibold text-foreground">{squadLeader}</span>. Keep growing your assets together.
+            </AlertDescription>
+        </Alert>
       )}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        {/* Left Side: Invitation */}
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Build Your Squad</CardTitle>
+            <CardDescription>
+              Share your squad code or link. You'll both earn $5 in your virtual wallet for every new member who joins.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="squad-code">Your Unique Squad Code</Label>
+              <div className="flex items-center gap-2">
+                <Input id="squad-code" value={referralCode} readOnly className="font-mono text-base" />
+                <Button variant="outline" size="icon" onClick={() => handleCopy(referralCode)}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="squad-link">Your Invitation Link</Label>
+              <div className="flex items-center gap-2">
+                <Input id="squad-link" value={squadLink} readOnly />
+                <Button variant="outline" size="icon" onClick={() => handleCopy(squadLink)}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="outline">
+                        <QrCode className="mr-2 h-4 w-4" />
+                        Show QR Code
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-xs">
+                    <DialogHeader>
+                        <DialogTitle>Share Your QR Code</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex flex-col items-center p-4 text-center">
+                    {squadLink ? (
+                      <QRCodeSVG value={squadLink} size={200} fgColor="hsl(var(--foreground))" bgColor="transparent" />
+                    ) : (
+                      <div className="h-[200px] w-[200px] bg-muted rounded-md flex items-center justify-center">
+                        <p className="text-sm text-muted-foreground">Loading QR Code...</p>
+                      </div>
+                    )}
+                    <p className="mt-4 text-sm text-muted-foreground">
+                        Let friends scan this to join your squad instantly.
+                    </p>
+                    </div>
+                </DialogContent>
+            </Dialog>
+          </CardFooter>
+        </Card>
+
+        {/* Right Side: Stats & Members */}
         <div className="space-y-6 lg:col-span-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Build Your Squad</CardTitle>
-              <CardDescription>
-                Share your squad code or link. You'll both earn $5 in your virtual wallet for every friend who joins.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Squad Earnings</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="squad-code">Your Squad Code</Label>
-                <div className="flex items-center gap-2">
-                  <Input id="squad-code" value={referralCode} readOnly />
-                  <Button variant="outline" size="icon" onClick={() => handleCopy(referralCode)}>
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="squad-link">Your Squad Link</Label>
-                <div className="flex items-center gap-2">
-                  <Input id="squad-link" value={squadLink} readOnly />
-                  <Button variant="outline" size="icon" onClick={() => handleCopy(squadLink)}>
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+            <CardContent>
+              <div className="text-2xl font-bold">${totalEarnings.toFixed(2)}</div>
+              <p className="text-xs text-muted-foreground">
+                From {squadMembers.length} squad member{squadMembers.length !== 1 && 's'}
+              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Squad Members</CardTitle>
-              <CardDescription>
+              <CardTitle>Squad Roster</CardTitle>
+               <CardDescription>
                 A list of users who have joined your squad.
               </CardDescription>
             </CardHeader>
@@ -142,7 +189,7 @@ export function SquadSystem() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Member Email</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -150,53 +197,22 @@ export function SquadSystem() {
                     squadMembers.map((memberEmail) => (
                       <TableRow key={memberEmail}>
                         <TableCell className="font-medium">{memberEmail}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-right">
                           <Badge variant="default">Active</Badge>
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                        <TableCell colSpan={2} className="text-center h-24 text-muted-foreground">
-                            Your squad is empty. Start inviting!
-                        </TableCell>
+                      <TableCell colSpan={2} className="h-24 text-center text-muted-foreground">
+                        Your squad is empty. Start inviting!
+                      </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
-        </div>
-        <div className="space-y-6">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Squad Earnings</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">${totalEarnings.toFixed(2)}</div>
-                    <p className="text-xs text-muted-foreground">
-                        From {squadMembers.length} squad member{squadMembers.length !== 1 && 's'}
-                    </p>
-                </CardContent>
-            </Card>
-            <Card className="flex flex-col items-center text-center">
-              <CardHeader>
-                <CardTitle>Share via QR Code</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {squadLink ? (
-                  <QRCodeSVG value={squadLink} size={160} fgColor="hsl(var(--foreground))" bgColor="transparent" />
-                ) : (
-                  <div className="h-[160px] w-[160px] bg-muted rounded-md flex items-center justify-center">
-                    <p className="text-sm text-muted-foreground">Loading QR Code...</p>
-                  </div>
-                )}
-                <p className="mt-4 text-xs text-muted-foreground">
-                    Let friends scan this to join your squad.
-                </p>
-              </CardContent>
-            </Card>
         </div>
       </div>
     </div>
