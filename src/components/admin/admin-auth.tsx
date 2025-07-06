@@ -33,7 +33,7 @@ type AdminAuthFormValues = z.infer<typeof adminAuthSchema>;
 
 // IMPORTANT: For local development, you can create a `.env.local` file in the root of your project
 // and add the line: NEXT_PUBLIC_ADMIN_PASSWORD="your_secret_password"
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "supersecret";
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Xx#%admin%34%xX";
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
