@@ -4,6 +4,7 @@
 // This makes it easier to replace with a real backend later.
 
 const WALLET_STORAGE_KEY = 'astral-wallet';
+const WITHDRAWAL_ADDRESSES_STORAGE_KEY = 'astral-withdrawal-addresses';
 
 const generateAddress = (prefix: string, length: number, chars: string): string => {
     let result = '';
@@ -16,6 +17,11 @@ const generateAddress = (prefix: string, length: number, chars: string): string 
 export type WalletAddresses = {
     usdt: string;
     eth: string;
+};
+
+export type WithdrawalAddresses = {
+    usdt?: string;
+    eth?: string;
 };
 
 // Simulates creating a wallet on a backend server.
@@ -63,4 +69,35 @@ export async function getOrCreateWallet(): Promise<WalletAddresses> {
         wallet = await createWallet();
     }
     return wallet;
+}
+
+// Simulates fetching withdrawal addresses from a backend.
+export async function getWithdrawalAddresses(): Promise<WithdrawalAddresses | null> {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (typeof window === 'undefined') {
+        return null;
+    }
+    const storedAddresses = localStorage.getItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY);
+    if (storedAddresses) {
+        try {
+            return JSON.parse(storedAddresses);
+        } catch (e) {
+            console.error("Failed to parse withdrawal addresses from localStorage", e);
+            return null;
+        }
+    }
+    return {};
+}
+
+// Simulates saving a withdrawal address to a backend.
+export async function saveWithdrawalAddress(asset: string, address: string): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const currentAddresses = await getWithdrawalAddresses() || {};
+    const newAddresses: WithdrawalAddresses = {
+        ...currentAddresses,
+        [asset]: address,
+    };
+    if (typeof window !== 'undefined') {
+        localStorage.setItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY, JSON.stringify(newAddresses));
+    }
 }

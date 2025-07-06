@@ -29,6 +29,7 @@ import {
   User,
   Gift,
   ArrowDownLeft,
+  ArrowUpRight,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -137,6 +138,14 @@ export default function DashboardLayout({
                 <Link href="/dashboard/deposit">
                   <ArrowDownLeft />
                   Deposit
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/dashboard/withdraw">
+                  <ArrowUpRight />
+                  Withdraw
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

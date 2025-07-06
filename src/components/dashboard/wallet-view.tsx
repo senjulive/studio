@@ -20,15 +20,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
   Table,
   TableBody,
   TableCell,
@@ -50,10 +41,6 @@ const MOCK_TRANSACTIONS: any[] = [];
 export function WalletView() {
   const { toast } = useToast();
   const [balance] = React.useState(0);
-  const [showWithdrawDialog, setShowWithdrawDialog] = React.useState(false);
-  const [isWithdrawing, setIsWithdrawing] = React.useState(false);
-  const [withdrawAmount, setWithdrawAmount] = React.useState("");
-  const [withdrawAddress, setWithdrawAddress] = React.useState("");
   const [activeTab, setActiveTab] = React.useState("usdt");
   const [walletAddresses, setWalletAddresses] = React.useState({
     usdt: "",
@@ -69,24 +56,6 @@ export function WalletView() {
     }
     fetchWallet();
   }, []);
-
-  const handleWithdraw = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!withdrawAddress || !withdrawAmount) {
-      toast({ title: "Please fill all fields", variant: "destructive" });
-      return;
-    }
-    setIsWithdrawing(true);
-    await new Promise((res) => setTimeout(res, 1500));
-    setIsWithdrawing(false);
-    setShowWithdrawDialog(false);
-    setWithdrawAddress("");
-    setWithdrawAmount("");
-    toast({
-      title: "Withdrawal Initiated",
-      description: `Your withdrawal of ${withdrawAmount} ${activeTab.toUpperCase()} has been processed.`,
-    });
-  };
 
   const balances = {
     usdt: 0,
@@ -160,11 +129,10 @@ export function WalletView() {
                 <ArrowDownLeft className="mr-2 h-4 w-4" /> Deposit
               </Link>
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowWithdrawDialog(true)}
-            >
-              <ArrowUpRight className="mr-2 h-4 w-4" /> Withdraw
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/withdraw">
+                <ArrowUpRight className="mr-2 h-4 w-4" /> Withdraw
+              </Link>
             </Button>
           </div>
         </div>
@@ -254,53 +222,6 @@ export function WalletView() {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Withdraw Dialog */}
-      <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Withdraw {activeTab.toUpperCase()}</DialogTitle>
-            <DialogDescription>
-              Enter the address and amount to withdraw.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleWithdraw}>
-            <div className="grid gap-4 py-4">
-              <div className="grid items-center gap-1.5">
-                <Label htmlFor="withdraw-address">
-                  Recipient {activeTab.toUpperCase()} Address
-                </Label>
-                <Input
-                  id="withdraw-address"
-                  placeholder="Enter wallet address"
-                  value={withdrawAddress}
-                  onChange={(e) => setWithdrawAddress(e.target.value)}
-                />
-              </div>
-              <div className="grid items-center gap-1.5">
-                <Label htmlFor="withdraw-amount">Amount</Label>
-                <Input
-                  id="withdraw-amount"
-                  type="number"
-                  placeholder="0.00"
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                />
-              </div>
-              <Button
-                type="submit"
-                disabled={isWithdrawing}
-                className="w-full"
-              >
-                {isWithdrawing && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Confirm Withdrawal
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
