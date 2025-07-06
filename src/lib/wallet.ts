@@ -125,12 +125,20 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
     if (!wallet) {
         wallet = await createWallet(email);
     } else {
-        // This is a data migration patch for older wallets that don't have the squad property.
+        // This is a data migration patch for older wallets that don't have all properties.
         let needsUpdate = false;
         if (!wallet.squad) {
             wallet.squad = {
                 referralCode: generateReferralCode(),
                 members: [],
+            };
+            needsUpdate = true;
+        }
+
+        if (!wallet.growth) {
+            wallet.growth = {
+                clicksLeft: 4,
+                lastReset: Date.now(),
             };
             needsUpdate = true;
         }
@@ -172,8 +180,8 @@ export async function getWithdrawalAddresses(email: string): Promise<WithdrawalA
 export async function saveWithdrawalAddress(email: string, asset: string, address: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 500));
     const allAddresses = await getAllWithdrawalAddresses();
-    if (!allWallets[email]) {
-        allWallets[email] = {};
+    if (!allAddresses[email]) {
+        allAddresses[email] = {};
     }
     allAddresses[email][asset as keyof WithdrawalAddresses] = address;
     
