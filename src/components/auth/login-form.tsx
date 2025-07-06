@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
+import Image from "next/image";
 import { Loader2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -31,14 +32,6 @@ import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
 import { login } from "@/lib/auth";
 import { getOrCreateWallet } from "@/lib/wallet";
-
-const CryptoLogo = () => (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary mx-auto mb-2">
-        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-);
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
 
@@ -93,7 +86,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-sm border-border/50">
       <CardHeader className="text-center">
-        <CryptoLogo />
+        <Image src="/logo.png" alt="AstralCore Logo" width={48} height={48} className="mx-auto mb-2" />
         <CardTitle className="text-2xl font-headline">AstralCore</CardTitle>
         <CardDescription>
           Enter your credentials to access your account.
