@@ -23,7 +23,7 @@ export function AdminPanel() {
             <div>
                 <CardTitle>Administrator Panel</CardTitle>
                 <CardDescription>
-                  Manage user wallets and view support messages.
+                  Manage wallets and support. Leverage AI to analyze conversations.
                 </CardDescription>
             </div>
         </div>
