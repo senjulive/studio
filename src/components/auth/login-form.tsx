@@ -94,7 +94,7 @@ export function LoginForm() {
     <Card className="w-full max-w-sm border-border/50">
       <CardHeader className="text-center">
         <CryptoLogo />
-        <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
+        <CardTitle className="text-2xl font-headline">AstralCore</CardTitle>
         <CardDescription>
           Enter your credentials to access your account.
         </CardDescription>
