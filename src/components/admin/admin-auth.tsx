@@ -1,0 +1,109 @@
+"use client";
+
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Lock, Loader2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+
+const adminAuthSchema = z.object({
+  password: z.string().min(1, { message: "Password is required." }),
+});
+
+type AdminAuthFormValues = z.infer<typeof adminAuthSchema>;
+
+// IMPORTANT: In a real application, this should be a securely stored environment variable.
+const ADMIN_PASSWORD = "supersecret";
+
+export function AdminAuth({ children }: { children: React.ReactNode }) {
+  const { toast } = useToast();
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const form = useForm<AdminAuthFormValues>({
+    resolver: zodResolver(adminAuthSchema),
+    defaultValues: {
+      password: "",
+    },
+  });
+
+  const onSubmit = (values: AdminAuthFormValues) => {
+    setIsLoading(true);
+    // Simulate a check
+    setTimeout(() => {
+      if (values.password === ADMIN_PASSWORD) {
+        toast({ title: "Access Granted" });
+        setIsAuthenticated(true);
+      } else {
+        toast({
+          title: "Access Denied",
+          description: "Incorrect password.",
+          variant: "destructive",
+        });
+        form.reset();
+      }
+      setIsLoading(false);
+    }, 500);
+  };
+
+  if (isAuthenticated) {
+    return <>{children}</>;
+  }
+
+  return (
+    <Card className="w-full max-w-sm">
+      <CardHeader className="text-center">
+        <CardTitle>Admin Access Required</CardTitle>
+        <CardDescription>
+          Please enter the password to access the admin panel.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Lock className="mr-2 h-4 w-4" />
+              )}
+              Unlock
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
