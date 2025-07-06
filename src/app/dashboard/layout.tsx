@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { logout, getCurrentUserEmail } from "@/lib/auth";
 import * as React from "react";
+import { cn } from "@/lib/utils";
 
 const CryptoLogo = () => (
   <svg
@@ -100,6 +101,13 @@ export default function DashboardLayout({
     { href: "/dashboard/squad", label: "Squad", icon: Users },
     { href: "/dashboard/profile", label: "Profile", icon: User },
     { href: "/dashboard/support", label: "Support", icon: MessageSquare },
+  ];
+
+  const bottomNavItems = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/support", label: "Support", icon: MessageSquare },
+    { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
+    { href: "/dashboard/profile", label: "Profile", icon: User },
   ];
 
   return (
@@ -183,9 +191,26 @@ export default function DashboardLayout({
              <h1 className="text-lg font-semibold md:text-2xl capitalize">{pathname.split('/').pop()?.replace('-', ' ')}</h1>
           </div>
         </header>
-        <main className="flex-1 bg-secondary p-4 md:p-6">
+        <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
         </main>
+        <nav className="absolute bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10">
+          {bottomNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors",
+                pathname === item.href
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </nav>
       </SidebarInset>
     </SidebarProvider>
   );
