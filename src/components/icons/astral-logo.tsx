@@ -5,7 +5,7 @@ export const AstralLogo = ({ className, ...props }: React.SVGProps<SVGSVGElement
     <svg
         viewBox="0 0 100 100"
         xmlns="http://www.w3.org/2000/svg"
-        className={cn("h-12 w-12", className)}
+        className={cn("h-14 w-14", className)}
         {...props}
     >
         <defs>
@@ -17,13 +17,17 @@ export const AstralLogo = ({ className, ...props }: React.SVGProps<SVGSVGElement
                 <stop offset="0%" stopColor="hsl(var(--chart-5))" />
                 <stop offset="100%" stopColor="hsl(var(--chart-4))" />
             </linearGradient>
+            <filter id="drop-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="1.5" dy="1.5" stdDeviation="1" floodColor="hsl(var(--primary) / 0.4)" />
+            </filter>
         </defs>
 
         <path
             d="M50 5 L93.3 27.5 L93.3 72.5 L50 95 L6.7 72.5 L6.7 27.5 Z"
-            fill="hsl(var(--primary) / 0.05)"
+            fill="hsl(var(--primary) / 0.10)"
             stroke="hsl(var(--primary))"
-            strokeWidth="3.5"
+            strokeWidth="4"
+            filter="url(#drop-shadow)"
         />
 
         <g stroke="hsl(var(--primary))" strokeWidth="1.5" strokeOpacity="0.5">
