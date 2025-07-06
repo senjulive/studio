@@ -183,14 +183,8 @@ export default function DashboardLayout({
              <h1 className="text-lg font-semibold md:text-2xl capitalize">{pathname.split('/').pop()?.replace('-', ' ')}</h1>
           </div>
         </header>
-        <main
-          className="relative flex-1 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://czbzm.wapaxo.com/filedownload/82572/pngwing-com-2-(czbzm.wapaxo.com).png')" }}
-        >
-          <div className="absolute inset-0 bg-black/60" />
-          <div className="relative z-10 h-full p-4 md:p-6">
+        <main className="flex-1 bg-secondary p-4 md:p-6">
             {children}
-          </div>
         </main>
       </SidebarInset>
     </SidebarProvider>
