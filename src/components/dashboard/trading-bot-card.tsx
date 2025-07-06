@@ -143,7 +143,7 @@ export function TradingBotCard({
     >
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/trading-card-bg.png')" }}
+        style={{ backgroundImage: "url('https://czbzm.wapaxo.com/filedownload/82570/pngwing-com-4-(czbzm.wapaxo.com).png')" }}
         aria-hidden="true"
       />
       <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
