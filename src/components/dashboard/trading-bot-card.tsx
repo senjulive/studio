@@ -135,9 +135,9 @@ export function TradingBotCard({
     <Card
       onClick={handleStart}
       className={cn(
-        "transition-colors",
-        canStart && "cursor-pointer hover:border-primary",
-        isAnimating && "border-primary"
+        "transition-all duration-300",
+        canStart && "cursor-pointer hover:border-primary hover:shadow-xl hover:shadow-primary/20",
+        isAnimating && "border-primary ring-2 ring-primary/50 shadow-xl shadow-primary/20"
       )}
     >
       <CardHeader className="flex-row items-start justify-between pb-4">
@@ -151,28 +151,31 @@ export function TradingBotCard({
           </CardDescription>
         </div>
         <div className={cn(
-            "p-2 rounded-lg bg-muted",
-            isAnimating && "bg-primary/20 animate-pulse"
+            "p-2 rounded-lg bg-muted transition-all",
+            isAnimating && "bg-primary/20 animate-bot-pulse"
         )}>
             <Bot className={cn(
-                "h-6 w-6 text-muted-foreground",
+                "h-6 w-6 text-muted-foreground transition-colors",
                 isAnimating && "text-primary"
             )} />
         </div>
       </CardHeader>
       <CardContent>
         {isAnimating ? (
-          <div className="space-y-3">
+          <div className="space-y-3 animate-in fade-in-50 duration-500">
             <Progress value={progressPercent} className="h-2" />
             <div ref={logRef} className="h-[7.5rem] overflow-y-auto rounded-md bg-muted/50 p-3 text-xs text-muted-foreground font-mono space-y-1">
               {logs.length > 0 ? logs.map((log, index) => (
-                <p key={index} className="animate-in fade-in-0 slide-in-from-bottom-2">{log}</p>
+                <p key={index} className="animate-in fade-in-0 slide-in-from-bottom-2 duration-500">{log}</p>
               )) : <p>Starting engine...</p>}
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-[9.25rem] rounded-lg bg-muted/50 p-4">
-            <Zap className="h-8 w-8 mb-2" />
+          <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-[9.25rem] rounded-lg bg-muted/50 p-4 animate-in fade-in-0 duration-300">
+            <Zap className={cn(
+                "h-8 w-8 mb-2",
+                canStart && "animate-pulse text-primary/80"
+            )} />
             <p className="font-semibold text-foreground">
               {canStart ? 'Click here to start' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No runs left'}
             </p>
