@@ -32,8 +32,8 @@ import {
   Users,
   ArrowDownLeft,
   ArrowUpRight,
-  UserCog,
   Shield,
+  MessageSquare
 } from "lucide-react";
 import { logout, getCurrentUserEmail } from "@/lib/auth";
 import * as React from "react";
@@ -96,6 +96,8 @@ export default function DashboardLayout({
     { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
     { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
     { href: "/dashboard/squad", label: "Squad", icon: Users },
+    { href: "/dashboard/profile", label: "Profile", icon: User },
+    { href: "/dashboard/support", label: "Support", icon: MessageSquare },
   ];
 
   return (
@@ -126,7 +128,7 @@ export default function DashboardLayout({
             <DropdownMenuTrigger asChild>
               <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent/50">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={`https://placehold.co/100x100/2563eb/white.png?text=${userInitial}`} alt="@user" />
+                  <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="abstract user" alt="@user" />
                   <AvatarFallback>{userInitial}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col overflow-hidden text-left">
@@ -147,9 +149,11 @@ export default function DashboardLayout({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+              <DropdownMenuItem asChild>
+                 <Link href="/dashboard/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
