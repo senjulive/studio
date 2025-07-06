@@ -5,9 +5,7 @@ import Link from "next/link";
 import {
   ArrowDownLeft,
   ArrowUpRight,
-  Loader2,
   Users,
-  Zap,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -33,86 +31,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
 import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TradingBotCard } from "./trading-bot-card";
 
 const MOCK_TRANSACTIONS: any[] = [];
 
-function GrowthEngine({
-  walletData,
-  onUpdate,
-}: {
-  walletData: WalletData;
-  onUpdate: (data: WalletData) => void;
-}) {
-  const { toast } = useToast();
-  const [isBoosting, setIsBoosting] = React.useState(false);
-  const totalBalance = walletData.balances.usdt + walletData.balances.eth * 2500; // Assuming ETH price for calculation
-
-  const canBoost = totalBalance >= 100 && walletData.growth.clicksLeft > 0;
-
-  const handleBoost = async () => {
-    if (!canBoost) return;
-
-    setIsBoosting(true);
-
-    const rate = totalBalance >= 500 ? 0.03 : 0.025;
-    const earnings = totalBalance * rate;
-    
-    const newWalletData: WalletData = {
-      ...walletData,
-      balances: {
-        ...walletData.balances,
-        // Add earnings to USDT balance for simplicity
-        usdt: walletData.balances.usdt + earnings,
-      },
-      growth: {
-        ...walletData.growth,
-        clicksLeft: walletData.growth.clicksLeft - 1,
-      },
-    };
-
-    await updateWallet(newWalletData);
-    onUpdate(newWalletData);
-
-    toast({
-      title: "Balance Boosted!",
-      description: `You've earned $${earnings.toFixed(2)}.`,
-    });
-    setIsBoosting(false);
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-            <CardTitle>Growth Engine</CardTitle>
-            <Zap className="h-5 w-5 text-yellow-500" />
-        </div>
-        <CardDescription>
-          Boost your balance up to 4 times a day.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="text-center">
-            <p className="text-sm text-muted-foreground">Clicks remaining today</p>
-            <p className="text-4xl font-bold">{walletData.growth.clicksLeft}</p>
-        </div>
-        <Button onClick={handleBoost} disabled={!canBoost || isBoosting} className="w-full">
-          {isBoosting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {totalBalance < 100 ? "Need $100 to start" : "Boost Balance"}
-        </Button>
-         <p className="text-xs text-muted-foreground text-center">
-            Earn {totalBalance >= 500 ? "3%" : "2.5%"} on your available assets per boost. Click count resets daily.
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
 export function WalletView() {
-  const { toast } = useToast();
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [activeTab, setActiveTab] = React.useState("usdt");
   
@@ -145,7 +70,7 @@ export function WalletView() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Skeleton className="h-[120px] rounded-lg" />
                 <Skeleton className="h-[120px] rounded-lg" />
-                <Skeleton className="h-[120px] rounded-lg" />
+                <Skeleton className="h-[192px] w-[192px] rounded-lg" />
             </div>
             <Skeleton className="h-[400px] rounded-lg" />
         </div>
@@ -201,8 +126,8 @@ export function WalletView() {
             </p>
           </CardContent>
         </Card>
-        <div className="md:col-span-2 lg:col-span-1">
-          <GrowthEngine walletData={walletData} onUpdate={handleWalletUpdate} />
+        <div className="flex items-center justify-center md:col-span-2 lg:col-span-1">
+          <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
         </div>
       </div>
 
