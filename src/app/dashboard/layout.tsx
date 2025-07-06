@@ -94,7 +94,7 @@ export default function DashboardLayout({
   const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
 
   const menuItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/dashboard/market", label: "Market", icon: LineChart },
     { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
     { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
@@ -104,7 +104,7 @@ export default function DashboardLayout({
   ];
 
   const bottomNavItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/dashboard/support", label: "Support", icon: MessageSquare },
     { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
     { href: "/dashboard/profile", label: "Profile", icon: User },
@@ -188,7 +188,7 @@ export default function DashboardLayout({
         <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
           <SidebarTrigger />
           <div className="w-full flex-1">
-             <h1 className="text-lg font-semibold md:text-2xl capitalize">{pathname.split('/').pop()?.replace('-', ' ')}</h1>
+             <h1 className="text-lg font-semibold md:text-2xl capitalize">{pathname === '/dashboard' ? 'Home' : pathname.split('/').pop()?.replace('-', ' ')}</h1>
           </div>
         </header>
         <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
