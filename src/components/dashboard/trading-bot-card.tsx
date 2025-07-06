@@ -23,9 +23,21 @@ export function TradingBotCard({
   const logRef = React.useRef<HTMLDivElement>(null);
 
   const { toast } = useToast();
+  
+  const getTierSettings = React.useCallback((balance: number) => {
+    if (balance >= 15000) return { dailyProfit: 0.085, clicks: 10 };
+    if (balance >= 10000) return { dailyProfit: 0.065, clicks: 8 };
+    if (balance >= 5000) return { dailyProfit: 0.055, clicks: 7 };
+    if (balance >= 1000) return { dailyProfit: 0.04, clicks: 6 };
+    if (balance >= 500) return { dailyProfit: 0.03, clicks: 5 };
+    return { dailyProfit: 0.02, clicks: 4 };
+  }, []);
 
   const totalBalance =
     (walletData?.balances?.usdt ?? 0);
+  const tierSettings = getTierSettings(totalBalance);
+  const profitPerTrade = tierSettings.dailyProfit / tierSettings.clicks;
+
   const canStart =
     totalBalance >= 100 && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
 
@@ -100,8 +112,7 @@ export function TradingBotCard({
       if (percent < 100) {
         animationRequestId = requestAnimationFrame(updateAnimation);
       } else {
-        const rate = 0.02; // 2% profit per trade
-        const earnings = totalBalance * rate;
+        const earnings = totalBalance * profitPerTrade;
 
         const newWalletData: WalletData = {
           ...walletData,
@@ -183,7 +194,7 @@ export function TradingBotCard({
               {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
             </p>
             <p className="text-xs text-muted-foreground">
-                {canStart ? 'Earn 2% per grid.' : 'Come back tomorrow for more grids.'}
+                {canStart ? `Earn ${(tierSettings.dailyProfit * 100).toFixed(1)}% daily.` : 'Come back tomorrow for more grids.'}
             </p>
           </div>
         )}

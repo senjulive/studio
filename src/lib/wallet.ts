@@ -22,6 +22,15 @@ const generateReferralCode = (): string => {
     return code;
 }
 
+const getTierSettings = (balance: number): { clicks: number } => {
+    if (balance >= 15000) return { clicks: 10 };
+    if (balance >= 10000) return { clicks: 8 };
+    if (balance >= 5000) return { clicks: 7 };
+    if (balance >= 1000) return { clicks: 6 };
+    if (balance >= 500) return { clicks: 5 };
+    return { clicks: 4 };
+};
+
 export type WalletAddresses = {
     usdt: string;
 };
@@ -185,7 +194,8 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
     const now = Date.now();
     const oneDay = 24 * 60 * 60 * 1000;
     if (now - patchedWallet.growth.lastReset > oneDay) {
-        patchedWallet.growth.clicksLeft = 4;
+        const tierSettings = getTierSettings(patchedWallet.balances.usdt);
+        patchedWallet.growth.clicksLeft = tierSettings.clicks;
         patchedWallet.growth.lastReset = now;
         patchedWallet.growth.dailyEarnings = 0;
         await updateWallet(email, patchedWallet);
