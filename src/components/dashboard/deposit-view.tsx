@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Copy, Info } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Loader2, ArrowDownLeft, Info } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,141 +15,144 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 
+const depositRequestSchema = z.object({
+  asset: z.enum(["usdt", "eth"], {
+    required_error: "Please select an asset.",
+  }),
+  amount: z.coerce
+    .number()
+    .positive({ message: "Please enter a positive amount." }),
+});
+
+type DepositRequestFormValues = z.infer<typeof depositRequestSchema>;
+
 export function DepositView() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = React.useState("usdt");
-  const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   React.useEffect(() => {
-    const email = getCurrentUserEmail();
-    setCurrentUserEmail(email);
-    if (email) {
-      async function fetchWallet() {
-        const data = await getOrCreateWallet(email);
-        setWalletData(data);
-      }
-      fetchWallet();
-    }
+    setCurrentUserEmail(getCurrentUserEmail());
   }, []);
 
-  const handleCopy = async (text: string) => {
-    if (!text) return;
-    try {
-      await navigator.clipboard.writeText(text);
-      toast({ title: "Address copied to clipboard" });
-      if (currentUserEmail) {
-        await sendSystemNotification(
-          currentUserEmail,
-          `User copied their ${activeTab.toUpperCase()} deposit address.`
-        );
-      }
-    } catch (err) {
-      toast({
-        title: "Failed to copy",
-        description: "Could not copy address to clipboard.",
-        variant: "destructive",
-      });
-    }
-  };
+  const form = useForm<DepositRequestFormValues>({
+    resolver: zodResolver(depositRequestSchema),
+    defaultValues: {
+      amount: 0,
+    },
+  });
 
-  const currentWalletAddress = walletData
-    ? activeTab === "usdt"
-      ? walletData.addresses.usdt
-      : walletData.addresses.eth
-    : "";
+  const onSubmit = async (values: DepositRequestFormValues) => {
+    if (!currentUserEmail) {
+      toast({ title: "Error", description: "Could not identify user.", variant: "destructive" });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    await sendSystemNotification(
+      currentUserEmail,
+      `User initiated a deposit request of ${values.amount} ${values.asset.toUpperCase()}.`
+    );
+
+    // Simulate network delay for user feedback
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    toast({
+      title: "Deposit Request Submitted",
+      description: `Your request to deposit ${values.amount} ${values.asset.toUpperCase()} is pending review.`,
+    });
+    
+    form.reset({ amount: 0, asset: values.asset });
+    setIsSubmitting(false);
+  };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Deposit Crypto</CardTitle>
+        <CardTitle>Request a Deposit</CardTitle>
         <CardDescription>
-          Select an asset and send it to your unique wallet address below.
+          Submit a deposit request. An administrator will review and process it shortly.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs
-          defaultValue="usdt"
-          className="mb-4"
-          onValueChange={setActiveTab}
-          value={activeTab}
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="usdt">USDT (TRC20)</TabsTrigger>
-            <TabsTrigger value="eth">ETH (ERC20)</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        <div className="flex flex-col items-center gap-6 py-4 text-center">
-            <div className="p-4 bg-white rounded-lg">
-                {currentWalletAddress ? (
-                    <QRCodeSVG
-                    value={currentWalletAddress}
-                    size={180}
-                    fgColor="hsl(var(--card-foreground))"
-                    bgColor="hsl(var(--card))"
-                    />
-                ) : (
-                    <Skeleton className="h-[180px] w-[180px] rounded-md" />
-                )}
-            </div>
-          <div className="grid w-full max-w-md items-center gap-1.5">
-            <Label htmlFor="deposit-address" className="text-muted-foreground">Your {activeTab.toUpperCase()} Address</Label>
-            <div className="flex items-center gap-2">
-              {currentWalletAddress ? (
-                <Input
-                  id="deposit-address"
-                  value={currentWalletAddress}
-                  readOnly
-                  className="text-center font-mono text-sm"
-                />
-              ) : (
-                <Skeleton className="h-10 w-full" />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="asset"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Asset</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an asset to deposit" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="usdt">USDT</SelectItem>
+                      <SelectItem value="eth">ETH</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
               )}
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => handleCopy(currentWalletAddress)}
-                disabled={!currentWalletAddress}
-                aria-label="Copy address"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <Alert className="mt-4 text-left bg-muted/30">
-            <Info className="h-4 w-4" />
-            <AlertTitle>Please Note</AlertTitle>
-            <AlertDescription>
-              <ul className="list-inside list-disc space-y-1">
-                <li>
-                  Only send{" "}
-                  <strong>
-                    {activeTab.toUpperCase()} (
-                    {activeTab === "usdt" ? "TRC20" : "ERC20"})
-                  </strong>{" "}
-                  to this address. Sending any other asset may result in permanent loss.
-                </li>
-                <li>
-                  Your deposit will be reflected after network confirmation.
-                </li>
-              </ul>
-            </AlertDescription>
-          </Alert>
-        </div>
+            />
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="0.00" {...field} disabled={isSubmitting} step="any" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowDownLeft className="mr-2 h-4 w-4" />
+              )}
+              Submit Deposit Request
+            </Button>
+          </form>
+        </Form>
+        <Alert className="mt-6 text-left bg-muted/30">
+          <Info className="h-4 w-4" />
+          <AlertTitle>Please Note</AlertTitle>
+          <AlertDescription>
+            <ul className="list-inside list-disc space-y-1">
+                <li>This is a request form. Funds will not be automatically added to your account.</li>
+                <li>An administrator will review your request and credit your account balance manually.</li>
+                <li>Processing may take some time. Please check your balance later.</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
       </CardContent>
     </Card>
   );
