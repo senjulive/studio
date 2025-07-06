@@ -20,9 +20,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable}`}>
-      <body className="font-body antialiased">
-        {children}
-        <Toaster />
+      <body className="font-body antialiased bg-secondary flex items-center justify-center p-0 sm:p-4">
+        <div className="relative w-full max-w-sm bg-background shadow-2xl h-dvh sm:h-[calc(100dvh-2rem)] sm:max-h-[900px] sm:rounded-2xl overflow-hidden">
+            <div className="h-full w-full overflow-y-auto">
+              {children}
+            </div>
+            <Toaster />
+        </div>
       </body>
     </html>
   );

@@ -178,7 +178,7 @@ export default function DashboardLayout({
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
-          <SidebarTrigger className="md:hidden" />
+          <SidebarTrigger />
           <div className="w-full flex-1">
              <h1 className="text-lg font-semibold md:text-2xl capitalize">{pathname.split('/').pop()?.replace('-', ' ')}</h1>
           </div>
@@ -188,7 +188,7 @@ export default function DashboardLayout({
           style={{ backgroundImage: "url('https://czbzm.wapaxo.com/filedownload/82572/pngwing-com-2-(czbzm.wapaxo.com).png')" }}
         >
           <div className="absolute inset-0 bg-black/60" />
-          <div className="relative z-10 h-full overflow-y-auto p-4 md:p-6">
+          <div className="relative z-10 h-full p-4 md:p-6">
             {children}
           </div>
         </main>
