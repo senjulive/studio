@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
-  Wallet,
+  WalletCards,
   Settings,
   LogOut,
   User,
@@ -159,7 +159,7 @@ export default function DashboardLayout({
           <SidebarTrigger />
           <div className="w-full flex-1">
              <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                {pathname === '/dashboard' && <AstralLogo className="h-6 w-6" />}
+                <AstralLogo className="h-6 w-6" />
                 <span>{pathname === '/dashboard' ? 'Home' : pathname.split('/').pop()?.replace('-', ' ')}</span>
             </h1>
           </div>
