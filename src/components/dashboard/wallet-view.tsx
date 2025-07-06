@@ -45,48 +45,7 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 
-const MOCK_TRANSACTIONS = [
-  {
-    id: "txn_1",
-    type: "Deposit",
-    asset: "USDT",
-    amount: 1500.75,
-    date: "2024-05-22T14:30:00Z",
-    status: "Completed",
-  },
-  {
-    id: "txn_2",
-    type: "Withdrawal",
-    asset: "ETH",
-    amount: 2.5,
-    date: "2024-05-21T09:00:00Z",
-    status: "Completed",
-  },
-  {
-    id: "txn_3",
-    type: "Deposit",
-    asset: "ETH",
-    amount: 5.0,
-    date: "2024-05-20T18:45:00Z",
-    status: "Completed",
-  },
-  {
-    id: "txn_4",
-    type: "Withdrawal",
-    asset: "USDT",
-    amount: 500.0,
-    date: "2024-05-19T11:20:00Z",
-    status: "Pending",
-  },
-  {
-    id: "txn_5",
-    type: "Deposit",
-    asset: "USDT",
-    amount: 2500.0,
-    date: "2024-05-18T16:00:00Z",
-    status: "Failed",
-  },
-];
+const MOCK_TRANSACTIONS: any[] = [];
 
 const WALLET_ADDRESSES = {
   USDT: "TQ1a1zP1Z5d6qF2w7gX8sR9j0kL3m4N5p6",
@@ -95,7 +54,7 @@ const WALLET_ADDRESSES = {
 
 export function WalletView() {
   const { toast } = useToast();
-  const [balance] = React.useState(12540.52);
+  const [balance] = React.useState(0);
   const [showDepositDialog, setShowDepositDialog] = React.useState(false);
   const [showWithdrawDialog, setShowWithdrawDialog] = React.useState(false);
   const [isWithdrawing, setIsWithdrawing] = React.useState(false);
@@ -135,8 +94,8 @@ export function WalletView() {
   };
 
   const balances = {
-    usdt: 3490.75,
-    eth: 7.5,
+    usdt: 0,
+    eth: 0,
   };
 
   const currentWalletAddress =
@@ -180,7 +139,7 @@ export function WalletView() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$25.00</div>
+            <div className="text-2xl font-bold">$0.00</div>
             <p className="text-xs text-muted-foreground">
               <Link
                 href="/dashboard/referrals"

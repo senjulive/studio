@@ -25,13 +25,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 
-const MOCK_REFERRALS = [
-  { id: 1, email: "friend1@example.com", date: "2024-05-20", status: "Completed", bonus: 5.00 },
-  { id: 2, email: "friend2@example.com", date: "2024-05-18", status: "Completed", bonus: 5.00 },
-  { id: 3, email: "user@test.com", date: "2024-05-15", status: "Pending", bonus: 5.00 },
-  { id: 4, email: "guest@example.com", date: "2024-05-12", status: "Completed", bonus: 5.00 },
-  { id: 5, email: "another@test.com", date: "2024-05-10", status: "Completed", bonus: 5.00 },
-];
+const MOCK_REFERRALS: any[] = [];
 
 export function ReferralSystem() {
   const { toast } = useToast();
