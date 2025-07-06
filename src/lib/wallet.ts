@@ -41,6 +41,12 @@ export type WalletData = {
         squadLeader?: string;
         members: string[];
     };
+    profile: {
+        fullName: string;
+        idCardNo: string;
+        contactNumber: string;
+        country: string;
+    };
 };
 
 export type WithdrawalAddresses = {
@@ -77,11 +83,22 @@ const createNewWalletObject = (): WalletData => {
             referralCode: generateReferralCode(),
             members: [],
         },
+        profile: {
+            fullName: '',
+            idCardNo: '',
+            contactNumber: '',
+            country: '',
+        },
     };
 }
 
 // Simulates creating a wallet for a new user on a backend server.
-export async function createWallet(email: string, referralCode?: string): Promise<WalletData> {
+export async function createWallet(
+    email: string,
+    contactNumber: string,
+    country: string,
+    referralCode?: string
+): Promise<WalletData> {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     if (typeof window === 'undefined') {
@@ -95,6 +112,9 @@ export async function createWallet(email: string, referralCode?: string): Promis
     }
 
     const newWalletData = createNewWalletObject();
+    
+    newWalletData.profile.contactNumber = contactNumber;
+    newWalletData.profile.country = country;
 
     // Handle referral logic
     if (referralCode) {
@@ -132,7 +152,8 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
 
     if (!existingWallet) {
         // If no wallet exists, create a fresh one and return it.
-        return createWallet(email);
+        // We can't know contact/country here, so it'll be blank.
+        return createWallet(email, '', '');
     }
 
     // Create a default wallet structure to safely merge with existing data.
@@ -147,6 +168,7 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
       balances: { ...defaultWallet.balances, ...(existingWallet.balances || {}) },
       growth: { ...defaultWallet.growth, ...(existingWallet.growth || {}) },
       squad: { ...defaultWallet.squad, ...(existingWallet.squad || {}) },
+      profile: { ...defaultWallet.profile, ...(existingWallet.profile || {}) },
     };
     
     // Ensure `members` is an array if it's missing from older data

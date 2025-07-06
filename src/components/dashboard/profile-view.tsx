@@ -3,18 +3,18 @@
 import * as React from "react";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { getAnnouncements, type Announcement } from "@/lib/announcements";
+import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Inbox, User, Mail } from "lucide-react";
+import { Inbox, User, Mail, BadgeInfo, Phone, MapPin } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 
 function AnnouncementCard({ announcement }: { announcement: Announcement }) {
@@ -37,14 +37,27 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
 }
 
 export function ProfileView() {
-  const [userEmail, setUserEmail] = React.useState<string | null>(null);
+  const [walletData, setWalletData] = React.useState<WalletData | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
   const announcements = getAnnouncements();
+  const userEmail = getCurrentUserEmail();
 
   React.useEffect(() => {
-    setUserEmail(getCurrentUserEmail());
-  }, []);
+    if (userEmail) {
+        async function fetchWallet() {
+            setIsLoading(true);
+            const data = await getOrCreateWallet(userEmail);
+            setWalletData(data);
+            setIsLoading(false);
+        }
+        fetchWallet();
+    } else {
+        setIsLoading(false);
+    }
+  }, [userEmail]);
 
   const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : "";
+  const profile = walletData?.profile;
 
   return (
     <Tabs defaultValue="profile" className="w-full">
@@ -70,15 +83,59 @@ export function ProfileView() {
             </CardTitle>
             <CardDescription>Your account details.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <div className="flex items-center space-x-4 rounded-md border p-4">
               <Mail className="h-5 w-5 mt-px text-muted-foreground" />
               <div className="flex-1 space-y-1">
                 <p className="text-sm font-medium leading-none">Email</p>
-                {userEmail ? (
-                    <p className="text-sm text-muted-foreground">{userEmail}</p>
-                ) : (
+                {isLoading ? (
                     <Skeleton className="h-5 w-48" />
+                ) : (
+                    <p className="text-sm text-muted-foreground">{userEmail}</p>
+                )}
+              </div>
+            </div>
+             <div className="flex items-center space-x-4 rounded-md border p-4">
+              <User className="h-5 w-5 mt-px text-muted-foreground" />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">Full Name</p>
+                {isLoading ? (
+                    <Skeleton className="h-5 w-32" />
+                ) : (
+                    <p className="text-sm text-muted-foreground">{profile?.fullName || 'Not set'}</p>
+                )}
+              </div>
+            </div>
+             <div className="flex items-center space-x-4 rounded-md border p-4">
+              <BadgeInfo className="h-5 w-5 mt-px text-muted-foreground" />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">ID Card No.</p>
+                {isLoading ? (
+                    <Skeleton className="h-5 w-32" />
+                ) : (
+                    <p className="text-sm text-muted-foreground">{profile?.idCardNo || 'Not set'}</p>
+                )}
+              </div>
+            </div>
+             <div className="flex items-center space-x-4 rounded-md border p-4">
+              <Phone className="h-5 w-5 mt-px text-muted-foreground" />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">Contact Number</p>
+                 {isLoading ? (
+                    <Skeleton className="h-5 w-32" />
+                ) : (
+                    <p className="text-sm text-muted-foreground">{profile?.contactNumber || 'Not set'}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center space-x-4 rounded-md border p-4">
+              <MapPin className="h-5 w-5 mt-px text-muted-foreground" />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">Country</p>
+                 {isLoading ? (
+                    <Skeleton className="h-5 w-32" />
+                ) : (
+                    <p className="text-sm text-muted-foreground">{profile?.country || 'Not set'}</p>
                 )}
               </div>
             </div>

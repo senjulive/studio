@@ -25,10 +25,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { createWallet } from "@/lib/wallet";
+import { countries } from "@/lib/countries";
 
 const CryptoLogo = () => (
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary mx-auto mb-2">
@@ -51,15 +59,32 @@ export function RegisterForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      country: "",
+      contactNumber: "",
       referralCode: "",
     },
   });
 
+  const selectedCountryName = form.watch("country");
+  const selectedCountry = React.useMemo(
+    () => countries.find((c) => c.name === selectedCountryName),
+    [selectedCountryName]
+  );
+
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
-    
+
+    const fullContactNumber = `${selectedCountry?.dial_code || ""}${
+      values.contactNumber
+    }`;
+
     try {
-      await createWallet(values.email, values.referralCode);
+      await createWallet(
+        values.email,
+        fullContactNumber,
+        values.country,
+        values.referralCode
+      );
       toast({
         title: "Account Created",
         description: "Your wallet is ready. Please sign in to continue.",
@@ -129,6 +154,61 @@ export function RegisterForm() {
             />
             <FormField
               control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your country" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {countries.map((country) => (
+                        <SelectItem key={country.code} value={country.name}>
+                          <div className="flex items-center gap-2">
+                            <span>{country.flag}</span>
+                            <span>
+                              {country.name} ({country.dial_code})
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="contactNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contact Number</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-10 w-20 items-center justify-center rounded-md border bg-muted text-sm shrink-0">
+                        {selectedCountry?.dial_code || "..."}
+                      </div>
+                      <Input
+                        placeholder="Your phone number"
+                        {...field}
+                        className="flex-1"
+                        disabled={!selectedCountry}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="referralCode"
               render={({ field }) => (
                 <FormItem>
@@ -140,11 +220,7 @@ export function RegisterForm() {
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create Account
             </Button>
