@@ -30,6 +30,7 @@ import {
   Gift,
   ArrowDownLeft,
   ArrowUpRight,
+  UserCog,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -202,6 +203,12 @@ export default function DashboardLayout({
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+               <DropdownMenuItem asChild>
+                <Link href="/admin">
+                    <UserCog className="mr-2 h-4 w-4" />
+                    <span>Admin Panel</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/">
                     <LogOut className="mr-2 h-4 w-4" />
