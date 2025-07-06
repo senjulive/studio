@@ -42,6 +42,7 @@ export const countries: Country[] = [
   { name: 'Japan', dial_code: '+81', code: 'JP', flag: '🇯🇵' },
   { name: 'Kuwait', dial_code: '+965', code: 'KW', flag: '🇰🇼' },
   { name: 'Malaysia', dial_code: '+60', code: 'MY', flag: '🇲🇾' },
+  { name: 'Maldives', dial_code: '+960', code: 'MV', flag: '🇲🇻' },
   { name: 'Mexico', dial_code: '+52', code: 'MX', flag: '🇲🇽' },
   { name: 'Netherlands', dial_code: '+31', code: 'NL', flag: '🇳🇱' },
   { name: 'New Zealand', dial_code: '+64', code: 'NZ', flag: '🇳🇿' },
@@ -63,6 +64,6 @@ export const countries: Country[] = [
   { name: 'Turkey', dial_code: '+90', code: 'TR', flag: '🇹🇷' },
   { name: 'United Arab Emirates', dial_code: '+971', code: 'AE', flag: '🇦🇪' },
   { name: 'United Kingdom', dial_code: '+44', code: 'GB', flag: '🇬🇧' },
-  { name:- 'United States', dial_code: '+1', code: 'US', flag: '🇺🇸' },
+  { name: 'United States', dial_code: '+1', code: 'US', flag: '🇺🇸' },
   { name: 'Vietnam', dial_code: '+84', code: 'VN', flag: '🇻🇳' },
 ];

@@ -31,7 +31,7 @@ import { registerSchema } from "@/lib/validators";
 import { createWallet } from "@/lib/wallet";
 import { AstralLogo } from "../icons/astral-logo";
 
-const US_COUNTRY = { name: 'United States', dial_code: '+1', code: 'US', flag: '🇺🇸' };
+const MALDIVES_COUNTRY = { name: 'Maldives', dial_code: '+960', code: 'MV', flag: '🇲🇻' };
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
@@ -54,7 +54,7 @@ export function RegisterForm() {
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
 
-    const fullContactNumber = `${US_COUNTRY.dial_code}${
+    const fullContactNumber = `${MALDIVES_COUNTRY.dial_code}${
       values.contactNumber
     }`;
 
@@ -63,7 +63,7 @@ export function RegisterForm() {
         values.email,
         values.username,
         fullContactNumber,
-        US_COUNTRY.name,
+        MALDIVES_COUNTRY.name,
         values.referralCode
       );
       toast({
@@ -155,8 +155,8 @@ export function RegisterForm() {
                   <FormControl>
                     <div className="flex items-center gap-2">
                       <div className="flex h-10 w-24 items-center justify-center rounded-md border bg-muted px-3 text-sm shrink-0">
-                         <span className="mr-2">{US_COUNTRY.flag}</span>
-                         <span>{US_COUNTRY.dial_code}</span>
+                         <span className="mr-2">{MALDIVES_COUNTRY.flag}</span>
+                         <span>{MALDIVES_COUNTRY.dial_code}</span>
                       </div>
                       <Input
                         placeholder="Your phone number"
