@@ -33,7 +33,8 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Shield,
-  MessageSquare
+  MessageSquare,
+  LineChart
 } from "lucide-react";
 import { logout, getCurrentUserEmail } from "@/lib/auth";
 import * as React from "react";
@@ -93,6 +94,7 @@ export default function DashboardLayout({
 
   const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/market", label: "Market", icon: LineChart },
     { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
     { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
     { href: "/dashboard/squad", label: "Squad", icon: Users },
