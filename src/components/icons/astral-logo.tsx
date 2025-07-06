@@ -48,12 +48,6 @@ export const AstralLogo = ({ className, ...props }: React.SVGProps<SVGSVGElement
             <rect x="47" y="22" width="6" height="18" fill="hsl(var(--chart-2))" rx="2" />
             <rect x="37" y="26" width="6" height="18" fill="hsl(var(--chart-2) / 0.8)" rx="2" />
             <rect x="57" y="26" width="6" height="18" fill="hsl(var(--chart-2) / 0.8)" rx="2" />
-
-            <g fill="url(#chevronGradient)">
-                <path d="M50 50 L70 65 L50 58 L30 65 Z" />
-                <path d="M50 66 L70 81 L50 74 L30 81 Z" opacity="0.8"/>
-                <path d="M50 82 L70 97 L50 90 L30 97 Z" opacity="0.6"/>
-            </g>
         </g>
     </svg>
 );
