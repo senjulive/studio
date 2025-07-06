@@ -159,7 +159,7 @@ export function TradingBotCard({
           <CardDescription>
             {(walletData?.growth?.clicksLeft ?? 0) > 0 
                 ? `${walletData.growth.clicksLeft} grid${walletData.growth.clicksLeft > 1 ? 's' : ''} remaining`
-                : 'No grids remaining for today'
+                : 'No grids remaining'
             }
           </CardDescription>
         </div>
@@ -194,7 +194,7 @@ export function TradingBotCard({
               {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
             </p>
             <p className="text-xs text-muted-foreground">
-                {canStart ? `Earn ${(tierSettings.dailyProfit * 100).toFixed(1)}% daily.` : 'Come back tomorrow for more grids.'}
+                {canStart ? `Earn up to ${(tierSettings.dailyProfit * 100).toFixed(1)}% daily.` : ''}
             </p>
           </div>
         )}
