@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -5,7 +6,6 @@ import Link from "next/link";
 import {
   ArrowDownLeft,
   ArrowUpRight,
-  Users,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -65,8 +65,6 @@ export function WalletView() {
   }, []);
 
   const totalBalance = walletData ? walletData.balances.usdt + walletData.balances.eth * 2500 : 0; // Assuming ETH price for calculation
-  const squadEarnings = walletData?.squad?.members?.length ? walletData.squad.members.length * 5 : 0;
-
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (currentUserEmail) {
@@ -78,10 +76,7 @@ export function WalletView() {
   if (!walletData) {
     return (
         <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2">
-                <Skeleton className="h-[120px] rounded-lg" />
-                <Skeleton className="h-[120px] rounded-lg" />
-            </div>
+            <Skeleton className="h-[120px] rounded-lg" />
             <Skeleton className="h-[240px] rounded-lg" />
             <Skeleton className="h-[400px] rounded-lg" />
         </div>
@@ -90,54 +85,33 @@ export function WalletView() {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Available Assets
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Across all your assets
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Squad Earnings
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${squadEarnings.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              <Link
-                href="/dashboard/squad"
-                className="font-medium text-accent hover:underline"
-              >
-                View squad &rarr;
-              </Link>
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">
+            Available Assets
+          </CardTitle>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="h-4 w-4 text-muted-foreground"
+          >
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">
+            ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Across all your assets
+          </p>
+        </CardContent>
+      </Card>
 
       <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
 
