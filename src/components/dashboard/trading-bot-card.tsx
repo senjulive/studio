@@ -25,18 +25,18 @@ export function TradingBotCard({
   const { toast } = useToast();
   
   const getTierSettings = React.useCallback((balance: number) => {
-    if (balance >= 15000) return { dailyProfit: 0.085, clicks: 10 };
-    if (balance >= 10000) return { dailyProfit: 0.065, clicks: 8 };
-    if (balance >= 5000) return { dailyProfit: 0.055, clicks: 7 };
-    if (balance >= 1000) return { dailyProfit: 0.04, clicks: 6 };
-    if (balance >= 500) return { dailyProfit: 0.03, clicks: 5 };
-    return { dailyProfit: 0.02, clicks: 4 };
+    if (balance >= 15000) return { name: "Tier 6", dailyProfit: 0.085, clicks: 10 };
+    if (balance >= 10000) return { name: "Tier 5", dailyProfit: 0.065, clicks: 8 };
+    if (balance >= 5000) return { name: "Tier 4", dailyProfit: 0.055, clicks: 7 };
+    if (balance >= 1000) return { name: "Tier 3", dailyProfit: 0.04, clicks: 6 };
+    if (balance >= 500) return { name: "Tier 2", dailyProfit: 0.03, clicks: 5 };
+    return { name: "Tier 1", dailyProfit: 0.02, clicks: 4 };
   }, []);
 
   const totalBalance =
     (walletData?.balances?.usdt ?? 0);
   const tierSettings = getTierSettings(totalBalance);
-  const profitPerTrade = tierSettings.dailyProfit / tierSettings.clicks;
+  const profitPerTrade = totalBalance > 0 ? (totalBalance * tierSettings.dailyProfit) / tierSettings.clicks : 0;
 
   const canStart =
     totalBalance >= 100 && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
@@ -44,7 +44,7 @@ export function TradingBotCard({
   const addLogLine = (text: string) => {
     setLogs((prev) => {
         const newLogs = [...prev, text];
-        if (newLogs.length > 5) {
+        if (newLogs.length > 6) {
             newLogs.shift();
         }
         return newLogs;
@@ -81,19 +81,22 @@ export function TradingBotCard({
     setLogs([]);
     setProgressPercent(0);
 
+    const exchanges = ['Binance', 'Coinbase Pro', 'Kraken', 'KuCoin', 'Bitstamp', 'Gemini'];
+    const exchange = exchanges[Math.floor(Math.random() * exchanges.length)];
+
     const milestones = [
-      { percent: 5, text: "🔗 Initializing AI core..." },
-      { percent: 15, text: "📈 Analyzing market data..." },
-      { percent: 30, text: "🔍 Identifying arbitrage opportunity..." },
-      { percent: 60, text: "✅ Executing trade..." },
-      { percent: 85, text: "🧮 Calculating profit..." },
-      { percent: 100, text: "💰 Trade complete. Profit secured." },
+      { percent: 5, text: "Robot started successfully" },
+      { percent: 15, text: "Scan the market successfully" },
+      { percent: 30, text: "Order matching successfully" },
+      { percent: 60, text: `Successfully buy on ${exchange}` },
+      { percent: 90, text: `Successfully sold on ${exchange}` },
+      { percent: 100, text: "Settlement completed" },
     ];
 
     let loggedMilestones = new Set();
     let animationRequestId: number;
 
-    const duration = 5000; // 5 seconds
+    const duration = 90000; // 90 seconds
     const startTime = performance.now();
 
     const updateAnimation = (time: number) => {
@@ -112,7 +115,7 @@ export function TradingBotCard({
       if (percent < 100) {
         animationRequestId = requestAnimationFrame(updateAnimation);
       } else {
-        const earnings = totalBalance * profitPerTrade;
+        const earnings = profitPerTrade;
 
         const newWalletData: WalletData = {
           ...walletData,
