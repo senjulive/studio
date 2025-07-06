@@ -238,8 +238,8 @@ export function TradingBotCard({
       <style>{`
         .trading-bot-card {
           position: relative;
-          width: 192px;
-          height: 192px;
+          width: 100%;
+          height: 120px;
           background: #121212;
           border-radius: 16px;
           border: 1px solid #00ff99;
@@ -297,7 +297,6 @@ export function TradingBotCard({
           flex: 1;
           padding-right: 2px;
           margin-top: 4px;
-          max-height: 72px;
           font-size: 0.7rem;
           line-height: 1rem;
           scrollbar-width: thin;

@@ -70,7 +70,7 @@ export function WalletView() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Skeleton className="h-[120px] rounded-lg" />
                 <Skeleton className="h-[120px] rounded-lg" />
-                <Skeleton className="h-[192px] w-[192px] rounded-lg" />
+                <Skeleton className="h-[120px] rounded-lg md:col-span-2 lg:col-span-1" />
             </div>
             <Skeleton className="h-[400px] rounded-lg" />
         </div>
@@ -126,7 +126,7 @@ export function WalletView() {
             </p>
           </CardContent>
         </Card>
-        <div className="flex items-center justify-center md:col-span-2 lg:col-span-1">
+        <div className="md:col-span-2 lg:col-span-1">
           <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
         </div>
       </div>
