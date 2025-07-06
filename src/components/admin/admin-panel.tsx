@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, PlusCircle, MinusCircle } from "lucide-react";
+import { Loader2, PlusCircle, MinusCircle, User, Shield } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -101,7 +101,6 @@ export function AdminPanel() {
 
     await updateWallet(selectedUserEmail, newWalletData);
     
-    // Optimistically update local state or refetch
     await refetchWallets();
 
     toast({
@@ -119,10 +118,17 @@ export function AdminPanel() {
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
-        <CardTitle>Administrator Panel</CardTitle>
-        <CardDescription>
-          Add or remove balance from a selected user's virtual wallet.
-        </CardDescription>
+        <div className="flex items-center gap-3">
+            <div className="bg-primary/10 p-2 rounded-lg">
+                <Shield className="h-6 w-6 text-primary"/>
+            </div>
+            <div>
+                <CardTitle>Administrator Panel</CardTitle>
+                <CardDescription>
+                  Add or remove balance from a selected user's wallet.
+                </CardDescription>
+            </div>
+        </div>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -132,7 +138,7 @@ export function AdminPanel() {
               <Select onValueChange={setSelectedUserEmail} value={selectedUserEmail} disabled={isFetchingWallets}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a user to manage" />
+                    <SelectValue placeholder="Select a user to manage..." />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -141,28 +147,32 @@ export function AdminPanel() {
                       <SelectItem key={email} value={email}>{email}</SelectItem>
                     ))
                   ) : (
-                    <div className="p-2 text-sm text-muted-foreground">No users found.</div>
+                    <div className="p-2 text-sm text-muted-foreground">
+                        {isFetchingWallets ? 'Loading users...' : 'No users found.'}
+                    </div>
                   )}
                 </SelectContent>
               </Select>
             </FormItem>
 
-            {selectedWalletData ? (
-                <div className="mb-6 grid grid-cols-2 gap-4 text-center border rounded-lg p-4">
+            {selectedUserEmail && (
+              isFetchingWallets ? (
+                <div className="mb-6 grid grid-cols-2 gap-4">
+                  <Skeleton className="h-24 w-full" />
+                  <Skeleton className="h-24 w-full" />
+                </div>
+              ) : selectedWalletData ? (
+                <div className="mb-6 grid grid-cols-2 gap-4 text-center border rounded-lg p-4 bg-muted/30">
                     <div>
-                        <p className="text-sm text-muted-foreground">Current USDT Balance</p>
+                        <p className="text-sm text-muted-foreground">USDT Balance</p>
                         <p className="text-2xl font-bold">${selectedWalletData.balances.usdt.toFixed(2)}</p>
                     </div>
                      <div>
-                        <p className="text-sm text-muted-foreground">Current ETH Balance</p>
+                        <p className="text-sm text-muted-foreground">ETH Balance</p>
                         <p className="text-2xl font-bold">{selectedWalletData.balances.eth.toFixed(4)} ETH</p>
                     </div>
                 </div>
-            ) : (
-                <div className="mb-6 grid grid-cols-2 gap-4">
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                </div>
+              ) : null
             )}
 
             <FormField

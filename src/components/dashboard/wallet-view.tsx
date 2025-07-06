@@ -2,10 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-} from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,7 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TradingBotCard } from "./trading-bot-card";
 import { getCurrentUserEmail } from "@/lib/auth";
 
-const MOCK_TRANSACTIONS: any[] = [];
+const MOCK_TRANSACTIONS: any[] = []; // You can populate this later if needed
 
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
@@ -60,9 +57,9 @@ export function WalletView() {
   if (!walletData) {
     return (
         <div className="space-y-6">
-            <Skeleton className="h-[280px] rounded-lg" />
-            <Skeleton className="h-[240px] rounded-lg" />
-            <Skeleton className="h-[300px] rounded-lg" />
+            <Skeleton className="h-64 w-full rounded-lg" />
+            <Skeleton className="h-60 w-full rounded-lg" />
+            <Skeleton className="h-72 w-full rounded-lg" />
         </div>
     )
   }
@@ -76,19 +73,19 @@ export function WalletView() {
         </CardHeader>
         <CardContent className="space-y-6">
             <div>
-                <p className="text-sm text-muted-foreground">Total Value</p>
+                <p className="text-sm text-muted-foreground">Total Value (USD)</p>
                 <p className="text-4xl font-bold tracking-tighter">
                     ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="rounded-lg border bg-background p-4">
+                <div className="rounded-lg border bg-secondary/50 p-4">
                     <p className="text-sm font-medium text-muted-foreground">USDT Balance</p>
                     <p className="text-2xl font-bold">
                         ${walletData.balances.usdt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                 </div>
-                <div className="rounded-lg border bg-background p-4">
+                <div className="rounded-lg border bg-secondary/50 p-4">
                     <p className="text-sm font-medium text-muted-foreground">ETH Balance</p>
                     <p className="text-2xl font-bold">
                         {walletData.balances.eth.toLocaleString(undefined, {minimumFractionDigits: 4, maximumFractionDigits: 8})} ETH
@@ -114,9 +111,9 @@ export function WalletView() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Full Transaction History</CardTitle>
+          <CardTitle>Transaction History</CardTitle>
           <CardDescription>
-            A record of all your deposits and withdrawals.
+            A record of all your deposits, withdrawals, and earnings.
           </CardDescription>
         </CardHeader>
         <CardContent>

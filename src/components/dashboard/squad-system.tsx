@@ -106,12 +106,11 @@ export function SquadSystem() {
         </Alert>
       )}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        {/* Left Side: Invitation */}
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle>Build Your Squad</CardTitle>
             <CardDescription>
-              Share your squad code or link. You'll both earn $5 in your virtual wallet for every new member who joins.
+              Share your squad code or link. You'll both earn $5 in your wallet for every new member who joins.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -119,7 +118,7 @@ export function SquadSystem() {
               <Label htmlFor="squad-code">Your Unique Squad Code</Label>
               <div className="flex items-center gap-2">
                 <Input id="squad-code" value={referralCode} readOnly className="font-mono text-base" />
-                <Button variant="outline" size="icon" onClick={() => handleCopy(referralCode)}>
+                <Button variant="outline" size="icon" onClick={() => handleCopy(referralCode)} aria-label="Copy squad code">
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -128,7 +127,7 @@ export function SquadSystem() {
               <Label htmlFor="squad-link">Your Invitation Link</Label>
               <div className="flex items-center gap-2">
                 <Input id="squad-link" value={squadLink} readOnly />
-                <Button variant="outline" size="icon" onClick={() => handleCopy(squadLink)}>
+                <Button variant="outline" size="icon" onClick={() => handleCopy(squadLink)} aria-label="Copy squad link">
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -148,9 +147,11 @@ export function SquadSystem() {
                     </DialogHeader>
                     <div className="flex flex-col items-center p-4 text-center">
                     {squadLink ? (
-                      <QRCodeSVG value={squadLink} size={200} fgColor="hsl(var(--foreground))" bgColor="transparent" />
+                      <div className="p-4 bg-white rounded-lg">
+                        <QRCodeSVG value={squadLink} size={200} fgColor="#000" bgColor="#fff" />
+                      </div>
                     ) : (
-                      <div className="h-[200px] w-[200px] bg-muted rounded-md flex items-center justify-center">
+                      <div className="h-[216px] w-[216px] bg-muted rounded-lg flex items-center justify-center">
                         <p className="text-sm text-muted-foreground">Loading QR Code...</p>
                       </div>
                     )}
@@ -163,7 +164,6 @@ export function SquadSystem() {
           </CardFooter>
         </Card>
 
-        {/* Right Side: Stats & Members */}
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -198,7 +198,7 @@ export function SquadSystem() {
                       <TableRow key={memberEmail}>
                         <TableCell className="font-medium">{memberEmail}</TableCell>
                         <TableCell className="text-right">
-                          <Badge variant="default">Active</Badge>
+                          <Badge variant="secondary">Active</Badge>
                         </TableCell>
                       </TableRow>
                     ))

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -31,6 +30,14 @@ import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { createWallet } from "@/lib/wallet";
 
+const CryptoLogo = () => (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary mx-auto mb-2">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
@@ -51,28 +58,31 @@ export function RegisterForm() {
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
     
-    // Create a new wallet for the new user, associated with their email.
-    // Pass the referral code to establish squad relationships.
-    await createWallet(values.email, values.referralCode);
-    
-    // Simulate other registration steps
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsLoading(false);
-    console.log(values);
-    toast({
-      title: "Account Created",
-      description: "Your wallet is ready. Please sign in to continue.",
-    });
-    router.push("/");
+    try {
+      await createWallet(values.email, values.referralCode);
+      toast({
+        title: "Account Created",
+        description: "Your wallet is ready. Please sign in to continue.",
+      });
+      router.push("/");
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-sm border-border/50">
       <CardHeader className="text-center">
+        <CryptoLogo />
         <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
         <CardDescription>
-          Enter your details below to create your Astral Core account.
+          Join Astral Core and start your journey.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -142,9 +152,9 @@ export function RegisterForm() {
         </Form>
       </CardContent>
       <CardFooter className="text-center text-sm">
-        <p className="w-full">
+        <p className="w-full text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/" className="text-primary font-medium hover:underline">
+          <Link href="/" className="font-semibold text-primary/90 hover:text-primary">
             Sign In
           </Link>
         </p>

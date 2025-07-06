@@ -85,7 +85,7 @@ export function WithdrawView() {
       return;
     }
     setIsWithdrawing(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsWithdrawing(false);
     setAmount("");
     toast({
@@ -135,6 +135,7 @@ export function WithdrawView() {
                     savedAddresses?.[activeTab as keyof WithdrawalAddresses] || ""
                   }
                   readOnly
+                  className="font-mono text-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -182,7 +183,7 @@ export function WithdrawView() {
             </div>
           )}
 
-          <Alert className="mt-4 text-left">
+          <Alert className="mt-4 text-left bg-muted/30">
             <Info className="h-4 w-4" />
             <AlertTitle>Please Note</AlertTitle>
             <AlertDescription>
@@ -193,7 +194,7 @@ export function WithdrawView() {
                   network.
                 </li>
                 <li>
-                  Withdrawals typically take <strong>24-72 hours</strong> to be fully processed.
+                  Withdrawals typically take <strong>24-72 hours</strong> to be fully processed for security reasons.
                 </li>
                 <li>
                   For security, once an address is saved, you must contact

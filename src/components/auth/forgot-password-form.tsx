@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,7 +43,7 @@ export function ForgotPasswordForm() {
 
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500)); 
     setIsLoading(false);
     console.log(values);
     toast({
@@ -55,7 +55,7 @@ export function ForgotPasswordForm() {
   };
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-sm border-border/50">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-headline">Forgot Password?</CardTitle>
         <CardDescription>
@@ -89,15 +89,13 @@ export function ForgotPasswordForm() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="text-center text-sm">
-        <p className="w-full">
-          <Link
-            href="/"
-            className="text-primary font-medium hover:underline"
-          >
-            &larr; Back to Sign In
-          </Link>
-        </p>
+      <CardFooter className="flex justify-center text-sm">
+          <Button variant="ghost" asChild>
+            <Link href="/" className="text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="mr-2 h-4 w-4"/>
+                Back to Sign In
+            </Link>
+          </Button>
       </CardFooter>
     </Card>
   );

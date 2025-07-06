@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Lock, Loader2 } from "lucide-react";
+import { Lock, Loader2, Shield } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +48,6 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
 
   const onSubmit = (values: AdminAuthFormValues) => {
     setIsLoading(true);
-    // Simulate a check
     setTimeout(() => {
       if (values.password === ADMIN_PASSWORD) {
         toast({ title: "Access Granted" });
@@ -72,6 +71,9 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
+        <div className="mx-auto bg-primary/10 p-3 rounded-full mb-2">
+            <Shield className="h-8 w-8 text-primary" />
+        </div>
         <CardTitle>Admin Access Required</CardTitle>
         <CardDescription>
           Please enter the password to access the admin panel.

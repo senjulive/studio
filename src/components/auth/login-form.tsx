@@ -31,6 +31,13 @@ import { loginSchema } from "@/lib/validators";
 import { login } from "@/lib/auth";
 import { getOrCreateWallet } from "@/lib/wallet";
 
+const CryptoLogo = () => (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary mx-auto mb-2">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -49,12 +56,8 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    // This would be a real auth check. Here, we just log in the user.
     await login(values.email);
-    // Ensure a wallet exists for the user.
     await getOrCreateWallet(values.email);
-
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
     
     setIsLoading(false);
     toast({
@@ -65,11 +68,12 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-sm border-border/50">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
+        <CryptoLogo />
+        <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
         <CardDescription>
-          Welcome back! Please enter your details to login.
+          Enter your credentials to access your account.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -97,7 +101,7 @@ export function LoginForm() {
                     <FormLabel>Password</FormLabel>
                     <Link
                       href="/forgot-password"
-                      className="text-sm text-primary font-medium hover:underline"
+                      className="text-sm font-medium text-primary/80 hover:text-primary"
                     >
                       Forgot password?
                     </Link>
@@ -121,11 +125,11 @@ export function LoginForm() {
         </Form>
       </CardContent>
       <CardFooter className="text-center text-sm">
-        <p className="w-full">
+        <p className="w-full text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="text-primary font-medium hover:underline"
+            className="font-semibold text-primary/90 hover:text-primary"
           >
             Sign up
           </Link>

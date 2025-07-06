@@ -1,7 +1,6 @@
 'use client';
 
-// This file now simulates async operations for a multi-user wallet system,
-// as if it were talking to a server. This makes it easier to replace with a real backend later.
+// Simulates a robust, async, multi-user wallet system with data patching.
 
 const WALLETS_STORAGE_KEY = 'astral-wallets';
 const WITHDRAWAL_ADDRESSES_STORAGE_KEY = 'astral-withdrawal-addresses';
@@ -40,8 +39,8 @@ export type WalletData = {
     };
     squad: {
         referralCode: string;
-        squadLeader?: string; // email of the leader
-        members: string[]; // emails of members
+        squadLeader?: string;
+        members: string[];
     };
 };
 
@@ -54,13 +53,13 @@ export type WithdrawalAddresses = {
 
 // Simulates fetching all wallets from a database. For admin use.
 export async function getAllWallets(): Promise<Record<string, WalletData>> {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500)); 
     if (typeof window === 'undefined') return {};
     const storedWallets = localStorage.getItem(WALLETS_STORAGE_KEY);
     return storedWallets ? JSON.parse(storedWallets) : {};
 }
 
-// Helper to create a complete, new wallet data object
+// Helper to create a complete, new wallet data object with all required fields.
 const createNewWalletObject = (): WalletData => {
     const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const ethChars = '0123456789abcdef';
@@ -85,87 +84,79 @@ const createNewWalletObject = (): WalletData => {
     };
 }
 
-
 // Simulates creating a wallet for a new user on a backend server.
 export async function createWallet(email: string, referralCode?: string): Promise<WalletData> {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    if (typeof window === 'undefined') {
+        throw new Error("Local storage is not available.");
+    }
+
+    const allWallets = await getAllWallets();
+    
+    if (allWallets[email]) {
+        throw new Error("User with this email already exists.");
+    }
 
     const newWalletData = createNewWalletObject();
 
-    if (typeof window !== 'undefined') {
-        const allWallets = await getAllWallets();
-        
-        // Handle referral logic
-        if (referralCode) {
-            const leaderEmail = Object.keys(allWallets).find(
-                (key) => allWallets[key]?.squad?.referralCode.toUpperCase() === referralCode.toUpperCase()
-            );
+    // Handle referral logic
+    if (referralCode) {
+        const leaderEmail = Object.keys(allWallets).find(
+            (key) => allWallets[key]?.squad?.referralCode.toUpperCase() === referralCode.toUpperCase()
+        );
 
-            if (leaderEmail && allWallets[leaderEmail]?.squad) {
-                const leaderWallet = allWallets[leaderEmail];
-                // Ensure members array exists before pushing
-                if (!leaderWallet.squad.members) {
-                    leaderWallet.squad.members = [];
-                }
-                leaderWallet.squad.members.push(email);
-                leaderWallet.balances.usdt = (leaderWallet.balances.usdt || 0) + 5; // Leader gets a $5 bonus
-                allWallets[leaderEmail] = leaderWallet; // Update leader's wallet
-                
-                newWalletData.squad.squadLeader = leaderEmail;
-                newWalletData.balances.usdt += 5; // New member also gets a $5 bonus
-            }
+        if (leaderEmail && allWallets[leaderEmail]) {
+            const leaderWallet = allWallets[leaderEmail];
+            leaderWallet.squad.members.push(email);
+            leaderWallet.balances.usdt += 5; // Leader gets a $5 bonus
+            allWallets[leaderEmail] = leaderWallet;
+            
+            newWalletData.squad.squadLeader = leaderEmail;
+            newWalletData.balances.usdt += 5; // New member also gets a $5 bonus
         }
-        
-        allWallets[email] = newWalletData;
-        localStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(allWallets));
     }
+    
+    allWallets[email] = newWalletData;
+    localStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(allWallets));
 
     return newWalletData;
 }
 
 // Simulates fetching a specific user's wallet from a backend server.
-export async function getWallet(email: string): Promise<WalletData | null> {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+async function getWallet(email: string): Promise<WalletData | null> {
+    await new Promise(resolve => setTimeout(resolve, 200));
     const allWallets = await getAllWallets();
     return allWallets[email] || null;
 }
 
-// This function now robustly handles wallet creation, patching, and daily resets.
+// This function robustly handles wallet creation, patching for backward compatibility, and daily resets.
 export async function getOrCreateWallet(email: string): Promise<WalletData> {
     const existingWallet = await getWallet(email);
 
     if (!existingWallet) {
+        // If no wallet exists, create a fresh one and return it.
         return createWallet(email);
     }
 
-    // Create a default wallet structure to safely merge with.
-    // This generates new addresses/codes, but they will be overwritten by existing data.
+    // Create a default wallet structure to safely merge with existing data.
     const defaultWallet = createNewWalletObject(); 
 
     // Deep merge existing wallet data onto the default structure.
-    // This ensures any missing properties are gracefully added.
+    // This ensures any missing properties from older wallet versions are gracefully added.
     const patchedWallet: WalletData = {
       ...defaultWallet,
       ...existingWallet,
-      addresses: {
-        ...defaultWallet.addresses,
-        ...(existingWallet.addresses || {}),
-      },
-      balances: {
-        ...defaultWallet.balances,
-        ...(existingWallet.balances || {}),
-      },
-      growth: {
-        ...defaultWallet.growth,
-        ...(existingWallet.growth || {}),
-      },
-      squad: {
-        ...defaultWallet.squad,
-        ...(existingWallet.squad || {}),
-      },
+      addresses: { ...defaultWallet.addresses, ...(existingWallet.addresses || {}) },
+      balances: { ...defaultWallet.balances, ...(existingWallet.balances || {}) },
+      growth: { ...defaultWallet.growth, ...(existingWallet.growth || {}) },
+      squad: { ...defaultWallet.squad, ...(existingWallet.squad || {}) },
     };
-
-    let needsUpdate = false;
+    
+    // Ensure `members` is an array if it's missing from older data
+    if (!Array.isArray(patchedWallet.squad.members)) {
+      patchedWallet.squad.members = [];
+    }
 
     // Check for daily reset of the growth engine.
     const now = Date.now();
@@ -173,12 +164,6 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
     if (now - patchedWallet.growth.lastReset > oneDay) {
         patchedWallet.growth.clicksLeft = 4;
         patchedWallet.growth.lastReset = now;
-        needsUpdate = true;
-    }
-
-    // If any patching or updates occurred, save the wallet back to storage.
-    // This check prevents unnecessary writes.
-    if (needsUpdate || JSON.stringify(existingWallet) !== JSON.stringify(patchedWallet)) {
         await updateWallet(email, patchedWallet);
     }
     
@@ -187,14 +172,13 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
 
 // Simulates updating a specific user's wallet on a backend server.
 export async function updateWallet(email: string, data: WalletData): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 200)); // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 200));
     if (typeof window !== 'undefined') {
         const allWallets = await getAllWallets();
         allWallets[email] = data;
         localStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(allWallets));
     }
 }
-
 
 // --- Multi-User Withdrawal Address Functions ---
 
@@ -205,13 +189,11 @@ async function getAllWithdrawalAddresses(): Promise<Record<string, WithdrawalAdd
     return stored ? JSON.parse(stored) : {};
 }
 
-// Simulates fetching withdrawal addresses for a specific user.
 export async function getWithdrawalAddresses(email: string): Promise<WithdrawalAddresses> {
     const allAddresses = await getAllWithdrawalAddresses();
     return allAddresses[email] || {};
 }
 
-// Simulates saving a withdrawal address for a specific user.
 export async function saveWithdrawalAddress(email: string, asset: string, address: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 500));
     const allAddresses = await getAllWithdrawalAddresses();

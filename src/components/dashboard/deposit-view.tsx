@@ -82,26 +82,28 @@ export function DepositView() {
           </TabsList>
         </Tabs>
 
-        <div className="flex flex-col items-center gap-4 py-4 text-center">
-          {currentWalletAddress ? (
-            <QRCodeSVG
-              value={currentWalletAddress}
-              size={180}
-              fgColor="hsl(var(--foreground))"
-              bgColor="transparent"
-            />
-          ) : (
-            <Skeleton className="h-[180px] w-[180px] rounded-md" />
-          )}
+        <div className="flex flex-col items-center gap-6 py-4 text-center">
+            <div className="p-4 bg-white rounded-lg">
+                {currentWalletAddress ? (
+                    <QRCodeSVG
+                    value={currentWalletAddress}
+                    size={180}
+                    fgColor="hsl(var(--card-foreground))"
+                    bgColor="hsl(var(--card))"
+                    />
+                ) : (
+                    <Skeleton className="h-[180px] w-[180px] rounded-md" />
+                )}
+            </div>
           <div className="grid w-full max-w-md items-center gap-1.5">
-            <Label htmlFor="deposit-address">Your {activeTab.toUpperCase()} Address</Label>
+            <Label htmlFor="deposit-address" className="text-muted-foreground">Your {activeTab.toUpperCase()} Address</Label>
             <div className="flex items-center gap-2">
               {currentWalletAddress ? (
                 <Input
                   id="deposit-address"
                   value={currentWalletAddress}
                   readOnly
-                  className="text-center"
+                  className="text-center font-mono text-sm"
                 />
               ) : (
                 <Skeleton className="h-10 w-full" />
@@ -111,12 +113,13 @@ export function DepositView() {
                 size="icon"
                 onClick={() => handleCopy(currentWalletAddress)}
                 disabled={!currentWalletAddress}
+                aria-label="Copy address"
               >
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          <Alert className="mt-4 text-left">
+          <Alert className="mt-4 text-left bg-muted/30">
             <Info className="h-4 w-4" />
             <AlertTitle>Please Note</AlertTitle>
             <AlertDescription>
@@ -130,7 +133,7 @@ export function DepositView() {
                   to this address. Sending any other asset may result in permanent loss.
                 </li>
                 <li>
-                  Your deposit will arrive in <strong>5-30 minutes</strong>, depending on network congestion.
+                  Your deposit will be reflected after network confirmation.
                 </li>
               </ul>
             </AlertDescription>
