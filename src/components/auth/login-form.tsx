@@ -173,7 +173,7 @@ export function LoginForm() {
             href="/register"
             className="font-semibold text-primary/90 hover:text-primary"
           >
-            Sign up
+            System Registration
           </Link>
         </p>
       </CardFooter>

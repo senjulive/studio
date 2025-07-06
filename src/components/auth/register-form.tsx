@@ -91,9 +91,9 @@ export function RegisterForm() {
     <Card className="w-full max-w-sm border-border/50">
       <CardHeader className="text-center">
         <CryptoLogo />
-        <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
+        <CardTitle className="text-2xl font-headline">System Registration</CardTitle>
         <CardDescription>
-          Join Astral Core and start your journey.
+          Complete the form below to register your account.
         </CardDescription>
       </CardHeader>
       <CardContent>
