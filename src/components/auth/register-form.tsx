@@ -25,18 +25,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { createWallet } from "@/lib/wallet";
-import { countries } from "@/lib/countries";
 
 const CryptoLogo = () => (
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary mx-auto mb-2">
@@ -46,6 +38,7 @@ const CryptoLogo = () => (
     </svg>
 );
 
+const US_COUNTRY = { name: 'United States', dial_code: '+1', code: 'US', flag: '🇺🇸' };
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
@@ -59,22 +52,15 @@ export function RegisterForm() {
       email: "",
       password: "",
       confirmPassword: "",
-      country: "",
       contactNumber: "",
       referralCode: "",
     },
   });
 
-  const selectedCountryName = form.watch("country");
-  const selectedCountry = React.useMemo(
-    () => countries.find((c) => c.name === selectedCountryName),
-    [selectedCountryName]
-  );
-
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
 
-    const fullContactNumber = `${selectedCountry?.dial_code || ""}${
+    const fullContactNumber = `${US_COUNTRY.dial_code}${
       values.contactNumber
     }`;
 
@@ -82,7 +68,7 @@ export function RegisterForm() {
       await createWallet(
         values.email,
         fullContactNumber,
-        values.country,
+        US_COUNTRY.name,
         values.referralCode
       );
       toast({
@@ -154,52 +140,20 @@ export function RegisterForm() {
             />
             <FormField
               control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your country" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {countries.map((country) => (
-                        <SelectItem key={country.code} value={country.name}>
-                          <div className="flex items-center gap-2">
-                            <span>{country.flag}</span>
-                            <span>
-                              {country.name} ({country.dial_code})
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="contactNumber"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Contact Number</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-2">
-                      <div className="flex h-10 w-20 items-center justify-center rounded-md border bg-muted text-sm shrink-0">
-                        {selectedCountry?.dial_code || "..."}
+                      <div className="flex h-10 w-24 items-center justify-center rounded-md border bg-muted px-3 text-sm shrink-0">
+                         <span className="mr-2">{US_COUNTRY.flag}</span>
+                         <span>{US_COUNTRY.dial_code}</span>
                       </div>
                       <Input
                         placeholder="Your phone number"
                         {...field}
                         className="flex-1"
-                        disabled={!selectedCountry}
                       />
                     </div>
                   </FormControl>
