@@ -141,7 +141,7 @@ export function WalletView() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-            <CardTitle>Portfolio Overview</CardTitle>
+            <CardTitle>Available Assets</CardTitle>
             <CardDescription>Your total asset value and individual balances.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
