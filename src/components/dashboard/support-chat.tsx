@@ -40,7 +40,7 @@ export function SupportChat() {
       async function fetchHistory() {
         setIsLoading(true);
         const history = await getChatHistoryForUser(userEmail!);
-        setMessages(history);
+        setMessages(history.filter(m => !m.silent));
         setIsLoading(false);
       }
       fetchHistory();

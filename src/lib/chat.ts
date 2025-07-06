@@ -7,6 +7,7 @@ export type Message = {
   text: string;
   timestamp: number;
   sender: 'user' | 'admin';
+  silent?: boolean;
 };
 
 export type ChatHistory = {
@@ -53,10 +54,35 @@ export async function sendMessage(email: string, text: string): Promise<Message>
     text,
     sender: 'user',
     timestamp: Date.now(),
+    silent: false,
   };
 
   allChats[email].push(newMessage);
   localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
   
   return newMessage;
+}
+
+// New function for silent system notifications
+export async function sendSystemNotification(email: string, text: string): Promise<void> {
+  await new Promise(resolve => setTimeout(resolve, 50));
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const allChats = await getAllChats();
+  if (!allChats[email]) {
+    allChats[email] = [];
+  }
+
+  const systemMessage: Message = {
+    id: `sys_${Date.now()}_${Math.random()}`,
+    text: `[System Alert] ${text}`,
+    sender: 'admin', // From 'admin' so it's styled as an admin message.
+    timestamp: Date.now(),
+    silent: true, // This is a silent notification.
+  };
+
+  allChats[email].push(systemMessage);
+  localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
 }

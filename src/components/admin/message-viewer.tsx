@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export function MessageViewer() {
   const [chats, setChats] = React.useState<ChatHistory | null>(null);
@@ -27,16 +28,6 @@ export function MessageViewer() {
     }
     fetchChats();
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-12 w-full" />
-      </div>
-    );
-  }
 
   const sortedChats = chats ? Object.entries(chats).sort(([, a], [, b]) => {
     const lastMsgA = a[a.length - 1]?.timestamp ?? 0;
@@ -80,7 +71,10 @@ export function MessageViewer() {
                         <span className="font-bold">{message.sender === 'user' ? email : 'Admin'}</span>
                         <span>{format(new Date(message.timestamp), "PPp")}</span>
                     </div>
-                    <p className="rounded-md bg-muted/50 p-3 text-sm">
+                    <p className={cn(
+                      "rounded-md p-3 text-sm",
+                      message.silent ? "bg-accent text-accent-foreground/80 italic" : "bg-muted/50"
+                    )}>
                       {message.text}
                     </p>
                   </div>

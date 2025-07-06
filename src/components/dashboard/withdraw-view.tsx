@@ -23,6 +23,7 @@ import {
   type WithdrawalAddresses,
 } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
+import { sendSystemNotification } from "@/lib/chat";
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -85,6 +86,14 @@ export function WithdrawView() {
       return;
     }
     setIsWithdrawing(true);
+
+    if (currentUserEmail) {
+      await sendSystemNotification(
+        currentUserEmail,
+        `User initiated a withdrawal of ${amount} ${activeTab.toUpperCase()}.`
+      );
+    }
+
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsWithdrawing(false);
     setAmount("");

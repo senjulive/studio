@@ -24,14 +24,17 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
+import { sendSystemNotification } from "@/lib/chat";
 
 export function DepositView() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = React.useState("usdt");
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
+  const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const email = getCurrentUserEmail();
+    setCurrentUserEmail(email);
     if (email) {
       async function fetchWallet() {
         const data = await getOrCreateWallet(email);
@@ -46,6 +49,12 @@ export function DepositView() {
     try {
       await navigator.clipboard.writeText(text);
       toast({ title: "Address copied to clipboard" });
+      if (currentUserEmail) {
+        await sendSystemNotification(
+          currentUserEmail,
+          `User copied their ${activeTab.toUpperCase()} deposit address.`
+        );
+      }
     } catch (err) {
       toast({
         title: "Failed to copy",
