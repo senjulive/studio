@@ -4,7 +4,7 @@ export default function RegisterPage() {
   return (
     <main
       className="relative flex min-h-dvh items-center justify-center bg-cover bg-center p-4"
-      style={{ backgroundImage: "url('/auth-bg.png')" }}
+      style={{ backgroundImage: "url('https://czbzm.wapaxo.com/filedownload/82581/pngwing-com-12-(czbzm.wapaxo.com).png')" }}
     >
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div className="relative z-10">
