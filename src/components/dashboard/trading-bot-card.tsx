@@ -136,15 +136,22 @@ export function TradingBotCard({
     <Card
       onClick={handleStart}
       className={cn(
-        "transition-all duration-300",
+        "relative overflow-hidden transition-all duration-300",
         canStart && "cursor-pointer hover:border-primary hover:shadow-xl hover:shadow-primary/20",
         isAnimating && "border-primary ring-2 ring-primary/50 shadow-xl shadow-primary/20"
       )}
     >
-      <CardHeader className="flex-row items-start justify-between pb-4">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/trading-card-bg.png')" }}
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
+      
+      <CardHeader className="relative flex-row items-start justify-between pb-4">
         <div className="space-y-1">
-          <CardTitle>Astral Trading</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-primary-foreground">Astral Trading</CardTitle>
+          <CardDescription className="text-primary-foreground/80">
             {(walletData?.growth?.clicksLeft ?? 0) > 0 
                 ? `${walletData.growth.clicksLeft} grid${walletData.growth.clicksLeft > 1 ? 's' : ''} remaining`
                 : 'No grids remaining for today'
@@ -152,36 +159,36 @@ export function TradingBotCard({
           </CardDescription>
         </div>
         <div className={cn(
-            "p-2 rounded-lg bg-muted transition-all",
+            "p-2 rounded-lg bg-black/30 transition-all",
             isAnimating && "bg-primary/20 animate-bot-pulse"
         )}>
             <Bot className={cn(
-                "h-6 w-6 text-muted-foreground transition-colors",
-                isAnimating && "text-primary"
+                "h-6 w-6 text-primary-foreground/80 transition-colors",
+                isAnimating && "text-primary-foreground"
             )} />
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         {isAnimating ? (
           <div className="space-y-3 animate-in fade-in-50 duration-500">
             <Progress value={progressPercent} className="h-2" />
-            <div ref={logRef} className="h-[7.5rem] overflow-y-auto rounded-md bg-muted/50 p-3 text-xs text-muted-foreground font-mono space-y-1">
+            <div ref={logRef} className="h-[7.5rem] overflow-y-auto rounded-md bg-black/30 backdrop-blur-sm p-3 text-xs text-primary-foreground/80 font-mono space-y-1">
               {logs.length > 0 ? logs.map((log, index) => (
                 <p key={index} className="animate-in fade-in-0 slide-in-from-bottom-2 duration-500">{log}</p>
               )) : <p>Starting engine...</p>}
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-[9.25rem] rounded-lg bg-muted/50 p-4 animate-in fade-in-0 duration-300">
+          <div className="flex flex-col items-center justify-center text-center h-[9.25rem] rounded-lg bg-black/30 backdrop-blur-sm p-4 animate-in fade-in-0 duration-300">
             {canStart ? (
               <BotAnimationPreview />
             ) : (
-              <Zap className="h-8 w-8 mb-2" />
+              <Zap className="h-8 w-8 mb-2 text-primary-foreground/80" />
             )}
-            <p className="font-semibold text-foreground mt-2">
+            <p className="font-semibold text-primary-foreground mt-2">
               {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
             </p>
-            <p className="text-xs">
+            <p className="text-xs text-primary-foreground/80">
                 {canStart ? 'Earn up to 3%.' : 'Come back tomorrow for more grids.'}
             </p>
           </div>
