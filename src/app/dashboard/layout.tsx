@@ -40,67 +40,11 @@ import * as React from "react";
 
 
 const CryptoLogo = () => (
-    <svg width="32" height="32" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-    <style>{`
-        .logo-a {
-            font-family: 'Times New Roman', serif;
-            font-size: 40px;
-            font-weight: bold;
-            fill: hsl(var(--primary));
-            animation: logo-fade-in 1.5s ease-out;
-            -webkit-animation: logo-fade-in 1.5s ease-out;
-        }
-        .logo-ring-1 {
-            stroke: hsl(var(--accent));
-            stroke-width: 1.5;
-            fill: none;
-            transform-origin: center;
-            animation: logo-rotate-1 10s linear infinite;
-            -webkit-animation: logo-rotate-1 10s linear infinite;
-        }
-        .logo-ring-2 {
-            stroke: hsl(var(--primary));
-            stroke-width: 1;
-            fill: none;
-            transform-origin: center;
-            animation: logo-rotate-2 15s linear infinite reverse;
-            -webkit-animation: logo-rotate-2 15s linear infinite reverse;
-        }
-        @keyframes logo-fade-in {
-            from { opacity: 0; transform: translateY(10px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @-webkit-keyframes logo-fade-in {
-            from { opacity: 0; -webkit-transform: translateY(10px) scale(0.9); }
-            to { opacity: 1; -webkit-transform: translateY(0) scale(1); }
-        }
-        @keyframes logo-rotate-1 {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        @-webkit-keyframes logo-rotate-1 {
-            from { -webkit-transform: rotate(0deg); }
-            to { -webkit-transform: rotate(360deg); }
-        }
-        @keyframes logo-rotate-2 {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        @-webkit-keyframes logo-rotate-2 {
-            from { -webkit-transform: rotate(0deg); }
-            to { -webkit-transform: rotate(360deg); }
-        }
-    `}</style>
-    <g className="logo-ring-1">
-        <ellipse cx="25" cy="25" rx="23" ry="15" />
-    </g>
-    <g className="logo-ring-2">
-        <ellipse cx="25" cy="25" rx="15" ry="23" />
-    </g>
-    <text x="25" y="36" textAnchor="middle" className="logo-a">
-        A
-    </text>
-</svg>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="hsl(var(--sidebar-primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M2 17L12 22L22 17" stroke="hsl(var(--sidebar-primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M2 12L12 17L22 12" stroke="hsl(var(--sidebar-primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
 );
 
 export default function DashboardLayout({

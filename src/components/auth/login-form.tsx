@@ -67,69 +67,6 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-4">
-            <svg width="48" height="48" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
-                <style>{`
-                    .logo-a {
-                        font-family: 'Times New Roman', serif;
-                        font-size: 40px;
-                        font-weight: bold;
-                        fill: hsl(var(--primary));
-                        animation: logo-fade-in 1.5s ease-out;
-                        -webkit-animation: logo-fade-in 1.5s ease-out;
-                    }
-                    .logo-ring-1 {
-                        stroke: hsl(var(--accent));
-                        stroke-width: 1.5;
-                        fill: none;
-                        transform-origin: center;
-                        animation: logo-rotate-1 10s linear infinite;
-                        -webkit-animation: logo-rotate-1 10s linear infinite;
-                    }
-                    .logo-ring-2 {
-                        stroke: hsl(var(--primary));
-                        stroke-width: 1;
-                        fill: none;
-                        transform-origin: center;
-                        animation: logo-rotate-2 15s linear infinite reverse;
-                        -webkit-animation: logo-rotate-2 15s linear infinite reverse;
-                    }
-                    @keyframes logo-fade-in {
-                        from { opacity: 0; transform: translateY(10px) scale(0.9); }
-                        to { opacity: 1; transform: translateY(0) scale(1); }
-                    }
-                    @-webkit-keyframes logo-fade-in {
-                        from { opacity: 0; -webkit-transform: translateY(10px) scale(0.9); }
-                        to { opacity: 1; -webkit-transform: translateY(0) scale(1); }
-                    }
-                    @keyframes logo-rotate-1 {
-                        from { transform: rotate(0deg); }
-                        to { transform: rotate(360deg); }
-                    }
-                    @-webkit-keyframes logo-rotate-1 {
-                        from { -webkit-transform: rotate(0deg); }
-                        to { -webkit-transform: rotate(360deg); }
-                    }
-                    @keyframes logo-rotate-2 {
-                        from { transform: rotate(0deg); }
-                        to { transform: rotate(360deg); }
-                    }
-                    @-webkit-keyframes logo-rotate-2 {
-                        from { -webkit-transform: rotate(0deg); }
-                        to { -webkit-transform: rotate(360deg); }
-                    }
-                `}</style>
-                <g className="logo-ring-1">
-                    <ellipse cx="25" cy="25" rx="23" ry="15" />
-                </g>
-                <g className="logo-ring-2">
-                    <ellipse cx="25" cy="25" rx="15" ry="23" />
-                </g>
-                <text x="25" y="36" textAnchor="middle" className="logo-a">
-                    A
-                </text>
-            </svg>
-        </div>
         <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
         <CardDescription>
           Welcome back! Please enter your details to login.
@@ -160,7 +97,7 @@ export function LoginForm() {
                     <FormLabel>Password</FormLabel>
                     <Link
                       href="/forgot-password"
-                      className="text-sm text-accent font-medium hover:underline"
+                      className="text-sm text-primary font-medium hover:underline"
                     >
                       Forgot password?
                     </Link>
@@ -174,7 +111,7 @@ export function LoginForm() {
             />
             <Button
               type="submit"
-              className="w-full bg-accent hover:bg-accent/90"
+              className="w-full"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -188,7 +125,7 @@ export function LoginForm() {
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="text-accent font-medium hover:underline"
+            className="text-primary font-medium hover:underline"
           >
             Sign up
           </Link>
