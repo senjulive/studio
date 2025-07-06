@@ -9,7 +9,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Astral Core',
+  title: 'AstralCore',
   description: 'Modern UI/UX Crypto Management Platform',
 };
 

@@ -2,7 +2,7 @@ import { MarketView } from '@/components/dashboard/market-view';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: "Live Market - Astral Core",
+    title: "Live Market - AstralCore",
     description: "Real-time cryptocurrency market data.",
 };
 

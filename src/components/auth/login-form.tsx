@@ -85,7 +85,7 @@ export function LoginForm() {
     setIsLoading(false);
     toast({
       title: "Login Successful",
-      description: "Welcome back to Astral Core!",
+      description: "Welcome back to AstralCore!",
     });
     router.push("/dashboard");
   };

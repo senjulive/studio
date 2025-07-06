@@ -116,7 +116,7 @@ export default function DashboardLayout({
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <CryptoLogo />
-            <span className="text-lg font-semibold text-sidebar-foreground">Astral Core</span>
+            <span className="text-lg font-semibold text-sidebar-foreground">AstralCore</span>
           </div>
         </SidebarHeader>
         <SidebarContent>

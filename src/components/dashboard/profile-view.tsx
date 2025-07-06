@@ -224,7 +224,7 @@ export function ProfileView() {
          <Card>
             <CardHeader>
                 <CardTitle>Announcements</CardTitle>
-                <CardDescription>Important updates and notifications from the Astral Core team.</CardDescription>
+                <CardDescription>Important updates and notifications from the AstralCore team.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
             {announcements.length > 0 ? (

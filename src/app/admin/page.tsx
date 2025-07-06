@@ -3,7 +3,7 @@ import { AdminAuth } from "@/components/admin/admin-auth";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: "Admin Panel - Astral Core",
+    title: "Admin Panel - AstralCore",
     description: "Manage user wallets.",
 };
 

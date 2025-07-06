@@ -11,7 +11,7 @@ export type Announcement = {
 const announcements: Announcement[] = [
   {
     id: '1',
-    title: '🎉 Welcome to the New Astral Core Platform!',
+    title: '🎉 Welcome to the New AstralCore Platform!',
     date: '2024-07-15',
     content: 'We are thrilled to launch our redesigned platform. Explore the new features, including the Squad System and AI Growth Engine. We appreciate your feedback!',
     read: false,
