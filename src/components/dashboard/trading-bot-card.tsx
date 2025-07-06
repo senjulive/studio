@@ -111,6 +111,7 @@ export function TradingBotCard({
           growth: {
             ...walletData.growth,
             clicksLeft: (walletData.growth?.clicksLeft ?? 1) - 1,
+            dailyEarnings: (walletData.growth?.dailyEarnings ?? 0) + earnings,
           },
         };
 

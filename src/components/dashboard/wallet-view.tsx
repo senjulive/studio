@@ -46,6 +46,7 @@ export function WalletView() {
   }, []);
 
   const totalBalance = walletData?.balances ? walletData.balances.usdt : 0;
+  const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (currentUserEmail) {
@@ -73,10 +74,20 @@ export function WalletView() {
         </CardHeader>
         <CardContent className="space-y-6">
             <div>
-                <p className="text-sm text-muted-foreground">Total Value (USD)</p>
-                <p className="text-4xl font-bold tracking-tighter">
-                    ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
+                <div className="flex items-baseline justify-between">
+                    <div>
+                        <p className="text-sm text-muted-foreground">Total Value (USD)</p>
+                        <p className="text-4xl font-bold tracking-tighter">
+                            ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                    </div>
+                    <div className="text-right">
+                         <p className="text-sm text-muted-foreground">Today's Earnings</p>
+                        <p className="text-lg font-semibold text-green-600">
+                            +${dailyEarnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                    </div>
+                </div>
             </div>
             <div className="grid grid-cols-1 gap-4">
                 <div className="rounded-lg border bg-secondary/50 p-4">

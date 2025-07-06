@@ -24,18 +24,17 @@ const generateReferralCode = (): string => {
 
 export type WalletAddresses = {
     usdt: string;
-    eth: string;
 };
 
 export type WalletData = {
     addresses: WalletAddresses;
     balances: {
         usdt: number;
-        eth: number;
     };
     growth: {
         clicksLeft: number;
         lastReset: number; // timestamp
+        dailyEarnings: number;
     };
     squad: {
         referralCode: string;
@@ -46,7 +45,6 @@ export type WalletData = {
 
 export type WithdrawalAddresses = {
     usdt?: string;
-    eth?: string;
 };
 
 // --- Multi-User Wallet Functions ---
@@ -62,20 +60,18 @@ export async function getAllWallets(): Promise<Record<string, WalletData>> {
 // Helper to create a complete, new wallet data object with all required fields.
 const createNewWalletObject = (): WalletData => {
     const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const ethChars = '0123456789abcdef';
 
     return {
         addresses: {
             usdt: generateAddress('T', 33, trc20Chars),
-            eth: generateAddress('0x', 40, ethChars),
         },
         balances: {
             usdt: 0,
-            eth: 0,
         },
         growth: {
             clicksLeft: 4,
             lastReset: Date.now(),
+            dailyEarnings: 0,
         },
         squad: {
             referralCode: generateReferralCode(),
@@ -164,6 +160,7 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
     if (now - patchedWallet.growth.lastReset > oneDay) {
         patchedWallet.growth.clicksLeft = 4;
         patchedWallet.growth.lastReset = now;
+        patchedWallet.growth.dailyEarnings = 0;
         await updateWallet(email, patchedWallet);
     }
     
