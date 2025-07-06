@@ -31,8 +31,9 @@ const adminAuthSchema = z.object({
 
 type AdminAuthFormValues = z.infer<typeof adminAuthSchema>;
 
-// IMPORTANT: In a real application, this should be a securely stored environment variable.
-const ADMIN_PASSWORD = "supersecret";
+// IMPORTANT: For local development, you can create a `.env.local` file in the root of your project
+// and add the line: NEXT_PUBLIC_ADMIN_PASSWORD="your_secret_password"
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "supersecret";
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
