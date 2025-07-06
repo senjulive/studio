@@ -179,10 +179,10 @@ export function TradingBotCard({
               <Zap className="h-8 w-8 mb-2" />
             )}
             <p className="font-semibold text-foreground mt-2">
-              {canStart ? 'Click to Start' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
+              {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
             </p>
             <p className="text-xs">
-                {canStart ? 'Earn up to 3% on your available balance.' : 'Come back tomorrow for more grids.'}
+                {canStart ? 'Earn up to 3%.' : 'Come back tomorrow for more grids.'}
             </p>
           </div>
         )}
