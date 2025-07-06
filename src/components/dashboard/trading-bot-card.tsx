@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BotAnimationPreview } from "./bot-animation-preview";
 
 export function TradingBotCard({
   walletData,
@@ -172,12 +173,13 @@ export function TradingBotCard({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-[9.25rem] rounded-lg bg-muted/50 p-4 animate-in fade-in-0 duration-300">
-            <Zap className={cn(
-                "h-8 w-8 mb-2",
-                canStart && "animate-pulse text-primary/80"
-            )} />
-            <p className="font-semibold text-foreground">
-              {canStart ? 'Click here to start' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No runs left'}
+            {canStart ? (
+              <BotAnimationPreview />
+            ) : (
+              <Zap className="h-8 w-8 mb-2" />
+            )}
+            <p className="font-semibold text-foreground mt-2">
+              {canStart ? 'Click to Start' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No runs left'}
             </p>
             <p className="text-xs">
                 {canStart ? 'Earn up to 3% on your available balance.' : 'Come back tomorrow for more runs.'}
