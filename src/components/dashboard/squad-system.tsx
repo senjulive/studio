@@ -33,7 +33,7 @@ export function SquadSystem() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [squadLink, setSquadLink] = React.useState("");
 
-  const referralCode = walletData?.squad.referralCode || "";
+  const referralCode = walletData?.squad?.referralCode || "";
 
   React.useEffect(() => {
     const email = getCurrentUserEmail();
@@ -66,8 +66,8 @@ export function SquadSystem() {
     }
   };
 
-  const squadMembers = walletData?.squad.members || [];
-  const squadLeader = walletData?.squad.squadLeader;
+  const squadMembers = walletData?.squad?.members || [];
+  const squadLeader = walletData?.squad?.squadLeader;
   const totalEarnings = squadMembers.length * 5;
 
   if (!walletData) {

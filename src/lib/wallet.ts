@@ -92,10 +92,10 @@ export async function createWallet(email: string, referralCode?: string): Promis
         // Handle referral logic
         if (referralCode) {
             const leaderEmail = Object.keys(allWallets).find(
-                (key) => allWallets[key].squad.referralCode.toUpperCase() === referralCode.toUpperCase()
+                (key) => allWallets[key]?.squad?.referralCode.toUpperCase() === referralCode.toUpperCase()
             );
 
-            if (leaderEmail) {
+            if (leaderEmail && allWallets[leaderEmail]?.squad) {
                 const leaderWallet = allWallets[leaderEmail];
                 leaderWallet.squad.members.push(email);
                 leaderWallet.balances.usdt += 5; // Leader gets a $5 bonus
@@ -124,6 +124,20 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
     let wallet = await getWallet(email);
     if (!wallet) {
         wallet = await createWallet(email);
+    } else {
+        // This is a data migration patch for older wallets that don't have the squad property.
+        let needsUpdate = false;
+        if (!wallet.squad) {
+            wallet.squad = {
+                referralCode: generateReferralCode(),
+                members: [],
+            };
+            needsUpdate = true;
+        }
+        
+        if (needsUpdate) {
+            await updateWallet(email, wallet);
+        }
     }
     return wallet;
 }
@@ -158,8 +172,8 @@ export async function getWithdrawalAddresses(email: string): Promise<WithdrawalA
 export async function saveWithdrawalAddress(email: string, asset: string, address: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 500));
     const allAddresses = await getAllWithdrawalAddresses();
-    if (!allAddresses[email]) {
-        allAddresses[email] = {};
+    if (!allWallets[email]) {
+        allWallets[email] = {};
     }
     allAddresses[email][asset as keyof WithdrawalAddresses] = address;
     
