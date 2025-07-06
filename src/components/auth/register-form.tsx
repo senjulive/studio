@@ -50,10 +50,9 @@ export function RegisterForm() {
 
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
     
-    // Create a new wallet for the new user.
-    createWallet();
+    // Create a new wallet for the new user. This now simulates a server call.
+    await createWallet();
     
     setIsLoading(false);
     console.log(values);

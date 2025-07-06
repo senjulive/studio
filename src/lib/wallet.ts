@@ -1,5 +1,7 @@
-
 'use client';
+
+// This file now simulates async operations, as if it were talking to a server.
+// This makes it easier to replace with a real backend later.
 
 const WALLET_STORAGE_KEY = 'astral-wallet';
 
@@ -16,7 +18,10 @@ export type WalletAddresses = {
     eth: string;
 };
 
-export function createWallet(): WalletAddresses {
+// Simulates creating a wallet on a backend server.
+export async function createWallet(): Promise<WalletAddresses> {
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+
     const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const ethChars = '0123456789abcdef';
 
@@ -32,7 +37,10 @@ export function createWallet(): WalletAddresses {
     return addresses;
 }
 
-export function getWallet(): WalletAddresses | null {
+// Simulates fetching a wallet from a backend server.
+export async function getWallet(): Promise<WalletAddresses | null> {
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+    
     if (typeof window === 'undefined') {
         return null;
     }
@@ -48,10 +56,11 @@ export function getWallet(): WalletAddresses | null {
     return null;
 }
 
-export function getOrCreateWallet(): WalletAddresses {
-    let wallet = getWallet();
+// Simulates the logic of getting a wallet or creating one if it doesn't exist.
+export async function getOrCreateWallet(): Promise<WalletAddresses> {
+    let wallet = await getWallet();
     if (!wallet) {
-        wallet = createWallet();
+        wallet = await createWallet();
     }
     return wallet;
 }

@@ -65,8 +65,13 @@ export function WalletView() {
   });
 
   React.useEffect(() => {
-    const addresses = getOrCreateWallet();
-    setWalletAddresses(addresses);
+    async function fetchWallet() {
+      const addresses = await getOrCreateWallet();
+      if (addresses) {
+        setWalletAddresses(addresses);
+      }
+    }
+    fetchWallet();
   }, []);
 
   const handleCopy = async (text: string) => {
