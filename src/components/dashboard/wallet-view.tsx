@@ -36,7 +36,7 @@ import { TradingBotCard } from "./trading-bot-card";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { UsdtLogoIcon } from "@/components/icons/usdt-logo";
 import { cn } from "@/lib/utils";
-import { LiveTradingChart } from "./live-trading-chart";
+import { AllAssetsChart } from "./all-assets-chart";
 
 type Transaction = {
   id: string;
@@ -54,6 +54,8 @@ type CryptoData = {
   iconUrl: string;
   price: number;
   change24h: number;
+  volume24h: number;
+  marketCap: number;
   priceHistory: { value: number }[];
 };
 
@@ -67,12 +69,70 @@ const quickAccessItems = [
   { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
 ];
 
+const initialCryptoData: CryptoData[] = [
+  {
+    id: "bitcoin",
+    name: "Bitcoin",
+    ticker: "BTC",
+    iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
+    price: 68000.0,
+    change24h: 2.5,
+    volume24h: 45000000000,
+    marketCap: 1300000000000,
+    priceHistory: Array.from({ length: 50 }, () => ({ value: 68000 + (Math.random() - 0.5) * 2000 })),
+  },
+  {
+    id: "ethereum",
+    name: "Ethereum",
+    ticker: "ETH",
+    iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
+    price: 3500.0,
+    change24h: -1.2,
+    volume24h: 25000000000,
+    marketCap: 420000000000,
+    priceHistory: Array.from({ length: 50 }, () => ({ value: 3500 + (Math.random() - 0.5) * 200 })),
+  },
+  {
+    id: "tether",
+    name: "Tether",
+    ticker: "USDT",
+    iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
+    price: 1.0,
+    change24h: 0.01,
+    volume24h: 80000000000,
+    marketCap: 110000000000,
+    priceHistory: Array.from({ length: 50 }, () => ({ value: 1 + (Math.random() - 0.5) * 0.01 })),
+  },
+    {
+    id: "solana",
+    name: "Solana",
+    ticker: "SOL",
+    iconUrl: "https://assets.coincap.io/assets/icons/sol@2x.png",
+    price: 150.0,
+    change24h: 5.8,
+    volume24h: 5000000000,
+    marketCap: 70000000000,
+    priceHistory: Array.from({ length: 50 }, () => ({ value: 150 + (Math.random() - 0.5) * 15 })),
+  },
+  {
+    id: "ripple",
+    name: "XRP",
+    ticker: "XRP",
+    iconUrl: "https://assets.coincap.io/assets/icons/xrp@2x.png",
+    price: 0.48,
+    change24h: -0.5,
+    volume24h: 1500000000,
+    marketCap: 26000000000,
+    priceHistory: Array.from({ length: 50 }, () => ({ value: 0.48 + (Math.random() - 0.5) * 0.05 })),
+  },
+];
+
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(
     null
   );
-  const [usdtData, setUsdtData] = React.useState<CryptoData | null>(null);
+  const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
 
   React.useEffect(() => {
     const email = getCurrentUserEmail();
@@ -87,36 +147,24 @@ export function WalletView() {
   }, []);
 
   React.useEffect(() => {
-    const initialUsdtData: CryptoData = {
-      id: "tether-dashboard",
-      name: "Tether",
-      ticker: "USDT",
-      iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
-      price: 1.0,
-      change24h: 0.01,
-      priceHistory: Array.from({ length: 50 }, () => ({
-        value: 1 + (Math.random() - 0.5) * 0.01,
-      })),
-    };
-    setUsdtData(initialUsdtData);
+    setAllAssetsData(initialCryptoData);
 
     const interval = setInterval(() => {
-      setUsdtData((prevData) => {
-        if (!prevData) return null;
-        const changeFactor = (Math.random() - 0.5) * 0.001;
-        const newPrice = prevData.price * (1 + changeFactor);
-        const newChange24h =
-          prevData.change24h + (Math.random() - 0.5) * 0.005;
-        const newHistory = [
-          ...prevData.priceHistory.slice(1),
-          { value: newPrice },
-        ];
-        return {
-          ...prevData,
-          price: newPrice,
-          change24h: newChange24h,
-          priceHistory: newHistory,
-        };
+      setAllAssetsData((prevData) => {
+        if (!prevData || prevData.length === 0) return [];
+        return prevData.map((coin) => {
+          const changeFactor = (Math.random() - 0.5) * 0.01;
+          const newPrice = coin.price * (1 + changeFactor);
+          const newHistory = [
+            ...coin.priceHistory.slice(1),
+            { value: newPrice },
+          ];
+          return {
+            ...coin,
+            price: newPrice,
+            priceHistory: newHistory,
+          };
+        });
       });
     }, 2000);
 
@@ -306,7 +354,7 @@ export function WalletView() {
         </CardContent>
       </Card>
 
-      <LiveTradingChart coin={usdtData} />
+      <AllAssetsChart coins={allAssetsData} />
 
       <Card>
         <CardHeader>
