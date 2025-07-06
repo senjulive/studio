@@ -24,21 +24,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 
 const depositRequestSchema = z.object({
-  asset: z.enum(["usdt", "eth"], {
-    required_error: "Please select an asset.",
-  }),
   amount: z.coerce
     .number()
     .positive({ message: "Please enter a positive amount." }),
@@ -70,9 +60,11 @@ export function DepositView() {
 
     setIsSubmitting(true);
     
+    const asset = "usdt";
+
     await sendSystemNotification(
       currentUserEmail,
-      `User initiated a deposit request of ${values.amount} ${values.asset.toUpperCase()}.`
+      `User initiated a deposit request of ${values.amount} ${asset.toUpperCase()}.`
     );
 
     // Simulate network delay for user feedback
@@ -80,17 +72,17 @@ export function DepositView() {
 
     toast({
       title: "Deposit Request Submitted",
-      description: `Your request to deposit ${values.amount} ${values.asset.toUpperCase()} is pending review.`,
+      description: `Your request to deposit ${values.amount} ${asset.toUpperCase()} is pending review.`,
     });
     
-    form.reset({ amount: 0, asset: values.asset });
+    form.reset({ amount: 0 });
     setIsSubmitting(false);
   };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Request a Deposit</CardTitle>
+        <CardTitle>Request a USDT Deposit</CardTitle>
         <CardDescription>
           Submit a deposit request. An administrator will review and process it shortly.
         </CardDescription>
@@ -100,31 +92,10 @@ export function DepositView() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="asset"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Asset</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an asset to deposit" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="usdt">USDT</SelectItem>
-                      <SelectItem value="eth">ETH</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount</FormLabel>
+                  <FormLabel>Amount (USDT)</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="0.00" {...field} disabled={isSubmitting} step="any" />
                   </FormControl>

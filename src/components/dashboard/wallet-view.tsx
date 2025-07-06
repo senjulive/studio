@@ -45,7 +45,7 @@ export function WalletView() {
     }
   }, []);
 
-  const totalBalance = walletData?.balances ? walletData.balances.usdt + walletData.balances.eth * 2500 : 0;
+  const totalBalance = walletData?.balances ? walletData.balances.usdt : 0;
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (currentUserEmail) {
@@ -78,17 +78,11 @@ export function WalletView() {
                     ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4">
                 <div className="rounded-lg border bg-secondary/50 p-4">
                     <p className="text-sm font-medium text-muted-foreground">USDT Balance</p>
                     <p className="text-2xl font-bold">
                         ${walletData.balances.usdt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
-                </div>
-                <div className="rounded-lg border bg-secondary/50 p-4">
-                    <p className="text-sm font-medium text-muted-foreground">ETH Balance</p>
-                    <p className="text-2xl font-bold">
-                        {walletData.balances.eth.toLocaleString(undefined, {minimumFractionDigits: 4, maximumFractionDigits: 8})} ETH
                     </p>
                 </div>
             </div>
@@ -141,9 +135,7 @@ export function WalletView() {
                   </TableCell>
                   <TableCell>{txn.asset}</TableCell>
                   <TableCell>
-                    {txn.asset === "USDT"
-                      ? `$${txn.amount.toFixed(2)}`
-                      : `${txn.amount.toFixed(4)} ETH`}
+                    {`$${txn.amount.toFixed(2)}`}
                   </TableCell>
                   <TableCell>
                     {new Date(txn.date).toLocaleDateString()}

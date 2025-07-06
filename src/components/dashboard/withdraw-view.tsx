@@ -15,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import {
   getWithdrawalAddresses,
@@ -27,7 +26,6 @@ import { sendSystemNotification } from "@/lib/chat";
 
 export function WithdrawView() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = React.useState("usdt");
   const [savedAddresses, setSavedAddresses] =
     React.useState<WithdrawalAddresses | null>(null);
   const [currentAddress, setCurrentAddress] = React.useState("");
@@ -36,6 +34,8 @@ export function WithdrawView() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
   const [isWithdrawing, setIsWithdrawing] = React.useState(false);
+
+  const asset = "usdt";
   
   React.useEffect(() => {
     const email = getCurrentUserEmail();
@@ -68,7 +68,7 @@ export function WithdrawView() {
     if (!currentUserEmail) return;
 
     setIsSaving(true);
-    await saveWithdrawalAddress(currentUserEmail, activeTab, currentAddress);
+    await saveWithdrawalAddress(currentUserEmail, asset, currentAddress);
     const updatedAddresses = await getWithdrawalAddresses(currentUserEmail);
     setSavedAddresses(updatedAddresses);
     setIsSaving(false);
@@ -90,7 +90,7 @@ export function WithdrawView() {
     if (currentUserEmail) {
       await sendSystemNotification(
         currentUserEmail,
-        `User initiated a withdrawal of ${amount} ${activeTab.toUpperCase()}.`
+        `User initiated a withdrawal of ${amount} ${asset.toUpperCase()}.`
       );
     }
 
@@ -99,35 +99,23 @@ export function WithdrawView() {
     setAmount("");
     toast({
       title: "Withdrawal Initiated",
-      description: `Your withdrawal of ${amount} ${activeTab.toUpperCase()} is being processed.`,
+      description: `Your withdrawal of ${amount} ${asset.toUpperCase()} is being processed.`,
     });
   };
 
   const hasSavedAddress =
-    savedAddresses && savedAddresses[activeTab as keyof WithdrawalAddresses];
+    savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Withdraw Crypto</CardTitle>
+        <CardTitle>Withdraw USDT (TRC20)</CardTitle>
         <CardDescription>
-          Manage your withdrawal addresses and send funds to your external
-          wallets.
+          Manage your withdrawal address and send funds to your external
+          wallet.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs
-          defaultValue="usdt"
-          className="mb-4"
-          onValueChange={setActiveTab}
-          value={activeTab}
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="usdt">USDT (TRC20)</TabsTrigger>
-            <TabsTrigger value="eth">ETH (ERC20)</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
         <div className="space-y-6 py-4">
           {isLoading ? (
             <div className="space-y-4">
@@ -138,10 +126,10 @@ export function WithdrawView() {
           ) : hasSavedAddress ? (
             <form onSubmit={handleWithdraw} className="space-y-4">
               <div className="space-y-2">
-                <Label>Your Saved {activeTab.toUpperCase()} Address</Label>
+                <Label>Your Saved USDT Address</Label>
                 <Input
                   value={
-                    savedAddresses?.[activeTab as keyof WithdrawalAddresses] || ""
+                    savedAddresses?.[asset as keyof WithdrawalAddresses] || ""
                   }
                   readOnly
                   className="font-mono text-sm"
@@ -155,6 +143,7 @@ export function WithdrawView() {
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
+                  disabled={isWithdrawing}
                 />
               </div>
               <Button type="submit" disabled={isWithdrawing} className="w-full">
@@ -162,22 +151,22 @@ export function WithdrawView() {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
                 Withdraw {amount || ""}{" "}
-                {amount ? activeTab.toUpperCase() : ""}
+                {amount ? asset.toUpperCase() : ""}
               </Button>
             </form>
           ) : (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 You have not set a withdrawal address for{" "}
-                {activeTab.toUpperCase()}. Please add one to continue.
+                {asset.toUpperCase()}. Please add one to continue.
               </p>
               <div className="space-y-2">
                 <Label htmlFor="new-address">
-                  New {activeTab.toUpperCase()} Withdrawal Address
+                  New {asset.toUpperCase()} Withdrawal Address
                 </Label>
                 <Input
                   id="new-address"
-                  placeholder="Enter your external wallet address"
+                  placeholder="Enter your external TRC20 wallet address"
                   value={currentAddress}
                   onChange={(e) => setCurrentAddress(e.target.value)}
                 />
@@ -199,8 +188,7 @@ export function WithdrawView() {
               <ul className="list-inside list-disc space-y-1">
                 <li>
                   Ensure the wallet address is correct and on the{" "}
-                  <strong>{activeTab === "usdt" ? "TRC20" : "ERC20"}</strong>{" "}
-                  network.
+                  <strong>TRC20</strong> network.
                 </li>
                 <li>
                   Withdrawals typically take <strong>24-72 hours</strong> to be fully processed for security reasons.

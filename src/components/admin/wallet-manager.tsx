@@ -29,7 +29,6 @@ import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const adminPanelSchema = z.object({
-  asset: z.enum(["usdt", "eth"]),
   amount: z.coerce
     .number()
     .positive({ message: "Amount must be a positive number." }),
@@ -58,7 +57,6 @@ export function WalletManager() {
   const form = useForm<AdminPanelFormValues>({
     resolver: zodResolver(adminPanelSchema),
     defaultValues: {
-      asset: "usdt",
       amount: 0,
     },
   });
@@ -75,14 +73,11 @@ export function WalletManager() {
 
     const newBalances = { ...selectedWalletData.balances };
     const amount = action === 'add' ? values.amount : -values.amount;
+    const asset = "usdt";
 
-    if (values.asset === 'usdt') {
-        newBalances.usdt += amount;
-    } else {
-        newBalances.eth += amount;
-    }
+    newBalances.usdt += amount;
 
-    if (newBalances.usdt < 0 || newBalances.eth < 0) {
+    if (newBalances.usdt < 0) {
         toast({ title: "Invalid Operation", description: "Balance cannot be negative.", variant: "destructive" });
         setIsLoading(false);
         return;
@@ -91,7 +86,7 @@ export function WalletManager() {
     if (action === 'add') {
       await sendAdminMessage(
         selectedUserEmail,
-        `Deposit received: ${values.amount.toFixed(2)} ${values.asset.toUpperCase()} has been credited to your account.`
+        `Deposit received: ${values.amount.toFixed(2)} ${asset.toUpperCase()} has been credited to your account.`
       );
     }
     
@@ -106,10 +101,10 @@ export function WalletManager() {
 
     toast({
       title: "Balance Updated",
-      description: `Successfully ${action}ed ${values.amount} ${values.asset.toUpperCase()} for ${selectedUserEmail}.`,
+      description: `Successfully ${action}ed ${values.amount} ${asset.toUpperCase()} for ${selectedUserEmail}.`,
     });
     
-    form.reset({ asset: values.asset, amount: 0 });
+    form.reset({ amount: 0 });
     setIsLoading(false);
   };
   
@@ -143,19 +138,14 @@ export function WalletManager() {
 
         {selectedUserEmail && (
           isFetchingWallets ? (
-            <div className="mb-6 grid grid-cols-2 gap-4">
-              <Skeleton className="h-24 w-full" />
+            <div className="mb-6">
               <Skeleton className="h-24 w-full" />
             </div>
           ) : selectedWalletData ? (
-            <div className="mb-6 grid grid-cols-2 gap-4 text-center border rounded-lg p-4 bg-muted/30">
+            <div className="mb-6 rounded-lg border bg-muted/30 p-4 text-center">
                 <div>
                     <p className="text-sm text-muted-foreground">USDT Balance</p>
                     <p className="text-2xl font-bold">${selectedWalletData.balances.usdt.toFixed(2)}</p>
-                </div>
-                 <div>
-                    <p className="text-sm text-muted-foreground">ETH Balance</p>
-                    <p className="text-2xl font-bold">{selectedWalletData.balances.eth.toFixed(4)} ETH</p>
                 </div>
             </div>
           ) : null
@@ -163,31 +153,10 @@ export function WalletManager() {
 
         <FormField
           control={form.control}
-          name="asset"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Asset</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedUserEmail || isLoading}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an asset" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="usdt">USDT</SelectItem>
-                  <SelectItem value="eth">ETH</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Amount (USDT)</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="0.00" {...field} disabled={!selectedUserEmail || isLoading} />
               </FormControl>
