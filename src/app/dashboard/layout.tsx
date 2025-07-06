@@ -183,7 +183,15 @@ export default function DashboardLayout({
              <h1 className="text-lg font-semibold md:text-2xl capitalize">{pathname.split('/').pop()?.replace('-', ' ')}</h1>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main
+          className="relative flex-1 bg-cover bg-center"
+          style={{ backgroundImage: "url('/dashboard-bg.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="relative z-10 h-full overflow-y-auto p-4 md:p-6">
+            {children}
+          </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
