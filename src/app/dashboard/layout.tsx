@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -42,6 +41,7 @@ import { logout, getCurrentUserEmail } from "@/lib/auth";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
+import { AstralLogo } from "@/components/icons/astral-logo";
 
 export default function DashboardLayout({
   children,
@@ -85,7 +85,7 @@ export default function DashboardLayout({
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="AstralCore Logo" width={32} height={32} />
+            <AstralLogo className="h-8 w-8" />
             <span className="text-lg font-semibold text-sidebar-foreground">AstralCore</span>
           </div>
         </SidebarHeader>

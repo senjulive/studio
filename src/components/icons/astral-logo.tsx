@@ -1,0 +1,59 @@
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+export const AstralLogo = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
+    <svg
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+        className={cn("h-12 w-12", className)}
+        {...props}
+    >
+        <defs>
+            <linearGradient id="chevronGradient" x1="0.5" y1="0" x2="0.5" y2="1">
+                <stop offset="0%" stopColor="hsl(var(--chart-4))" />
+                <stop offset="100%" stopColor="hsl(var(--chart-5))" />
+            </linearGradient>
+            <linearGradient id="nodeGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="hsl(var(--chart-5))" />
+                <stop offset="100%" stopColor="hsl(var(--chart-4))" />
+            </linearGradient>
+        </defs>
+
+        <path
+            d="M50 5 L93.3 27.5 L93.3 72.5 L50 95 L6.7 72.5 L6.7 27.5 Z"
+            fill="hsl(var(--primary) / 0.05)"
+            stroke="hsl(var(--primary))"
+            strokeWidth="3.5"
+        />
+
+        <g stroke="hsl(var(--primary))" strokeWidth="1.5" strokeOpacity="0.5">
+            <line x1="71.65" y1="16.25" x2="62" y2="28" />
+            <line x1="93.3" y1="50" x2="73" y2="50" />
+            <line x1="71.65" y1="83.75" x2="62" y2="72" />
+            <line x1="28.35" y1="83.75" x2="38" y2="72" />
+            <line x1="6.7" y1="50" x2="27" y2="50" />
+            <line x1="28.35" y1="16.25" x2="38" y2="28" />
+        </g>
+        
+        <g fill="url(#nodeGradient)">
+            <circle cx="62" cy="28" r="4" />
+            <circle cx="73" cy="50" r="4" />
+            <circle cx="62" cy="72" r="4" />
+            <circle cx="38" cy="72" r="4" />
+            <circle cx="27" cy="50" r="4" />
+            <circle cx="38" cy="28" r="4" />
+        </g>
+        
+        <g transform="translate(0, -2)">
+            <rect x="47" y="22" width="6" height="18" fill="hsl(var(--chart-2))" rx="2" />
+            <rect x="37" y="26" width="6" height="18" fill="hsl(var(--chart-2) / 0.8)" rx="2" />
+            <rect x="57" y="26" width="6" height="18" fill="hsl(var(--chart-2) / 0.8)" rx="2" />
+
+            <g fill="url(#chevronGradient)">
+                <path d="M50 50 L70 65 L50 58 L30 65 Z" />
+                <path d="M50 66 L70 81 L50 74 L30 81 Z" opacity="0.8"/>
+                <path d="M50 82 L70 97 L50 90 L30 97 Z" opacity="0.6"/>
+            </g>
+        </g>
+    </svg>
+);

@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
-import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -30,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { createWallet } from "@/lib/wallet";
+import { AstralLogo } from "../icons/astral-logo";
 
 const US_COUNTRY = { name: 'United States', dial_code: '+1', code: 'US', flag: '🇺🇸' };
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -85,7 +85,7 @@ export function RegisterForm() {
   return (
     <Card className="w-full max-w-sm border-border/50">
       <CardHeader className="text-center">
-        <Image src="/logo.png" alt="AstralCore Logo" width={48} height={48} className="mx-auto mb-2" />
+        <AstralLogo className="mx-auto mb-2" />
         <CardTitle className="text-2xl font-headline">System Registration</CardTitle>
         <CardDescription>
           Complete the form below to register your account.

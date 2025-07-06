@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
-import Image from "next/image";
 import { Loader2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -32,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
 import { login } from "@/lib/auth";
 import { getOrCreateWallet } from "@/lib/wallet";
+import { AstralLogo } from "../icons/astral-logo";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
 
@@ -78,7 +78,7 @@ export function LoginForm() {
     setIsLoading(false);
     toast({
       title: "Login Successful",
-      description: "Welcome back to AstralCore!",
+      description: "Welcome to AstralCore!",
     });
     router.push("/dashboard");
   };
@@ -86,7 +86,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-sm border-border/50">
       <CardHeader className="text-center">
-        <Image src="/logo.png" alt="AstralCore Logo" width={48} height={48} className="mx-auto mb-2" />
+        <AstralLogo className="mx-auto mb-2" />
         <CardTitle className="text-2xl font-headline">AstralCore</CardTitle>
         <CardDescription>
           Enter your credentials to access your account.
