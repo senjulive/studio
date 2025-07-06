@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -99,7 +100,7 @@ export function TradingBotCard({
       if (percent < 100) {
         animationRequestId = requestAnimationFrame(updateAnimation);
       } else {
-        const rate = totalBalance >= 500 ? 0.03 : 0.025;
+        const rate = 0.015;
         const earnings = totalBalance * rate;
 
         const newWalletData: WalletData = {
@@ -182,7 +183,7 @@ export function TradingBotCard({
               {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
             </p>
             <p className="text-xs text-muted-foreground">
-                {canStart ? 'Earn up to 3%.' : 'Come back tomorrow for more grids.'}
+                {canStart ? 'Earn 1.5%.' : 'Come back tomorrow for more grids.'}
             </p>
           </div>
         )}
