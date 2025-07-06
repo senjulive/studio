@@ -6,11 +6,9 @@ import Link from "next/link";
 import {
   ArrowDownLeft,
   ArrowUpRight,
-  Copy,
   Loader2,
   Users,
 } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,7 +43,6 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Skeleton } from "@/components/ui/skeleton";
 import { getOrCreateWallet } from "@/lib/wallet";
 
 const MOCK_TRANSACTIONS: any[] = [];
@@ -53,7 +50,6 @@ const MOCK_TRANSACTIONS: any[] = [];
 export function WalletView() {
   const { toast } = useToast();
   const [balance] = React.useState(0);
-  const [showDepositDialog, setShowDepositDialog] = React.useState(false);
   const [showWithdrawDialog, setShowWithdrawDialog] = React.useState(false);
   const [isWithdrawing, setIsWithdrawing] = React.useState(false);
   const [withdrawAmount, setWithdrawAmount] = React.useState("");
@@ -73,19 +69,6 @@ export function WalletView() {
     }
     fetchWallet();
   }, []);
-
-  const handleCopy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast({ title: "Address copied to clipboard" });
-    } catch (err) {
-      toast({
-        title: "Failed to copy",
-        description: "Could not copy address to clipboard.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,9 +92,6 @@ export function WalletView() {
     usdt: 0,
     eth: 0,
   };
-
-  const currentWalletAddress =
-    activeTab === "usdt" ? walletAddresses.usdt : walletAddresses.eth;
 
   return (
     <>
@@ -175,8 +155,10 @@ export function WalletView() {
             <TabsTrigger value="eth">ETH Wallet</TabsTrigger>
           </TabsList>
           <div className="flex items-center gap-2">
-            <Button onClick={() => setShowDepositDialog(true)}>
-              <ArrowDownLeft className="mr-2 h-4 w-4" /> Deposit
+            <Button asChild>
+              <Link href="/dashboard/deposit">
+                <ArrowDownLeft className="mr-2 h-4 w-4" /> Deposit
+              </Link>
             </Button>
             <Button
               variant="outline"
@@ -272,53 +254,6 @@ export function WalletView() {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Deposit Dialog */}
-      <Dialog open={showDepositDialog} onOpenChange={setShowDepositDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Deposit {activeTab.toUpperCase()}</DialogTitle>
-            <DialogDescription>
-              Only send {activeTab.toUpperCase()} (
-              {activeTab === "usdt" ? "TRC20" : "ERC20"}) to this address.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            {currentWalletAddress ? (
-              <QRCodeSVG
-                value={currentWalletAddress}
-                size={160}
-                fgColor="hsl(var(--foreground))"
-                bgColor="transparent"
-              />
-            ) : (
-              <Skeleton className="h-[160px] w-[160px] rounded-md" />
-            )}
-            <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="deposit-address">Deposit Address</Label>
-              <div className="flex items-center gap-2">
-                {currentWalletAddress ? (
-                  <Input
-                    id="deposit-address"
-                    value={currentWalletAddress}
-                    readOnly
-                  />
-                ) : (
-                  <Skeleton className="h-10 w-full" />
-                )}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleCopy(currentWalletAddress)}
-                  disabled={!currentWalletAddress}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Withdraw Dialog */}
       <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>

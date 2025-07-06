@@ -28,6 +28,7 @@ import {
   LogOut,
   User,
   Gift,
+  ArrowDownLeft,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -128,6 +129,14 @@ export default function DashboardLayout({
                 <Link href="/dashboard">
                   <Wallet />
                   Wallets
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/dashboard/deposit">
+                  <ArrowDownLeft />
+                  Deposit
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
