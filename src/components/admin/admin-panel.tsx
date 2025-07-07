@@ -9,6 +9,12 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Shield,
   WalletCards,
   Mail,
@@ -40,48 +46,65 @@ export function AdminPanel() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="wallets" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 gap-2">
-            <TabsTrigger value="wallets" className="flex-col h-16">
-              <WalletCards className="h-5 w-5" />
-              <span className="mt-1 text-xs text-center">
-                Manage
-                <br />
-                Wallets
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="messages" className="flex-col h-16">
-              <Mail className="h-5 w-5" />
-              <span className="mt-1 text-xs text-center">
-                View
-                <br />
-                Messages
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="bot-settings" className="flex-col h-16">
-              <Bot className="h-5 w-5" />
-              <span className="mt-1 text-xs text-center">
-                Bot
-                <br />
-                Settings
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="announcements" className="flex-col h-16">
-              <Megaphone className="h-5 w-5" />
-              <span className="mt-1 text-xs text-center">
-                Post
-                <br />
-                Alerts
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="site-settings" className="flex-col h-16">
-              <Settings className="h-5 w-5" />
-              <span className="mt-1 text-xs text-center">
-                Site
-                <br />
-                Settings
-              </span>
-            </TabsTrigger>
-          </TabsList>
+          <TooltipProvider>
+            <TabsList className="grid w-full grid-cols-5 gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="wallets" className="h-14 w-full">
+                    <WalletCards className="h-6 w-6" />
+                    <span className="sr-only">Manage Wallets</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Manage Wallets</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="messages" className="h-14 w-full">
+                    <Mail className="h-6 w-6" />
+                     <span className="sr-only">View Messages</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>View Messages</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="bot-settings" className="h-14 w-full">
+                    <Bot className="h-6 w-6" />
+                     <span className="sr-only">Bot Settings</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Bot Settings</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="announcements" className="h-14 w-full">
+                    <Megaphone className="h-6 w-6" />
+                     <span className="sr-only">Announcements</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Announcements</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="site-settings" className="h-14 w-full">
+                    <Settings className="h-6 w-6" />
+                     <span className="sr-only">Site Settings</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Site Settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TabsList>
+          </TooltipProvider>
           <TabsContent value="wallets" className="mt-6">
             <WalletManager />
           </TabsContent>
