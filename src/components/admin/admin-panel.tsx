@@ -8,7 +8,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield } from "lucide-react";
+import {
+  Shield,
+  WalletCards,
+  Mail,
+  Bot,
+  Megaphone,
+  Settings,
+} from "lucide-react";
 import { WalletManager } from "./wallet-manager";
 import { MessageViewer } from "./message-viewer";
 import { BotSettingsManager } from "./bot-settings-manager";
@@ -33,12 +40,27 @@ export function AdminPanel() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="wallets" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="wallets">Wallet Management</TabsTrigger>
-            <TabsTrigger value="messages">User Messages</TabsTrigger>
-            <TabsTrigger value="bot-settings">Bot Settings</TabsTrigger>
-            <TabsTrigger value="announcements">Announcements</TabsTrigger>
-            <TabsTrigger value="site-settings">Site Settings</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 gap-2">
+            <TabsTrigger value="wallets">
+              <WalletCards className="mr-2 h-4 w-4" />
+              <span>Wallet Management</span>
+            </TabsTrigger>
+            <TabsTrigger value="messages">
+              <Mail className="mr-2 h-4 w-4" />
+              <span>User Messages</span>
+            </TabsTrigger>
+            <TabsTrigger value="bot-settings">
+              <Bot className="mr-2 h-4 w-4" />
+              <span>Bot Settings</span>
+            </TabsTrigger>
+            <TabsTrigger value="announcements">
+              <Megaphone className="mr-2 h-4 w-4" />
+              <span>Announcements</span>
+            </TabsTrigger>
+            <TabsTrigger value="site-settings">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Site Settings</span>
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="wallets" className="mt-6">
             <WalletManager />
