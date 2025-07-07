@@ -201,7 +201,7 @@ export function DepositView() {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="platform">
               <Wallet className="mr-2 h-4 w-4" />
-              Platform Address
+              Deposit
             </TabsTrigger>
             <TabsTrigger value="personal">
               <User className="mr-2 h-4 w-4" />
