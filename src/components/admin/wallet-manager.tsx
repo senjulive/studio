@@ -40,6 +40,9 @@ const addressUpdateSchema = z.object({
 });
 
 const balanceUpdateSchema = z.object({
+  asset: z.enum(["usdt", "btc", "eth"], {
+    required_error: "You need to select an asset.",
+  }),
   amount: z.coerce
     .number()
     .positive({ message: "Amount must be a positive number." }),
@@ -47,6 +50,14 @@ const balanceUpdateSchema = z.object({
 
 type AddressUpdateFormValues = z.infer<typeof addressUpdateSchema>;
 type BalanceUpdateFormValues = z.infer<typeof balanceUpdateSchema>;
+
+const formatBalance = (amount: number) => {
+    if (amount === 0) return '0.00';
+    if (amount > 0 && amount < 0.0001) return amount.toExponential(2);
+    if (amount > 1000) return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+}
+
 
 export function WalletManager() {
   const { toast } = useToast();
@@ -125,13 +136,13 @@ export function WalletManager() {
 
     setIsUpdatingBalance(true);
 
+    const { asset } = values;
     const newBalances = { ...selectedWalletData.balances };
     const amount = action === "add" ? values.amount : -values.amount;
-    const asset = "usdt";
+    
+    newBalances[asset] = (newBalances[asset] || 0) + amount;
 
-    newBalances.usdt += amount;
-
-    if (newBalances.usdt < 0) {
+    if (newBalances[asset] < 0) {
       toast({
         title: "Invalid Operation",
         description: "Balance cannot be negative.",
@@ -145,14 +156,12 @@ export function WalletManager() {
       await sendAdminMessage(
         selectedUserEmail,
         `Deposit received: ${values.amount.toFixed(
-          2
+          8
         )} ${asset.toUpperCase()} has been credited to your account.`
       );
       await addNotification(selectedUserEmail, {
         title: "Deposit Approved",
-        content: `Your balance has been credited with $${values.amount.toFixed(
-          2
-        )} USDT.`,
+        content: `Your balance has been credited with ${values.amount} ${asset.toUpperCase()}.`,
         href: "/dashboard",
       });
     }
@@ -211,11 +220,23 @@ export function WalletManager() {
         (isFetchingWallets ? (
           <Skeleton className="h-24 w-full" />
         ) : selectedWalletData ? (
-          <div className="mb-6 rounded-lg border bg-muted/30 p-4 text-center">
+          <div className="mb-6 rounded-lg border bg-muted/30 p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
             <div>
               <p className="text-sm text-muted-foreground">USDT Balance</p>
-              <p className="text-2xl font-bold">
-                ${selectedWalletData.balances.usdt.toFixed(2)}
+              <p className="text-xl font-bold">
+                ${formatBalance(selectedWalletData.balances.usdt)}
+              </p>
+            </div>
+             <div>
+              <p className="text-sm text-muted-foreground">ETH Balance</p>
+              <p className="text-xl font-bold">
+                {formatBalance(selectedWalletData.balances.eth)}
+              </p>
+            </div>
+             <div>
+              <p className="text-sm text-muted-foreground">BTC Balance</p>
+              <p className="text-xl font-bold">
+                {formatBalance(selectedWalletData.balances.btc)}
               </p>
             </div>
           </div>
@@ -272,24 +293,48 @@ export function WalletManager() {
         <CardContent>
           <Form {...balanceForm}>
             <form className="space-y-4">
-              <FormField
-                control={balanceForm.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount (USDT)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="0.00"
-                        {...field}
-                        disabled={!selectedUserEmail || isUpdatingBalance}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+               <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={balanceForm.control}
+                  name="asset"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Asset</FormLabel>
+                       <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedUserEmail || isUpdatingBalance}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select asset" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="usdt">USDT</SelectItem>
+                          <SelectItem value="btc">BTC</SelectItem>
+                          <SelectItem value="eth">ETH</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                    control={balanceForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Amount</FormLabel>
+                        <FormControl>
+                        <Input
+                            type="number"
+                            placeholder="0.00"
+                            {...field}
+                            disabled={!selectedUserEmail || isUpdatingBalance}
+                        />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+               </div>
               <div className="flex gap-4">
                 <Button
                   onClick={balanceForm.handleSubmit(onSubmitBalanceAdd)}

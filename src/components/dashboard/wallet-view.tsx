@@ -127,6 +127,27 @@ const initialCryptoData: CryptoData[] = [
   },
 ];
 
+const assetConfig = [
+    {
+        ticker: "USDT",
+        name: "USDT Balance",
+        icon: "https://assets.coincap.io/assets/icons/usdt@2x.png",
+        balanceKey: "usdt",
+    },
+    {
+        ticker: "ETH",
+        name: "ETH Balance",
+        icon: "https://assets.coincap.io/assets/icons/eth@2x.png",
+        balanceKey: "eth",
+    },
+    {
+        ticker: "BTC",
+        name: "BTC Balance",
+        icon: "https://assets.coincap.io/assets/icons/btc@2x.png",
+        balanceKey: "btc",
+    },
+] as const;
+
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(
@@ -240,7 +261,19 @@ export function WalletView() {
     );
   }, [walletData]);
 
-  const totalBalance = walletData?.balances ? walletData.balances.usdt : 0;
+  const totalBalance = React.useMemo(() => {
+    if (!walletData || allAssetsData.length === 0) return 0;
+    
+    const btcPrice = allAssetsData.find(c => c.ticker === "BTC")?.price ?? 0;
+    const ethPrice = allAssetsData.find(c => c.ticker === "ETH")?.price ?? 0;
+
+    return (
+        walletData.balances.usdt +
+        (walletData.balances.btc * btcPrice) +
+        (walletData.balances.eth * ethPrice)
+    );
+  }, [walletData, allAssetsData]);
+
   const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
 
   const handleWalletUpdate = async (newData: WalletData) => {
@@ -298,20 +331,22 @@ export function WalletView() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4">
-            <div className="rounded-lg border bg-secondary/50 p-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={20} height={20} className="rounded-full" />
-                <span>USDT Balance</span>
-              </div>
-              <p className="text-2xl font-bold mt-1">
-                $
-                {walletData.balances.usdt.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
-            </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {assetConfig.map(asset => (
+                <div key={asset.ticker} className="rounded-lg border bg-secondary/50 p-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                        <Image src={asset.icon} alt={`${asset.ticker} logo`} width={20} height={20} className="rounded-full" />
+                        <span>{asset.name}</span>
+                    </div>
+                    <p className="text-2xl font-bold mt-1">
+                        {asset.balanceKey === 'usdt' && '$'}
+                        {walletData.balances[asset.balanceKey].toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: asset.balanceKey === 'usdt' ? 2 : 6,
+                        })}
+                    </p>
+                </div>
+            ))}
           </div>
         </CardContent>
         <CardFooter className="flex gap-2">

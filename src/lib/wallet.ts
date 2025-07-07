@@ -41,6 +41,8 @@ export type WalletData = {
     addresses: WalletAddresses;
     balances: {
         usdt: number;
+        btc: number;
+        eth: number;
     };
     growth: {
         clicksLeft: number;
@@ -86,6 +88,8 @@ const createNewWalletObject = (): WalletData => {
         },
         balances: {
             usdt: 0,
+            btc: 0,
+            eth: 0,
         },
         growth: {
             clicksLeft: 4,
