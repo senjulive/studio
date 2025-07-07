@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -213,7 +214,7 @@ export function DepositView() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Wallet className="h-6 w-6" />
-          <span>Deposit Crypto</span>
+          <span>Deposit</span>
         </CardTitle>
         <CardDescription>
           Choose a method below to fund your account.
