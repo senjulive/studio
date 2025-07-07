@@ -3,25 +3,22 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  LineChart,
-  MessageSquare,
-  Repeat,
-  User,
-  Users,
-} from "lucide-react";
+import { Repeat } from "lucide-react";
+
+import { DepositIcon } from "@/components/icons/nav/deposit-icon";
+import { MarketIcon } from "@/components/icons/nav/market-icon";
+import { ProfileIcon } from "@/components/icons/nav/profile-icon";
+import { SquadIcon } from "@/components/icons/nav/squad-icon";
+import { SupportIcon } from "@/components/icons/nav/support-icon";
+import { WithdrawIcon } from "@/components/icons/nav/withdraw-icon";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   Table,
@@ -61,13 +58,13 @@ type CryptoData = {
 };
 
 const quickAccessItems = [
-  { href: "/dashboard/market", label: "Market", icon: LineChart },
-  { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
+  { href: "/dashboard/market", label: "Market", icon: MarketIcon },
+  { href: "/dashboard/deposit", label: "Deposit", icon: DepositIcon },
   { href: "/dashboard/market", label: "Trade", icon: Repeat },
-  { href: "/dashboard/profile", label: "Profile", icon: User },
-  { href: "/dashboard/support", label: "Support", icon: MessageSquare },
-  { href: "/dashboard/squad", label: "Squad", icon: Users },
-  { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
+  { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
+  { href: "/dashboard/support", label: "Support", icon: SupportIcon },
+  { href: "/dashboard/squad", label: "Squad", icon: SquadIcon },
+  { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
 ];
 
 const initialCryptoData: CryptoData[] = [
@@ -382,8 +379,8 @@ export function WalletView() {
                 href={item.href}
                 className="flex flex-col items-center justify-center space-y-2 rounded-lg p-2 transition-colors hover:bg-muted"
               >
-                <div className="rounded-full bg-primary/10 p-3">
-                  <item.icon className="h-5 w-5 text-primary" />
+                <div className="rounded-full bg-primary/10 p-2">
+                  <item.icon className="h-7 w-7 text-primary" />
                 </div>
                 <span className="text-xs font-medium text-muted-foreground">
                   {item.label}
