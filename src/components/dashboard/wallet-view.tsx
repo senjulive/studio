@@ -302,7 +302,7 @@ export function WalletView() {
         className="relative overflow-hidden"
       >
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-purple-100 via-blue-200 to-white -z-10"
+          className="absolute inset-0 bg-gradient-to-br from-blue-200 via-blue-100 to-white -z-10"
           style={{
             clipPath: 'ellipse(100% 70% at 0% 100%)'
           }}
@@ -368,9 +368,9 @@ export function WalletView() {
         </CardContent>
       </Card>
 
-      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} className="bg-gradient-to-b from-blue-100 via-purple-200 to-white" />
+      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
 
-      <Card className="bg-gradient-to-b from-blue-100 via-purple-200 to-white">
+      <Card>
         <CardHeader>
           <CardTitle>Quick Access</CardTitle>
         </CardHeader>
@@ -394,9 +394,9 @@ export function WalletView() {
         </CardContent>
       </Card>
 
-      <AllAssetsChart coins={allAssetsData} className="bg-gradient-to-b from-blue-100 via-purple-200 to-white" />
+      <AllAssetsChart coins={allAssetsData} />
 
-      <Card className="bg-gradient-to-b from-blue-100 via-purple-200 to-white">
+      <Card>
         <CardHeader>
           <CardTitle>Transaction History</CardTitle>
           <CardDescription>
