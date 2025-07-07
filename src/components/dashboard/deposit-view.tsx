@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const DepositAddressDisplay = ({
   address,
@@ -101,6 +102,7 @@ const PersonalDepositRequest = () => {
   const { toast } = useToast();
   const userEmail = getCurrentUserEmail();
   const [amount, setAmount] = React.useState("");
+  const [selectedAsset, setSelectedAsset] = React.useState("usdt");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleDepositRequest = async (e: React.FormEvent) => {
@@ -119,12 +121,12 @@ const PersonalDepositRequest = () => {
     try {
       await sendSystemNotification(
         userEmail,
-        `User has initiated a deposit request for $${parseFloat(amount).toFixed(2)} USDT. Please verify payment and credit their account manually via the Wallet Management tab.`
+        `User has initiated a deposit request for ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()}. Please verify payment and credit their account manually via the Wallet Management tab.`
       );
 
       await addNotification(userEmail, {
         title: "Deposit Request Submitted",
-        content: `Your request to deposit $${parseFloat(amount).toFixed(2)} USDT has been received and is pending approval.`,
+        content: `Your request to deposit ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()} has been received and is pending approval.`,
         href: "/dashboard/deposit",
       });
       
@@ -145,11 +147,28 @@ const PersonalDepositRequest = () => {
         setIsSubmitting(false);
     }
   };
+  
+  const assets = [
+    { id: "usdt", name: "USDT", icon: "https://assets.coincap.io/assets/icons/usdt@2x.png" },
+    { id: "eth", name: "ETH", icon: "https://assets.coincap.io/assets/icons/eth@2x.png" },
+    { id: "btc", name: "BTC", icon: "https://assets.coincap.io/assets/icons/btc@2x.png" },
+  ];
 
   return (
-    <form onSubmit={handleDepositRequest} className="space-y-4">
+    <form onSubmit={handleDepositRequest} className="space-y-6">
+        <div className="space-y-4">
+            <Label className="block text-center text-sm font-medium text-muted-foreground">Select Asset</Label>
+            <RadioGroup onValueChange={setSelectedAsset} value={selectedAsset} className="flex justify-center gap-4">
+                {assets.map(asset => (
+                    <Label key={asset.id} htmlFor={asset.id} className="cursor-pointer rounded-full border-2 p-1 transition-all hover:border-primary/50 has-[input:checked]:border-primary has-[input:checked]:ring-2 has-[input:checked]:ring-primary/20">
+                        <RadioGroupItem value={asset.id} id={asset.id} className="sr-only" />
+                        <Image src={asset.icon} alt={`${asset.name} logo`} width={40} height={40} className="rounded-full" />
+                    </Label>
+                ))}
+            </RadioGroup>
+        </div>
       <div className="space-y-2">
-        <Label htmlFor="deposit-amount">Amount to Deposit (USDT)</Label>
+        <Label htmlFor="deposit-amount">Amount to Deposit ({selectedAsset.toUpperCase()})</Label>
         <Input 
           id="deposit-amount"
           type="number"
@@ -271,7 +290,7 @@ export function DepositView() {
                 <AlertTitle>How It Works</AlertTitle>
                 <AlertDescription>
                     <ul className="list-inside list-disc space-y-1">
-                        <li>Enter the amount of USDT you wish to deposit and submit the request.</li>
+                        <li>Select the asset, enter the amount you wish to deposit, and submit the request.</li>
                         <li>Your funds will be credited to your account within 5-15 minutes of approval.</li>
                         <li>You can contact support if you have any questions about your deposit status.</li>
                     </ul>
