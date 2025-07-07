@@ -52,16 +52,6 @@ function DashboardLoading() {
   );
 }
 
-const generateRandomString = (length: number) => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
-
 
 export default function DashboardLayout({
   children,
@@ -73,7 +63,6 @@ export default function DashboardLayout({
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [isClient, setIsClient] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
-  const [randomizedLabels, setRandomizedLabels] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -83,7 +72,7 @@ export default function DashboardLayout({
     return () => clearTimeout(timer);
   }, []);
 
-  const menuItems = React.useMemo(() => [
+  const menuItems = [
     { href: "/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/dashboard/market", label: "Market", icon: LineChart },
     { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
@@ -92,18 +81,12 @@ export default function DashboardLayout({
     { href: "/dashboard/profile", label: "Profile", icon: User },
     { href: "/dashboard/support", label: "Support", icon: MessageSquare },
     { href: "/dashboard/about", label: "About", icon: Info },
-  ], []);
+  ];
 
   React.useEffect(() => {
     setUserEmail(getCurrentUserEmail());
     setIsClient(true);
-    
-    const newLabels: Record<string, string> = {};
-    menuItems.forEach(item => {
-      newLabels[item.href] = generateRandomString(8);
-    });
-    setRandomizedLabels(newLabels);
-  }, [menuItems]);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -124,7 +107,8 @@ export default function DashboardLayout({
   }
   
   const getPageTitle = () => {
-    return randomizedLabels[pathname] || (pathname.split('/').pop()?.replace('-', ' ') || 'Home');
+    const currentItem = menuItems.find(item => item.href === pathname);
+    return currentItem ? currentItem.label : (pathname.split('/').pop()?.replace('-', ' ') || 'Home');
   };
 
   return (
@@ -143,7 +127,7 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild isActive={isClient ? pathname === item.href : false}>
                   <Link href={item.href}>
                     <item.icon />
-                    {randomizedLabels[item.href] ? <span>{randomizedLabels[item.href]}</span> : <Skeleton className="h-4 w-20" />}
+                    <span>{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -226,7 +210,7 @@ export default function DashboardLayout({
               )}
             >
               <item.icon className="h-5 w-5" />
-              {randomizedLabels[item.href] ? <span>{randomizedLabels[item.href]}</span> : <Skeleton className="h-3 w-10 mt-1" />}
+              <span>{item.label}</span>
             </Link>
           ))}
         </nav>
