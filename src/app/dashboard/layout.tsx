@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -23,25 +24,24 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from "@/components/ui/sidebar";
-import {
-  LayoutDashboard,
-  Settings,
-  LogOut,
-  User,
-  Users,
-  ArrowDownLeft,
-  ArrowUpRight,
-  MessageSquare,
-  LineChart,
-  Info,
-  Download,
-} from "lucide-react";
 import { logout, getCurrentUserEmail } from "@/lib/auth";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { AstralLogo } from "@/components/icons/astral-logo";
 import { Skeleton } from "@/components/ui/skeleton";
+
+import { HomeIcon } from "@/components/icons/nav/home-icon";
+import { MarketIcon } from "@/components/icons/nav/market-icon";
+import { DepositIcon } from "@/components/icons/nav/deposit-icon";
+import { WithdrawIcon } from "@/components/icons/nav/withdraw-icon";
+import { SquadIcon } from "@/components/icons/nav/squad-icon";
+import { ProfileIcon } from "@/components/icons/nav/profile-icon";
+import { SupportIcon } from "@/components/icons/nav/support-icon";
+import { AboutIcon } from "@/components/icons/nav/about-icon";
+import { DownloadIcon } from "@/components/icons/nav/download-icon";
+import { SettingsIcon } from "@/components/icons/nav/settings-icon";
+import { LogoutIcon } from "@/components/icons/nav/logout-icon";
 
 function DashboardLoading() {
   return (
@@ -85,18 +85,18 @@ export default function DashboardLayout({
   }, []);
 
   const menuItems = [
-    { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-    { href: "/dashboard/market", label: "Market", icon: LineChart },
-    { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
-    { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
-    { href: "/dashboard/squad", label: "Squad", icon: Users },
-    { href: "/dashboard/profile", label: "Profile", icon: User },
-    { href: "/dashboard/support", label: "Support", icon: MessageSquare },
-    { href: "/dashboard/about", label: "About", icon: Info },
+    { href: "/dashboard", label: "Home", icon: HomeIcon },
+    { href: "/dashboard/market", label: "Market", icon: MarketIcon },
+    { href: "/dashboard/deposit", label: "Deposit", icon: DepositIcon },
+    { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
+    { href: "/dashboard/squad", label: "Squad", icon: SquadIcon },
+    { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
+    { href: "/dashboard/support", label: "Support", icon: SupportIcon },
+    { href: "/dashboard/about", label: "About", icon: AboutIcon },
     {
       href: downloadHref,
       label: "Download App",
-      icon: Download,
+      icon: DownloadIcon,
       download: "AstralCore.url",
     },
   ];
@@ -114,10 +114,10 @@ export default function DashboardLayout({
   const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
 
   const bottomNavItems = [
-    { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-    { href: "/dashboard/support", label: "Support", icon: MessageSquare },
-    { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
-    { href: "/dashboard/profile", label: "Profile", icon: User },
+    { href: "/dashboard", label: "Home", icon: HomeIcon },
+    { href: "/dashboard/support", label: "Support", icon: SupportIcon },
+    { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
+    { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
   ];
 
   if (isInitializing) {
@@ -180,17 +180,17 @@ export default function DashboardLayout({
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                  <Link href="/dashboard/profile">
-                  <User className="mr-2 h-4 w-4" />
+                  <ProfileIcon className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                  </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
+                <SettingsIcon className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
+                <LogoutIcon className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
