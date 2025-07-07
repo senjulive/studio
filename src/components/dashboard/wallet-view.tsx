@@ -372,12 +372,12 @@ export function WalletView() {
           <CardTitle>Quick Access</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-7 gap-2 text-center">
             {quickAccessItems.map((item, index) => (
               <Link
                 key={index}
                 href={item.href}
-                className="flex flex-col items-center justify-center space-y-2 rounded-lg p-2 transition-colors hover:bg-muted"
+                className="flex flex-col items-center justify-center space-y-1 rounded-lg p-1 transition-colors hover:bg-muted"
               >
                 <div className="rounded-full bg-primary/10 p-2">
                   <item.icon className="h-7 w-7 text-primary" />
