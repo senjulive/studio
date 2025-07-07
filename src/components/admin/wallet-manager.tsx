@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { getAllWallets, updateWallet, type WalletData } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
@@ -181,18 +182,16 @@ export function WalletManager() {
 
   return (
     <div className="space-y-6">
-      <FormItem>
-        <FormLabel>Select User</FormLabel>
+      <div className="space-y-2">
+        <Label>Select User</Label>
         <Select
           onValueChange={setSelectedUserEmail}
           value={selectedUserEmail}
           disabled={isFetchingWallets}
         >
-          <FormControl>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a user to manage..." />
-            </SelectTrigger>
-          </FormControl>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a user to manage..." />
+          </SelectTrigger>
           <SelectContent>
             {allWallets && Object.keys(allWallets).length > 0 ? (
               Object.keys(allWallets).map((email) => (
@@ -207,7 +206,7 @@ export function WalletManager() {
             )}
           </SelectContent>
         </Select>
-      </FormItem>
+      </div>
 
       {selectedUserEmail &&
         (isFetchingWallets ? (
