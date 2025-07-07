@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
-  WalletCards,
   Settings,
   LogOut,
   User,
@@ -34,7 +33,6 @@ import {
   ArrowUpRight,
   MessageSquare,
   LineChart,
-  Bell,
   Info
 } from "lucide-react";
 import { logout, getCurrentUserEmail } from "@/lib/auth";
@@ -43,6 +41,17 @@ import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { AstralLogo } from "@/components/icons/astral-logo";
 import { Skeleton } from "@/components/ui/skeleton";
+
+function DashboardLoading() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-dvh bg-background text-foreground animate-in fade-in-50">
+      <AstralLogo className="h-20 w-20 animate-pulse" />
+      <p className="mt-4 text-lg font-semibold">Loading Your Dashboard</p>
+      <p className="text-muted-foreground">Please wait a moment...</p>
+    </div>
+  );
+}
+
 
 export default function DashboardLayout({
   children,
@@ -53,6 +62,16 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [isClient, setIsClient] = React.useState(false);
+  const [isInitializing, setIsInitializing] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 2000); 
+
+    return () => clearTimeout(timer);
+  }, []);
+
 
   React.useEffect(() => {
     setUserEmail(getCurrentUserEmail());
@@ -83,6 +102,10 @@ export default function DashboardLayout({
     { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
     { href: "/dashboard/profile", label: "Profile", icon: User },
   ];
+
+  if (isInitializing) {
+    return <DashboardLoading />;
+  }
 
   return (
     <SidebarProvider>
