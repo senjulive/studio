@@ -233,10 +233,10 @@ export function DepositView() {
                 <AlertTitle>How It Works</AlertTitle>
                 <AlertDescription>
                     <ul className="list-inside list-disc space-y-1">
-                        <li>Enter the amount of USDT you wish to deposit.</li>
-                        <li>After submitting, an administrator is notified of your request.</li>
-                        <li>Your account balance will be credited manually once the administrator confirms your transaction.</li>
-                        <li>You can contact support at any time to inquire about your deposit status.</li>
+                        <li>Enter the amount of USDT you wish to deposit and submit the request.</li>
+                        <li>An administrator will review your request for confirmation.</li>
+                        <li>Your funds will be credited to your account within 5-15 minutes of approval.</li>
+                        <li>You can contact support if you have any questions about your deposit status.</li>
                     </ul>
                 </AlertDescription>
             </Alert>
