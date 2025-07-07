@@ -40,7 +40,7 @@ export function AdminPanel() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="wallets" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 gap-2">
+          <TabsList className="grid w-full grid-cols-3 gap-2">
             <TabsTrigger value="wallets" className="flex-col h-16">
               <WalletCards className="h-5 w-5" />
               <span className="mt-1 text-xs text-center">
