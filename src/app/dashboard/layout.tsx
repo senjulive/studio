@@ -43,6 +43,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { AstralLogo } from "@/components/icons/astral-logo";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardLayout({
   children,
@@ -52,9 +53,11 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
     setUserEmail(getCurrentUserEmail());
+    setIsClient(true);
   }, []);
 
   const handleLogout = async () => {
@@ -95,7 +98,7 @@ export default function DashboardLayout({
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton asChild isActive={pathname === item.href}>
+                <SidebarMenuButton asChild isActive={isClient ? pathname === item.href : false}>
                   <Link href={item.href}>
                     <item.icon />
                     {item.label}
@@ -162,7 +165,11 @@ export default function DashboardLayout({
           <div className="w-full flex-1">
              <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
                 <AstralLogo className="h-6 w-6" />
-                <span>{pathname === '/dashboard' ? 'Home' : pathname.split('/').pop()?.replace('-', ' ')}</span>
+                {isClient ? (
+                  <span>{pathname === '/dashboard' ? 'Home' : pathname.split('/').pop()?.replace('-', ' ')}</span>
+                ) : (
+                  <Skeleton className="h-6 w-24" />
+                )}
             </h1>
           </div>
           <NotificationBell />
@@ -177,7 +184,7 @@ export default function DashboardLayout({
               href={item.href}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors",
-                pathname === item.href
+                isClient && pathname === item.href
                   ? "text-primary font-medium"
                   : "text-muted-foreground hover:text-foreground"
               )}
