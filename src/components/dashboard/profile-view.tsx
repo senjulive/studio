@@ -29,7 +29,6 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
                 <CardTitle className="text-lg">{announcement.title}</CardTitle>
                 <CardDescription>{announcement.date}</CardDescription>
             </div>
-            {!announcement.read && <Badge variant="destructive">New</Badge>}
         </div>
       </CardHeader>
       <CardContent>
@@ -81,8 +80,8 @@ const ProfileDetailItem = ({
 export function ProfileView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
 
-  const announcements = getAnnouncements();
   const userEmail = getCurrentUserEmail();
 
   React.useEffect(() => {
@@ -97,6 +96,7 @@ export function ProfileView() {
     } else {
         setIsLoading(false);
     }
+    setAnnouncements(getAnnouncements());
   }, [userEmail]);
 
   const profile = walletData?.profile;
