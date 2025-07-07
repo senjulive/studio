@@ -128,6 +128,7 @@ export function TradingBotCard({
         animationRequestId = requestAnimationFrame(updateAnimation);
       } else {
         const earnings = profitPerTrade;
+        const newEarning = { amount: earnings, timestamp: Date.now() };
 
         const newWalletData: WalletData = {
           ...walletData,
@@ -139,6 +140,7 @@ export function TradingBotCard({
             ...walletData.growth,
             clicksLeft: (walletData.growth?.clicksLeft ?? 1) - 1,
             dailyEarnings: (walletData.growth?.dailyEarnings ?? 0) + earnings,
+            earningsHistory: [...(walletData.growth.earningsHistory || []), newEarning],
           },
         };
 

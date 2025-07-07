@@ -55,6 +55,7 @@ export type WalletData = {
         clicksLeft: number;
         lastReset: number; // timestamp
         dailyEarnings: number;
+        earningsHistory: { amount: number; timestamp: number }[];
     };
     squad: {
         referralCode: string;
@@ -103,6 +104,7 @@ const createNewWalletObject = (): WalletData => {
             clicksLeft: 4,
             lastReset: Date.now(),
             dailyEarnings: 0,
+            earningsHistory: [],
         },
         squad: {
             referralCode: generateReferralCode(),
@@ -202,7 +204,7 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
       addresses: { ...defaultWallet.addresses, ...(existingWallet.addresses || {}) },
       balances: { ...defaultWallet.balances, ...(existingWallet.balances || {}) },
       pendingWithdrawals: existingWallet.pendingWithdrawals || [],
-      growth: { ...defaultWallet.growth, ...(existingWallet.growth || {}) },
+      growth: { ...defaultWallet.growth, ...(existingWallet.growth || {}), earningsHistory: existingWallet.growth?.earningsHistory || [] },
       squad: { ...defaultWallet.squad, ...(existingWallet.squad || {}) },
       profile: { ...defaultWallet.profile, ...(existingWallet.profile || {}) },
     };
@@ -220,6 +222,7 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
         patchedWallet.growth.clicksLeft = tierSettings.clicks;
         patchedWallet.growth.lastReset = now;
         patchedWallet.growth.dailyEarnings = 0;
+        patchedWallet.growth.earningsHistory = [];
         await updateWallet(email, patchedWallet);
     }
     

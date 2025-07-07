@@ -195,15 +195,17 @@ export function WalletView() {
 
     const history: Transaction[] = [];
 
-    // Daily Earnings
-    if (walletData.growth.dailyEarnings > 0) {
-      history.push({
-        id: `earn-${walletData.growth.lastReset}`,
-        type: "Daily Earnings",
-        asset: "USDT",
-        amount: walletData.growth.dailyEarnings,
-        date: new Date(walletData.growth.lastReset).toISOString(),
-        status: "Completed",
+    // Grid Profits from earnings history
+    if (walletData.growth.earningsHistory) {
+      walletData.growth.earningsHistory.forEach((earning, index) => {
+        history.push({
+          id: `grid-profit-${earning.timestamp}-${index}`,
+          type: 'Grid Profit',
+          asset: 'USDT',
+          amount: earning.amount,
+          date: new Date(earning.timestamp).toISOString(),
+          status: 'Completed',
+        });
       });
     }
 
@@ -235,7 +237,21 @@ export function WalletView() {
       });
     });
 
-    // Mock deposit and withdrawal for demonstration
+    // Pending Withdrawals from walletData
+    if (walletData.pendingWithdrawals) {
+      walletData.pendingWithdrawals.forEach(w => {
+          history.push({
+              id: w.id,
+              type: 'Withdrawal',
+              asset: 'USDT',
+              amount: -w.amount,
+              date: new Date(w.timestamp).toISOString(),
+              status: 'Pending',
+          });
+      });
+    }
+
+    // Mock deposit for demonstration, since there is no deposit history yet
     history.push({
       id: "txn-dep-1",
       type: "Deposit",
@@ -245,14 +261,6 @@ export function WalletView() {
       status: "Completed",
     });
 
-    history.push({
-      id: "txn-wd-1",
-      type: "Withdrawal",
-      asset: "USDT",
-      amount: -Math.floor(Math.random() * (500 - 50 + 1) + 50),
-      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      status: "Pending",
-    });
 
     return history.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
