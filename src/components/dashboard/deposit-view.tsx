@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Copy, Info, QrCode, Wallet, User } from "lucide-react";
+import { Copy, Info, QrCode, Wallet, User, Loader2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -19,8 +19,9 @@ import { useToast } from "@/hooks/use-toast";
 import { getSiteSettings } from "@/lib/site-settings";
 import { Skeleton } from "../ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
+import { sendSystemNotification } from "@/lib/chat";
+import { addNotification } from "@/lib/notifications";
 
 // A reusable component for displaying a deposit address
 const DepositAddressDisplay = ({
@@ -92,32 +93,97 @@ const DepositAddressDisplay = ({
   );
 };
 
+// New component for the personal deposit request form
+const PersonalDepositRequest = () => {
+  const { toast } = useToast();
+  const userEmail = getCurrentUserEmail();
+  const [amount, setAmount] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleDepositRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!amount || parseFloat(amount) <= 0 || !userEmail) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a positive amount to deposit.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Notify admin via a silent message in the chat system
+      await sendSystemNotification(
+        userEmail,
+        `User has initiated a deposit request for $${parseFloat(amount).toFixed(2)} USDT. Please verify payment and credit their account manually via the Wallet Management tab.`
+      );
+
+      // Create a notification for the user
+      await addNotification(userEmail, {
+        title: "Deposit Request Submitted",
+        content: `Your request to deposit $${parseFloat(amount).toFixed(2)} USDT has been received and is pending approval.`,
+        href: "/dashboard/deposit",
+      });
+      
+      toast({
+        title: "Deposit Request Sent",
+        description: "An administrator has been notified. Your balance will be updated upon confirmation."
+      });
+
+      setAmount("");
+
+    } catch (error) {
+        toast({
+            title: "Request Failed",
+            description: "Could not submit your deposit request. Please try again later.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleDepositRequest} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="deposit-amount">Amount to Deposit (USDT)</Label>
+        <Input 
+          id="deposit-amount"
+          type="number"
+          placeholder="e.g., 500.00"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          disabled={isSubmitting}
+          min="0"
+          step="0.01"
+        />
+      </div>
+      <Button type="submit" disabled={isSubmitting || !amount} className="w-full">
+        {isSubmitting ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : null}
+        Submit Deposit Request
+      </Button>
+    </form>
+  )
+}
+
+
 export function DepositView() {
   const [globalDepositAddress, setGlobalDepositAddress] = React.useState<string>("");
-  const [personalDepositAddress, setPersonalDepositAddress] = React.useState<string>("");
   const [isLoadingGlobal, setIsLoadingGlobal] = React.useState(true);
-  const [isLoadingPersonal, setIsLoadingPersonal] = React.useState(true);
   
-  const userEmail = getCurrentUserEmail();
-
   React.useEffect(() => {
     async function fetchAddresses() {
       setIsLoadingGlobal(true);
       const settings = await getSiteSettings();
       setGlobalDepositAddress(settings.usdtDepositAddress);
       setIsLoadingGlobal(false);
-
-      if (userEmail) {
-        setIsLoadingPersonal(true);
-        const wallet = await getOrCreateWallet(userEmail);
-        setPersonalDepositAddress(wallet.addresses.usdt);
-        setIsLoadingPersonal(false);
-      } else {
-        setIsLoadingPersonal(false);
-      }
     }
     fetchAddresses();
-  }, [userEmail]);
+  }, []);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -127,7 +193,7 @@ export function DepositView() {
           <span>Deposit USDT (TRC20)</span>
         </CardTitle>
         <CardDescription>
-          Send USDT to one of the addresses below to fund your account.
+          Choose a method below to fund your account.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -139,7 +205,7 @@ export function DepositView() {
             </TabsTrigger>
             <TabsTrigger value="personal">
               <User className="mr-2 h-4 w-4" />
-              Personal Address
+              Personal Request
             </TabsTrigger>
           </TabsList>
           <TabsContent value="platform" className="mt-6">
@@ -161,19 +227,16 @@ export function DepositView() {
             </Alert>
           </TabsContent>
           <TabsContent value="personal" className="mt-6">
-            <DepositAddressDisplay
-              address={personalDepositAddress}
-              isLoading={isLoadingPersonal}
-            />
+            <PersonalDepositRequest />
              <Alert className="mt-6 w-full text-left bg-muted/30">
                 <Info className="h-4 w-4" />
-                <AlertTitle>Important Instructions</AlertTitle>
+                <AlertTitle>How It Works</AlertTitle>
                 <AlertDescription>
                     <ul className="list-inside list-disc space-y-1">
-                        <li>This is your unique, personal deposit address.</li>
-                        <li>Only send <strong>USDT</strong> on the <strong>TRC20 (Tron)</strong> network to this address.</li>
-                        <li>Funds sent to this address will be automatically credited to your account.</li>
-                        <li>Using this address may result in faster deposit confirmation times.</li>
+                        <li>Enter the amount of USDT you wish to deposit.</li>
+                        <li>After submitting, an administrator is notified of your request.</li>
+                        <li>Your account balance will be credited manually once the administrator confirms your transaction.</li>
+                        <li>You can contact support at any time to inquire about your deposit status.</li>
                     </ul>
                 </AlertDescription>
             </Alert>
