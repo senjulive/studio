@@ -368,9 +368,9 @@ export function WalletView() {
         </CardContent>
       </Card>
 
-      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} className="bg-gradient-to-b from-muted to-background" />
+      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} className="bg-gradient-to-b from-blue-100 via-purple-200 to-white" />
 
-      <Card className="bg-gradient-to-b from-muted to-background">
+      <Card className="bg-gradient-to-b from-blue-100 via-purple-200 to-white">
         <CardHeader>
           <CardTitle>Quick Access</CardTitle>
         </CardHeader>
@@ -394,9 +394,9 @@ export function WalletView() {
         </CardContent>
       </Card>
 
-      <AllAssetsChart coins={allAssetsData} className="bg-gradient-to-b from-muted to-background" />
+      <AllAssetsChart coins={allAssetsData} className="bg-gradient-to-b from-blue-100 via-purple-200 to-white" />
 
-      <Card className="bg-gradient-to-b from-muted to-background">
+      <Card className="bg-gradient-to-b from-blue-100 via-purple-200 to-white">
         <CardHeader>
           <CardTitle>Transaction History</CardTitle>
           <CardDescription>
