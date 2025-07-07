@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { getAnnouncements, type Announcement } from "@/lib/announcements";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
@@ -15,6 +16,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Inbox, User, Mail, BadgeInfo, Phone, MapPin, Award, Star, Shield, Users } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -77,6 +79,28 @@ const ProfileDetailItem = ({
   </div>
 );
 
+const assetConfig = [
+    {
+        ticker: "USDT",
+        name: "Tether",
+        icon: "https://assets.coincap.io/assets/icons/usdt@2x.png",
+        balanceKey: "usdt",
+    },
+    {
+        ticker: "ETH",
+        name: "Ethereum",
+        icon: "https://assets.coincap.io/assets/icons/eth@2x.png",
+        balanceKey: "eth",
+    },
+    {
+        ticker: "BTC",
+        name: "Bitcoin",
+        icon: "https://assets.coincap.io/assets/icons/btc@2x.png",
+        balanceKey: "btc",
+    },
+] as const;
+
+
 export function ProfileView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -134,6 +158,45 @@ export function ProfileView() {
              </div>
           </CardHeader>
           <CardContent>
+            <div className="space-y-4 mb-6">
+                <Label className="text-xs text-muted-foreground">Asset Balances</Label>
+                {isLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-3 w-10" />
+                        </div>
+                        </div>
+                        <Skeleton className="h-5 w-24" />
+                    </div>
+                    ))
+                ) : (
+                    assetConfig.map(asset => (
+                    <div key={asset.ticker} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                        <Image src={asset.icon} alt={`${asset.name} logo`} width={32} height={32} className="rounded-full" />
+                        <div>
+                            <p className="font-medium">{asset.name}</p>
+                            <p className="text-sm text-muted-foreground">{asset.ticker}</p>
+                        </div>
+                        </div>
+                        <div className="text-right">
+                        <p className="font-medium font-mono">
+                            {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 6,
+                            }) ?? '0.00'}
+                        </p>
+                        </div>
+                    </div>
+                    ))
+                )}
+            </div>
+            <Separator className="mb-6"/>
+
             <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
                 <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
                 <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />

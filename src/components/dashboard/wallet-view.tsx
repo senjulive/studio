@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -292,6 +293,8 @@ export function WalletView() {
       </div>
     );
   }
+  
+  const assetsWithFunds = assetConfig.filter(asset => walletData.balances[asset.balanceKey] > 0);
 
   return (
     <div className="space-y-6">
@@ -331,23 +334,29 @@ export function WalletView() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {assetConfig.map(asset => (
-                <div key={asset.ticker} className="rounded-lg border bg-secondary/50 p-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                        <Image src={asset.icon} alt={`${asset.ticker} logo`} width={20} height={20} className="rounded-full" />
-                        <span>{asset.name}</span>
-                    </div>
-                    <p className="text-2xl font-bold mt-1">
-                        {asset.balanceKey === 'usdt' && '$'}
-                        {walletData.balances[asset.balanceKey].toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: asset.balanceKey === 'usdt' ? 2 : 6,
-                        })}
-                    </p>
-                </div>
-            ))}
-          </div>
+          {assetsWithFunds.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {assetsWithFunds.map(asset => (
+                  <div key={asset.ticker} className="rounded-lg border bg-secondary/50 p-4">
+                      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                          <Image src={asset.icon} alt={`${asset.ticker} logo`} width={20} height={20} className="rounded-full" />
+                          <span>{asset.name}</span>
+                      </div>
+                      <p className="text-2xl font-bold mt-1">
+                          {asset.balanceKey === 'usdt' && '$'}
+                          {walletData.balances[asset.balanceKey].toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: asset.balanceKey === 'usdt' ? 2 : 6,
+                          })}
+                      </p>
+                  </div>
+              ))}
+            </div>
+          ) : (
+             <div className="text-center text-muted-foreground p-4 border border-dashed rounded-lg">
+                You currently have no funds. Make a deposit to get started.
+            </div>
+          )}
         </CardContent>
         <CardFooter className="flex gap-2">
           <Button asChild className="w-full">
