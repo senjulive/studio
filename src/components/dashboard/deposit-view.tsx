@@ -205,7 +205,7 @@ export function DepositView() {
             </TabsTrigger>
             <TabsTrigger value="personal">
               <User className="mr-2 h-4 w-4" />
-              Personal Request
+              Confirm Request
             </TabsTrigger>
           </TabsList>
           <TabsContent value="platform" className="mt-6">
