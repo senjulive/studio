@@ -44,6 +44,13 @@ export type WalletData = {
         btc: number;
         eth: number;
     };
+    pendingWithdrawals: {
+        id: string;
+        amount: number;
+        asset: 'usdt';
+        address: string;
+        timestamp: number;
+    }[];
     growth: {
         clicksLeft: number;
         lastReset: number; // timestamp
@@ -91,6 +98,7 @@ const createNewWalletObject = (): WalletData => {
             btc: 0,
             eth: 0,
         },
+        pendingWithdrawals: [],
         growth: {
             clicksLeft: 4,
             lastReset: Date.now(),
@@ -193,6 +201,7 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
       ...existingWallet,
       addresses: { ...defaultWallet.addresses, ...(existingWallet.addresses || {}) },
       balances: { ...defaultWallet.balances, ...(existingWallet.balances || {}) },
+      pendingWithdrawals: existingWallet.pendingWithdrawals || [],
       growth: { ...defaultWallet.growth, ...(existingWallet.growth || {}) },
       squad: { ...defaultWallet.squad, ...(existingWallet.squad || {}) },
       profile: { ...defaultWallet.profile, ...(existingWallet.profile || {}) },

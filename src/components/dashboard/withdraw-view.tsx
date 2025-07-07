@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Info, Loader2 } from "lucide-react";
+import { Info, Loader2, Clock } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,12 +30,14 @@ import {
   saveWithdrawalAddress,
   type WithdrawalAddresses,
   getOrCreateWallet,
-  type WalletData
+  type WalletData,
+  updateWallet,
 } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
 import { UsdtLogoIcon } from "../icons/usdt-logo";
+import { format } from "date-fns";
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -50,9 +60,8 @@ export function WithdrawView() {
     }
   }, []);
 
-  React.useEffect(() => {
-    async function fetchData() {
-      if (currentUserEmail) {
+  const fetchWalletData = React.useCallback(async () => {
+    if (currentUserEmail) {
         setIsLoading(true);
         const [addresses, wallet] = await Promise.all([
           getWithdrawalAddresses(currentUserEmail),
@@ -62,9 +71,11 @@ export function WithdrawView() {
         setWalletData(wallet);
         setIsLoading(false);
       }
-    }
-    fetchData();
   }, [currentUserEmail]);
+
+  React.useEffect(() => {
+    fetchWalletData();
+  }, [fetchWalletData]);
 
   const handleSaveAddress = async () => {
     if (!currentAddress) {
@@ -87,7 +98,11 @@ export function WithdrawView() {
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || parseFloat(amount) <= 0) {
+    const withdrawAmount = parseFloat(amount);
+
+    if (!walletData || !currentUserEmail || !savedAddresses?.usdt) return;
+
+    if (!amount || withdrawAmount <= 0) {
       toast({
         title: "Invalid Amount",
         description: "Please enter a valid amount to withdraw.",
@@ -95,34 +110,63 @@ export function WithdrawView() {
       });
       return;
     }
-    setIsWithdrawing(true);
-
-    if (currentUserEmail) {
-      const username = walletData?.profile.username || currentUserEmail;
-      await sendSystemNotification(
-        currentUserEmail,
-        `User '${username}' (${currentUserEmail}) initiated a withdrawal of ${amount} ${asset.toUpperCase()}.`
-      );
-      await addNotification(currentUserEmail, {
-        title: "Withdrawal Request Received",
-        content: `Your request to withdraw $${amount} USDT is now pending review.`,
-        href: "/dashboard/withdraw"
+    
+    if (withdrawAmount > walletData.balances.usdt) {
+      toast({
+        title: "Insufficient Balance",
+        description: `Your USDT balance is too low to withdraw $${withdrawAmount.toFixed(2)}.`,
+        variant: "destructive",
       });
+      return;
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsWithdrawing(false);
+    setIsWithdrawing(true);
+
+    const withdrawalRequest = {
+        id: `wd_${Date.now()}`,
+        amount: withdrawAmount,
+        asset: 'usdt' as const,
+        address: savedAddresses.usdt,
+        timestamp: Date.now()
+    };
+
+    const newWalletData: WalletData = {
+        ...walletData,
+        balances: {
+            ...walletData.balances,
+            usdt: walletData.balances.usdt - withdrawAmount,
+        },
+        pendingWithdrawals: [...(walletData.pendingWithdrawals || []), withdrawalRequest]
+    };
+
+    await updateWallet(currentUserEmail, newWalletData);
+    setWalletData(newWalletData);
+
+    const username = walletData?.profile.username || currentUserEmail;
+    await sendSystemNotification(
+      currentUserEmail,
+      `User '${username}' (${currentUserEmail}) initiated a withdrawal of ${amount} ${asset.toUpperCase()} to address ${savedAddresses.usdt}.`
+    );
+    await addNotification(currentUserEmail, {
+      title: "Withdrawal Request Received",
+      content: `Your request to withdraw $${amount} USDT is now pending review.`,
+      href: "/dashboard/withdraw"
+    });
+
     setAmount("");
     toast({
       title: "Withdrawal Initiated",
-      description: `Your withdrawal of ${amount} ${asset.toUpperCase()} is being processed.`,
+      description: `Your withdrawal of ${withdrawAmount.toFixed(2)} ${asset.toUpperCase()} is being processed.`,
     });
+    setIsWithdrawing(false);
   };
 
   const hasSavedAddress =
     savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
+  const pendingWithdrawals = walletData?.pendingWithdrawals || [];
 
   return (
+    <div className="space-y-6">
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -155,7 +199,7 @@ export function WithdrawView() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="amount">Amount to Withdraw</Label>
+                <Label htmlFor="amount">Amount to Withdraw (Available: ${walletData?.balances.usdt.toFixed(2)})</Label>
                 <Input
                   id="amount"
                   type="number"
@@ -165,7 +209,7 @@ export function WithdrawView() {
                   disabled={isWithdrawing}
                 />
               </div>
-              <Button type="submit" disabled={isWithdrawing} className="w-full">
+              <Button type="submit" disabled={isWithdrawing || !amount} className="w-full">
                 {isWithdrawing && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
@@ -222,5 +266,38 @@ export function WithdrawView() {
         </div>
       </CardContent>
     </Card>
+
+    {pendingWithdrawals.length > 0 && (
+        <Card className="w-full max-w-2xl mx-auto">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    Pending Withdrawals
+                </CardTitle>
+                <CardDescription>These withdrawals are currently being processed.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Amount (USDT)</TableHead>
+                            <TableHead>Address</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {pendingWithdrawals.map((w) => (
+                            <TableRow key={w.id}>
+                                <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
+                                <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>
+                                <TableCell className="font-mono text-xs truncate max-w-[100px] sm:max-w-xs">{w.address}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    )}
+    </div>
   );
 }

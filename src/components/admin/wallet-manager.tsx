@@ -5,7 +5,8 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, PlusCircle, MinusCircle, Save, User } from "lucide-react";
+import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle } from "lucide-react";
+import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import {
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -30,6 +32,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { getAllWallets, updateWallet, type WalletData } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
@@ -69,6 +79,7 @@ export function WalletManager() {
   const [selectedUserEmail, setSelectedUserEmail] = React.useState<string>("");
   const [isUpdatingAddress, setIsUpdatingAddress] = React.useState(false);
   const [isUpdatingBalance, setIsUpdatingBalance] = React.useState(false);
+  const [isCompleting, setIsCompleting] = React.useState<string | null>(null);
   const [isFetchingWallets, setIsFetchingWallets] = React.useState(true);
 
   const addressForm = useForm<AddressUpdateFormValues>({
@@ -189,10 +200,44 @@ export function WalletManager() {
   const onSubmitBalanceRemove = (values: BalanceUpdateFormValues) =>
     handleBalanceUpdate(values, "remove");
 
+  const handleCompleteWithdrawal = async (withdrawalId: string) => {
+    if (!selectedWalletData || !selectedUserEmail) return;
+    setIsCompleting(withdrawalId);
+
+    const withdrawal = selectedWalletData.pendingWithdrawals.find(w => w.id === withdrawalId);
+    if (!withdrawal) {
+        toast({ title: "Error", description: "Withdrawal not found.", variant: "destructive" });
+        setIsCompleting(null);
+        return;
+    }
+
+    const newWalletData: WalletData = {
+        ...selectedWalletData,
+        pendingWithdrawals: selectedWalletData.pendingWithdrawals.filter(w => w.id !== withdrawalId),
+    };
+
+    await updateWallet(selectedUserEmail, newWalletData);
+
+    await sendAdminMessage(
+        selectedUserEmail,
+        `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`
+    );
+    await addNotification(selectedUserEmail, {
+        title: "Withdrawal Completed",
+        content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`,
+        href: "/dashboard",
+    });
+
+    toast({ title: "Withdrawal Marked as Complete" });
+    await refetchWallets();
+    setIsCompleting(null);
+  };
+
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Select User</label>
+        <Label>Select User</Label>
         <Select
           onValueChange={setSelectedUserEmail}
           value={selectedUserEmail}
@@ -249,6 +294,50 @@ export function WalletManager() {
             </div>
           </div>
         ) : null)}
+
+       {selectedWalletData?.pendingWithdrawals && selectedWalletData.pendingWithdrawals.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Withdrawals</CardTitle>
+              <CardDescription>Review and process pending withdrawal requests for this user.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount (USDT)</TableHead>
+                    <TableHead>Address</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {selectedWalletData.pendingWithdrawals.map((w) => (
+                    <TableRow key={w.id}>
+                      <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
+                      <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>
+                      <TableCell className="font-mono text-xs truncate max-w-xs">{w.address}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          onClick={() => handleCompleteWithdrawal(w.id)}
+                          disabled={isCompleting === w.id}
+                        >
+                          {isCompleting === w.id ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                          )}
+                          Mark as Complete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+       )}
 
       <Card>
         <CardHeader>
