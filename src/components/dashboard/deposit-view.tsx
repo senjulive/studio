@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Copy, Info, QrCode, Wallet } from "lucide-react";
+import { Copy, Info, QrCode, Wallet, User } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -18,25 +18,23 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { getSiteSettings } from "@/lib/site-settings";
 import { Skeleton } from "../ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
+import { getCurrentUserEmail } from "@/lib/auth";
 
-export function DepositView() {
+// A reusable component for displaying a deposit address
+const DepositAddressDisplay = ({
+  address,
+  isLoading,
+}: {
+  address: string;
+  isLoading: boolean;
+}) => {
   const { toast } = useToast();
-  const [depositAddress, setDepositAddress] = React.useState<string>("");
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    async function fetchAddress() {
-      setIsLoading(true);
-      const settings = await getSiteSettings();
-      setDepositAddress(settings.usdtDepositAddress);
-      setIsLoading(false);
-    }
-    fetchAddress();
-  }, []);
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(depositAddress);
+      await navigator.clipboard.writeText(address);
       toast({ title: "Address copied to clipboard!" });
     } catch (err) {
       toast({
@@ -46,7 +44,7 @@ export function DepositView() {
       });
     }
   };
-  
+
   const DepositAddressSkeleton = () => (
     <div className="space-y-6">
       <div className="mx-auto flex h-48 w-48 items-center justify-center rounded-lg bg-muted">
@@ -61,6 +59,65 @@ export function DepositView() {
       </div>
     </div>
   );
+  
+  if (isLoading) {
+    return <DepositAddressSkeleton />;
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-6 text-center">
+      <div className="rounded-lg bg-white p-4">
+        <QRCodeSVG value={address} size={176} />
+      </div>
+      <div className="w-full space-y-2 text-left">
+        <Label htmlFor={`deposit-address-${address}`}>Deposit Address</Label>
+        <div className="flex items-center gap-2">
+          <Input
+            id={`deposit-address-${address}`}
+            value={address}
+            readOnly
+            className="font-mono text-base"
+          />
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleCopy}
+            aria-label="Copy address"
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export function DepositView() {
+  const [globalDepositAddress, setGlobalDepositAddress] = React.useState<string>("");
+  const [personalDepositAddress, setPersonalDepositAddress] = React.useState<string>("");
+  const [isLoadingGlobal, setIsLoadingGlobal] = React.useState(true);
+  const [isLoadingPersonal, setIsLoadingPersonal] = React.useState(true);
+  
+  const userEmail = getCurrentUserEmail();
+
+  React.useEffect(() => {
+    async function fetchAddresses() {
+      setIsLoadingGlobal(true);
+      const settings = await getSiteSettings();
+      setGlobalDepositAddress(settings.usdtDepositAddress);
+      setIsLoadingGlobal(false);
+
+      if (userEmail) {
+        setIsLoadingPersonal(true);
+        const wallet = await getOrCreateWallet(userEmail);
+        setPersonalDepositAddress(wallet.addresses.usdt);
+        setIsLoadingPersonal(false);
+      } else {
+        setIsLoadingPersonal(false);
+      }
+    }
+    fetchAddresses();
+  }, [userEmail]);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -70,46 +127,58 @@ export function DepositView() {
           <span>Deposit USDT (TRC20)</span>
         </CardTitle>
         <CardDescription>
-          Send USDT to the address below to fund your account.
+          Send USDT to one of the addresses below to fund your account.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col items-center gap-6 text-center">
-            {isLoading ? <DepositAddressSkeleton /> : (
-                <>
-                  <div className="rounded-lg bg-white p-4">
-                    <QRCodeSVG value={depositAddress} size={176} />
-                  </div>
-                  <div className="w-full space-y-2 text-left">
-                    <Label htmlFor="deposit-address">Platform Deposit Address</Label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        id="deposit-address"
-                        value={depositAddress}
-                        readOnly
-                        className="font-mono text-base"
-                      />
-                      <Button variant="outline" size="icon" onClick={handleCopy} aria-label="Copy address">
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </>
-            )}
-
-            <Alert className="mt-6 w-full text-left bg-muted/30">
+        <Tabs defaultValue="platform" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="platform">
+              <Wallet className="mr-2 h-4 w-4" />
+              Platform Address
+            </TabsTrigger>
+            <TabsTrigger value="personal">
+              <User className="mr-2 h-4 w-4" />
+              Personal Address
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="platform" className="mt-6">
+            <DepositAddressDisplay
+              address={globalDepositAddress}
+              isLoading={isLoadingGlobal}
+            />
+             <Alert className="mt-6 w-full text-left bg-muted/30">
                 <Info className="h-4 w-4" />
                 <AlertTitle>Important Instructions</AlertTitle>
                 <AlertDescription>
                     <ul className="list-inside list-disc space-y-1">
+                        <li>This is a shared platform deposit address.</li>
                         <li>Only send <strong>USDT</strong> on the <strong>TRC20 (Tron)</strong> network to this address.</li>
                         <li>Sending any other asset or using a different network will result in the permanent loss of your funds.</li>
                         <li>Deposits are typically credited by an administrator after verification. Please contact support if you have any questions.</li>
-                        <li>The deposit address can be changed by the administrator at any time. Always verify the address here before sending funds.</li>
                     </ul>
                 </AlertDescription>
             </Alert>
-        </div>
+          </TabsContent>
+          <TabsContent value="personal" className="mt-6">
+            <DepositAddressDisplay
+              address={personalDepositAddress}
+              isLoading={isLoadingPersonal}
+            />
+             <Alert className="mt-6 w-full text-left bg-muted/30">
+                <Info className="h-4 w-4" />
+                <AlertTitle>Important Instructions</AlertTitle>
+                <AlertDescription>
+                    <ul className="list-inside list-disc space-y-1">
+                        <li>This is your unique, personal deposit address.</li>
+                        <li>Only send <strong>USDT</strong> on the <strong>TRC20 (Tron)</strong> network to this address.</li>
+                        <li>Funds sent to this address will be automatically credited to your account.</li>
+                        <li>Using this address may result in faster deposit confirmation times.</li>
+                    </ul>
+                </AlertDescription>
+            </Alert>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
