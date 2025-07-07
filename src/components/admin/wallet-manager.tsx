@@ -1,10 +1,11 @@
+
 "use client";
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, PlusCircle, MinusCircle, Save } from "lucide-react";
+import { Loader2, PlusCircle, MinusCircle, Save, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +23,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -192,7 +192,7 @@ export function WalletManager() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label>Select User</Label>
+        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Select User</label>
         <Select
           onValueChange={setSelectedUserEmail}
           value={selectedUserEmail}
@@ -205,7 +205,7 @@ export function WalletManager() {
             {allWallets && Object.keys(allWallets).length > 0 ? (
               Object.keys(allWallets).map((email) => (
                 <SelectItem key={email} value={email}>
-                  {email}
+                  {allWallets[email].profile?.username || email}
                 </SelectItem>
               ))
             ) : (
@@ -219,26 +219,33 @@ export function WalletManager() {
 
       {selectedUserEmail &&
         (isFetchingWallets ? (
-          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-48 w-full" />
         ) : selectedWalletData ? (
-          <div className="mb-6 rounded-lg border bg-muted/30 p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-sm text-muted-foreground">USDT Balance</p>
-              <p className="text-xl font-bold">
-                ${formatBalance(selectedWalletData.balances.usdt)}
-              </p>
+          <div className="mb-6 rounded-lg border bg-muted/30 p-4 space-y-4">
+            <div className="border-b pb-4">
+                <p className="text-sm font-medium text-muted-foreground flex items-center gap-2"><User className="h-4 w-4" /> User Details</p>
+                <p className="text-lg font-bold">{selectedWalletData.profile.username || 'N/A'}</p>
+                <p className="text-sm text-muted-foreground">{selectedUserEmail}</p>
             </div>
-             <div>
-              <p className="text-sm text-muted-foreground">ETH Balance</p>
-              <p className="text-xl font-bold">
-                {formatBalance(selectedWalletData.balances.eth)}
-              </p>
-            </div>
-             <div>
-              <p className="text-sm text-muted-foreground">BTC Balance</p>
-              <p className="text-xl font-bold">
-                {formatBalance(selectedWalletData.balances.btc)}
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-sm text-muted-foreground">USDT Balance</p>
+                <p className="text-xl font-bold">
+                  ${formatBalance(selectedWalletData.balances.usdt)}
+                </p>
+              </div>
+               <div>
+                <p className="text-sm text-muted-foreground">ETH Balance</p>
+                <p className="text-xl font-bold">
+                  {formatBalance(selectedWalletData.balances.eth)}
+                </p>
+              </div>
+               <div>
+                <p className="text-sm text-muted-foreground">BTC Balance</p>
+                <p className="text-xl font-bold">
+                  {formatBalance(selectedWalletData.balances.btc)}
+                </p>
+              </div>
             </div>
           </div>
         ) : null)}

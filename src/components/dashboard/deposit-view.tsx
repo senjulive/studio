@@ -25,6 +25,7 @@ import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 
 const DepositAddressDisplay = ({
   address,
@@ -102,9 +103,16 @@ const DepositAddressDisplay = ({
 const PersonalDepositRequest = () => {
   const { toast } = useToast();
   const userEmail = getCurrentUserEmail();
+  const [wallet, setWallet] = React.useState<WalletData | null>(null);
   const [amount, setAmount] = React.useState("");
   const [selectedAsset, setSelectedAsset] = React.useState("usdt");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    if (userEmail) {
+      getOrCreateWallet(userEmail).then(setWallet);
+    }
+  }, [userEmail]);
 
   const handleDepositRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,9 +128,10 @@ const PersonalDepositRequest = () => {
     setIsSubmitting(true);
 
     try {
+      const username = wallet?.profile.username || userEmail;
       await sendSystemNotification(
         userEmail,
-        `User has initiated a deposit request for ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()}. Please verify payment and credit their account manually via the Wallet Management tab.`
+        `User '${username}' (${userEmail}) has initiated a deposit request for ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()}. Please verify payment and credit their account manually via the Wallet Management tab.`
       );
 
       await addNotification(userEmail, {
@@ -176,12 +185,12 @@ const PersonalDepositRequest = () => {
           placeholder="e.g., 500.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !wallet}
           min="0"
           step="0.01"
         />
       </div>
-      <Button type="submit" disabled={isSubmitting || !amount} className="w-full">
+      <Button type="submit" disabled={isSubmitting || !amount || !wallet} className="w-full">
         {isSubmitting ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : null}
@@ -210,7 +219,7 @@ export function DepositView() {
   }, []);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto bg-gradient-to-b from-blue-100 to-white">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Wallet className="h-6 w-6" />

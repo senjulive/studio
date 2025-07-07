@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -26,9 +27,11 @@ import { addNotification } from "@/lib/notifications";
 import { useToast } from "@/hooks/use-toast";
 import { analyzeSupportThread, type SupportAgentOutput } from "@/ai/flows/support-agent-flow";
 import { Card, CardContent } from "@/components/ui/card";
+import { getAllWallets, type WalletData } from "@/lib/wallet";
 
 export function MessageViewer() {
   const [chats, setChats] = React.useState<ChatHistory | null>(null);
+  const [wallets, setWallets] = React.useState<Record<string, WalletData> | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [replyMessages, setReplyMessages] = React.useState<Record<string, string>>({});
   const [isSending, setIsSending] = React.useState<Record<string, boolean>>({});
@@ -37,13 +40,17 @@ export function MessageViewer() {
   const { toast } = useToast();
 
   React.useEffect(() => {
-    async function fetchChats() {
+    async function fetchData() {
       setIsLoading(true);
-      const data = await getAllChats();
-      setChats(data);
+      const [chatData, walletData] = await Promise.all([
+          getAllChats(),
+          getAllWallets()
+      ]);
+      setChats(chatData);
+      setWallets(walletData);
       setIsLoading(false);
     }
-    fetchChats();
+    fetchData();
   }, []);
 
   const handleSendMessage = async (email: string) => {
@@ -111,153 +118,158 @@ export function MessageViewer() {
 
   return (
     <Accordion type="single" collapsible className="w-full">
-      {sortedChats.map(([email, messages]) => (
-        <AccordionItem value={email} key={email}>
-          <AccordionTrigger>
-            <div className="flex items-center gap-3 w-full">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>{email.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 text-left">
-                <p className="font-medium">{email}</p>
-                <p className="text-xs text-muted-foreground">
-                  {messages.length} message(s)
-                </p>
-              </div>
-              <Badge
-                variant={
-                  messages.some((m) => m.sender === "user")
-                    ? "destructive"
-                    : "secondary"
-                }
-                className="mr-4"
-              >
-                {messages[messages.length - 1]?.sender === "user" ? "New" : "Viewed"}
-              </Badge>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-4">
-               <Card className="bg-muted/30">
-                <CardContent className="p-4 space-y-4">
-                  <div>
-                    <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleAnalyze(email, messages)} 
-                        disabled={isAnalyzing[email] || isLoading}
-                    >
-                        {isAnalyzing[email] ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                            <BrainCircuit className="mr-2 h-4 w-4" />
-                        )}
-                        Analyze with AI
-                    </Button>
-                  </div>
+      {sortedChats.map(([email, messages]) => {
+        const wallet = wallets?.[email];
+        const displayName = wallet?.profile?.username || email;
 
-                  {isAnalyzing[email] && (
-                      <div className="space-y-3">
-                          <div className="space-y-1">
-                              <Skeleton className="h-4 w-24" />
-                              <Skeleton className="h-3 w-full" />
-                              <Skeleton className="h-3 w-4/5" />
-                          </div>
-                           <div className="space-y-1">
-                              <Skeleton className="h-4 w-32" />
-                              <Skeleton className="h-3 w-full" />
-                              <Skeleton className="h-3 w-full" />
-                              <Skeleton className="h-3 w-1/2" />
-                          </div>
-                      </div>
-                  )}
-
-                  {analysis[email] && (
-                      <div className="space-y-3 animate-in fade-in-50">
-                          <div>
-                              <h4 className="font-semibold text-sm text-foreground">AI Summary</h4>
-                              <p className="text-sm text-muted-foreground">{analysis[email]?.summary}</p>
-                          </div>
-                          <div>
-                              <h4 className="font-semibold text-sm text-foreground">Suggested Reply</h4>
-                              <p className="text-sm text-muted-foreground whitespace-pre-wrap p-3 bg-background rounded-md border">{analysis[email]?.suggestedReply}</p>
-                              <Button 
-                                  size="sm" 
-                                  variant="ghost" 
-                                  className="mt-2 px-2"
-                                  onClick={() => setReplyMessages(prev => ({ ...prev, [email]: analysis[email]?.suggestedReply || '' }))}
-                              >
-                                  Use this reply
-                              </Button>
-                          </div>
-                      </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <ScrollArea className="h-64 w-full rounded-md border p-4">
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div key={message.id} className="flex flex-col">
-                      <div className="text-xs text-muted-foreground flex justify-between">
-                        <span className="font-bold">
-                          {message.sender === "user" ? email : "Admin"}
-                        </span>
-                        <span>{format(new Date(message.timestamp), "PPp")}</span>
-                      </div>
-                      <div
-                        className={cn(
-                          "rounded-md p-3 text-sm",
-                          message.silent
-                            ? "bg-accent text-accent-foreground/80 italic"
-                            : "bg-muted/50"
-                        )}
-                      >
-                        <p>{message.text}</p>
-                         {message.file && message.file.type.startsWith('image/') && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={message.file.dataUrl} alt={message.file.name} className="mt-2 rounded-md max-w-full h-auto" />
-                        )}
-                      </div>
-                    </div>
-                  ))}
+        return (
+          <AccordionItem value={email} key={email}>
+            <AccordionTrigger>
+              <div className="flex items-center gap-3 w-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{displayName.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 text-left">
+                  <p className="font-medium">{displayName}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {messages.length} message(s) from {email}
+                  </p>
                 </div>
-              </ScrollArea>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendMessage(email);
-                }}
-                className="flex w-full items-center space-x-2 border-t pt-4"
-              >
-                <Input
-                  value={replyMessages[email] || ""}
-                  onChange={(e) =>
-                    setReplyMessages((prev) => ({
-                      ...prev,
-                      [email]: e.target.value,
-                    }))
+                <Badge
+                  variant={
+                    messages[messages.length - 1]?.sender === "user"
+                      ? "destructive"
+                      : "secondary"
                   }
-                  placeholder="Type your reply..."
-                  disabled={isSending[email]}
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={isSending[email] || !replyMessages[email]?.trim()}
+                  className="mr-4"
                 >
-                  {isSending[email] ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">Send</span>
-                </Button>
-              </form>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      ))}
+                  {messages[messages.length - 1]?.sender === "user" ? "New" : "Viewed"}
+                </Badge>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-4">
+                 <Card className="bg-muted/30">
+                  <CardContent className="p-4 space-y-4">
+                    <div>
+                      <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleAnalyze(email, messages)} 
+                          disabled={isAnalyzing[email] || isLoading}
+                      >
+                          {isAnalyzing[email] ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                              <BrainCircuit className="mr-2 h-4 w-4" />
+                          )}
+                          Analyze with AI
+                      </Button>
+                    </div>
+
+                    {isAnalyzing[email] && (
+                        <div className="space-y-3">
+                            <div className="space-y-1">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-3 w-full" />
+                                <Skeleton className="h-3 w-4/5" />
+                            </div>
+                             <div className="space-y-1">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-3 w-full" />
+                                <Skeleton className="h-3 w-full" />
+                                <Skeleton className="h-3 w-1/2" />
+                            </div>
+                        </div>
+                    )}
+
+                    {analysis[email] && (
+                        <div className="space-y-3 animate-in fade-in-50">
+                            <div>
+                                <h4 className="font-semibold text-sm text-foreground">AI Summary</h4>
+                                <p className="text-sm text-muted-foreground">{analysis[email]?.summary}</p>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-sm text-foreground">Suggested Reply</h4>
+                                <p className="text-sm text-muted-foreground whitespace-pre-wrap p-3 bg-background rounded-md border">{analysis[email]?.suggestedReply}</p>
+                                <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="mt-2 px-2"
+                                    onClick={() => setReplyMessages(prev => ({ ...prev, [email]: analysis[email]?.suggestedReply || '' }))}
+                                >
+                                    Use this reply
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <ScrollArea className="h-64 w-full rounded-md border p-4">
+                  <div className="space-y-4">
+                    {messages.map((message) => (
+                      <div key={message.id} className="flex flex-col">
+                        <div className="text-xs text-muted-foreground flex justify-between">
+                          <span className="font-bold">
+                            {message.sender === "user" ? displayName : "Admin"}
+                          </span>
+                          <span>{format(new Date(message.timestamp), "PPp")}</span>
+                        </div>
+                        <div
+                          className={cn(
+                            "rounded-md p-3 text-sm",
+                            message.silent
+                              ? "bg-accent text-accent-foreground/80 italic"
+                              : "bg-muted/50"
+                          )}
+                        >
+                          <p>{message.text}</p>
+                           {message.file && message.file.type.startsWith('image/') && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={message.file.dataUrl} alt={message.file.name} className="mt-2 rounded-md max-w-full h-auto" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSendMessage(email);
+                  }}
+                  className="flex w-full items-center space-x-2 border-t pt-4"
+                >
+                  <Input
+                    value={replyMessages[email] || ""}
+                    onChange={(e) =>
+                      setReplyMessages((prev) => ({
+                        ...prev,
+                        [email]: e.target.value,
+                      }))
+                    }
+                    placeholder="Type your reply..."
+                    disabled={isSending[email]}
+                  />
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={isSending[email] || !replyMessages[email]?.trim()}
+                  >
+                    {isSending[email] ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">Send</span>
+                  </Button>
+                </form>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        )
+      })}
     </Accordion>
   );
 }

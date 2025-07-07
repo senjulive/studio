@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -21,6 +22,8 @@ import {
   getWithdrawalAddresses,
   saveWithdrawalAddress,
   type WithdrawalAddresses,
+  getOrCreateWallet,
+  type WalletData
 } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
@@ -30,6 +33,7 @@ export function WithdrawView() {
   const { toast } = useToast();
   const [savedAddresses, setSavedAddresses] =
     React.useState<WithdrawalAddresses | null>(null);
+  const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
@@ -47,15 +51,19 @@ export function WithdrawView() {
   }, []);
 
   React.useEffect(() => {
-    async function fetchAddresses() {
+    async function fetchData() {
       if (currentUserEmail) {
         setIsLoading(true);
-        const addresses = await getWithdrawalAddresses(currentUserEmail);
+        const [addresses, wallet] = await Promise.all([
+          getWithdrawalAddresses(currentUserEmail),
+          getOrCreateWallet(currentUserEmail),
+        ]);
         setSavedAddresses(addresses);
+        setWalletData(wallet);
         setIsLoading(false);
       }
     }
-    fetchAddresses();
+    fetchData();
   }, [currentUserEmail]);
 
   const handleSaveAddress = async () => {
@@ -90,9 +98,10 @@ export function WithdrawView() {
     setIsWithdrawing(true);
 
     if (currentUserEmail) {
+      const username = walletData?.profile.username || currentUserEmail;
       await sendSystemNotification(
         currentUserEmail,
-        `User initiated a withdrawal of ${amount} ${asset.toUpperCase()}.`
+        `User '${username}' (${currentUserEmail}) initiated a withdrawal of ${amount} ${asset.toUpperCase()}.`
       );
       await addNotification(currentUserEmail, {
         title: "Withdrawal Request Received",
@@ -114,7 +123,7 @@ export function WithdrawView() {
     savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto bg-gradient-to-b from-blue-100 to-white">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
             <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={24} height={24} className="rounded-full" />
