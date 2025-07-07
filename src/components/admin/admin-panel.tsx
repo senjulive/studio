@@ -13,6 +13,7 @@ import { WalletManager } from "./wallet-manager";
 import { MessageViewer } from "./message-viewer";
 import { BotSettingsManager } from "./bot-settings-manager";
 import { AnnouncementManager } from "./announcement-manager";
+import { SiteSettingsManager } from "./site-settings-manager";
 
 export function AdminPanel() {
   return (
@@ -25,18 +26,19 @@ export function AdminPanel() {
             <div>
                 <CardTitle>Administrator Panel</CardTitle>
                 <CardDescription>
-                  Manage wallets, support, bot settings and announcements.
+                  Manage wallets, messages, bot settings, announcements and site settings.
                 </CardDescription>
             </div>
         </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="wallets" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="wallets">Wallet Management</TabsTrigger>
             <TabsTrigger value="messages">User Messages</TabsTrigger>
             <TabsTrigger value="bot-settings">Bot Settings</TabsTrigger>
             <TabsTrigger value="announcements">Announcements</TabsTrigger>
+            <TabsTrigger value="site-settings">Site Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="wallets" className="mt-6">
             <WalletManager />
@@ -49,6 +51,9 @@ export function AdminPanel() {
           </TabsContent>
            <TabsContent value="announcements" className="mt-6">
             <AnnouncementManager />
+          </TabsContent>
+           <TabsContent value="site-settings" className="mt-6">
+            <SiteSettingsManager />
           </TabsContent>
         </Tabs>
       </CardContent>
