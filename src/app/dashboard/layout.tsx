@@ -52,6 +52,16 @@ function DashboardLoading() {
   );
 }
 
+const generateRandomString = (length: number) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 
 export default function DashboardLayout({
   children,
@@ -63,6 +73,7 @@ export default function DashboardLayout({
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [isClient, setIsClient] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
+  const [randomizedLabels, setRandomizedLabels] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -72,20 +83,7 @@ export default function DashboardLayout({
     return () => clearTimeout(timer);
   }, []);
 
-
-  React.useEffect(() => {
-    setUserEmail(getCurrentUserEmail());
-    setIsClient(true);
-  }, []);
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/');
-  };
-  
-  const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
-
-  const menuItems = [
+  const menuItems = React.useMemo(() => [
     { href: "/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/dashboard/market", label: "Market", icon: LineChart },
     { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
@@ -94,7 +92,25 @@ export default function DashboardLayout({
     { href: "/dashboard/profile", label: "Profile", icon: User },
     { href: "/dashboard/support", label: "Support", icon: MessageSquare },
     { href: "/dashboard/about", label: "About", icon: Info },
-  ];
+  ], []);
+
+  React.useEffect(() => {
+    setUserEmail(getCurrentUserEmail());
+    setIsClient(true);
+    
+    const newLabels: Record<string, string> = {};
+    menuItems.forEach(item => {
+      newLabels[item.href] = generateRandomString(8);
+    });
+    setRandomizedLabels(newLabels);
+  }, [menuItems]);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
+  
+  const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
 
   const bottomNavItems = [
     { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -106,6 +122,10 @@ export default function DashboardLayout({
   if (isInitializing) {
     return <DashboardLoading />;
   }
+  
+  const getPageTitle = () => {
+    return randomizedLabels[pathname] || (pathname.split('/').pop()?.replace('-', ' ') || 'Home');
+  };
 
   return (
     <SidebarProvider>
@@ -123,7 +143,7 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild isActive={isClient ? pathname === item.href : false}>
                   <Link href={item.href}>
                     <item.icon />
-                    {item.label}
+                    {randomizedLabels[item.href] ? <span>{randomizedLabels[item.href]}</span> : <Skeleton className="h-4 w-20" />}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -182,7 +202,7 @@ export default function DashboardLayout({
              <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
                 <AstralLogo className="h-6 w-6" />
                 {isClient ? (
-                  <span>{pathname === '/dashboard' ? 'Home' : pathname.split('/').pop()?.replace('-', ' ')}</span>
+                  <span>{getPageTitle()}</span>
                 ) : (
                   <Skeleton className="h-6 w-24" />
                 )}
@@ -206,7 +226,7 @@ export default function DashboardLayout({
               )}
             >
               <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
+              {randomizedLabels[item.href] ? <span>{randomizedLabels[item.href]}</span> : <Skeleton className="h-3 w-10 mt-1" />}
             </Link>
           ))}
         </nav>
