@@ -14,9 +14,11 @@ import { getBotTierSettings, type TierSetting } from "@/lib/settings";
 export function TradingBotCard({
   walletData,
   onUpdate,
+  className,
 }: {
   walletData: WalletData;
   onUpdate: (data: WalletData) => void;
+  className?: string;
 }) {
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [logs, setLogs] = React.useState<string[]>([]);
@@ -163,7 +165,8 @@ export function TradingBotCard({
       className={cn(
         "transition-all duration-300",
         canStart && "cursor-pointer hover:border-primary hover:shadow-lg",
-        isAnimating && "border-primary ring-2 ring-primary/50"
+        isAnimating && "border-primary ring-2 ring-primary/50",
+        className
       )}
     >
       <CardHeader className="flex-row items-start justify-between pb-4">

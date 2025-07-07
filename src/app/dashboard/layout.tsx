@@ -174,7 +174,7 @@ export default function DashboardLayout({
           </div>
           <NotificationBell />
         </header>
-        <main className="flex-1 bg-gradient-to-b from-purple-100 via-blue-100 to-background p-4 md:p-6 pb-20">
+        <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
         </main>
         <nav className="absolute bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10">

@@ -299,10 +299,14 @@ export function WalletView() {
   return (
     <div className="space-y-6">
       <Card
-        style={{
-          backgroundImage: 'radial-gradient(ellipse at bottom left, hsl(var(--accent)) 0%, hsl(var(--primary)/.15) 100%)',
-        }}
+        className="relative overflow-hidden"
       >
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-purple-100 via-blue-200 to-white -z-10"
+          style={{
+            clipPath: 'ellipse(100% 70% at 0% 100%)'
+          }}
+        />
         <CardHeader>
           <CardTitle>Available Assets</CardTitle>
           <CardDescription>
@@ -341,7 +345,7 @@ export function WalletView() {
           {assetsWithFunds.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {assetsWithFunds.map(asset => (
-                  <div key={asset.ticker} className="rounded-lg border bg-secondary/50 p-4">
+                  <div key={asset.ticker} className="rounded-lg border bg-background/50 p-4">
                       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                           <Image src={asset.icon} alt={`${asset.ticker} logo`} width={20} height={20} className="rounded-full" />
                           <span>{asset.name}</span>
@@ -364,9 +368,9 @@ export function WalletView() {
         </CardContent>
       </Card>
 
-      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
+      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} className="bg-gradient-to-b from-muted to-background" />
 
-      <Card>
+      <Card className="bg-gradient-to-b from-muted to-background">
         <CardHeader>
           <CardTitle>Quick Access</CardTitle>
         </CardHeader>
@@ -390,9 +394,9 @@ export function WalletView() {
         </CardContent>
       </Card>
 
-      <AllAssetsChart coins={allAssetsData} />
+      <AllAssetsChart coins={allAssetsData} className="bg-gradient-to-b from-muted to-background" />
 
-      <Card>
+      <Card className="bg-gradient-to-b from-muted to-background">
         <CardHeader>
           <CardTitle>Transaction History</CardTitle>
           <CardDescription>

@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 type CryptoData = {
   id: string;
@@ -34,6 +35,7 @@ type CryptoData = {
 
 type AllAssetsChartProps = {
   coins: CryptoData[];
+  className?: string;
 };
 
 const cryptoColors: { [key: string]: string } = {
@@ -45,7 +47,7 @@ const cryptoColors: { [key: string]: string } = {
 };
 
 
-export function AllAssetsChart({ coins }: AllAssetsChartProps) {
+export function AllAssetsChart({ coins, className }: AllAssetsChartProps) {
   const filteredCoins = React.useMemo(() => {
     const tickersToShow = ['BTC', 'ETH', 'USDT'];
     return coins.filter(coin => tickersToShow.includes(coin.ticker));
@@ -90,7 +92,7 @@ export function AllAssetsChart({ coins }: AllAssetsChartProps) {
 
   if (!filteredCoins || filteredCoins.length === 0) {
     return (
-      <Card>
+      <Card className={className}>
         <CardHeader>
           <CardTitle>Asset Performance</CardTitle>
           <CardDescription>Live price data for your assets.</CardDescription>
@@ -105,7 +107,7 @@ export function AllAssetsChart({ coins }: AllAssetsChartProps) {
   }
 
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader>
         <CardTitle>Key Asset Performance</CardTitle>
         <CardDescription>
