@@ -41,25 +41,41 @@ export function AdminPanel() {
       <CardContent>
         <Tabs defaultValue="wallets" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 gap-2">
-            <TabsTrigger value="wallets">
-              <WalletCards className="mr-2 h-4 w-4" />
-              <span>Wallet Management</span>
+            <TabsTrigger value="wallets" className="flex-col h-16">
+              <WalletCards className="h-5 w-5" />
+              <span className="mt-1 text-xs text-center">
+                Wallet
+                <br />
+                Management
+              </span>
             </TabsTrigger>
-            <TabsTrigger value="messages">
-              <Mail className="mr-2 h-4 w-4" />
-              <span>User Messages</span>
+            <TabsTrigger value="messages" className="flex-col h-16">
+              <Mail className="h-5 w-5" />
+              <span className="mt-1 text-xs text-center">
+                User
+                <br />
+                Messages
+              </span>
             </TabsTrigger>
-            <TabsTrigger value="bot-settings">
-              <Bot className="mr-2 h-4 w-4" />
-              <span>Bot Settings</span>
+            <TabsTrigger value="bot-settings" className="flex-col h-16">
+              <Bot className="h-5 w-5" />
+              <span className="mt-1 text-xs text-center">
+                Bot
+                <br />
+                Settings
+              </span>
             </TabsTrigger>
-            <TabsTrigger value="announcements">
-              <Megaphone className="mr-2 h-4 w-4" />
-              <span>Announcements</span>
+            <TabsTrigger value="announcements" className="flex-col h-16">
+              <Megaphone className="h-5 w-5" />
+              <span className="mt-1 text-xs text-center">Announcements</span>
             </TabsTrigger>
-            <TabsTrigger value="site-settings">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Site Settings</span>
+            <TabsTrigger value="site-settings" className="flex-col h-16">
+              <Settings className="h-5 w-5" />
+              <span className="mt-1 text-xs text-center">
+                Site
+                <br />
+                Settings
+              </span>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="wallets" className="mt-6">
