@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Info, Loader2 } from "lucide-react";
+import { SiTether } from "react-icons/si";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,6 @@ import {
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
-import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -117,7 +117,7 @@ export function WithdrawView() {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-            <UsdtLogoIcon />
+            <SiTether className="h-6 w-6" />
             <span>Withdraw USDT (TRC20)</span>
         </CardTitle>
         <CardDescription>

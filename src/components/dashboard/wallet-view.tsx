@@ -11,6 +11,7 @@ import {
   User,
   Users,
 } from "lucide-react";
+import { SiTether } from "react-icons/si";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,6 @@ import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TradingBotCard } from "./trading-bot-card";
 import { getCurrentUserEmail } from "@/lib/auth";
-import { UsdtLogoIcon } from "@/components/icons/usdt-logo";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
 
@@ -301,7 +301,7 @@ export function WalletView() {
           <div className="grid grid-cols-1 gap-4">
             <div className="rounded-lg border bg-secondary/50 p-4">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <UsdtLogoIcon />
+                <SiTether className="h-5 w-5" />
                 <span>USDT Balance</span>
               </div>
               <p className="text-2xl font-bold mt-1">

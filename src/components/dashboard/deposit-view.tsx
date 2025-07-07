@@ -3,6 +3,8 @@
 import * as React from "react";
 import { Copy, Info, QrCode, Wallet, User, Loader2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import { FaBitcoin, FaEthereum } from "react-icons/fa";
+import { SiTether } from "react-icons/si";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -22,9 +24,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
-import { BtcLogoIcon } from "../icons/btc-logo";
-import { EthLogoIcon } from "../icons/eth-logo";
-import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 const DepositAddressDisplay = ({
   address,
@@ -217,9 +216,9 @@ export function DepositView() {
           <TabsContent value="deposit" className="mt-6">
             <Tabs defaultValue="usdt" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="usdt"><UsdtLogoIcon className="mr-2"/>USDT</TabsTrigger>
-                    <TabsTrigger value="eth"><EthLogoIcon className="mr-2"/>ETH</TabsTrigger>
-                    <TabsTrigger value="btc"><BtcLogoIcon className="mr-2"/>BTC</TabsTrigger>
+                    <TabsTrigger value="usdt"><SiTether className="mr-2 h-5 w-5"/>USDT</TabsTrigger>
+                    <TabsTrigger value="eth"><FaEthereum className="mr-2 h-5 w-5"/>ETH</TabsTrigger>
+                    <TabsTrigger value="btc"><FaBitcoin className="mr-2 h-5 w-5"/>BTC</TabsTrigger>
                 </TabsList>
                 <TabsContent value="usdt">
                     <DepositAddressDisplay
