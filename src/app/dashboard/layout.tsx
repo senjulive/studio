@@ -35,7 +35,8 @@ import {
   Shield,
   MessageSquare,
   LineChart,
-  Bell
+  Bell,
+  Info
 } from "lucide-react";
 import { logout, getCurrentUserEmail } from "@/lib/auth";
 import * as React from "react";
@@ -71,6 +72,7 @@ export default function DashboardLayout({
     { href: "/dashboard/squad", label: "Squad", icon: Users },
     { href: "/dashboard/profile", label: "Profile", icon: User },
     { href: "/dashboard/support", label: "Support", icon: MessageSquare },
+    { href: "/dashboard/about", label: "About", icon: Info },
   ];
 
   const bottomNavItems = [
