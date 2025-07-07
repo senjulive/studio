@@ -1,15 +1,15 @@
-
 "use client";
 
 import * as React from "react";
 import { useToast } from "@/hooks/use-toast";
-import { type WalletData, updateWallet } from "@/lib/wallet";
+import { type WalletData } from "@/lib/wallet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BotAnimationPreview } from "./bot-animation-preview";
 import { AstralLogo } from "../icons/astral-logo";
+import { getBotTierSettings, type TierSetting } from "@/lib/settings";
 
 export function TradingBotCard({
   walletData,
@@ -21,34 +21,43 @@ export function TradingBotCard({
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [logs, setLogs] = React.useState<string[]>([]);
   const [progressPercent, setProgressPercent] = React.useState(0);
+  const [tierSettings, setTierSettings] = React.useState<TierSetting[]>([]);
   const logRef = React.useRef<HTMLDivElement>(null);
 
   const { toast } = useToast();
-  
-  const getTierSettings = React.useCallback((balance: number) => {
-    if (balance >= 15000) return { name: "Tier 6", dailyProfit: 0.085, clicks: 10 };
-    if (balance >= 10000) return { name: "Tier 5", dailyProfit: 0.065, clicks: 8 };
-    if (balance >= 5000) return { name: "Tier 4", dailyProfit: 0.055, clicks: 7 };
-    if (balance >= 1000) return { name: "Tier 3", dailyProfit: 0.04, clicks: 6 };
-    if (balance >= 500) return { name: "Tier 2", dailyProfit: 0.03, clicks: 5 };
-    return { name: "Tier 1", dailyProfit: 0.02, clicks: 4 };
+
+  React.useEffect(() => {
+    async function fetchSettings() {
+      const settings = await getBotTierSettings();
+      setTierSettings(settings);
+    }
+    fetchSettings();
   }, []);
 
-  const totalBalance =
-    (walletData?.balances?.usdt ?? 0);
-  const tierSettings = getTierSettings(totalBalance);
-  const profitPerTrade = totalBalance > 0 ? (totalBalance * tierSettings.dailyProfit) / tierSettings.clicks : 0;
+  const getCurrentTier = React.useCallback((balance: number): TierSetting | null => {
+    if (tierSettings.length === 0) return null;
+    // Tiers are pre-sorted by balance ascending, so we find the highest applicable tier by reversing
+    const applicableTier = [...tierSettings].reverse().find(tier => balance >= tier.balanceThreshold);
+    return applicableTier || null;
+  }, [tierSettings]);
+
+  const totalBalance = (walletData?.balances?.usdt ?? 0);
+  const currentTier = getCurrentTier(totalBalance);
+  
+  const profitPerTrade = currentTier && totalBalance > 0 
+    ? (totalBalance * currentTier.dailyProfit) / currentTier.clicks 
+    : 0;
 
   const canStart =
     totalBalance >= 100 && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
 
   const addLogLine = (text: string) => {
     setLogs((prev) => {
-        const newLogs = [...prev, text];
-        if (newLogs.length > 6) {
-            newLogs.shift();
-        }
-        return newLogs;
+      const newLogs = [...prev, text];
+      if (newLogs.length > 6) {
+        newLogs.shift();
+      }
+      return newLogs;
     });
   };
 
@@ -59,7 +68,7 @@ export function TradingBotCard({
   }, [logs]);
 
   const handleStart = async () => {
-    if (!canStart) {
+    if (!canStart || !currentTier) {
       if (isAnimating) {
         toast({ title: "Bot is already running." });
       } else if (totalBalance < 100) {
@@ -200,7 +209,7 @@ export function TradingBotCard({
               {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
             </p>
             <p className="text-xs text-muted-foreground">
-                {canStart ? `Earn up to ${(tierSettings.dailyProfit * 100).toFixed(1)}% daily.` : ''}
+                {canStart && currentTier ? `Earn up to ${(currentTier.dailyProfit * 100).toFixed(1)}% daily.` : ''}
             </p>
           </div>
         )}
