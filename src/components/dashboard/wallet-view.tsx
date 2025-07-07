@@ -300,8 +300,7 @@ export function WalletView() {
     <div className="space-y-6">
       <Card
         style={{
-          backgroundImage:
-            'radial-gradient(circle at 100% 0, hsl(var(--chart-2) / 0.05), transparent 50%), radial-gradient(circle at 0% 100%, hsl(var(--primary) / 0.05), transparent 50%)',
+          backgroundImage: 'radial-gradient(ellipse at bottom left, hsl(var(--accent)) 0%, hsl(var(--primary)/.15) 100%)',
         }}
       >
         <CardHeader>
