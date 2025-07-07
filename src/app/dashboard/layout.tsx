@@ -227,7 +227,7 @@ export default function DashboardLayout({
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className="h-6 w-6" />
               <span>{item.label}</span>
             </Link>
           ))}
