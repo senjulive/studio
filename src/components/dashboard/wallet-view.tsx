@@ -358,18 +358,6 @@ export function WalletView() {
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex gap-2">
-          <Button asChild className="w-full">
-            <Link href="/dashboard/deposit">
-              <ArrowDownLeft className="mr-2 h-4 w-4" /> Deposit
-            </Link>
-          </Button>
-          <Button variant="outline" asChild className="w-full">
-            <Link href="/dashboard/withdraw">
-              <ArrowUpRight className="mr-2 h-4 w-4" /> Withdraw
-            </Link>
-          </Button>
-        </CardFooter>
       </Card>
 
       <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
