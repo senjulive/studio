@@ -32,7 +32,6 @@ import {
   Users,
   ArrowDownLeft,
   ArrowUpRight,
-  Shield,
   MessageSquare,
   LineChart,
   Bell,
@@ -145,12 +144,6 @@ export default function DashboardLayout({
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-               <DropdownMenuItem asChild>
-                <Link href="/admin">
-                    <Shield className="mr-2 h-4 w-4" />
-                    <span>Admin Panel</span>
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
