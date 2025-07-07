@@ -298,7 +298,12 @@ export function WalletView() {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 100% 0, hsl(var(--chart-2) / 0.05), transparent 50%), radial-gradient(circle at 0% 100%, hsl(var(--primary) / 0.05), transparent 50%)',
+        }}
+      >
         <CardHeader>
           <CardTitle>Available Assets</CardTitle>
           <CardDescription>
