@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -190,8 +191,8 @@ export function WalletManager() {
 
   return (
     <div className="space-y-6">
-      <FormItem>
-        <FormLabel>Select User</FormLabel>
+      <div className="space-y-2">
+        <Label>Select User</Label>
         <Select
           onValueChange={setSelectedUserEmail}
           value={selectedUserEmail}
@@ -214,7 +215,7 @@ export function WalletManager() {
             )}
           </SelectContent>
         </Select>
-      </FormItem>
+      </div>
 
       {selectedUserEmail &&
         (isFetchingWallets ? (
