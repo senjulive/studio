@@ -25,9 +25,7 @@ import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
-import { BtcLogoIcon } from "../icons/btc-logo";
-import { EthLogoIcon } from "../icons/eth-logo";
-import { UsdtLogoIcon } from "../icons/usdt-logo";
+import Image from "next/image";
 
 const DepositAddressDisplay = ({
   address,
@@ -161,9 +159,9 @@ const PersonalDepositRequest = () => {
   };
   
   const assets = [
-    { id: "usdt", name: "USDT", icon: UsdtLogoIcon },
-    { id: "eth", name: "ETH", icon: EthLogoIcon },
-    { id: "btc", name: "BTC", icon: BtcLogoIcon },
+    { id: "usdt", name: "USDT", iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png" },
+    { id: "eth", name: "ETH", iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png" },
+    { id: "btc", name: "BTC", iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png" },
   ];
 
   return (
@@ -174,7 +172,7 @@ const PersonalDepositRequest = () => {
                 {assets.map(asset => (
                     <Label key={asset.id} htmlFor={asset.id} className="cursor-pointer rounded-full border-2 p-1 transition-all hover:border-primary/50 has-[input:checked]:border-primary has-[input:checked]:ring-2 has-[input:checked]:ring-primary/20">
                         <RadioGroupItem value={asset.id} id={asset.id} className="sr-only" />
-                        <asset.icon className="h-10 w-10" />
+                        <Image src={asset.iconUrl} alt={`${asset.name} logo`} width={40} height={40} className="rounded-full" />
                     </Label>
                 ))}
             </RadioGroup>
@@ -247,15 +245,15 @@ export function DepositView() {
             <Tabs defaultValue="usdt" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="usdt" className="gap-2">
-                        <UsdtLogoIcon />
+                        <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT" width={20} height={20} className="rounded-full" />
                         USDT
                     </TabsTrigger>
                     <TabsTrigger value="eth" className="gap-2">
-                        <EthLogoIcon />
+                        <Image src="https://assets.coincap.io/assets/icons/eth@2x.png" alt="ETH" width={20} height={20} className="rounded-full" />
                         ETH
                     </TabsTrigger>
                     <TabsTrigger value="btc" className="gap-2">
-                        <BtcLogoIcon />
+                        <Image src="https://assets.coincap.io/assets/icons/btc@2x.png" alt="BTC" width={20} height={20} className="rounded-full" />
                         BTC
                     </TabsTrigger>
                 </TabsList>

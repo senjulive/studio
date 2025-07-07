@@ -36,7 +36,7 @@ import {
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
-import { UsdtLogoIcon } from "../icons/usdt-logo";
+import Image from "next/image";
 import { format } from "date-fns";
 
 export function WithdrawView() {
@@ -170,7 +170,7 @@ export function WithdrawView() {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-            <UsdtLogoIcon className="h-6 w-6" />
+            <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={24} height={24} className="rounded-full" />
             <span>Withdraw USDT (TRC20)</span>
         </CardTitle>
         <CardDescription>

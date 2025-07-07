@@ -20,9 +20,7 @@ import { Inbox, User, Mail, BadgeInfo, Phone, MapPin, Award, Star, Shield, Users
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
-import { BtcLogoIcon } from "../icons/btc-logo";
-import { EthLogoIcon } from "../icons/eth-logo";
-import { UsdtLogoIcon } from "../icons/usdt-logo";
+import Image from "next/image";
 
 function AnnouncementCard({ announcement }: { announcement: Announcement }) {
   return (
@@ -85,19 +83,19 @@ const assetConfig = [
     {
         ticker: "USDT",
         name: "Tether",
-        icon: UsdtLogoIcon,
+        iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
         balanceKey: "usdt",
     },
     {
         ticker: "ETH",
         name: "Ethereum",
-        icon: EthLogoIcon,
+        iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
         balanceKey: "eth",
     },
     {
         ticker: "BTC",
         name: "Bitcoin",
-        icon: BtcLogoIcon,
+        iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
         balanceKey: "btc",
     },
 ] as const;
@@ -179,7 +177,7 @@ export function ProfileView() {
                     assetConfig.map(asset => (
                     <div key={asset.ticker} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                        <asset.icon className="h-8 w-8" />
+                        <Image src={asset.iconUrl} alt={asset.name} width={32} height={32} className="rounded-full" />
                         <div>
                             <p className="font-medium">{asset.name}</p>
                             <p className="text-sm text-muted-foreground">{asset.ticker}</p>

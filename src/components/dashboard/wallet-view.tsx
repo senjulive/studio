@@ -37,9 +37,7 @@ import { TradingBotCard } from "./trading-bot-card";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
-import { BtcLogoIcon } from "../icons/btc-logo";
-import { EthLogoIcon } from "../icons/eth-logo";
-import { UsdtLogoIcon } from "../icons/usdt-logo";
+import Image from "next/image";
 
 type Transaction = {
   id: string;
@@ -134,19 +132,19 @@ const assetConfig = [
     {
         ticker: "USDT",
         name: "USDT Balance",
-        icon: UsdtLogoIcon,
+        iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
         balanceKey: "usdt",
     },
     {
         ticker: "ETH",
         name: "ETH Balance",
-        icon: EthLogoIcon,
+        iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
         balanceKey: "eth",
     },
     {
         ticker: "BTC",
         name: "BTC Balance",
-        icon: BtcLogoIcon,
+        iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
         balanceKey: "btc",
     },
 ] as const;
@@ -349,7 +347,7 @@ export function WalletView() {
               {assetsWithFunds.map(asset => (
                   <div key={asset.ticker} className="rounded-lg border bg-background/50 p-4">
                       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                          <asset.icon className="h-5 w-5" />
+                          <Image src={asset.iconUrl} alt={asset.ticker} width={20} height={20} className="rounded-full" />
                           <span>{asset.name}</span>
                       </div>
                       <p className="text-2xl font-bold mt-1">

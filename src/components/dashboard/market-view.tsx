@@ -22,9 +22,6 @@ import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 import { LiveTradingChart } from "./live-trading-chart";
-import { BtcLogoIcon } from "../icons/btc-logo";
-import { EthLogoIcon } from "../icons/eth-logo";
-import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 type CryptoData = {
   id: string;
@@ -185,18 +182,13 @@ export function MarketView() {
       >
         <TableCell>
           <div className="flex items-center gap-3">
-            {coin.ticker === 'BTC' && <BtcLogoIcon className="h-8 w-8" />}
-            {coin.ticker === 'ETH' && <EthLogoIcon className="h-8 w-8" />}
-            {coin.ticker === 'USDT' && <UsdtLogoIcon className="h-8 w-8" />}
-            {coin.ticker !== 'BTC' && coin.ticker !== 'ETH' && coin.ticker !== 'USDT' && (
-                <Image
-                  src={coin.iconUrl}
-                  alt={`${coin.name} logo`}
-                  width={32}
-                  height={32}
-                  className="rounded-full"
-                />
-            )}
+            <Image
+              src={coin.iconUrl}
+              alt={`${coin.name} logo`}
+              width={32}
+              height={32}
+              className="rounded-full"
+            />
             <div>
               <div className="font-medium">{coin.name}</div>
               <div className="text-xs text-muted-foreground">{coin.ticker}</div>

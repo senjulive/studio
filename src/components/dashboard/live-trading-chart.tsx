@@ -20,9 +20,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { BtcLogoIcon } from "../icons/btc-logo";
-import { EthLogoIcon } from "../icons/eth-logo";
-import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 type CryptoData = {
   id: string;
@@ -68,18 +65,13 @@ export function LiveTradingChart({ coin }: LiveTradingChartProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          {coin.ticker === 'BTC' && <BtcLogoIcon className="h-10 w-10" />}
-          {coin.ticker === 'ETH' && <EthLogoIcon className="h-10 w-10" />}
-          {coin.ticker === 'USDT' && <UsdtLogoIcon className="h-10 w-10" />}
-          {coin.ticker !== 'BTC' && coin.ticker !== 'ETH' && coin.ticker !== 'USDT' && (
-              <Image
-                src={coin.iconUrl}
-                alt={`${coin.name} logo`}
-                width={40}
-                height={40}
-                className="rounded-full"
-              />
-          )}
+          <Image
+            src={coin.iconUrl}
+            alt={`${coin.name} logo`}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
           <div>
             <CardTitle className="flex items-center gap-2">
               {coin.name}
