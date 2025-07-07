@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -197,9 +198,9 @@ export function DepositView() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="platform" className="w-full">
+        <Tabs defaultValue="deposit" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="platform">
+            <TabsTrigger value="deposit">
               <Wallet className="mr-2 h-4 w-4" />
               Deposit
             </TabsTrigger>
@@ -208,7 +209,7 @@ export function DepositView() {
               Confirm Request
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="platform" className="mt-6">
+          <TabsContent value="deposit" className="mt-6">
             <DepositAddressDisplay
               address={globalDepositAddress}
               isLoading={isLoadingGlobal}
@@ -218,10 +219,8 @@ export function DepositView() {
                 <AlertTitle>Important Instructions</AlertTitle>
                 <AlertDescription>
                     <ul className="list-inside list-disc space-y-1">
-                        <li>This is a shared platform deposit address.</li>
-                        <li>Only send <strong>USDT</strong> on the <strong>TRC20 (Tron)</strong> network to this address.</li>
-                        <li>Sending any other asset or using a different network will result in the permanent loss of your funds.</li>
-                        <li>Deposits are typically credited by an administrator after verification. Please contact support if you have any questions.</li>
+                        <li>Deposit to the address, then confirm the transaction under the 'Confirm Request' tab.</li>
+                        <li>Only send <strong>USDT</strong> on the <strong>TRC20 (Tron)</strong> network. Sending any other asset or using a different network will result in the permanent loss of your funds.</li>
                     </ul>
                 </AlertDescription>
             </Alert>
