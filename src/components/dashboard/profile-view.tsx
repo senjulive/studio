@@ -184,7 +184,7 @@ export function ProfileView() {
                         </div>
                         </div>
                         <div className="text-right">
-                        <p className="font-medium font-mono">
+                        <p className="font-medium font-mono text-green-600">
                             {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 6,
