@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { Copy, Info, QrCode, Wallet, User, Loader2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -26,6 +25,9 @@ import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
+import { BtcLogoIcon } from "../icons/btc-logo";
+import { EthLogoIcon } from "../icons/eth-logo";
+import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 const DepositAddressDisplay = ({
   address,
@@ -159,9 +161,9 @@ const PersonalDepositRequest = () => {
   };
   
   const assets = [
-    { id: "usdt", name: "USDT", icon: "https://assets.coincap.io/assets/icons/usdt@2x.png" },
-    { id: "eth", name: "ETH", icon: "https://assets.coincap.io/assets/icons/eth@2x.png" },
-    { id: "btc", name: "BTC", icon: "https://assets.coincap.io/assets/icons/btc@2x.png" },
+    { id: "usdt", name: "USDT", icon: UsdtLogoIcon },
+    { id: "eth", name: "ETH", icon: EthLogoIcon },
+    { id: "btc", name: "BTC", icon: BtcLogoIcon },
   ];
 
   return (
@@ -172,7 +174,7 @@ const PersonalDepositRequest = () => {
                 {assets.map(asset => (
                     <Label key={asset.id} htmlFor={asset.id} className="cursor-pointer rounded-full border-2 p-1 transition-all hover:border-primary/50 has-[input:checked]:border-primary has-[input:checked]:ring-2 has-[input:checked]:ring-primary/20">
                         <RadioGroupItem value={asset.id} id={asset.id} className="sr-only" />
-                        <Image src={asset.icon} alt={`${asset.name} logo`} width={40} height={40} className="rounded-full" />
+                        <asset.icon className="h-10 w-10" />
                     </Label>
                 ))}
             </RadioGroup>
@@ -219,7 +221,7 @@ export function DepositView() {
   }, []);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto bg-gradient-to-b from-blue-100 to-white">
+    <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Wallet className="h-6 w-6" />
@@ -244,16 +246,16 @@ export function DepositView() {
           <TabsContent value="deposit" className="mt-6">
             <Tabs defaultValue="usdt" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="usdt">
-                        <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={20} height={20} className="mr-2 rounded-full" />
+                    <TabsTrigger value="usdt" className="gap-2">
+                        <UsdtLogoIcon />
                         USDT
                     </TabsTrigger>
-                    <TabsTrigger value="eth">
-                        <Image src="https://assets.coincap.io/assets/icons/eth@2x.png" alt="ETH logo" width={20} height={20} className="mr-2 rounded-full" />
+                    <TabsTrigger value="eth" className="gap-2">
+                        <EthLogoIcon />
                         ETH
                     </TabsTrigger>
-                    <TabsTrigger value="btc">
-                        <Image src="https://assets.coincap.io/assets/icons/btc@2x.png" alt="BTC logo" width={20} height={20} className="mr-2 rounded-full" />
+                    <TabsTrigger value="btc" className="gap-2">
+                        <BtcLogoIcon />
                         BTC
                     </TabsTrigger>
                 </TabsList>
@@ -282,7 +284,7 @@ export function DepositView() {
                     />
                 </TabsContent>
             </Tabs>
-             <Alert className="mt-6 w-full text-left bg-muted/30">
+             <Alert className="mt-6 w-full text-left">
                 <Info className="h-4 w-4" />
                 <AlertTitle>Important Instructions</AlertTitle>
                 <AlertDescription>
@@ -295,7 +297,7 @@ export function DepositView() {
           </TabsContent>
           <TabsContent value="personal" className="mt-6">
             <PersonalDepositRequest />
-             <Alert className="mt-6 w-full text-left bg-muted/30">
+             <Alert className="mt-6 w-full text-left">
                 <Info className="h-4 w-4" />
                 <AlertTitle>How It Works</AlertTitle>
                 <AlertDescription>

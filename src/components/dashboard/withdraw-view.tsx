@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { Info, Loader2 } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -28,6 +27,7 @@ import {
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
+import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -123,10 +123,10 @@ export function WithdrawView() {
     savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
 
   return (
-    <Card className="w-full max-w-2xl mx-auto bg-gradient-to-b from-blue-100 to-white">
+    <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-            <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={24} height={24} className="rounded-full" />
+            <UsdtLogoIcon className="h-6 w-6" />
             <span>Withdraw USDT (TRC20)</span>
         </CardTitle>
         <CardDescription>
@@ -200,7 +200,7 @@ export function WithdrawView() {
             </div>
           )}
 
-          <Alert className="mt-4 text-left bg-muted/30">
+          <Alert className="mt-4 text-left">
             <Info className="h-4 w-4" />
             <AlertTitle>Please Note</AlertTitle>
             <AlertDescription>
