@@ -18,6 +18,11 @@ const MessageSchema = z.object({
   timestamp: z.number(),
   sender: z.enum(['user', 'admin']),
   silent: z.boolean().optional(),
+  file: z.object({
+    name: z.string(),
+    type: z.string(),
+    dataUrl: z.string().describe("An image file attached to the message, as a data URI."),
+  }).optional(),
 });
 
 const SupportAgentInputSchema = z.object({
@@ -26,8 +31,8 @@ const SupportAgentInputSchema = z.object({
 export type SupportAgentInput = z.infer<typeof SupportAgentInputSchema>;
 
 const SupportAgentOutputSchema = z.object({
-  summary: z.string().describe("A brief summary of the user's issue or question."),
-  suggestedReply: z.string().describe("A professionally drafted reply to send to the user."),
+  summary: z.string().describe("A brief summary of the user's issue or question, considering any attached images."),
+  suggestedReply: z.string().describe("A professionally drafted reply to send to the user, considering any attached images."),
 });
 export type SupportAgentOutput = z.infer<typeof SupportAgentOutputSchema>;
 
@@ -42,13 +47,16 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert customer support agent for AstralCore, a crypto management platform.
 Your task is to analyze a support conversation and assist the admin.
 
-Based on the message history provided, please do the following:
-1.  **Summarize the Issue:** Write a one or two-sentence summary of the user's problem or question.
+Based on the message history provided, which may include text and images from the user, please do the following:
+1.  **Summarize the Issue:** Write a one or two-sentence summary of the user's problem or question. If they provided an image, refer to it in your summary (e.g., "The user is asking about an error shown in their screenshot.").
 2.  **Draft a Reply:** Compose a helpful, professional, and empathetic response to the user. Address their concerns directly. If their issue seems resolved, draft a polite closing message.
 
 Here is the conversation history:
 {{#each messages}}
 [{{sender}}] {{text}}
+{{#if file}}
+{{media url=file.dataUrl}}
+{{/if}}
 {{/each}}
 `,
 });
@@ -60,8 +68,6 @@ const supportAgentFlow = ai.defineFlow(
     outputSchema: SupportAgentOutputSchema,
   },
   async input => {
-    // The prompt expects a formatted timestamp, but the model can handle unix timestamps.
-    // For better readability in the prompt if we were to debug, we could format it. But it's not strictly necessary.
     const {output} = await prompt(input);
     return output!;
   }

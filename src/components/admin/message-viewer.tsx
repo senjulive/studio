@@ -71,6 +71,10 @@ export function MessageViewer() {
     setIsAnalyzing((prev) => ({ ...prev, [email]: true }));
     setAnalysis((prev) => ({ ...prev, [email]: null }));
     try {
+      // The flow expects message objects that are serializable.
+      // The `file` property with a raw File object is not.
+      // We must ensure only serializable data (like a dataUrl) is passed.
+      // The `messages` from `getAllChats` should already be in this format.
       const result = await analyzeSupportThread({ messages });
       setAnalysis((prev) => ({ ...prev, [email]: result }));
     } catch (e) {
@@ -93,6 +97,10 @@ export function MessageViewer() {
       })
     : [];
 
+  if (isLoading) {
+    return <Skeleton className="h-48 w-full" />;
+  }
+  
   if (!chats || sortedChats.length === 0) {
     return (
       <div className="flex h-48 items-center justify-center rounded-md border border-dashed">
@@ -124,7 +132,7 @@ export function MessageViewer() {
                 }
                 className="mr-4"
               >
-                {messages.some((m) => m.sender === "user") ? "New" : "Viewed"}
+                {messages[messages.length - 1]?.sender === "user" ? "New" : "Viewed"}
               </Badge>
             </div>
           </AccordionTrigger>
@@ -197,7 +205,7 @@ export function MessageViewer() {
                         </span>
                         <span>{format(new Date(message.timestamp), "PPp")}</span>
                       </div>
-                      <p
+                      <div
                         className={cn(
                           "rounded-md p-3 text-sm",
                           message.silent
@@ -205,8 +213,12 @@ export function MessageViewer() {
                             : "bg-muted/50"
                         )}
                       >
-                        {message.text}
-                      </p>
+                        <p>{message.text}</p>
+                         {message.file && message.file.type.startsWith('image/') && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={message.file.dataUrl} alt={message.file.name} className="mt-2 rounded-md max-w-full h-auto" />
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Paperclip, X } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -25,10 +25,13 @@ export function SupportChat() {
   const { toast } = useToast();
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [newMessage, setNewMessage] = React.useState("");
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSending, setIsSending] = React.useState(false);
+  
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     const email = getCurrentUserEmail();
@@ -51,17 +54,59 @@ export function SupportChat() {
     if (scrollAreaRef.current) {
         scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }, [messages])
+  }, [messages]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({ title: "File too large", description: "Please select a file smaller than 5MB.", variant: "destructive" });
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast({ title: "Invalid file type", description: "Only image files are supported.", variant: "destructive" });
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+  
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !userEmail) return;
+    if ((!newMessage.trim() && !selectedFile) || !userEmail) return;
 
     setIsSending(true);
+    
+    let fileData: Message['file'] | undefined = undefined;
+    if (selectedFile) {
+      try {
+        fileData = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            resolve({
+              name: selectedFile.name,
+              type: selectedFile.type,
+              dataUrl: event.target?.result as string,
+            });
+          };
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(selectedFile);
+        });
+      } catch (error) {
+        toast({ title: "Error reading file", description: "Could not process the selected file.", variant: "destructive" });
+        setIsSending(false);
+        return;
+      }
+    }
+    
     try {
-      const sentMessage = await sendMessage(userEmail, newMessage);
+      const sentMessage = await sendMessage(userEmail, newMessage, fileData);
       setMessages((prev) => [...prev, sentMessage]);
       setNewMessage("");
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error) {
       toast({
         title: "Error Sending Message",
@@ -112,7 +157,7 @@ export function SupportChat() {
                             <AvatarFallback>A</AvatarFallback>
                         </Avatar>
                     )}
-                  <div className="flex flex-col space-y-1 max-w-md">
+                  <div className="flex flex-col space-y-1 max-w-xs sm:max-w-md">
                     <div
                       className={cn(
                         "rounded-lg px-4 py-2 text-sm",
@@ -122,6 +167,10 @@ export function SupportChat() {
                       )}
                     >
                       {message.text}
+                      {message.file && message.file.type.startsWith('image/') && (
+                         // eslint-disable-next-line @next/next/no-img-element
+                        <img src={message.file.dataUrl} alt={message.file.name} className="mt-2 rounded-md max-w-full h-auto" />
+                      )}
                     </div>
                     <span className={cn(
                         "text-xs text-muted-foreground",
@@ -141,15 +190,50 @@ export function SupportChat() {
           )}
         </ScrollArea>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col items-stretch gap-2">
+        {selectedFile && (
+          <div className="flex items-center justify-between rounded-md border bg-muted/50 p-2 text-sm">
+            <span className="truncate text-muted-foreground">
+              {selectedFile.name}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => {
+                setSelectedFile(null);
+                if (fileInputRef.current) fileInputRef.current.value = "";
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
         <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
+          <Input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            className="hidden"
+            accept="image/*"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isSending || isLoading}
+          >
+            <Paperclip className="h-4 w-4" />
+            <span className="sr-only">Attach file</span>
+          </Button>
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
             disabled={isSending || isLoading}
           />
-          <Button type="submit" disabled={isSending || isLoading || !newMessage.trim()}>
+          <Button type="submit" disabled={isSending || isLoading || (!newMessage.trim() && !selectedFile)}>
             {isSending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (

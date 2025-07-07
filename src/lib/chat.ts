@@ -8,6 +8,11 @@ export type Message = {
   timestamp: number;
   sender: 'user' | 'admin';
   silent?: boolean;
+  file?: {
+    name: string;
+    type: string;
+    dataUrl: string;
+  };
 };
 
 export type ChatHistory = {
@@ -38,7 +43,7 @@ export async function getChatHistoryForUser(email: string): Promise<Message[]> {
 }
 
 // Simulates sending a message from a user.
-export async function sendMessage(email: string, text: string): Promise<Message> {
+export async function sendMessage(email: string, text: string, file?: Message['file']): Promise<Message> {
   await new Promise(resolve => setTimeout(resolve, 200));
   if (typeof window === 'undefined') {
     throw new Error('Cannot send message: not in a browser environment.');
@@ -55,6 +60,7 @@ export async function sendMessage(email: string, text: string): Promise<Message>
     sender: 'user',
     timestamp: Date.now(),
     silent: false,
+    file,
   };
 
   allChats[email].push(newMessage);
