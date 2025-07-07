@@ -58,8 +58,8 @@ export function AnnouncementManager() {
     setIsSubmitting(true);
     await addAnnouncement(values.title, values.content);
     toast({
-      title: "Announcement Published",
-      description: "The new announcement is now visible to all users.",
+      title: "Alert Published",
+      description: "The new alert is now visible to all users.",
     });
     form.reset();
     await fetchAnnouncements();
@@ -70,8 +70,8 @@ export function AnnouncementManager() {
     setIsDeleting(id);
     await deleteAnnouncement(id);
     toast({
-      title: "Announcement Deleted",
-      description: "The announcement has been removed.",
+      title: "Alert Deleted",
+      description: "The alert has been removed.",
     });
     await fetchAnnouncements();
     setIsDeleting(null);
@@ -82,9 +82,9 @@ export function AnnouncementManager() {
       <div className="lg:col-span-2">
         <Card>
           <CardHeader>
-            <CardTitle>New Announcement</CardTitle>
+            <CardTitle>New Alert</CardTitle>
             <CardDescription>
-              Create and publish a new announcement for all users.
+              Create and publish a new alert for all users.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -110,7 +110,7 @@ export function AnnouncementManager() {
                     <FormItem>
                       <FormLabel>Content</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Describe the announcement..." {...field} rows={5} />
+                        <Textarea placeholder="Describe the alert..." {...field} rows={5} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -122,7 +122,7 @@ export function AnnouncementManager() {
                   ) : (
                     <PlusCircle className="mr-2 h-4 w-4" />
                   )}
-                  Publish Announcement
+                  Publish Alert
                 </Button>
               </form>
             </Form>
@@ -133,9 +133,9 @@ export function AnnouncementManager() {
       <div className="lg:col-span-3">
         <Card>
           <CardHeader>
-            <CardTitle>Published Announcements</CardTitle>
+            <CardTitle>Published Alerts</CardTitle>
             <CardDescription>
-              A list of all active announcements.
+              A list of all active alerts.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -172,7 +172,7 @@ export function AnnouncementManager() {
                 ) : (
                   <div className="flex h-48 flex-col items-center justify-center rounded-md border border-dashed text-center">
                     <Megaphone className="h-10 w-10 text-muted-foreground" />
-                    <p className="mt-2 text-sm font-medium text-muted-foreground">No announcements published yet.</p>
+                    <p className="mt-2 text-sm font-medium text-muted-foreground">No alerts published yet.</p>
                   </div>
                 )}
               </div>

@@ -44,15 +44,15 @@ export function AdminPanel() {
             <TabsTrigger value="wallets" className="flex-col h-16">
               <WalletCards className="h-5 w-5" />
               <span className="mt-1 text-xs text-center">
-                Wallet
+                Manage
                 <br />
-                Management
+                Wallets
               </span>
             </TabsTrigger>
             <TabsTrigger value="messages" className="flex-col h-16">
               <Mail className="h-5 w-5" />
               <span className="mt-1 text-xs text-center">
-                User
+                View
                 <br />
                 Messages
               </span>
@@ -67,7 +67,11 @@ export function AdminPanel() {
             </TabsTrigger>
             <TabsTrigger value="announcements" className="flex-col h-16">
               <Megaphone className="h-5 w-5" />
-              <span className="mt-1 text-xs text-center">Announcements</span>
+              <span className="mt-1 text-xs text-center">
+                Post
+                <br />
+                Alerts
+              </span>
             </TabsTrigger>
             <TabsTrigger value="site-settings" className="flex-col h-16">
               <Settings className="h-5 w-5" />
