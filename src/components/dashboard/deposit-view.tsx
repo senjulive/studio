@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -130,7 +129,7 @@ const PersonalDepositRequest = () => {
       
       toast({
         title: "Deposit Request Sent",
-        description: "An administrator has been notified. Your balance will be updated upon confirmation."
+        description: "Your balance will be updated upon confirmation."
       });
 
       setAmount("");
@@ -219,8 +218,8 @@ export function DepositView() {
                 <AlertTitle>Important Instructions</AlertTitle>
                 <AlertDescription>
                     <ul className="list-inside list-disc space-y-1">
-                        <li>Deposit to the address, then confirm the transaction under the 'Confirm Request' tab.</li>
-                        <li>Only send <strong>USDT</strong> on the <strong>TRC20 (Tron)</strong> network. Sending any other asset or using a different network will result in the permanent loss of your funds.</li>
+                        <li>Deposit to the address, then confirm your request.</li>
+                        <li>Only send <strong>USDT</strong> on the <strong>TRC20 (Tron)</strong> network. Sending any other asset will result in the permanent loss of your funds.</li>
                     </ul>
                 </AlertDescription>
             </Alert>
@@ -233,7 +232,6 @@ export function DepositView() {
                 <AlertDescription>
                     <ul className="list-inside list-disc space-y-1">
                         <li>Enter the amount of USDT you wish to deposit and submit the request.</li>
-                        <li>An administrator will review your request for confirmation.</li>
                         <li>Your funds will be credited to your account within 5-15 minutes of approval.</li>
                         <li>You can contact support if you have any questions about your deposit status.</li>
                     </ul>
