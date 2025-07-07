@@ -15,6 +15,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const settingsSchema = z.object({
   usdtDepositAddress: z.string().min(1, "Address is required."),
+  ethDepositAddress: z.string().min(1, "Address is required."),
+  btcDepositAddress: z.string().min(1, "Address is required."),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -28,6 +30,8 @@ export function SiteSettingsManager() {
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       usdtDepositAddress: "",
+      ethDepositAddress: "",
+      btcDepositAddress: "",
     },
   });
 
@@ -35,7 +39,11 @@ export function SiteSettingsManager() {
     async function fetchSettings() {
       setIsLoading(true);
       const settings = await getSiteSettings();
-      form.reset({ usdtDepositAddress: settings.usdtDepositAddress });
+      form.reset({
+        usdtDepositAddress: settings.usdtDepositAddress,
+        ethDepositAddress: settings.ethDepositAddress,
+        btcDepositAddress: settings.btcDepositAddress,
+      });
       setIsLoading(false);
     }
     fetchSettings();
@@ -60,6 +68,8 @@ export function SiteSettingsManager() {
         </CardHeader>
         <CardContent className="space-y-4">
             <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-32" />
         </CardContent>
       </Card>
@@ -71,7 +81,7 @@ export function SiteSettingsManager() {
       <CardHeader>
         <CardTitle>Site-Wide Settings</CardTitle>
         <CardDescription>
-          Configure global settings for the application.
+          Configure global deposit addresses for the application.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -85,6 +95,32 @@ export function SiteSettingsManager() {
                   <FormLabel>Global USDT Deposit Address (TRC20)</FormLabel>
                   <FormControl>
                     <Input placeholder="T..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="ethDepositAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Global ETH Deposit Address (ERC20)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="0x..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="btcDepositAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Global BTC Deposit Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="bc1..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

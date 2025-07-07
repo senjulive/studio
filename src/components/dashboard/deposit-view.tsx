@@ -22,14 +22,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
+import { BtcLogoIcon } from "../icons/btc-logo";
+import { EthLogoIcon } from "../icons/eth-logo";
+import { UsdtLogoIcon } from "../icons/usdt-logo";
 
-// A reusable component for displaying a deposit address
 const DepositAddressDisplay = ({
   address,
   isLoading,
+  network,
+  asset,
 }: {
   address: string;
   isLoading: boolean;
+  network: string;
+  asset: string;
 }) => {
   const { toast } = useToast();
 
@@ -47,7 +53,7 @@ const DepositAddressDisplay = ({
   };
 
   const DepositAddressSkeleton = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-6">
       <div className="mx-auto flex h-48 w-48 items-center justify-center rounded-lg bg-muted">
         <QrCode className="h-16 w-16 text-muted-foreground" />
       </div>
@@ -60,18 +66,18 @@ const DepositAddressDisplay = ({
       </div>
     </div>
   );
-  
+
   if (isLoading) {
     return <DepositAddressSkeleton />;
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 text-center">
+    <div className="flex flex-col items-center gap-6 text-center pt-6">
       <div className="rounded-lg bg-white p-4">
         <QRCodeSVG value={address} size={176} />
       </div>
       <div className="w-full space-y-2 text-left">
-        <Label htmlFor={`deposit-address-${address}`}>Deposit Address</Label>
+        <Label htmlFor={`deposit-address-${address}`}>{asset} Deposit Address ({network})</Label>
         <div className="flex items-center gap-2">
           <Input
             id={`deposit-address-${address}`}
@@ -93,7 +99,6 @@ const DepositAddressDisplay = ({
   );
 };
 
-// New component for the personal deposit request form
 const PersonalDepositRequest = () => {
   const { toast } = useToast();
   const userEmail = getCurrentUserEmail();
@@ -114,13 +119,11 @@ const PersonalDepositRequest = () => {
     setIsSubmitting(true);
 
     try {
-      // Notify admin via a silent message in the chat system
       await sendSystemNotification(
         userEmail,
         `User has initiated a deposit request for $${parseFloat(amount).toFixed(2)} USDT. Please verify payment and credit their account manually via the Wallet Management tab.`
       );
 
-      // Create a notification for the user
       await addNotification(userEmail, {
         title: "Deposit Request Submitted",
         content: `Your request to deposit $${parseFloat(amount).toFixed(2)} USDT has been received and is pending approval.`,
@@ -170,17 +173,20 @@ const PersonalDepositRequest = () => {
   )
 }
 
-
 export function DepositView() {
-  const [globalDepositAddress, setGlobalDepositAddress] = React.useState<string>("");
-  const [isLoadingGlobal, setIsLoadingGlobal] = React.useState(true);
+  const [addresses, setAddresses] = React.useState({ usdt: '', eth: '', btc: ''});
+  const [isLoading, setIsLoading] = React.useState(true);
   
   React.useEffect(() => {
     async function fetchAddresses() {
-      setIsLoadingGlobal(true);
+      setIsLoading(true);
       const settings = await getSiteSettings();
-      setGlobalDepositAddress(settings.usdtDepositAddress);
-      setIsLoadingGlobal(false);
+      setAddresses({
+        usdt: settings.usdtDepositAddress,
+        eth: settings.ethDepositAddress,
+        btc: settings.btcDepositAddress,
+      });
+      setIsLoading(false);
     }
     fetchAddresses();
   }, []);
@@ -190,7 +196,7 @@ export function DepositView() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Wallet className="h-6 w-6" />
-          <span>Deposit USDT (TRC20)</span>
+          <span>Deposit Crypto</span>
         </CardTitle>
         <CardDescription>
           Choose a method below to fund your account.
@@ -209,17 +215,44 @@ export function DepositView() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="deposit" className="mt-6">
-            <DepositAddressDisplay
-              address={globalDepositAddress}
-              isLoading={isLoadingGlobal}
-            />
+            <Tabs defaultValue="usdt" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="usdt"><UsdtLogoIcon className="mr-2"/>USDT</TabsTrigger>
+                    <TabsTrigger value="eth"><EthLogoIcon className="mr-2"/>ETH</TabsTrigger>
+                    <TabsTrigger value="btc"><BtcLogoIcon className="mr-2"/>BTC</TabsTrigger>
+                </TabsList>
+                <TabsContent value="usdt">
+                    <DepositAddressDisplay
+                    address={addresses.usdt}
+                    isLoading={isLoading}
+                    network="TRC20"
+                    asset="USDT"
+                    />
+                </TabsContent>
+                <TabsContent value="eth">
+                    <DepositAddressDisplay
+                    address={addresses.eth}
+                    isLoading={isLoading}
+                    network="ERC20"
+                    asset="ETH"
+                    />
+                </TabsContent>
+                <TabsContent value="btc">
+                    <DepositAddressDisplay
+                    address={addresses.btc}
+                    isLoading={isLoading}
+                    network="Bitcoin"
+                    asset="BTC"
+                    />
+                </TabsContent>
+            </Tabs>
              <Alert className="mt-6 w-full text-left bg-muted/30">
                 <Info className="h-4 w-4" />
                 <AlertTitle>Important Instructions</AlertTitle>
                 <AlertDescription>
                     <ul className="list-inside list-disc space-y-1">
                         <li>Deposit to the address, then confirm your request.</li>
-                        <li>Only send <strong>USDT</strong> on the <strong>TRC20 (Tron)</strong> network. Sending any other asset will result in the permanent loss of your funds.</li>
+                        <li>Only send the correct asset to the corresponding address (e.g., USDT to the USDT address). Sending any other asset will result in the permanent loss of your funds.</li>
                     </ul>
                 </AlertDescription>
             </Alert>
