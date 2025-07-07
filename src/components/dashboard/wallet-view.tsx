@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -11,7 +12,6 @@ import {
   User,
   Users,
 } from "lucide-react";
-import { SiTether } from "react-icons/si";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -301,7 +301,7 @@ export function WalletView() {
           <div className="grid grid-cols-1 gap-4">
             <div className="rounded-lg border bg-secondary/50 p-4">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <SiTether className="h-5 w-5" />
+                <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={20} height={20} className="rounded-full" />
                 <span>USDT Balance</span>
               </div>
               <p className="text-2xl font-bold mt-1">

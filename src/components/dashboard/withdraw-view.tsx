@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { Info, Loader2 } from "lucide-react";
-import { SiTether } from "react-icons/si";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -117,7 +117,7 @@ export function WithdrawView() {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-            <SiTether className="h-6 w-6" />
+            <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={24} height={24} className="rounded-full" />
             <span>Withdraw USDT (TRC20)</span>
         </CardTitle>
         <CardDescription>

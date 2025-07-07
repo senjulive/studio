@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { Copy, Info, QrCode, Wallet, User, Loader2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { FaBitcoin, FaEthereum } from "react-icons/fa";
-import { SiTether } from "react-icons/si";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -216,9 +215,18 @@ export function DepositView() {
           <TabsContent value="deposit" className="mt-6">
             <Tabs defaultValue="usdt" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="usdt"><SiTether className="mr-2 h-5 w-5"/>USDT</TabsTrigger>
-                    <TabsTrigger value="eth"><FaEthereum className="mr-2 h-5 w-5"/>ETH</TabsTrigger>
-                    <TabsTrigger value="btc"><FaBitcoin className="mr-2 h-5 w-5"/>BTC</TabsTrigger>
+                    <TabsTrigger value="usdt">
+                        <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={20} height={20} className="mr-2 rounded-full" />
+                        USDT
+                    </TabsTrigger>
+                    <TabsTrigger value="eth">
+                        <Image src="https://assets.coincap.io/assets/icons/eth@2x.png" alt="ETH logo" width={20} height={20} className="mr-2 rounded-full" />
+                        ETH
+                    </TabsTrigger>
+                    <TabsTrigger value="btc">
+                        <Image src="https://assets.coincap.io/assets/icons/btc@2x.png" alt="BTC logo" width={20} height={20} className="mr-2 rounded-full" />
+                        BTC
+                    </TabsTrigger>
                 </TabsList>
                 <TabsContent value="usdt">
                     <DepositAddressDisplay
