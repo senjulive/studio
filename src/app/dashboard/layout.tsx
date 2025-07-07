@@ -33,7 +33,8 @@ import {
   ArrowUpRight,
   MessageSquare,
   LineChart,
-  Info
+  Info,
+  Download,
 } from "lucide-react";
 import { logout, getCurrentUserEmail } from "@/lib/auth";
 import * as React from "react";
@@ -63,6 +64,7 @@ export default function DashboardLayout({
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [isClient, setIsClient] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
+  const [downloadHref, setDownloadHref] = React.useState("");
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,6 +72,16 @@ export default function DashboardLayout({
     }, 2000); 
 
     return () => clearTimeout(timer);
+  }, []);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const fileContent = `[InternetShortcut]\nURL=${window.location.origin}`;
+      const dataUri = `data:text/plain;charset=utf-8,${encodeURIComponent(
+        fileContent
+      )}`;
+      setDownloadHref(dataUri);
+    }
   }, []);
 
   const menuItems = [
@@ -81,6 +93,12 @@ export default function DashboardLayout({
     { href: "/dashboard/profile", label: "Profile", icon: User },
     { href: "/dashboard/support", label: "Support", icon: MessageSquare },
     { href: "/dashboard/about", label: "About", icon: Info },
+    {
+      href: downloadHref,
+      label: "Download App",
+      icon: Download,
+      download: "AstralCore.url",
+    },
   ];
 
   React.useEffect(() => {
@@ -123,9 +141,9 @@ export default function DashboardLayout({
         <SidebarContent>
           <SidebarMenu>
             {menuItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton asChild isActive={isClient ? pathname === item.href : false}>
-                  <Link href={item.href}>
+              <SidebarMenuItem key={item.label}>
+                <SidebarMenuButton asChild isActive={isClient ? pathname === item.href && !item.download : false}>
+                  <Link href={item.href} download={item.download}>
                     <item.icon />
                     <span>{item.label}</span>
                   </Link>
