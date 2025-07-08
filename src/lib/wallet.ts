@@ -2,7 +2,7 @@
 'use client';
 
 import { supabase } from '@/lib/supabase';
-import { addNotification } from '@/lib/notifications';
+import { sendSystemNotification } from '@/lib/chat';
 import { getBotTierSettings } from './settings';
 
 const generateAddress = (prefix: string, length: number, chars: string): string => {
@@ -156,21 +156,26 @@ export async function createWallet(
 
         if (leaderData && !leaderError) {
             const leaderId = leaderData.id;
+            const leaderWallet = leaderData.data as WalletData;
             
             // Set the squad leader for the new user
             newWalletData.squad.squadLeader = leaderId;
             // New member gets a $5 bonus for using a code
             newWalletData.balances.usdt += 5; 
             
-            // The logic to update the leader's wallet (add member, grant bonus) has been removed.
-            // This is because a user cannot update another user's wallet due to security policies (RLS).
-            // This kind of operation should be handled by a secure backend function (e.g., Supabase Edge Function).
+            // The logic to update the leader's wallet is correctly removed.
+            // Now, we just notify the admin so they can handle the leader's bonus manually.
+            const leaderUsername = leaderWallet.profile.username || leaderId;
+            await sendSystemNotification(
+                userId, // Log this in the new user's chat for context
+                `Referral successful. User '${email}' was referred by '${leaderUsername}'. Admin action required to credit leader's bonus.`
+            );
         }
     }
 
     const { error } = await supabase.from('wallets').insert({
         id: userId,
-        data: newWalletData
+        data: newWalletData as any,
     });
 
     if (error) {
@@ -229,7 +234,7 @@ export async function getOrCreateWallet(userId: string): Promise<WalletData> {
 export async function updateWallet(userId: string, newData: WalletData): Promise<void> {
     const { error } = await supabase
         .from('wallets')
-        .update({ data: newData })
+        .update({ data: newData as any })
         .eq('id', userId);
 
     if (error) {
