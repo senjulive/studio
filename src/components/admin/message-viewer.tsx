@@ -25,7 +25,7 @@ import { BrainCircuit, Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { addNotification } from "@/lib/notifications";
 import { useToast } from "@/hooks/use-toast";
-import { analyzeSupportThread, type SupportAgentOutput } from "@/ai/flows/support-agent-flow";
+import { type SupportAgentOutput } from "@/ai/flows/support-agent-flow";
 import { Card, CardContent } from "@/components/ui/card";
 import { getAllWallets, type WalletData } from "@/lib/wallet";
 
@@ -78,11 +78,19 @@ export function MessageViewer() {
     setIsAnalyzing((prev) => ({ ...prev, [email]: true }));
     setAnalysis((prev) => ({ ...prev, [email]: null }));
     try {
-      // The flow expects message objects that are serializable.
-      // The `file` property with a raw File object is not.
-      // We must ensure only serializable data (like a dataUrl) is passed.
-      // The `messages` from `getAllChats` should already be in this format.
-      const result = await analyzeSupportThread({ messages });
+      const response = await fetch('/api/support-agent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get analysis from the server.');
+      }
+
+      const result: SupportAgentOutput = await response.json();
       setAnalysis((prev) => ({ ...prev, [email]: result }));
     } catch (e) {
       console.error(e);
