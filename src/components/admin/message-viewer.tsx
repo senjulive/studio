@@ -27,7 +27,8 @@ import { addNotification } from "@/lib/notifications";
 import { useToast } from "@/hooks/use-toast";
 import { type SupportAgentOutput } from "@/ai/flows/support-agent-flow";
 import { Card, CardContent } from "@/components/ui/card";
-import { getAllWallets, type WalletData } from "@/lib/wallet";
+import { type WalletData } from "@/lib/wallet";
+import { useAdmin } from "@/contexts/AdminContext";
 
 export function MessageViewer() {
   const [chats, setChats] = React.useState<ChatHistory | null>(null);
@@ -38,20 +39,46 @@ export function MessageViewer() {
   const [analysis, setAnalysis] = React.useState<Record<string, SupportAgentOutput | null>>({});
   const [isAnalyzing, setIsAnalyzing] = React.useState<Record<string, boolean>>({});
   const { toast } = useToast();
+  const { adminPassword } = useAdmin();
 
   React.useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
+
+      const fetchWallets = async () => {
+        if (!adminPassword) return {};
+        try {
+          const response = await fetch('/api/admin/wallets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminPassword }),
+          });
+          if (!response.ok) {
+            console.error("Failed to fetch wallets:", response.statusText);
+            return {};
+          };
+          return await response.json();
+        } catch (error: any) {
+          toast({
+            title: 'Error Fetching Wallets',
+            description: `Could not fetch wallets for display names: ${error.message}`,
+            variant: 'destructive',
+          });
+          return {};
+        }
+      };
+      
       const [chatData, walletData] = await Promise.all([
-          getAllChats(),
-          getAllWallets()
+        getAllChats(),
+        fetchWallets(),
       ]);
+
       setChats(chatData);
       setWallets(walletData);
       setIsLoading(false);
     }
     fetchData();
-  }, []);
+  }, [adminPassword, toast]);
 
   const handleSendMessage = async (userId: string) => {
     const text = replyMessages[userId];
@@ -281,3 +308,5 @@ export function MessageViewer() {
     </Accordion>
   );
 }
+
+    
