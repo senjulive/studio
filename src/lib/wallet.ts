@@ -266,9 +266,13 @@ export async function saveWithdrawalAddress(email: string, asset: string, addres
     }
 }
 
-export async function resetAllWithdrawalAddresses(): Promise<void> {
+export async function resetWithdrawalAddressForUser(email: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 500));
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY);
+    if (typeof window === 'undefined') return;
+
+    const allAddresses = await getAllWithdrawalAddresses();
+    if (allAddresses[email]) {
+        delete allAddresses[email];
+        localStorage.setItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY, JSON.stringify(allAddresses));
     }
 }

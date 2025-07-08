@@ -5,7 +5,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle } from "lucide-react";
+import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -32,6 +33,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -41,7 +53,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { getAllWallets, updateWallet, type WalletData } from "@/lib/wallet";
+import { getAllWallets, updateWallet, type WalletData, resetWithdrawalAddressForUser } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
@@ -81,6 +93,7 @@ export function WalletManager() {
   const [isUpdatingBalance, setIsUpdatingBalance] = React.useState(false);
   const [isCompleting, setIsCompleting] = React.useState<string | null>(null);
   const [isFetchingWallets, setIsFetchingWallets] = React.useState(true);
+  const [isResettingAddress, setIsResettingAddress] = React.useState(false);
 
   const addressForm = useForm<AddressUpdateFormValues>({
     resolver: zodResolver(addressUpdateSchema),
@@ -231,6 +244,18 @@ export function WalletManager() {
     toast({ title: "Withdrawal Marked as Complete" });
     await refetchWallets();
     setIsCompleting(null);
+  };
+
+  const handleResetAddress = async () => {
+    if (!selectedUserEmail) return;
+
+    setIsResettingAddress(true);
+    await resetWithdrawalAddressForUser(selectedUserEmail);
+    toast({
+        title: "Withdrawal Address Reset",
+        description: `Successfully reset withdrawal address for ${selectedUserEmail}.`,
+    });
+    setIsResettingAddress(false);
   };
 
 
@@ -463,6 +488,50 @@ export function WalletManager() {
           </Form>
         </CardContent>
       </Card>
+
+      <Card className="border-destructive">
+        <CardHeader>
+            <CardTitle className="text-destructive flex items-center gap-2">
+                <AlertTriangle />
+                Danger Zone
+            </CardTitle>
+            <CardDescription>
+              This action is irreversible. Please proceed with caution.
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="destructive" disabled={!selectedUserEmail || isResettingAddress}>
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Reset Withdrawal Address
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This will delete the saved withdrawal address for{" "}
+                        <span className="font-bold">{selectedUserEmail}</span>.
+                        The user will need to re-enter it. This action cannot be undone.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel disabled={isResettingAddress}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={handleResetAddress}
+                        disabled={isResettingAddress}
+                        className="bg-destructive hover:bg-destructive/90"
+                    >
+                        {isResettingAddress && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Confirm Reset
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </CardContent>
+      </Card>
+
     </div>
   );
 }
