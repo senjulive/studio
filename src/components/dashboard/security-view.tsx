@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -86,24 +87,33 @@ export function SecurityView() {
     setIsSubmitting(true);
 
     try {
-      if ("currentPassword" in values) { // Change password
-        const isValid = await verifyWithdrawalPassword(email, values.currentPassword);
+      if (hasPassword) {
+        // Handle changing the password
+        const changeValues = values as ChangePasswordValues;
+        const isValid = await verifyWithdrawalPassword(email, changeValues.currentPassword);
+
         if (!isValid) {
           form.setError("currentPassword", { message: "Incorrect current password." });
-          return;
+        } else {
+          await setWithdrawalPassword(email, changeValues.newPassword);
+          toast({
+            title: "Password Updated",
+            description: "Your withdrawal password has been changed successfully.",
+          });
+          await fetchWallet();
+          form.reset();
         }
+      } else {
+        // Handle creating a new password
+        const createValues = values as CreatePasswordValues;
+        await setWithdrawalPassword(email, createValues.newPassword);
+        toast({
+          title: "Password Created",
+          description: "Your withdrawal password has been set successfully.",
+        });
+        await fetchWallet();
+        form.reset();
       }
-      
-      await setWithdrawalPassword(email, values.newPassword);
-      
-      toast({
-        title: "Password Updated",
-        description: "Your withdrawal password has been set successfully.",
-      });
-
-      await fetchWallet(); // Refetch wallet to update UI state
-      form.reset();
-
     } catch (error) {
       toast({
         title: "Update Failed",
