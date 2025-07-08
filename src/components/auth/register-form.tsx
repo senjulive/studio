@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -25,14 +26,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { createWallet } from "@/lib/wallet";
 import { AstralLogo } from "../icons/astral-logo";
 import { register } from "@/lib/auth";
+import { countries } from "@/lib/countries";
 
-const MALDIVES_COUNTRY = { name: 'Maldives', dial_code: '+960', code: 'MV', flag: '🇲🇻' };
+const MALDIVES_COUNTRY = countries.find(c => c.code === "MV")!;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
@@ -47,29 +56,39 @@ export function RegisterForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      country: "MV",
       contactNumber: "",
       referralCode: "",
     },
   });
 
+  const selectedCountryCode = form.watch("country");
+  const selectedCountry = React.useMemo(
+    () => countries.find((c) => c.code === selectedCountryCode) || MALDIVES_COUNTRY,
+    [selectedCountryCode]
+  );
+
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
 
-    const fullContactNumber = `${MALDIVES_COUNTRY.dial_code}${
-      values.contactNumber
-    }`;
+    const countryInfo = countries.find(c => c.code === values.country);
+    if (!countryInfo) {
+      toast({ title: "Invalid Country", description: "Please select a valid country.", variant: "destructive"});
+      setIsLoading(false);
+      return;
+    }
+
+    const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      // Step 1: Register the user with Supabase Auth and get the new user object back
       const newUser = await register({ email: values.email, password: values.password });
 
-      // Step 2: Create the associated wallet data in the database
       await createWallet(
         newUser.id,
         values.email,
         values.username,
         fullContactNumber,
-        MALDIVES_COUNTRY.name,
+        countryInfo.name,
         values.referralCode
       );
       toast({
@@ -154,6 +173,33 @@ export function RegisterForm() {
             />
             <FormField
               control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select your country" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            {countries.map(c => (
+                                <SelectItem key={c.code} value={c.code}>
+                                    <div className="flex items-center gap-2">
+                                        <span>{c.flag}</span>
+                                        <span>{c.name}</span>
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="contactNumber"
               render={({ field }) => (
                 <FormItem>
@@ -161,8 +207,8 @@ export function RegisterForm() {
                   <FormControl>
                     <div className="flex items-center gap-2">
                       <div className="flex h-10 w-24 items-center justify-center rounded-md border bg-muted px-3 text-sm shrink-0">
-                         <span className="mr-2">{MALDIVES_COUNTRY.flag}</span>
-                         <span>{MALDIVES_COUNTRY.dial_code}</span>
+                         <span className="mr-2">{selectedCountry.flag}</span>
+                         <span>{selectedCountry.dial_code}</span>
                       </div>
                       <Input
                         placeholder="Your phone number"

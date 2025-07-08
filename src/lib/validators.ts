@@ -19,6 +19,7 @@ export const registerSchema = z
         "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
       ),
     confirmPassword: z.string(),
+    country: z.string().min(2, { message: "Please select a country." }),
     contactNumber: z.string().min(5, { message: "Please enter a valid contact number." }),
     referralCode: z.string().optional(),
   })
