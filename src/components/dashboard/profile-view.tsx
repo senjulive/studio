@@ -136,14 +136,20 @@ export function ProfileView() {
                 <VirtualCard walletData={walletData} userEmail={userEmail} />
              </div>
              <div className="p-6 pt-2 w-full">
-                <CardTitle className="text-2xl flex items-center justify-center gap-2">
-                {isLoading ? <Skeleton className="h-8 w-40" /> : profileDisplayName}
-                <Badge variant="outline" className={cn("flex items-center gap-1.5", rank.className)}>
-                    <rank.Icon className="h-5 w-5" />
-                    {rank.name}
-                </Badge>
+                <CardTitle className="text-2xl">
+                  {isLoading ? <Skeleton className="h-8 w-40" /> : profileDisplayName}
                 </CardTitle>
-                <CardDescription className="mt-1.5">Your account details.</CardDescription>
+                <div className="mt-2 flex justify-center">
+                  {isLoading ? (
+                    <Skeleton className="h-8 w-24" />
+                  ) : (
+                    <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
+                      <rank.Icon className="h-5 w-5" />
+                      <span>{rank.name}</span>
+                    </Badge>
+                  )}
+                </div>
+                <CardDescription className="mt-2">Your account details.</CardDescription>
              </div>
           </CardHeader>
           <CardContent>
