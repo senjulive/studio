@@ -96,7 +96,7 @@ export function RegisterForm() {
         description: "Please check your email to verify your account, then sign in.",
       });
       router.push("/");
-    } catch (error: any) {
+    } catch (error: any) => {
       toast({
         title: "Registration Failed",
         description: error.message || "An unexpected error occurred.",
@@ -252,3 +252,4 @@ export function RegisterForm() {
     </Card>
   );
 }
+    
