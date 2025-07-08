@@ -94,13 +94,12 @@ export function ProfileView() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
   const { user } = useUser();
-  const userEmail = user?.email;
 
   React.useEffect(() => {
-    if (userEmail) {
+    if (user?.id) {
         async function fetchWallet() {
             setIsLoading(true);
-            const data = await getOrCreateWallet(userEmail);
+            const data = await getOrCreateWallet(user.id);
             setWalletData(data);
             setIsLoading(false);
         }
@@ -109,7 +108,7 @@ export function ProfileView() {
         setIsLoading(false);
     }
     setAnnouncements(getAnnouncements());
-  }, [userEmail]);
+  }, [user]);
 
   const profile = walletData?.profile;
   const profileDisplayName = profile?.fullName || profile?.username || "User Profile";
@@ -133,7 +132,7 @@ export function ProfileView() {
         <Card className="max-w-md mx-auto">
           <CardHeader className="items-center text-center p-0">
              <div className="p-4 w-full">
-                <VirtualCard walletData={walletData} userEmail={userEmail} />
+                <VirtualCard walletData={walletData} userEmail={user?.email || null} />
              </div>
              <div className="p-6 pt-2 w-full">
                 <CardTitle className="text-2xl">
@@ -195,7 +194,7 @@ export function ProfileView() {
             <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
                 <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
                 <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
-                <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={userEmail} />
+                <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={user?.email} />
                 <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="ID Card No." value={profile?.idCardNo} />
                 <ProfileDetailItem isLoading={isLoading} icon={<Phone className="h-4 w-4" />} label="Contact Number" value={profile?.contactNumber} />
                 <ProfileDetailItem isLoading={isLoading} icon={<MapPin className="h-4 w-4" />} label="Country" value={profile?.country} />

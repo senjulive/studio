@@ -14,7 +14,7 @@ export type Notification = {
 };
 
 export type UserNotifications = {
-  [userEmail: string]: Notification[];
+  [userId: string]: Notification[];
 };
 
 function safeJsonParse<T>(json: string | null, fallback: T): T {
@@ -40,9 +40,9 @@ async function saveAllNotifications(data: UserNotifications): Promise<void> {
 }
 
 // Fetches notifications for a user, including unread announcements
-export async function getNotifications(email: string): Promise<Notification[]> {
+export async function getNotifications(userId: string): Promise<Notification[]> {
   const allNotifications = await getAllNotifications();
-  let userNotifications = allNotifications[email] || [];
+  let userNotifications = allNotifications[userId] || [];
 
   const staticAnnouncements = getAnnouncements();
 
@@ -63,16 +63,16 @@ export async function getNotifications(email: string): Promise<Notification[]> {
   }
   
   if (newNotificationsAdded) {
-    allNotifications[email] = userNotifications;
+    allNotifications[userId] = userNotifications;
     await saveAllNotifications(allNotifications);
   }
 
   return userNotifications.sort((a, b) => b.date - a.date);
 }
 
-export async function addNotification(email: string, notificationData: Omit<Notification, 'id' | 'date' | 'read'>): Promise<void> {
+export async function addNotification(userId: string, notificationData: Omit<Notification, 'id' | 'date' | 'read'>): Promise<void> {
     const allNotifications = await getAllNotifications();
-    const userNotifications = allNotifications[email] || [];
+    const userNotifications = allNotifications[userId] || [];
 
     const newNotification: Notification = {
         ...notificationData,
@@ -82,15 +82,15 @@ export async function addNotification(email: string, notificationData: Omit<Noti
     };
 
     userNotifications.unshift(newNotification);
-    allNotifications[email] = userNotifications;
+    allNotifications[userId] = userNotifications;
     await saveAllNotifications(allNotifications);
 }
 
-export async function markAllAsRead(email: string): Promise<Notification[]> {
+export async function markAllAsRead(userId: string): Promise<Notification[]> {
     const allNotifications = await getAllNotifications();
-    const userNotifications = (allNotifications[email] || []).map(n => ({ ...n, read: true }));
+    const userNotifications = (allNotifications[userId] || []).map(n => ({ ...n, read: true }));
     
-    allNotifications[email] = userNotifications;
+    allNotifications[userId] = userNotifications;
     await saveAllNotifications(allNotifications);
     
     return userNotifications;

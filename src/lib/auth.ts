@@ -2,13 +2,17 @@
 
 // This file handles auth using Supabase.
 import { supabase } from '@/lib/supabase';
-import type { SignInWithPasswordCredentials, SignUpWithPasswordCredentials } from '@supabase/supabase-js';
+import type { SignInWithPasswordCredentials, SignUpWithPasswordCredentials, User } from '@supabase/supabase-js';
 
-export async function register(credentials: SignUpWithPasswordCredentials): Promise<void> {
-    const { error } = await supabase.auth.signUp(credentials);
+export async function register(credentials: SignUpWithPasswordCredentials): Promise<User> {
+    const { data, error } = await supabase.auth.signUp(credentials);
     if (error) {
         throw new Error(error.message);
     }
+    if (!data.user) {
+        throw new Error("Registration did not return a user.");
+    }
+    return data.user;
 }
 
 export async function login(credentials: SignInWithPasswordCredentials): Promise<void> {

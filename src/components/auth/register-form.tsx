@@ -60,11 +60,12 @@ export function RegisterForm() {
     }`;
 
     try {
-      // Step 1: Register the user with Supabase Auth
-      await register({ email: values.email, password: values.password });
+      // Step 1: Register the user with Supabase Auth and get the new user object back
+      const newUser = await register({ email: values.email, password: values.password });
 
-      // Step 2: Create the associated wallet data
+      // Step 2: Create the associated wallet data in the database
       await createWallet(
+        newUser.id,
         values.email,
         values.username,
         fullContactNumber,

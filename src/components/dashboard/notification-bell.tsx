@@ -45,25 +45,24 @@ export function NotificationBell() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isOpen, setIsOpen] = React.useState(false);
   const { user } = useUser();
-  const userEmail = user?.email;
 
   const unreadCount = React.useMemo(() => {
     return notifications.filter((n) => !n.read).length;
   }, [notifications]);
 
   const fetchNotifications = React.useCallback(async () => {
-    if (userEmail) {
+    if (user?.id) {
       // Don't show loader on background refresh
       if(!isOpen) {
         setIsLoading(true);
       }
-      const data = await getNotifications(userEmail);
+      const data = await getNotifications(user.id);
       setNotifications(data);
       setIsLoading(false);
     } else {
         setIsLoading(false);
     }
-  }, [userEmail, isOpen]);
+  }, [user, isOpen]);
 
   React.useEffect(() => {
     fetchNotifications();
@@ -73,8 +72,8 @@ export function NotificationBell() {
   }, [fetchNotifications]);
   
   const handleMarkAllRead = async () => {
-    if (!userEmail) return;
-    const updatedNotifications = await markAllAsRead(userEmail);
+    if (!user?.id) return;
+    const updatedNotifications = await markAllAsRead(user.id);
     setNotifications(updatedNotifications);
   };
   

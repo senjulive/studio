@@ -103,21 +103,20 @@ const DepositAddressDisplay = ({
 const PersonalDepositRequest = () => {
   const { toast } = useToast();
   const { user } = useUser();
-  const userEmail = user?.email;
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
   const [amount, setAmount] = React.useState("");
   const [selectedAsset, setSelectedAsset] = React.useState("usdt");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   React.useEffect(() => {
-    if (userEmail) {
-      getOrCreateWallet(userEmail).then(setWallet);
+    if (user?.id) {
+      getOrCreateWallet(user.id).then(setWallet);
     }
-  }, [userEmail]);
+  }, [user]);
 
   const handleDepositRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || parseFloat(amount) <= 0 || !userEmail) {
+    if (!amount || parseFloat(amount) <= 0 || !user) {
       toast({
         title: "Invalid Amount",
         description: "Please enter a positive amount to deposit.",
@@ -129,13 +128,13 @@ const PersonalDepositRequest = () => {
     setIsSubmitting(true);
 
     try {
-      const username = wallet?.profile.username || userEmail;
+      const username = wallet?.profile.username || user.email;
       await sendSystemNotification(
-        userEmail,
-        `User '${username}' (${userEmail}) has initiated a deposit request for ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()}. Please verify payment and credit their account manually via the Wallet Management tab.`
+        user.id,
+        `User '${username}' (${user.email}) has initiated a deposit request for ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()}. Please verify payment and credit their account manually via the Wallet Management tab.`
       );
 
-      await addNotification(userEmail, {
+      await addNotification(user.id, {
         title: "Deposit Request Submitted",
         content: `Your request to deposit ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()} has been received and is pending approval.`,
         href: "/dashboard/deposit",

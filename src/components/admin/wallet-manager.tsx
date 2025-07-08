@@ -88,7 +88,7 @@ export function WalletManager() {
     string,
     WalletData
   > | null>(null);
-  const [selectedUserEmail, setSelectedUserEmail] = React.useState<string>("");
+  const [selectedUserId, setSelectedUserId] = React.useState<string>("");
   const [isUpdatingAddress, setIsUpdatingAddress] = React.useState(false);
   const [isUpdatingBalance, setIsUpdatingBalance] = React.useState(false);
   const [isCompleting, setIsCompleting] = React.useState<string | null>(null);
@@ -117,7 +117,7 @@ export function WalletManager() {
   }, [refetchWallets]);
 
   const selectedWalletData =
-    selectedUserEmail && allWallets ? allWallets[selectedUserEmail] : null;
+    selectedUserId && allWallets ? allWallets[selectedUserId] : null;
 
   React.useEffect(() => {
     if (selectedWalletData) {
@@ -126,10 +126,10 @@ export function WalletManager() {
       addressForm.reset({ usdtAddress: "" });
     }
     balanceForm.reset({ amount: 0 });
-  }, [selectedUserEmail, selectedWalletData, addressForm, balanceForm]);
+  }, [selectedUserId, selectedWalletData, addressForm, balanceForm]);
 
   const handleAddressUpdate = async (values: AddressUpdateFormValues) => {
-    if (!selectedWalletData || !selectedUserEmail) return;
+    if (!selectedWalletData || !selectedUserId) return;
 
     setIsUpdatingAddress(true);
     const newWalletData: WalletData = {
@@ -137,11 +137,11 @@ export function WalletManager() {
       addresses: { ...selectedWalletData.addresses, usdt: values.usdtAddress },
     };
 
-    await updateWallet(selectedUserEmail, newWalletData);
+    await updateWallet(selectedUserId, newWalletData);
     await refetchWallets();
     toast({
       title: "Address Updated",
-      description: `Successfully updated USDT address for ${selectedUserEmail}.`,
+      description: `Successfully updated USDT address for ${selectedUserId}.`,
     });
     setIsUpdatingAddress(false);
   };
@@ -150,7 +150,7 @@ export function WalletManager() {
     values: BalanceUpdateFormValues,
     action: "add" | "remove"
   ) => {
-    if (!selectedWalletData || !selectedUserEmail) {
+    if (!selectedWalletData || !selectedUserId) {
       toast({
         title: "Error",
         description: "Please select a user.",
@@ -179,12 +179,12 @@ export function WalletManager() {
 
     if (action === "add") {
       await sendAdminMessage(
-        selectedUserEmail,
+        selectedUserId,
         `Deposit received: ${values.amount.toFixed(
           8
         )} ${asset.toUpperCase()} has been credited to your account.`
       );
-      await addNotification(selectedUserEmail, {
+      await addNotification(selectedUserId, {
         title: "Deposit Approved",
         content: `Your balance has been credited with ${values.amount} ${asset.toUpperCase()}.`,
         href: "/dashboard",
@@ -196,12 +196,12 @@ export function WalletManager() {
       balances: newBalances,
     };
 
-    await updateWallet(selectedUserEmail, newWalletData);
+    await updateWallet(selectedUserId, newWalletData);
     await refetchWallets();
 
     toast({
       title: "Balance Updated",
-      description: `Successfully ${action}ed ${values.amount} ${asset.toUpperCase()} for ${selectedUserEmail}.`,
+      description: `Successfully ${action}ed ${values.amount} ${asset.toUpperCase()} for ${selectedUserId}.`,
     });
 
     balanceForm.reset({ amount: 0 });
@@ -214,7 +214,7 @@ export function WalletManager() {
     handleBalanceUpdate(values, "remove");
 
   const handleCompleteWithdrawal = async (withdrawalId: string) => {
-    if (!selectedWalletData || !selectedUserEmail) return;
+    if (!selectedWalletData || !selectedUserId) return;
     setIsCompleting(withdrawalId);
 
     const withdrawal = selectedWalletData.pendingWithdrawals.find(w => w.id === withdrawalId);
@@ -229,13 +229,13 @@ export function WalletManager() {
         pendingWithdrawals: selectedWalletData.pendingWithdrawals.filter(w => w.id !== withdrawalId),
     };
 
-    await updateWallet(selectedUserEmail, newWalletData);
+    await updateWallet(selectedUserId, newWalletData);
 
     await sendAdminMessage(
-        selectedUserEmail,
+        selectedUserId,
         `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`
     );
-    await addNotification(selectedUserEmail, {
+    await addNotification(selectedUserId, {
         title: "Withdrawal Completed",
         content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`,
         href: "/dashboard",
@@ -247,13 +247,13 @@ export function WalletManager() {
   };
 
   const handleResetAddress = async () => {
-    if (!selectedUserEmail) return;
+    if (!selectedUserId) return;
 
     setIsResettingAddress(true);
-    await resetWithdrawalAddressForUser(selectedUserEmail);
+    await resetWithdrawalAddressForUser(selectedUserId);
     toast({
         title: "Withdrawal Address Reset",
-        description: `Successfully reset withdrawal address for ${selectedUserEmail}.`,
+        description: `Successfully reset withdrawal address for ${selectedUserId}.`,
     });
     setIsResettingAddress(false);
   };
@@ -264,8 +264,8 @@ export function WalletManager() {
       <div className="space-y-2">
         <Label>Select User</Label>
         <Select
-          onValueChange={setSelectedUserEmail}
-          value={selectedUserEmail}
+          onValueChange={setSelectedUserId}
+          value={selectedUserId}
           disabled={isFetchingWallets}
         >
           <SelectTrigger>
@@ -273,9 +273,9 @@ export function WalletManager() {
           </SelectTrigger>
           <SelectContent>
             {allWallets && Object.keys(allWallets).length > 0 ? (
-              Object.keys(allWallets).map((email) => (
-                <SelectItem key={email} value={email}>
-                  {allWallets[email].profile?.username || email}
+              Object.keys(allWallets).map((userId) => (
+                <SelectItem key={userId} value={userId}>
+                  {allWallets[userId].profile?.username || userId}
                 </SelectItem>
               ))
             ) : (
@@ -287,7 +287,7 @@ export function WalletManager() {
         </Select>
       </div>
 
-      {selectedUserEmail &&
+      {selectedUserId &&
         (isFetchingWallets ? (
           <Skeleton className="h-48 w-full" />
         ) : selectedWalletData ? (
@@ -295,7 +295,7 @@ export function WalletManager() {
             <div className="border-b pb-4">
                 <p className="text-sm font-medium text-muted-foreground flex items-center gap-2"><User className="h-4 w-4" /> User Details</p>
                 <p className="text-lg font-bold">{selectedWalletData.profile.username || 'N/A'}</p>
-                <p className="text-sm text-muted-foreground">{selectedUserEmail}</p>
+                <p className="text-sm text-muted-foreground">{selectedUserId}</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div>
@@ -384,7 +384,7 @@ export function WalletManager() {
                       <Input
                         placeholder="T..."
                         {...field}
-                        disabled={!selectedUserEmail || isUpdatingAddress}
+                        disabled={!selectedUserId || isUpdatingAddress}
                       />
                     </FormControl>
                     <FormMessage />
@@ -394,7 +394,7 @@ export function WalletManager() {
               <Button
                 type="submit"
                 variant="secondary"
-                disabled={!selectedUserEmail || isUpdatingAddress}
+                disabled={!selectedUserId || isUpdatingAddress}
               >
                 {isUpdatingAddress ? (
                   <Loader2 className="animate-spin" />
@@ -422,7 +422,7 @@ export function WalletManager() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Asset</FormLabel>
-                       <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedUserEmail || isUpdatingBalance}>
+                       <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedUserId || isUpdatingBalance}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select asset" />
@@ -449,7 +449,7 @@ export function WalletManager() {
                             type="number"
                             placeholder="0.00"
                             {...field}
-                            disabled={!selectedUserEmail || isUpdatingBalance}
+                            disabled={!selectedUserId || isUpdatingBalance}
                         />
                         </FormControl>
                         <FormMessage />
@@ -461,7 +461,7 @@ export function WalletManager() {
                 <Button
                   onClick={balanceForm.handleSubmit(onSubmitBalanceAdd)}
                   className="w-full"
-                  disabled={!selectedUserEmail || isUpdatingBalance}
+                  disabled={!selectedUserId || isUpdatingBalance}
                 >
                   {isUpdatingBalance ? (
                     <Loader2 className="animate-spin" />
@@ -474,7 +474,7 @@ export function WalletManager() {
                   onClick={balanceForm.handleSubmit(onSubmitBalanceRemove)}
                   variant="destructive"
                   className="w-full"
-                  disabled={!selectedUserEmail || isUpdatingBalance}
+                  disabled={!selectedUserId || isUpdatingBalance}
                 >
                   {isUpdatingBalance ? (
                     <Loader2 className="animate-spin" />
@@ -502,7 +502,7 @@ export function WalletManager() {
         <CardContent className="flex flex-col sm:flex-row gap-4 items-start">
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <Button variant="destructive" disabled={!selectedUserEmail || isResettingAddress}>
+                    <Button variant="destructive" disabled={!selectedUserId || isResettingAddress}>
                     <AlertTriangle className="mr-2 h-4 w-4" />
                     Reset Withdrawal Address
                     </Button>
@@ -512,7 +512,7 @@ export function WalletManager() {
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
                         This will delete the saved withdrawal address for{" "}
-                        <span className="font-bold">{selectedUserEmail}</span>.
+                        <span className="font-bold">{selectedUserId}</span>.
                         The user will need to re-enter it. This action cannot be undone.
                     </AlertDialogDescription>
                     </AlertDialogHeader>

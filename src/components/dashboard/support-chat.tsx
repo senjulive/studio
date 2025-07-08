@@ -27,7 +27,6 @@ export function SupportChat() {
   const [newMessage, setNewMessage] = React.useState("");
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const { user } = useUser();
-  const userEmail = user?.email;
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSending, setIsSending] = React.useState(false);
   
@@ -35,10 +34,10 @@ export function SupportChat() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (userEmail) {
+    if (user?.id) {
       async function fetchHistory() {
         setIsLoading(true);
-        const history = await getChatHistoryForUser(userEmail);
+        const history = await getChatHistoryForUser(user.id);
         setMessages(history.filter(m => !m.silent));
         setIsLoading(false);
       }
@@ -46,7 +45,7 @@ export function SupportChat() {
     } else {
         setIsLoading(false);
     }
-  }, [userEmail]);
+  }, [user]);
 
   React.useEffect(() => {
     if (scrollAreaRef.current) {
@@ -71,7 +70,7 @@ export function SupportChat() {
   
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!newMessage.trim() && !selectedFile) || !userEmail) return;
+    if ((!newMessage.trim() && !selectedFile) || !user?.id) return;
 
     setIsSending(true);
     
@@ -98,7 +97,7 @@ export function SupportChat() {
     }
     
     try {
-      const sentMessage = await sendMessage(userEmail, newMessage, fileData);
+      const sentMessage = await sendMessage(user.id, newMessage, fileData);
       setMessages((prev) => [...prev, sentMessage]);
       setNewMessage("");
       setSelectedFile(null);
@@ -116,7 +115,7 @@ export function SupportChat() {
     }
   };
   
-  const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : "U";
+  const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : "U";
 
   return (
     <Card className="w-full h-[calc(100vh-10rem)] flex flex-col">

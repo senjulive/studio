@@ -150,18 +150,17 @@ const assetConfig = [
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const { user } = useUser();
-  const currentUserEmail = user?.email;
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
 
   React.useEffect(() => {
-    if (currentUserEmail) {
+    if (user?.id) {
       async function fetchWallet() {
-        const data = await getOrCreateWallet(currentUserEmail);
+        const data = await getOrCreateWallet(user.id);
         setWalletData(data);
       }
       fetchWallet();
     }
-  }, [currentUserEmail]);
+  }, [user]);
 
   React.useEffect(() => {
     setAllAssetsData(initialCryptoData);
@@ -284,8 +283,8 @@ export function WalletView() {
   const rank = getUserRank(usdtBalance);
 
   const handleWalletUpdate = async (newData: WalletData) => {
-    if (currentUserEmail) {
-      await updateWallet(currentUserEmail, newData);
+    if (user?.id) {
+      await updateWallet(user.id, newData);
       setWalletData(newData);
     }
   };

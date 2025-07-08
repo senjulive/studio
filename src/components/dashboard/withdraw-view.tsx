@@ -47,7 +47,6 @@ export function WithdrawView() {
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
   const { user } = useUser();
-  const currentUserEmail = user?.email;
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
   const [isWithdrawing, setIsWithdrawing] = React.useState(false);
@@ -55,17 +54,17 @@ export function WithdrawView() {
   const asset = "usdt";
   
   const fetchWalletData = React.useCallback(async () => {
-    if (currentUserEmail) {
+    if (user?.id) {
         setIsLoading(true);
         const [addresses, wallet] = await Promise.all([
-          getWithdrawalAddresses(currentUserEmail),
-          getOrCreateWallet(currentUserEmail),
+          getWithdrawalAddresses(user.id),
+          getOrCreateWallet(user.id),
         ]);
         setSavedAddresses(addresses);
         setWalletData(wallet);
         setIsLoading(false);
       }
-  }, [currentUserEmail]);
+  }, [user]);
 
   React.useEffect(() => {
     fetchWalletData();
@@ -80,11 +79,11 @@ export function WithdrawView() {
       });
       return;
     }
-    if (!currentUserEmail) return;
+    if (!user?.id) return;
 
     setIsSaving(true);
-    await saveWithdrawalAddress(currentUserEmail, asset, currentAddress);
-    const updatedAddresses = await getWithdrawalAddresses(currentUserEmail);
+    await saveWithdrawalAddress(user.id, asset, currentAddress);
+    const updatedAddresses = await getWithdrawalAddresses(user.id);
     setSavedAddresses(updatedAddresses);
     setIsSaving(false);
     toast({ title: "Address Saved", description: "Your withdrawal address has been saved." });
@@ -94,7 +93,7 @@ export function WithdrawView() {
     e.preventDefault();
     const withdrawAmount = parseFloat(amount);
 
-    if (!walletData || !currentUserEmail || !savedAddresses?.usdt) return;
+    if (!walletData || !user?.id || !savedAddresses?.usdt) return;
 
     if (!amount || withdrawAmount <= 0) {
       toast({
@@ -133,15 +132,15 @@ export function WithdrawView() {
         pendingWithdrawals: [...(walletData.pendingWithdrawals || []), withdrawalRequest]
     };
 
-    await updateWallet(currentUserEmail, newWalletData);
+    await updateWallet(user.id, newWalletData);
     setWalletData(newWalletData);
 
-    const username = walletData?.profile.username || currentUserEmail;
+    const username = walletData?.profile.username || user.email;
     await sendSystemNotification(
-      currentUserEmail,
-      `User '${username}' (${currentUserEmail}) initiated a withdrawal of ${amount} ${asset.toUpperCase()} to address ${savedAddresses.usdt}.`
+      user.id,
+      `User '${username}' (${user.email}) initiated a withdrawal of ${amount} ${asset.toUpperCase()} to address ${savedAddresses.usdt}.`
     );
-    await addNotification(currentUserEmail, {
+    await addNotification(user.id, {
       title: "Withdrawal Request Received",
       content: `Your request to withdraw $${amount} USDT is now pending review.`,
       href: "/dashboard/withdraw"

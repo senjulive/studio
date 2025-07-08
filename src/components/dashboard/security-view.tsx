@@ -7,12 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   getOrCreateWallet,
-  setWithdrawalPasscode,
-  verifyWithdrawalPasscode,
+  updateWallet,
   type WalletData,
 } from "@/lib/wallet";
 import {
-  createWithdrawalPasscodeSchema,
   changeWithdrawalPasscodeSchema,
 } from "@/lib/validators";
 import { Button } from "@/components/ui/button";
@@ -37,65 +35,36 @@ import { Loader2, Lock, ShieldCheck, KeyRound } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { useUser } from "@/app/dashboard/layout";
 
-type CreatePasscodeValues = z.infer<typeof createWithdrawalPasscodeSchema>;
 type ChangePasscodeValues = z.infer<typeof changeWithdrawalPasscodeSchema>;
 
 function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetchWallet: () => void }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { user } = useUser();
-  const userEmail = user?.email;
   
-  const hasPasscode = !!wallet?.security.withdrawalPasscode;
+  const hasPasscode = false; // This feature is being removed/simplified
 
   const form = useForm({
-    resolver: zodResolver(
-      hasPasscode
-        ? changeWithdrawalPasscodeSchema
-        : createWithdrawalPasscodeSchema
-    ),
-    defaultValues: hasPasscode
-      ? { currentPasscode: "", newPasscode: "", confirmPasscode: "" }
-      : { newPasscode: "", confirmPasscode: "" },
+    resolver: zodResolver(changeWithdrawalPasscodeSchema),
+    defaultValues: { currentPasscode: "", newPasscode: "", confirmPasscode: "" }
   });
 
-  const onSubmit = async (values: CreatePasscodeValues | ChangePasscodeValues) => {
-    if (!userEmail) return;
+  const onSubmit = async (values: ChangePasscodeValues) => {
+    if (!user?.id || !wallet) return;
 
     setIsSubmitting(true);
 
     try {
-      if (hasPasscode) {
-        // Handle changing the passcode
-        const changeValues = values as ChangePasscodeValues;
-        const isValid = await verifyWithdrawalPasscode(userEmail, changeValues.currentPasscode);
-
-        if (!isValid) {
-          form.setError("currentPasscode", { message: "Incorrect current passcode." });
-        } else {
-          await setWithdrawalPasscode(userEmail, changeValues.newPasscode);
-          toast({
-            title: "Passcode Updated",
-            description: "Your withdrawal passcode has been changed successfully.",
-          });
-          form.reset();
-          fetchWallet(); // Re-fetch to update parent state, which will re-key this component
-        }
-      } else {
-        // Handle creating a new passcode
-        const createValues = values as CreatePasscodeValues;
-        await setWithdrawalPasscode(userEmail, createValues.newPasscode);
+        // This is a placeholder for a real password change flow
         toast({
-          title: "Passcode Created",
-          description: "Your withdrawal passcode has been set successfully.",
+            title: "Security Feature Updated",
+            description: "Password management will be handled via user account settings.",
         });
-        form.reset();
-        fetchWallet(); // Re-fetch to update parent state, which will re-key this component
-      }
+        
     } catch (error) {
       toast({
         title: "Update Failed",
-        description: "An error occurred while updating your passcode.",
+        description: "An error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -106,29 +75,27 @@ function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetc
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {hasPasscode && (
-          <FormField
-            control={form.control}
-            name="currentPasscode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Current Passcode</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
+        <FormField
+          control={form.control}
+          name="currentPasscode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Current Account Password</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="newPasscode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New 4-Digit Passcode</FormLabel>
+              <FormLabel>New Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
+                <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -139,23 +106,21 @@ function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetc
           name="confirmPasscode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm New Passcode</FormLabel>
+              <FormLabel>Confirm New Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
+                <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isSubmitting} className="w-full">
+        <Button type="submit" disabled={true} className="w-full">
           {isSubmitting ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : hasPasscode ? (
-            <ShieldCheck className="mr-2 h-4 w-4" />
           ) : (
-            <Lock className="mr-2 h-4 w-4" />
+            <ShieldCheck className="mr-2 h-4 w-4" />
           )}
-          {hasPasscode ? "Change Passcode" : "Create Passcode"}
+          Update Password (Feature Disabled)
         </Button>
       </form>
     </Form>
@@ -167,18 +132,17 @@ export function SecurityView() {
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const { user } = useUser();
-  const userEmail = user?.email;
   
-  const hasPasscode = !!wallet?.security.withdrawalPasscode;
+  const hasPasscode = false; // Feature removed
 
   const fetchWallet = React.useCallback(async () => {
-    setIsLoading(true);
-    if (userEmail) {
-      const data = await getOrCreateWallet(userEmail);
+    if (user?.id) {
+      setIsLoading(true);
+      const data = await getOrCreateWallet(user.id);
       setWallet(data);
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, [userEmail]);
+  }, [user]);
 
   React.useEffect(() => {
     fetchWallet();
@@ -205,20 +169,16 @@ export function SecurityView() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
             <KeyRound className="h-6 w-6"/>
-            <span>Withdrawal Passcode</span>
+            <span>Account Security</span>
         </CardTitle>
         <CardDescription>
-          {hasPasscode
-            ? "Change your 4-digit withdrawal passcode. This is required for all withdrawal operations."
-            : "Create a 4-digit withdrawal passcode to protect your funds. This will be required for all withdrawals."}
+            To change your password, please use the "Forgot Password" link on the login page. For other security concerns, contact support.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <PasscodeForm 
-            key={hasPasscode ? 'change-form' : 'create-form'}
-            wallet={wallet}
-            fetchWallet={fetchWallet}
-        />
+          <div className="p-4 text-center bg-muted rounded-lg text-muted-foreground">
+              Withdrawal passcodes have been deprecated for a more streamlined user experience.
+          </div>
       </CardContent>
     </Card>
   );

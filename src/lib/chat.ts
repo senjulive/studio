@@ -16,7 +16,7 @@ export type Message = {
 };
 
 export type ChatHistory = {
-  [userEmail: string]: Message[];
+  [userId: string]: Message[];
 };
 
 function safeJsonParse<T>(json: string | null, fallback: T): T {
@@ -37,21 +37,21 @@ export async function getAllChats(): Promise<ChatHistory> {
 }
 
 // Simulates fetching chat history for a single user.
-export async function getChatHistoryForUser(email: string): Promise<Message[]> {
+export async function getChatHistoryForUser(userId: string): Promise<Message[]> {
   const allChats = await getAllChats();
-  return allChats[email] || [];
+  return allChats[userId] || [];
 }
 
 // Simulates sending a message from a user.
-export async function sendMessage(email: string, text: string, file?: Message['file']): Promise<Message> {
+export async function sendMessage(userId: string, text: string, file?: Message['file']): Promise<Message> {
   await new Promise(resolve => setTimeout(resolve, 200));
   if (typeof window === 'undefined') {
     throw new Error('Cannot send message: not in a browser environment.');
   }
 
   const allChats = await getAllChats();
-  if (!allChats[email]) {
-    allChats[email] = [];
+  if (!allChats[userId]) {
+    allChats[userId] = [];
   }
 
   const newMessage: Message = {
@@ -63,22 +63,22 @@ export async function sendMessage(email: string, text: string, file?: Message['f
     file,
   };
 
-  allChats[email].push(newMessage);
+  allChats[userId].push(newMessage);
   localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
   
   return newMessage;
 }
 
 // Simulates an admin sending a message to a user.
-export async function sendAdminMessage(email: string, text: string): Promise<Message> {
+export async function sendAdminMessage(userId: string, text: string): Promise<Message> {
   await new Promise(resolve => setTimeout(resolve, 200));
   if (typeof window === 'undefined') {
     throw new Error('Cannot send message: not in a browser environment.');
   }
 
   const allChats = await getAllChats();
-  if (!allChats[email]) {
-    allChats[email] = [];
+  if (!allChats[userId]) {
+    allChats[userId] = [];
   }
 
   const newMessage: Message = {
@@ -89,7 +89,7 @@ export async function sendAdminMessage(email: string, text: string): Promise<Mes
     silent: false,
   };
 
-  allChats[email].push(newMessage);
+  allChats[userId].push(newMessage);
   localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
   
   return newMessage;
@@ -97,15 +97,15 @@ export async function sendAdminMessage(email: string, text: string): Promise<Mes
 
 
 // Function for silent system notifications
-export async function sendSystemNotification(email: string, text: string): Promise<void> {
+export async function sendSystemNotification(userId: string, text: string): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 50));
   if (typeof window === 'undefined') {
     return;
   }
 
   const allChats = await getAllChats();
-  if (!allChats[email]) {
-    allChats[email] = [];
+  if (!allChats[userId]) {
+    allChats[userId] = [];
   }
 
   const systemMessage: Message = {
@@ -116,6 +116,6 @@ export async function sendSystemNotification(email: string, text: string): Promi
     silent: true,
   };
 
-  allChats[email].push(systemMessage);
+  allChats[userId].push(systemMessage);
   localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
 }

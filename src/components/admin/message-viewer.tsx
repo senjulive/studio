@@ -53,15 +53,15 @@ export function MessageViewer() {
     fetchData();
   }, []);
 
-  const handleSendMessage = async (email: string) => {
-    const text = replyMessages[email];
+  const handleSendMessage = async (userId: string) => {
+    const text = replyMessages[userId];
     if (!text || !text.trim()) return;
 
-    setIsSending((prev) => ({ ...prev, [email]: true }));
+    setIsSending((prev) => ({ ...prev, [userId]: true }));
 
-    await sendAdminMessage(email, text);
+    await sendAdminMessage(userId, text);
 
-    await addNotification(email, {
+    await addNotification(userId, {
       title: "New Support Message",
       content: "An administrator has replied to your support ticket.",
       href: "/dashboard/support"
@@ -70,13 +70,13 @@ export function MessageViewer() {
     const data = await getAllChats();
     setChats(data);
 
-    setReplyMessages((prev) => ({ ...prev, [email]: "" }));
-    setIsSending((prev) => ({ ...prev, [email]: false }));
+    setReplyMessages((prev) => ({ ...prev, [userId]: "" }));
+    setIsSending((prev) => ({ ...prev, [userId]: false }));
   };
   
-  const handleAnalyze = async (email: string, messages: Message[]) => {
-    setIsAnalyzing((prev) => ({ ...prev, [email]: true }));
-    setAnalysis((prev) => ({ ...prev, [email]: null }));
+  const handleAnalyze = async (userId: string, messages: Message[]) => {
+    setIsAnalyzing((prev) => ({ ...prev, [userId]: true }));
+    setAnalysis((prev) => ({ ...prev, [userId]: null }));
     try {
       const response = await fetch('/api/support-agent', {
         method: 'POST',
@@ -91,7 +91,7 @@ export function MessageViewer() {
       }
 
       const result: SupportAgentOutput = await response.json();
-      setAnalysis((prev) => ({ ...prev, [email]: result }));
+      setAnalysis((prev) => ({ ...prev, [userId]: result }));
     } catch (e) {
       console.error(e);
       toast({
@@ -100,7 +100,7 @@ export function MessageViewer() {
         variant: "destructive",
       });
     } finally {
-      setIsAnalyzing((prev) => ({ ...prev, [email]: false }));
+      setIsAnalyzing((prev) => ({ ...prev, [userId]: false }));
     }
   };
 
@@ -126,12 +126,12 @@ export function MessageViewer() {
 
   return (
     <Accordion type="single" collapsible className="w-full">
-      {sortedChats.map(([email, messages]) => {
-        const wallet = wallets?.[email];
-        const displayName = wallet?.profile?.username || email;
+      {sortedChats.map(([userId, messages]) => {
+        const wallet = wallets?.[userId];
+        const displayName = wallet?.profile?.username || userId;
 
         return (
-          <AccordionItem value={email} key={email}>
+          <AccordionItem value={userId} key={userId}>
             <AccordionTrigger>
               <div className="flex items-center gap-3 w-full">
                 <Avatar className="h-8 w-8">
@@ -140,7 +140,7 @@ export function MessageViewer() {
                 <div className="flex-1 text-left">
                   <p className="font-medium">{displayName}</p>
                   <p className="text-xs text-muted-foreground">
-                    {messages.length} message(s) from {email}
+                    {messages.length} message(s) from {userId}
                   </p>
                 </div>
                 <Badge
@@ -163,10 +163,10 @@ export function MessageViewer() {
                       <Button 
                           variant="outline" 
                           size="sm" 
-                          onClick={() => handleAnalyze(email, messages)} 
-                          disabled={isAnalyzing[email] || isLoading}
+                          onClick={() => handleAnalyze(userId, messages)} 
+                          disabled={isAnalyzing[userId] || isLoading}
                       >
-                          {isAnalyzing[email] ? (
+                          {isAnalyzing[userId] ? (
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
                               <BrainCircuit className="mr-2 h-4 w-4" />
@@ -175,7 +175,7 @@ export function MessageViewer() {
                       </Button>
                     </div>
 
-                    {isAnalyzing[email] && (
+                    {isAnalyzing[userId] && (
                         <div className="space-y-3">
                             <div className="space-y-1">
                                 <Skeleton className="h-4 w-24" />
@@ -191,20 +191,20 @@ export function MessageViewer() {
                         </div>
                     )}
 
-                    {analysis[email] && (
+                    {analysis[userId] && (
                         <div className="space-y-3 animate-in fade-in-50">
                             <div>
                                 <h4 className="font-semibold text-sm text-foreground">AI Summary</h4>
-                                <p className="text-sm text-muted-foreground">{analysis[email]?.summary}</p>
+                                <p className="text-sm text-muted-foreground">{analysis[userId]?.summary}</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold text-sm text-foreground">Suggested Reply</h4>
-                                <p className="text-sm text-muted-foreground whitespace-pre-wrap p-3 bg-background rounded-md border">{analysis[email]?.suggestedReply}</p>
+                                <p className="text-sm text-muted-foreground whitespace-pre-wrap p-3 bg-background rounded-md border">{analysis[userId]?.suggestedReply}</p>
                                 <Button 
                                     size="sm" 
                                     variant="ghost" 
                                     className="mt-2 px-2"
-                                    onClick={() => setReplyMessages(prev => ({ ...prev, [email]: analysis[email]?.suggestedReply || '' }))}
+                                    onClick={() => setReplyMessages(prev => ({ ...prev, [userId]: analysis[userId]?.suggestedReply || '' }))}
                                 >
                                     Use this reply
                                 </Button>
@@ -245,27 +245,27 @@ export function MessageViewer() {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    handleSendMessage(email);
+                    handleSendMessage(userId);
                   }}
                   className="flex w-full items-center space-x-2 border-t pt-4"
                 >
                   <Input
-                    value={replyMessages[email] || ""}
+                    value={replyMessages[userId] || ""}
                     onChange={(e) =>
                       setReplyMessages((prev) => ({
                         ...prev,
-                        [email]: e.target.value,
+                        [userId]: e.target.value,
                       }))
                     }
                     placeholder="Type your reply..."
-                    disabled={isSending[email]}
+                    disabled={isSending[userId]}
                   />
                   <Button
                     type="submit"
                     size="icon"
-                    disabled={isSending[email] || !replyMessages[email]?.trim()}
+                    disabled={isSending[userId] || !replyMessages[userId]?.trim()}
                   >
-                    {isSending[email] ? (
+                    {isSending[userId] ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <Send className="h-4 w-4" />

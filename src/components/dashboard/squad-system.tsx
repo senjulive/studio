@@ -42,19 +42,18 @@ export function SquadSystem() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [squadLink, setSquadLink] = React.useState("");
   const { user } = useUser();
-  const userEmail = user?.email;
 
   const referralCode = walletData?.squad?.referralCode || "";
 
   React.useEffect(() => {
-    if (userEmail) {
+    if (user?.id) {
       async function fetchWallet() {
-        const data = await getOrCreateWallet(userEmail);
+        const data = await getOrCreateWallet(user.id);
         setWalletData(data);
       }
       fetchWallet();
     }
-  }, [userEmail]);
+  }, [user]);
 
   React.useEffect(() => {
     if (referralCode) {
