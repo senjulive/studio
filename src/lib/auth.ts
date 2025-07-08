@@ -1,3 +1,4 @@
+
 'use client';
 
 // This file handles auth using Supabase.
@@ -25,17 +26,21 @@ export async function register(credentials: SignUpWithPasswordCredentials): Prom
     return data.user;
 }
 
-export async function login(credentials: SignInWithPasswordCredentials): Promise<void> {
+export async function login(credentials: SignInWithPasswordCredentials): Promise<User> {
     if (!isSupabaseConfigured()) {
         throw new Error("Supabase is not configured. Please add your credentials to the .env file.");
     }
-    const { error } = await supabase.auth.signInWithPassword(credentials);
+    const { data, error } = await supabase.auth.signInWithPassword(credentials);
     if (error) {
         if (error.message === 'Failed to fetch') {
             throw new Error("Connection to Supabase failed. Please check your credentials and network connection.");
         }
         throw new Error(error.message);
     }
+    if (!data.user) {
+        throw new Error("Login did not return a user.");
+    }
+    return data.user;
 }
 
 export async function logout(): Promise<void> {

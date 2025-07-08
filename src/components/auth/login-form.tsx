@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -80,8 +81,8 @@ export function LoginForm() {
     }
     
     try {
-      await login({ email: values.email, password: values.password });
-      await getOrCreateWallet(values.email);
+      const user = await login({ email: values.email, password: values.password });
+      await getOrCreateWallet(user.id);
       
       toast({
         title: "Login Successful",

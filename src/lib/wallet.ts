@@ -1,3 +1,4 @@
+
 'use client';
 
 import { supabase } from '@/lib/supabase';
@@ -216,10 +217,14 @@ export async function getOrCreateWallet(userId: string): Promise<WalletData> {
     }
     
     if (error && error.code === 'PGRST116') { // "PGRST116" is the code for "exact one row not found"
-        console.log("No wallet found for user, creating a new one.");
-        // This path is for users who registered before the wallets table existed.
-        const newWallet = await createWallet(userId, "unknown", "unknown", "unknown");
-        return newWallet;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not found, cannot create wallet.");
+
+      console.log("No wallet found for user, creating a new one.");
+      // This path is for users who registered before the wallets table existed.
+      // It uses the user's email and provides default values for other profile info.
+      const newWallet = await createWallet(user.id, user.email!, "User", "N/A", "N/A");
+      return newWallet;
     }
     
     console.error("Error in getOrCreateWallet:", error);
