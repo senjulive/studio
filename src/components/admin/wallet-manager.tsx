@@ -53,10 +53,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { getAllWallets, updateWallet, type WalletData, resetWithdrawalAddressForUser } from "@/lib/wallet";
+import type { WalletData } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
+import { useAdmin } from "@/contexts/AdminContext";
+
 
 const addressUpdateSchema = z.object({
   usdtAddress: z.string().min(1, { message: "Address is required." }),
@@ -84,16 +86,14 @@ const formatBalance = (amount: number) => {
 
 export function WalletManager() {
   const { toast } = useToast();
-  const [allWallets, setAllWallets] = React.useState<Record<
-    string,
-    WalletData
-  > | null>(null);
+  const { adminPassword } = useAdmin();
+
+  const [allWallets, setAllWallets] = React.useState<Record<string, WalletData> | null>(null);
   const [selectedUserId, setSelectedUserId] = React.useState<string>("");
-  const [isUpdatingAddress, setIsUpdatingAddress] = React.useState(false);
-  const [isUpdatingBalance, setIsUpdatingBalance] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isUpdating, setIsUpdating] = React.useState(false);
   const [isCompleting, setIsCompleting] = React.useState<string | null>(null);
   const [isFetchingWallets, setIsFetchingWallets] = React.useState(true);
-  const [isResettingAddress, setIsResettingAddress] = React.useState(false);
 
   const addressForm = useForm<AddressUpdateFormValues>({
     resolver: zodResolver(addressUpdateSchema),
@@ -106,18 +106,51 @@ export function WalletManager() {
   });
 
   const refetchWallets = React.useCallback(async () => {
+    if (!adminPassword) return;
     setIsFetchingWallets(true);
-    const data = await getAllWallets();
-    setAllWallets(data);
-    setIsFetchingWallets(false);
-  }, []);
+    try {
+        const response = await fetch('/api/admin/wallets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminPassword })
+        });
+        if (!response.ok) throw new Error('Failed to fetch wallets');
+        const data = await response.json();
+        setAllWallets(data);
+    } catch (error: any) {
+        toast({ title: "Error", description: `Could not fetch wallets: ${error.message}`, variant: "destructive" });
+        setAllWallets({});
+    } finally {
+        setIsFetchingWallets(false);
+    }
+  }, [adminPassword, toast]);
 
   React.useEffect(() => {
     refetchWallets();
   }, [refetchWallets]);
+  
+  const postAdminUpdate = React.useCallback(async (url: string, body: object) => {
+    setIsUpdating(true);
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...body, adminPassword }),
+        });
+        const result = await response.json();
+        if (!response.ok || result.error) {
+            throw new Error(result.error || 'API request failed');
+        }
+        await refetchWallets();
+        return result;
+    } catch (error: any) {
+        toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+    } finally {
+        setIsUpdating(false);
+    }
+  }, [adminPassword, refetchWallets, toast]);
 
-  const selectedWalletData =
-    selectedUserId && allWallets ? allWallets[selectedUserId] : null;
+  const selectedWalletData = selectedUserId && allWallets ? allWallets[selectedUserId] : null;
 
   React.useEffect(() => {
     if (selectedWalletData) {
@@ -131,58 +164,40 @@ export function WalletManager() {
   const handleAddressUpdate = async (values: AddressUpdateFormValues) => {
     if (!selectedWalletData || !selectedUserId) return;
 
-    setIsUpdatingAddress(true);
     const newWalletData: WalletData = {
       ...selectedWalletData,
       addresses: { ...selectedWalletData.addresses, usdt: values.usdtAddress },
     };
 
-    await updateWallet(selectedUserId, newWalletData);
-    await refetchWallets();
+    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
     toast({
       title: "Address Updated",
       description: `Successfully updated USDT address for ${selectedUserId}.`,
     });
-    setIsUpdatingAddress(false);
   };
 
   const handleBalanceUpdate = async (
     values: BalanceUpdateFormValues,
     action: "add" | "remove"
   ) => {
-    if (!selectedWalletData || !selectedUserId) {
-      toast({
-        title: "Error",
-        description: "Please select a user.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsUpdatingBalance(true);
-
+    if (!selectedWalletData || !selectedUserId) return;
+    
+    setIsUpdating(true);
     const { asset } = values;
     const newBalances = { ...selectedWalletData.balances };
     const amount = action === "add" ? values.amount : -values.amount;
-    
     newBalances[asset] = (newBalances[asset] || 0) + amount;
 
     if (newBalances[asset] < 0) {
-      toast({
-        title: "Invalid Operation",
-        description: "Balance cannot be negative.",
-        variant: "destructive",
-      });
-      setIsUpdatingBalance(false);
+      toast({ title: "Invalid Operation", description: "Balance cannot be negative.", variant: "destructive" });
+      setIsUpdating(false);
       return;
     }
 
     if (action === "add") {
       await sendAdminMessage(
         selectedUserId,
-        `Credit received: ${values.amount.toFixed(
-          8
-        )} ${asset.toUpperCase()} has been added to your account by an administrator.`
+        `Credit received: ${values.amount.toFixed(8)} ${asset.toUpperCase()} has been added to your account by an administrator.`
       );
       await addNotification(selectedUserId, {
         title: "Account Credited by Admin",
@@ -191,27 +206,16 @@ export function WalletManager() {
       });
     }
 
-    const newWalletData: WalletData = {
-      ...selectedWalletData,
-      balances: newBalances,
-    };
+    const newWalletData: WalletData = { ...selectedWalletData, balances: newBalances };
+    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
 
-    await updateWallet(selectedUserId, newWalletData);
-    await refetchWallets();
-
-    toast({
-      title: "Balance Updated",
-      description: `Successfully ${action}ed ${values.amount} ${asset.toUpperCase()} for ${selectedUserId}.`,
-    });
-
+    toast({ title: "Balance Updated", description: `Successfully ${action}ed ${values.amount} ${asset.toUpperCase()} for ${selectedUserId}.` });
     balanceForm.reset({ amount: 0 });
-    setIsUpdatingBalance(false);
+    setIsUpdating(false);
   };
 
-  const onSubmitBalanceAdd = (values: BalanceUpdateFormValues) =>
-    handleBalanceUpdate(values, "add");
-  const onSubmitBalanceRemove = (values: BalanceUpdateFormValues) =>
-    handleBalanceUpdate(values, "remove");
+  const onSubmitBalanceAdd = (values: BalanceUpdateFormValues) => handleBalanceUpdate(values, "add");
+  const onSubmitBalanceRemove = (values: BalanceUpdateFormValues) => handleBalanceUpdate(values, "remove");
 
   const handleCompleteWithdrawal = async (withdrawalId: string) => {
     if (!selectedWalletData || !selectedUserId) return;
@@ -229,33 +233,18 @@ export function WalletManager() {
         pendingWithdrawals: selectedWalletData.pendingWithdrawals.filter(w => w.id !== withdrawalId),
     };
 
-    await updateWallet(selectedUserId, newWalletData);
-
-    await sendAdminMessage(
-        selectedUserId,
-        `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`
-    );
-    await addNotification(selectedUserId, {
-        title: "Withdrawal Completed",
-        content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`,
-        href: "/dashboard",
-    });
+    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
+    await sendAdminMessage(selectedUserId, `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`);
+    await addNotification(selectedUserId, { title: "Withdrawal Completed", content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`, href: "/dashboard" });
 
     toast({ title: "Withdrawal Marked as Complete" });
-    await refetchWallets();
     setIsCompleting(null);
   };
 
   const handleResetAddress = async () => {
     if (!selectedUserId) return;
-
-    setIsResettingAddress(true);
-    await resetWithdrawalAddressForUser(selectedUserId);
-    toast({
-        title: "Withdrawal Address Reset",
-        description: `Successfully reset withdrawal address for ${selectedUserId}.`,
-    });
-    setIsResettingAddress(false);
+    await postAdminUpdate('/api/admin/reset-address', { userId: selectedUserId });
+    toast({ title: "Withdrawal Address Reset", description: `Successfully reset withdrawal address for ${selectedUserId}.` });
   };
 
 
@@ -263,19 +252,15 @@ export function WalletManager() {
     <div className="space-y-6">
       <div className="space-y-2">
         <Label>Select User</Label>
-        <Select
-          onValueChange={setSelectedUserId}
-          value={selectedUserId}
-          disabled={isFetchingWallets}
-        >
+        <Select onValueChange={setSelectedUserId} value={selectedUserId} disabled={isFetchingWallets}>
           <SelectTrigger>
             <SelectValue placeholder="Select a user to manage..." />
           </SelectTrigger>
           <SelectContent>
             {allWallets && Object.keys(allWallets).length > 0 ? (
-              Object.keys(allWallets).map((userId) => (
-                <SelectItem key={userId} value={userId}>
-                  {allWallets[userId].profile?.username || userId}
+              Object.values(allWallets).map((wallet) => (
+                <SelectItem key={Object.keys(allWallets).find(key => allWallets[key] === wallet)!} value={Object.keys(allWallets).find(key => allWallets[key] === wallet)!}>
+                  {wallet.profile?.username || Object.keys(allWallets).find(key => allWallets[key] === wallet)}
                 </SelectItem>
               ))
             ) : (
@@ -287,10 +272,7 @@ export function WalletManager() {
         </Select>
       </div>
 
-      {selectedUserId &&
-        (isFetchingWallets ? (
-          <Skeleton className="h-48 w-full" />
-        ) : selectedWalletData ? (
+      {selectedUserId && (isFetchingWallets ? ( <Skeleton className="h-48 w-full" /> ) : selectedWalletData ? (
           <div className="mb-6 rounded-lg border bg-muted/30 p-4 space-y-4">
             <div className="border-b pb-4">
                 <p className="text-sm font-medium text-muted-foreground flex items-center gap-2"><User className="h-4 w-4" /> User Details</p>
@@ -300,21 +282,15 @@ export function WalletManager() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-sm text-muted-foreground">USDT Balance</p>
-                <p className="text-xl font-bold">
-                  ${formatBalance(selectedWalletData.balances.usdt)}
-                </p>
+                <p className="text-xl font-bold">${formatBalance(selectedWalletData.balances.usdt)}</p>
               </div>
                <div>
                 <p className="text-sm text-muted-foreground">ETH Balance</p>
-                <p className="text-xl font-bold">
-                  {formatBalance(selectedWalletData.balances.eth)}
-                </p>
+                <p className="text-xl font-bold">{formatBalance(selectedWalletData.balances.eth)}</p>
               </div>
                <div>
                 <p className="text-sm text-muted-foreground">BTC Balance</p>
-                <p className="text-xl font-bold">
-                  {formatBalance(selectedWalletData.balances.btc)}
-                </p>
+                <p className="text-xl font-bold">{formatBalance(selectedWalletData.balances.btc)}</p>
               </div>
             </div>
           </div>
@@ -343,16 +319,8 @@ export function WalletManager() {
                       <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>
                       <TableCell className="font-mono text-xs truncate max-w-xs">{w.address}</TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          onClick={() => handleCompleteWithdrawal(w.id)}
-                          disabled={isCompleting === w.id}
-                        >
-                          {isCompleting === w.id ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                          )}
+                        <Button size="sm" onClick={() => handleCompleteWithdrawal(w.id)} disabled={isCompleting === w.id}>
+                          {isCompleting === w.id ? (<Loader2 className="mr-2 h-4 w-4 animate-spin" />) : (<CheckCircle className="mr-2 h-4 w-4" />)}
                           Mark as Complete
                         </Button>
                       </TableCell>
@@ -370,10 +338,7 @@ export function WalletManager() {
         </CardHeader>
         <CardContent>
           <Form {...addressForm}>
-            <form
-              onSubmit={addressForm.handleSubmit(handleAddressUpdate)}
-              className="space-y-4"
-            >
+            <form onSubmit={addressForm.handleSubmit(handleAddressUpdate)} className="space-y-4">
               <FormField
                 control={addressForm.control}
                 name="usdtAddress"
@@ -381,26 +346,14 @@ export function WalletManager() {
                   <FormItem>
                     <FormLabel>USDT Deposit Address (TRC20)</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="T..."
-                        {...field}
-                        disabled={!selectedUserId || isUpdatingAddress}
-                      />
+                      <Input placeholder="T..." {...field} disabled={!selectedUserId || isUpdating} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button
-                type="submit"
-                variant="secondary"
-                disabled={!selectedUserId || isUpdatingAddress}
-              >
-                {isUpdatingAddress ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <Save />
-                )}
+              <Button type="submit" variant="secondary" disabled={!selectedUserId || isUpdating}>
+                {isUpdating ? <Loader2 className="animate-spin" /> : <Save />}
                 Update Address
               </Button>
             </form>
@@ -422,7 +375,7 @@ export function WalletManager() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Asset</FormLabel>
-                       <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedUserId || isUpdatingBalance}>
+                       <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedUserId || isUpdating}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select asset" />
@@ -445,12 +398,7 @@ export function WalletManager() {
                     <FormItem>
                         <FormLabel>Amount</FormLabel>
                         <FormControl>
-                        <Input
-                            type="number"
-                            placeholder="0.00"
-                            {...field}
-                            disabled={!selectedUserId || isUpdatingBalance}
-                        />
+                          <Input type="number" placeholder="0.00" {...field} disabled={!selectedUserId || isUpdating} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -458,29 +406,12 @@ export function WalletManager() {
                 />
                </div>
               <div className="flex gap-4">
-                <Button
-                  onClick={balanceForm.handleSubmit(onSubmitBalanceAdd)}
-                  className="w-full"
-                  disabled={!selectedUserId || isUpdatingBalance}
-                >
-                  {isUpdatingBalance ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    <PlusCircle />
-                  )}
+                <Button onClick={balanceForm.handleSubmit(onSubmitBalanceAdd)} className="w-full" disabled={!selectedUserId || isUpdating}>
+                  {isUpdating ? (<Loader2 className="animate-spin" />) : (<PlusCircle />)}
                   Add Balance
                 </Button>
-                <Button
-                  onClick={balanceForm.handleSubmit(onSubmitBalanceRemove)}
-                  variant="destructive"
-                  className="w-full"
-                  disabled={!selectedUserId || isUpdatingBalance}
-                >
-                  {isUpdatingBalance ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    <MinusCircle />
-                  )}
+                <Button onClick={balanceForm.handleSubmit(onSubmitBalanceRemove)} variant="destructive" className="w-full" disabled={!selectedUserId || isUpdating}>
+                  {isUpdating ? (<Loader2 className="animate-spin" />) : (<MinusCircle />)}
                   Remove Balance
                 </Button>
               </div>
@@ -502,9 +433,9 @@ export function WalletManager() {
         <CardContent className="flex flex-col sm:flex-row gap-4 items-start">
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <Button variant="destructive" disabled={!selectedUserId || isResettingAddress}>
-                    <AlertTriangle className="mr-2 h-4 w-4" />
-                    Reset Withdrawal Address
+                    <Button variant="destructive" disabled={!selectedUserId || isUpdating}>
+                      <AlertTriangle className="mr-2 h-4 w-4" />
+                      Reset Withdrawal Address
                     </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -512,18 +443,14 @@ export function WalletManager() {
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
                         This will delete the saved withdrawal address for{" "}
-                        <span className="font-bold">{selectedUserId}</span>.
+                        <span className="font-bold">{selectedWalletData?.profile.username || selectedUserId}</span>.
                         The user will need to re-enter it. This action cannot be undone.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isResettingAddress}>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={handleResetAddress}
-                        disabled={isResettingAddress}
-                        className="bg-destructive hover:bg-destructive/90"
-                    >
-                        {isResettingAddress && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <AlertDialogCancel disabled={isUpdating}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetAddress} disabled={isUpdating} className="bg-destructive hover:bg-destructive/90">
+                        {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Confirm Reset
                     </AlertDialogAction>
                     </AlertDialogFooter>

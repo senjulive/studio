@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { AdminProvider } from "@/contexts/AdminContext";
 
 const adminAuthSchema = z.object({
   password: z.string().min(1, { message: "Password is required." }),
@@ -39,6 +41,7 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [password, setPassword] = React.useState("");
 
   const form = useForm<AdminAuthFormValues>({
     resolver: zodResolver(adminAuthSchema),
@@ -52,6 +55,7 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
     setTimeout(() => {
       if (values.password === ADMIN_PASSWORD) {
         toast({ title: "Access Granted" });
+        setPassword(values.password);
         setIsAuthenticated(true);
       } else {
         toast({
@@ -66,7 +70,7 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
   };
 
   if (isAuthenticated) {
-    return <>{children}</>;
+    return <AdminProvider value={{ adminPassword: password }}>{children}</AdminProvider>;
   }
 
   return (

@@ -3,6 +3,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { getBotTierSettings } from './settings';
+import { sendSystemNotification } from './chat';
 
 const generateAddress = (prefix: string, length: number, chars: string): string => {
     let result = '';
@@ -108,25 +109,6 @@ const createNewWalletDataObject = (): WalletData => {
 }
 
 
-// Admin Function: Fetches all wallets. Requires RLS policy for admins in Supabase.
-export async function getAllWallets(): Promise<Record<string, WalletData>> {
-    const { data, error } = await supabase
-      .from('wallets')
-      .select('id, data');
-  
-    if (error) {
-      console.error("Error fetching all wallets:", error);
-      // Depending on RLS, this might fail for non-admins. Return empty for now.
-      return {};
-    }
-  
-    const wallets: Record<string, WalletData> = {};
-    for (const row of data) {
-      wallets[row.id] = row.data as WalletData;
-    }
-    return wallets;
-}
-
 // Called after a new user signs up.
 export async function createWallet(
     userId: string,
@@ -155,13 +137,15 @@ export async function createWallet(
         // Find the leader by their referral code
         const { data: leaderData, error: leaderError } = await supabase
             .from('wallets_public')
-            .select('id')
+            .select('id, username')
             .eq('referral_code', referralCode.toUpperCase())
             .single();
 
         if (leaderData && !leaderError) {
             // Set the squad leader for the new user, this will be picked up by the trigger
             publicWalletData.squad_leader_id = leaderData.id;
+            // Send a system notification to the new user's chat log, visible only to admin
+            await sendSystemNotification(userId, `User registered with squad code ${referralCode} from leader ${leaderData.username} (${leaderData.id}).`);
         }
     }
     
@@ -260,7 +244,7 @@ export async function getOrCreateWallet(userId: string): Promise<WalletData> {
 }
 
 
-// Updates a user's wallet data.
+// Updates a user's own wallet data.
 export async function updateWallet(userId: string, newData: WalletData): Promise<void> {
     const { error: privateError } = await supabase
         .from('wallets')
@@ -299,10 +283,4 @@ export async function saveWithdrawalAddress(userId: string, asset: string, addre
 export async function getWithdrawalAddresses(userId: string): Promise<WithdrawalAddresses> {
     const wallet = await getOrCreateWallet(userId);
     return wallet.security.withdrawalAddresses || {};
-}
-
-export async function resetWithdrawalAddressForUser(userId: string): Promise<void> {
-    const wallet = await getOrCreateWallet(userId);
-    wallet.security.withdrawalAddresses = {};
-    await updateWallet(userId, wallet);
 }
