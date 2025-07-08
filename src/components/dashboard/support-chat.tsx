@@ -16,17 +16,18 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { getCurrentUserEmail } from "@/lib/auth";
 import { getChatHistoryForUser, sendMessage, type Message } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { useUser } from "@/app/dashboard/layout";
 
 export function SupportChat() {
   const { toast } = useToast();
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [newMessage, setNewMessage] = React.useState("");
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-  const [userEmail, setUserEmail] = React.useState<string | null>(null);
+  const { user } = useUser();
+  const userEmail = user?.email;
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSending, setIsSending] = React.useState(false);
   
@@ -34,19 +35,16 @@ export function SupportChat() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    const email = getCurrentUserEmail();
-    setUserEmail(email);
-  }, []);
-
-  React.useEffect(() => {
     if (userEmail) {
       async function fetchHistory() {
         setIsLoading(true);
-        const history = await getChatHistoryForUser(userEmail!);
+        const history = await getChatHistoryForUser(userEmail);
         setMessages(history.filter(m => !m.silent));
         setIsLoading(false);
       }
       fetchHistory();
+    } else {
+        setIsLoading(false);
     }
   }, [userEmail]);
 

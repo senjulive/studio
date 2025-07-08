@@ -15,7 +15,6 @@ import {
   createWithdrawalPasscodeSchema,
   changeWithdrawalPasscodeSchema,
 } from "@/lib/validators";
-import { getCurrentUserEmail } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lock, ShieldCheck, KeyRound } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
+import { useUser } from "@/app/dashboard/layout";
 
 type CreatePasscodeValues = z.infer<typeof createWithdrawalPasscodeSchema>;
 type ChangePasscodeValues = z.infer<typeof changeWithdrawalPasscodeSchema>;
@@ -43,6 +43,8 @@ type ChangePasscodeValues = z.infer<typeof changeWithdrawalPasscodeSchema>;
 function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetchWallet: () => void }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { user } = useUser();
+  const userEmail = user?.email;
   
   const hasPasscode = !!wallet?.security.withdrawalPasscode;
 
@@ -58,8 +60,7 @@ function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetc
   });
 
   const onSubmit = async (values: CreatePasscodeValues | ChangePasscodeValues) => {
-    const email = getCurrentUserEmail();
-    if (!email) return;
+    if (!userEmail) return;
 
     setIsSubmitting(true);
 
@@ -67,12 +68,12 @@ function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetc
       if (hasPasscode) {
         // Handle changing the passcode
         const changeValues = values as ChangePasscodeValues;
-        const isValid = await verifyWithdrawalPasscode(email, changeValues.currentPasscode);
+        const isValid = await verifyWithdrawalPasscode(userEmail, changeValues.currentPasscode);
 
         if (!isValid) {
           form.setError("currentPasscode", { message: "Incorrect current passcode." });
         } else {
-          await setWithdrawalPasscode(email, changeValues.newPasscode);
+          await setWithdrawalPasscode(userEmail, changeValues.newPasscode);
           toast({
             title: "Passcode Updated",
             description: "Your withdrawal passcode has been changed successfully.",
@@ -83,7 +84,7 @@ function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetc
       } else {
         // Handle creating a new passcode
         const createValues = values as CreatePasscodeValues;
-        await setWithdrawalPasscode(email, createValues.newPasscode);
+        await setWithdrawalPasscode(userEmail, createValues.newPasscode);
         toast({
           title: "Passcode Created",
           description: "Your withdrawal passcode has been set successfully.",
@@ -165,18 +166,19 @@ function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetc
 export function SecurityView() {
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const { user } = useUser();
+  const userEmail = user?.email;
   
   const hasPasscode = !!wallet?.security.withdrawalPasscode;
 
   const fetchWallet = React.useCallback(async () => {
     setIsLoading(true);
-    const email = getCurrentUserEmail();
-    if (email) {
-      const data = await getOrCreateWallet(email);
+    if (userEmail) {
+      const data = await getOrCreateWallet(userEmail);
       setWallet(data);
     }
     setIsLoading(false);
-  }, []);
+  }, [userEmail]);
 
   React.useEffect(() => {
     fetchWallet();

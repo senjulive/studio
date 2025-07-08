@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { createWallet } from "@/lib/wallet";
 import { AstralLogo } from "../icons/astral-logo";
+import { register } from "@/lib/auth";
 
 const MALDIVES_COUNTRY = { name: 'Maldives', dial_code: '+960', code: 'MV', flag: '🇲🇻' };
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -59,6 +60,10 @@ export function RegisterForm() {
     }`;
 
     try {
+      // Step 1: Register the user with Supabase Auth
+      await register({ email: values.email, password: values.password });
+
+      // Step 2: Create the associated wallet data
       await createWallet(
         values.email,
         values.username,
@@ -68,7 +73,7 @@ export function RegisterForm() {
       );
       toast({
         title: "Account Created",
-        description: "Your wallet is ready. Please sign in to continue.",
+        description: "Please check your email to verify your account, then sign in.",
       });
       router.push("/");
     } catch (error: any) {

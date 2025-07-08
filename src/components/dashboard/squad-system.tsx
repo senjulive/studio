@@ -34,26 +34,27 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getCurrentUserEmail } from "@/lib/auth";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
+import { useUser } from "@/app/dashboard/layout";
 
 export function SquadSystem() {
   const { toast } = useToast();
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [squadLink, setSquadLink] = React.useState("");
+  const { user } = useUser();
+  const userEmail = user?.email;
 
   const referralCode = walletData?.squad?.referralCode || "";
 
   React.useEffect(() => {
-    const email = getCurrentUserEmail();
-    if (email) {
+    if (userEmail) {
       async function fetchWallet() {
-        const data = await getOrCreateWallet(email);
+        const data = await getOrCreateWallet(userEmail);
         setWalletData(data);
       }
       fetchWallet();
     }
-  }, []);
+  }, [userEmail]);
 
   React.useEffect(() => {
     if (referralCode) {

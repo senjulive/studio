@@ -79,15 +79,25 @@ export function LoginForm() {
         }
     }
     
-    await login(values.email);
-    await getOrCreateWallet(values.email);
-    
-    setIsLoading(false);
-    toast({
-      title: "Login Successful",
-      description: "Welcome to AstralCore!",
-    });
-    router.push("/dashboard");
+    try {
+      await login({ email: values.email, password: values.password });
+      await getOrCreateWallet(values.email);
+      
+      toast({
+        title: "Login Successful",
+        description: "Welcome to AstralCore!",
+      });
+      router.push("/dashboard");
+
+    } catch(error: any) {
+        toast({
+            title: "Login Failed",
+            description: error.message || "Invalid credentials. Please try again.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (

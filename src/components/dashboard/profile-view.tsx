@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import { getCurrentUserEmail } from "@/lib/auth";
 import { getAnnouncements, type Announcement } from "@/lib/announcements";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import {
@@ -22,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
+import { useUser } from "@/app/dashboard/layout";
 
 function AnnouncementCard({ announcement }: { announcement: Announcement }) {
   return (
@@ -93,8 +93,8 @@ export function ProfileView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
-
-  const userEmail = getCurrentUserEmail();
+  const { user } = useUser();
+  const userEmail = user?.email;
 
   React.useEffect(() => {
     if (userEmail) {

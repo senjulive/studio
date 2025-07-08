@@ -33,11 +33,11 @@ import {
   type WalletData,
   updateWallet,
 } from "@/lib/wallet";
-import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
 import Image from "next/image";
 import { format } from "date-fns";
+import { useUser } from "@/app/dashboard/layout";
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -46,20 +46,14 @@ export function WithdrawView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
-  const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
+  const { user } = useUser();
+  const currentUserEmail = user?.email;
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
   const [isWithdrawing, setIsWithdrawing] = React.useState(false);
 
   const asset = "usdt";
   
-  React.useEffect(() => {
-    const email = getCurrentUserEmail();
-    if (email) {
-      setCurrentUserEmail(email);
-    }
-  }, []);
-
   const fetchWalletData = React.useCallback(async () => {
     if (currentUserEmail) {
         setIsLoading(true);

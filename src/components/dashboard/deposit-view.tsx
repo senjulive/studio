@@ -20,12 +20,12 @@ import { useToast } from "@/hooks/use-toast";
 import { getSiteSettings } from "@/lib/site-settings";
 import { Skeleton } from "../ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import Image from "next/image";
+import { useUser } from "@/app/dashboard/layout";
 
 const DepositAddressDisplay = ({
   address,
@@ -102,7 +102,8 @@ const DepositAddressDisplay = ({
 
 const PersonalDepositRequest = () => {
   const { toast } = useToast();
-  const userEmail = getCurrentUserEmail();
+  const { user } = useUser();
+  const userEmail = user?.email;
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
   const [amount, setAmount] = React.useState("");
   const [selectedAsset, setSelectedAsset] = React.useState("usdt");

@@ -31,11 +31,11 @@ import {
 import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TradingBotCard } from "./trading-bot-card";
-import { getCurrentUserEmail } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
+import { useUser } from "@/app/dashboard/layout";
 
 type Transaction = {
   id: string;
@@ -149,22 +149,19 @@ const assetConfig = [
 
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
-  const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(
-    null
-  );
+  const { user } = useUser();
+  const currentUserEmail = user?.email;
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
 
   React.useEffect(() => {
-    const email = getCurrentUserEmail();
-    if (email) {
-      setCurrentUserEmail(email);
+    if (currentUserEmail) {
       async function fetchWallet() {
-        const data = await getOrCreateWallet(email);
+        const data = await getOrCreateWallet(currentUserEmail);
         setWalletData(data);
       }
       fetchWallet();
     }
-  }, []);
+  }, [currentUserEmail]);
 
   React.useEffect(() => {
     setAllAssetsData(initialCryptoData);

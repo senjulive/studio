@@ -24,7 +24,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from "@/components/ui/sidebar";
-import { logout, getCurrentUserEmail } from "@/lib/auth";
+import { logout, getCurrentUser } from "@/lib/auth";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
@@ -42,6 +42,15 @@ import { AboutIcon } from "@/components/icons/nav/about-icon";
 import { DownloadIcon } from "@/components/icons/nav/download-icon";
 import { SettingsIcon } from "@/components/icons/nav/settings-icon";
 import { LogoutIcon } from "@/components/icons/nav/logout-icon";
+
+import type { User } from '@supabase/supabase-js';
+
+// Create a context to hold the user data
+const UserContext = React.createContext<{ user: User | null }>({ user: null });
+
+// Custom hook to use the UserContext
+export const useUser = () => React.useContext(UserContext);
+
 
 function DashboardLoading() {
   return (
@@ -61,18 +70,23 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [userEmail, setUserEmail] = React.useState<string | null>(null);
-  const [isClient, setIsClient] = React.useState(false);
+  const [user, setUser] = React.useState<User | null>(null);
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState("");
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitializing(false);
-    }, 2000); 
+    const checkUser = async () => {
+      const currentUser = await getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+        setIsInitializing(false);
+      } else {
+        router.push('/');
+      }
+    };
+    checkUser();
+  }, [router]);
 
-    return () => clearTimeout(timer);
-  }, []);
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -101,16 +115,12 @@ export default function DashboardLayout({
     },
   ];
 
-  React.useEffect(() => {
-    setUserEmail(getCurrentUserEmail());
-    setIsClient(true);
-  }, []);
-
   const handleLogout = async () => {
     await logout();
     router.push('/');
   };
   
+  const userEmail = user?.email;
   const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
 
   const bottomNavItems = [
@@ -128,111 +138,115 @@ export default function DashboardLayout({
     const currentItem = menuItems.find(item => item.href === pathname);
     return currentItem ? currentItem.label : (pathname.split('/').pop()?.replace('-', ' ') || 'Home');
   };
+  
+  const isClient = !isInitializing;
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <AstralLogo className="h-8 w-8" />
-            <span className="text-lg font-semibold text-sidebar-foreground">AstralCore</span>
-          </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarMenu>
-            {menuItems.map((item) => (
-              <SidebarMenuItem key={item.label}>
-                <SidebarMenuButton asChild isActive={isClient ? pathname === item.href && !item.download : false}>
-                  <Link href={item.href} download={item.download}>
-                    <item.icon />
-                    <span>{item.label}</span>
+    <UserContext.Provider value={{ user }}>
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarHeader>
+            <div className="flex items-center gap-2">
+              <AstralLogo className="h-8 w-8" />
+              <span className="text-lg font-semibold text-sidebar-foreground">AstralCore</span>
+            </div>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton asChild isActive={isClient ? pathname === item.href && !item.download : false}>
+                    <Link href={item.href} download={item.download}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarContent>
+          <SidebarFooter>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent/50">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="abstract user" alt="@user" />
+                    <AvatarFallback>{userInitial}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col overflow-hidden text-left">
+                    <p className="truncate text-sm font-medium text-sidebar-foreground">User</p>
+                    <p className="truncate text-xs text-sidebar-foreground/70">
+                      {userEmail || '...'}
+                    </p>
+                  </div>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none text-foreground">User</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {userEmail || '...'}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/profile">
+                    <ProfileIcon className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
                   </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent/50">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="abstract user" alt="@user" />
-                  <AvatarFallback>{userInitial}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col overflow-hidden text-left">
-                  <p className="truncate text-sm font-medium text-sidebar-foreground">User</p>
-                  <p className="truncate text-xs text-sidebar-foreground/70">
-                    {userEmail || '...'}
-                  </p>
-                </div>
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none text-foreground">User</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {userEmail || '...'}
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                 <Link href="/dashboard/profile">
-                  <ProfileIcon className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                 </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <SettingsIcon className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogoutIcon className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>
-        <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
-          <SidebarTrigger />
-          <div className="w-full flex-1">
-             <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                <AstralLogo className="h-6 w-6" />
-                {isClient ? (
-                  <span>{getPageTitle()}</span>
-                ) : (
-                  <Skeleton className="h-6 w-24" />
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <SettingsIcon className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogoutIcon className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarFooter>
+        </Sidebar>
+        <SidebarInset>
+          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
+            <SidebarTrigger />
+            <div className="w-full flex-1">
+              <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
+                  <AstralLogo className="h-6 w-6" />
+                  {isClient ? (
+                    <span>{getPageTitle()}</span>
+                  ) : (
+                    <Skeleton className="h-6 w-24" />
+                  )}
+              </h1>
+            </div>
+            <NotificationBell />
+          </header>
+          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
+              {children}
+          </main>
+          <nav className="absolute bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10">
+            {bottomNavItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors",
+                  isClient && pathname === item.href
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
-            </h1>
-          </div>
-          <NotificationBell />
-        </header>
-        <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
-            {children}
-        </main>
-        <nav className="absolute bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10">
-          {bottomNavItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors",
-                isClient && pathname === item.href
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <item.icon className="h-6 w-6" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
-      </SidebarInset>
-    </SidebarProvider>
+              >
+                <item.icon className="h-6 w-6" />
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </nav>
+        </SidebarInset>
+      </SidebarProvider>
+    </UserContext.Provider>
   );
 }

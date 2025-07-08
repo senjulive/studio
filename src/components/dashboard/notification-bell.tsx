@@ -18,8 +18,8 @@ import {
   markAllAsRead,
   type Notification,
 } from "@/lib/notifications";
-import { getCurrentUserEmail } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/app/dashboard/layout";
 
 function NotificationItem({ notification }: { notification: Notification }) {
     const content = (
@@ -44,8 +44,8 @@ export function NotificationBell() {
   const [notifications, setNotifications] = React.useState<Notification[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isOpen, setIsOpen] = React.useState(false);
-
-  const userEmail = getCurrentUserEmail();
+  const { user } = useUser();
+  const userEmail = user?.email;
 
   const unreadCount = React.useMemo(() => {
     return notifications.filter((n) => !n.read).length;

@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { forgotPasswordSchema } from "@/lib/validators";
+import { resetPasswordForEmail } from "@/lib/auth";
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
@@ -43,15 +44,23 @@ export function ForgotPasswordForm() {
 
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500)); 
-    setIsLoading(false);
-    console.log(values);
-    toast({
-      title: "Password Reset Email Sent",
-      description:
-        "If an account with that email exists, we've sent instructions to reset your password.",
-    });
-    form.reset();
+    try {
+      await resetPasswordForEmail(values.email);
+      toast({
+        title: "Password Reset Email Sent",
+        description:
+          "If an account with that email exists, we've sent instructions to reset your password.",
+      });
+      form.reset();
+    } catch (error: any) {
+      toast({
+        title: "Request Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
