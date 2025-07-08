@@ -1,3 +1,4 @@
+
 'use client';
 
 import { addNotification } from '@/lib/notifications';
@@ -70,9 +71,7 @@ export type WalletData = {
         country: string;
         avatarUrl?: string;
     };
-    security: {
-        withdrawalPasscode: string | null;
-    };
+    security: {};
 };
 
 export type WithdrawalAddresses = {
@@ -121,9 +120,7 @@ const createNewWalletObject = (): WalletData => {
             country: '',
             avatarUrl: '',
         },
-        security: {
-            withdrawalPasscode: null,
-        },
+        security: {},
     };
 }
 
@@ -282,37 +279,4 @@ export async function resetWithdrawalAddressForUser(email: string): Promise<void
         delete allAddresses[email];
         localStorage.setItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY, JSON.stringify(allAddresses));
     }
-}
-
-// --- Withdrawal Passcode Functions ---
-
-export async function setWithdrawalPasscode(email: string, passcode: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    if (typeof window === 'undefined') return;
-
-    const wallet = await getWallet(email);
-    if (!wallet) throw new Error("Wallet not found.");
-
-    wallet.security.withdrawalPasscode = passcode;
-    await updateWallet(email, wallet);
-}
-
-export async function verifyWithdrawalPasscode(email: string, passcode: string): Promise<boolean> {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const wallet = await getWallet(email);
-    if (!wallet || !wallet.security.withdrawalPasscode) {
-        return false;
-    }
-    return wallet.security.withdrawalPasscode === passcode;
-}
-
-export async function resetWithdrawalPasscode(email: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    if (typeof window === 'undefined') return;
-
-    const wallet = await getWallet(email);
-    if (!wallet) throw new Error("Wallet not found.");
-    
-    wallet.security.withdrawalPasscode = null;
-    await updateWallet(email, wallet);
 }

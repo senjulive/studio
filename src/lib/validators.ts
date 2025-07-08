@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 export const loginSchema = z.object({
@@ -29,34 +30,3 @@ export const registerSchema = z
 export const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
 });
-
-export const createWithdrawalPasscodeSchema = z
-  .object({
-    newPasscode: z
-      .string()
-      .length(4, { message: "Passcode must be 4 digits." })
-      .regex(/^\d{4}$/, { message: "Passcode must only contain digits." }),
-    confirmPasscode: z.string(),
-  })
-  .refine((data) => data.newPasscode === data.confirmPasscode, {
-    message: "Passcodes do not match.",
-    path: ["confirmPasscode"],
-  });
-  
-export const changeWithdrawalPasscodeSchema = z
-  .object({
-    currentPasscode: z.string().min(1, "Current passcode is required."),
-    newPasscode: z
-      .string()
-      .length(4, { message: "Passcode must be 4 digits." })
-      .regex(/^\d{4}$/, { message: "Passcode must only contain digits." }),
-    confirmPasscode: z.string(),
-  })
-  .refine((data) => data.newPasscode === data.confirmPasscode, {
-    message: "Passcodes do not match.",
-    path: ["confirmPasscode"],
-  })
-  .refine((data) => data.currentPasscode !== data.newPasscode, {
-    message: "New passcode must be different from the current one.",
-    path: ["newPasscode"],
-  });

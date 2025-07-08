@@ -1,8 +1,8 @@
+
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { Info, Loader2, Clock, ShieldAlert } from "lucide-react";
+import { Info, Loader2, Clock } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -32,16 +32,12 @@ import {
   getOrCreateWallet,
   type WalletData,
   updateWallet,
-  verifyWithdrawalPasscode,
 } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
 import Image from "next/image";
 import { format } from "date-fns";
-import { Checkbox } from "../ui/checkbox";
-
-const SAVED_PASSCODE_KEY = 'astral-saved-passcode';
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -50,8 +46,6 @@ export function WithdrawView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
-  const [withdrawalPasscode, setWithdrawalPasscode] = React.useState("");
-  const [savePasscode, setSavePasscode] = React.useState(false);
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -63,16 +57,6 @@ export function WithdrawView() {
     const email = getCurrentUserEmail();
     if (email) {
       setCurrentUserEmail(email);
-    }
-  }, []);
-  
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = sessionStorage.getItem(SAVED_PASSCODE_KEY);
-      if (saved) {
-        setWithdrawalPasscode(saved);
-        setSavePasscode(true);
-      }
     }
   }, []);
 
@@ -136,37 +120,7 @@ export function WithdrawView() {
       return;
     }
 
-    if (!withdrawalPasscode) {
-      toast({
-        title: "Passcode Required",
-        description: "Please enter your 4-digit withdrawal passcode.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsWithdrawing(true);
-
-    const isPasscodeCorrect = await verifyWithdrawalPasscode(currentUserEmail, withdrawalPasscode);
-
-    if (!isPasscodeCorrect) {
-        toast({
-            title: "Incorrect Passcode",
-            description: "The withdrawal passcode you entered is incorrect.",
-            variant: "destructive",
-        });
-        setIsWithdrawing(false);
-        return;
-    }
-
-    // Passcode is correct, handle sessionStorage
-    if (typeof window !== "undefined") {
-      if (savePasscode) {
-        sessionStorage.setItem(SAVED_PASSCODE_KEY, withdrawalPasscode);
-      } else {
-        sessionStorage.removeItem(SAVED_PASSCODE_KEY);
-      }
-    }
 
     const withdrawalRequest = {
         id: `wd_${Date.now()}`,
@@ -200,9 +154,6 @@ export function WithdrawView() {
     });
 
     setAmount("");
-    if (!savePasscode) {
-        setWithdrawalPasscode("");
-    }
     toast({
       title: "Withdrawal Initiated",
       description: `Your withdrawal of ${withdrawAmount.toFixed(2)} ${asset.toUpperCase()} is being processed.`,
@@ -211,7 +162,6 @@ export function WithdrawView() {
   };
 
   const hasSavedAddress = savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
-  const hasWithdrawalPasscode = walletData?.security.withdrawalPasscode;
   const pendingWithdrawals = walletData?.pendingWithdrawals || [];
   
   const renderContent = () => {
@@ -223,21 +173,6 @@ export function WithdrawView() {
             <Skeleton className="h-10 w-1/4" />
           </div>
       );
-    }
-    
-    if (!hasWithdrawalPasscode) {
-        return (
-            <Alert variant="destructive">
-                <ShieldAlert className="h-4 w-4" />
-                <AlertTitle>Withdrawal Passcode Required</AlertTitle>
-                <AlertDescription>
-                    For your security, you must create a 4-digit withdrawal passcode before you can make any withdrawals.
-                    <Button asChild variant="link" className="p-0 h-auto ml-1">
-                        <Link href="/dashboard/security">Go to Security Settings</Link>
-                    </Button>
-                </AlertDescription>
-            </Alert>
-        );
     }
 
     if (!hasSavedAddress) {
@@ -291,25 +226,6 @@ export function WithdrawView() {
                 onChange={(e) => setAmount(e.target.value)}
                 disabled={isWithdrawing}
             />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="withdrawal-passcode">Withdrawal Passcode</Label>
-                <Input
-                    id="withdrawal-passcode"
-                    type="password"
-                    placeholder="••••"
-                    value={withdrawalPasscode}
-                    onChange={(e) => setWithdrawalPasscode(e.target.value)}
-                    disabled={isWithdrawing}
-                    maxLength={4}
-                    inputMode="numeric"
-                />
-            </div>
-            <div className="flex items-center space-x-2">
-                <Checkbox id="save-passcode" checked={savePasscode} onCheckedChange={(checked) => setSavePasscode(!!checked)} />
-                <Label htmlFor="save-passcode" className="text-sm font-normal text-muted-foreground cursor-pointer">
-                    Save passcode for this session
-                </Label>
             </div>
             <Button type="submit" disabled={isWithdrawing || !amount} className="w-full">
             {isWithdrawing && (
