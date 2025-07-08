@@ -35,6 +35,7 @@ import { getCurrentUserEmail } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
+import { getUserRank } from "@/lib/ranks";
 
 type Transaction = {
   id: string;
@@ -281,6 +282,9 @@ export function WalletView() {
   }, [walletData, allAssetsData]);
 
   const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
+  
+  const usdtBalance = walletData?.balances?.usdt ?? 0;
+  const rank = getUserRank(usdtBalance);
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (currentUserEmail) {
@@ -313,7 +317,15 @@ export function WalletView() {
           }}
         />
         <CardHeader>
-          <CardTitle>Available Assets</CardTitle>
+           <CardTitle className="flex items-center gap-3">
+            Available Assets
+            {walletData && (
+              <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
+                <rank.Icon className="h-5 w-5" />
+                <span>{rank.name}</span>
+              </Badge>
+            )}
+          </CardTitle>
           <CardDescription>
             Your total asset value and individual balances.
           </CardDescription>
