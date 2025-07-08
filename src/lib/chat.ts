@@ -1,6 +1,7 @@
+
 'use client';
 
-const CHATS_STORAGE_KEY = 'astral-chats';
+import { supabase } from '@/lib/supabase';
 
 export type Message = {
   id: string;
@@ -19,103 +20,82 @@ export type ChatHistory = {
   [userId: string]: Message[];
 };
 
-function safeJsonParse<T>(json: string | null, fallback: T): T {
-  if (!json) return fallback;
-  try {
-    return JSON.parse(json) as T;
-  } catch (e) {
-    return fallback;
-  }
-}
-
-// Simulates fetching all chats from a database. For admin use.
+// Admin function: Fetches all chats from the database.
 export async function getAllChats(): Promise<ChatHistory> {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  if (typeof window === 'undefined') return {};
-  const storedChats = localStorage.getItem(CHATS_STORAGE_KEY);
-  return safeJsonParse(storedChats, {});
+  const { data, error } = await supabase
+    .from('chats')
+    .select('user_id, message, created_at')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error("Error fetching all chats:", error);
+    return {};
+  }
+
+  const chatHistory: ChatHistory = {};
+  for (const row of data) {
+    const userId = (row.user_id as any).toString();
+    if (!chatHistory[userId]) {
+      chatHistory[userId] = [];
+    }
+    chatHistory[userId].push(row.message as Message);
+  }
+  return chatHistory;
 }
 
-// Simulates fetching chat history for a single user.
+// Fetches chat history for a single user.
 export async function getChatHistoryForUser(userId: string): Promise<Message[]> {
-  const allChats = await getAllChats();
-  return allChats[userId] || [];
+  const { data, error } = await supabase
+    .from('chats')
+    .select('message')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: true });
+  
+  if (error) {
+    console.error(`Error fetching chat history for ${userId}:`, error);
+    return [];
+  }
+
+  return data ? data.map(row => row.message as Message) : [];
 }
 
-// Simulates sending a message from a user.
-export async function sendMessage(userId: string, text: string, file?: Message['file']): Promise<Message> {
-  await new Promise(resolve => setTimeout(resolve, 200));
-  if (typeof window === 'undefined') {
-    throw new Error('Cannot send message: not in a browser environment.');
-  }
-
-  const allChats = await getAllChats();
-  if (!allChats[userId]) {
-    allChats[userId] = [];
-  }
-
+// Universal function to send a message.
+async function createMessage(userId: string, text: string, sender: 'user' | 'admin', silent: boolean, file?: Message['file']): Promise<Message> {
   const newMessage: Message = {
-    id: `msg_${Date.now()}_${Math.random()}`,
+    id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     text,
-    sender: 'user',
+    sender,
     timestamp: Date.now(),
-    silent: false,
+    silent,
     file,
   };
 
-  allChats[userId].push(newMessage);
-  localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
-  
+  const { error } = await supabase.from('chats').insert({
+    id: newMessage.id,
+    user_id: userId,
+    message: newMessage as any,
+  });
+
+  if (error) {
+    console.error('Error sending message:', error);
+    throw new Error('Failed to send message.');
+  }
+
   return newMessage;
 }
 
-// Simulates an admin sending a message to a user.
+
+// Sends a message from a user.
+export async function sendMessage(userId: string, text: string, file?: Message['file']): Promise<Message> {
+  return createMessage(userId, text, 'user', false, file);
+}
+
+// Sends a message from an admin.
 export async function sendAdminMessage(userId: string, text: string): Promise<Message> {
-  await new Promise(resolve => setTimeout(resolve, 200));
-  if (typeof window === 'undefined') {
-    throw new Error('Cannot send message: not in a browser environment.');
-  }
-
-  const allChats = await getAllChats();
-  if (!allChats[userId]) {
-    allChats[userId] = [];
-  }
-
-  const newMessage: Message = {
-    id: `msg_${Date.now()}_${Math.random()}`,
-    text,
-    sender: 'admin',
-    timestamp: Date.now(),
-    silent: false,
-  };
-
-  allChats[userId].push(newMessage);
-  localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
-  
-  return newMessage;
+    return createMessage(userId, text, 'admin', false);
 }
 
-
-// Function for silent system notifications
-export async function sendSystemNotification(userId: string, text: string): Promise<void> {
-  await new Promise(resolve => setTimeout(resolve, 50));
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  const allChats = await getAllChats();
-  if (!allChats[userId]) {
-    allChats[userId] = [];
-  }
-
-  const systemMessage: Message = {
-    id: `sys_${Date.now()}_${Math.random()}`,
-    text: `[System Alert] ${text}`,
-    sender: 'admin',
-    timestamp: Date.now(),
-    silent: true,
-  };
-
-  allChats[userId].push(systemMessage);
-  localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(allChats));
+// Sends a silent system notification into the chat history.
+export async function sendSystemNotification(userId:string, text:string): Promise<void>{
+    await createMessage(userId, `[System Alert] ${text}`, 'admin', true);
 }
