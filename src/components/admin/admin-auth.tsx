@@ -33,10 +33,6 @@ const adminAuthSchema = z.object({
 
 type AdminAuthFormValues = z.infer<typeof adminAuthSchema>;
 
-// IMPORTANT: For local development, you can create a `.env.local` file in the root of your project
-// and add the line: NEXT_PUBLIC_ADMIN_PASSWORD="your_secret_password"
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Xx#%admin%34%xX";
-
 export function AdminAuth({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
@@ -50,23 +46,38 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
     },
   });
 
-  const onSubmit = (values: AdminAuthFormValues) => {
+  const onSubmit = async (values: AdminAuthFormValues) => {
     setIsLoading(true);
-    setTimeout(() => {
-      if (values.password === ADMIN_PASSWORD) {
+    try {
+      const response = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: values.password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         toast({ title: "Access Granted" });
         setPassword(values.password);
         setIsAuthenticated(true);
       } else {
         toast({
           title: "Access Denied",
-          description: "Incorrect password.",
+          description: result.error || "Incorrect password.",
           variant: "destructive",
         });
         form.reset();
       }
-      setIsLoading(false);
-    }, 500);
+    } catch (error) {
+        toast({
+          title: "Authentication Error",
+          description: "Could not connect to the server. Please try again.",
+          variant: "destructive",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   if (isAuthenticated) {
