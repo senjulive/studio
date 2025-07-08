@@ -180,12 +180,12 @@ export function WalletManager() {
     if (action === "add") {
       await sendAdminMessage(
         selectedUserId,
-        `Deposit received: ${values.amount.toFixed(
+        `Credit received: ${values.amount.toFixed(
           8
-        )} ${asset.toUpperCase()} has been credited to your account.`
+        )} ${asset.toUpperCase()} has been added to your account by an administrator.`
       );
       await addNotification(selectedUserId, {
-        title: "Deposit Approved",
+        title: "Account Credited by Admin",
         content: `Your balance has been credited with ${values.amount} ${asset.toUpperCase()}.`,
         href: "/dashboard",
       });

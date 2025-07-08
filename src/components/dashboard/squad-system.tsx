@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -101,7 +102,7 @@ export function SquadSystem() {
             <UserCheck className="h-4 w-4" />
             <AlertTitle>You're in a Squad!</AlertTitle>
             <AlertDescription>
-                Your squad leader is <span className="font-semibold text-foreground">{squadLeader}</span>. Keep growing your assets together.
+                Your squad leader is <span className="font-semibold text-foreground">{squadLeader.username}</span>. Keep growing your assets together.
             </AlertDescription>
         </Alert>
       )}
@@ -183,7 +184,7 @@ export function SquadSystem() {
                <CardDescription>
                 A list of users who have joined your squad.
               </CardDescription>
-            </CardHeader>
+            </Header>
             <CardContent>
               <Table>
                 <TableHeader>

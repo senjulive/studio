@@ -2,7 +2,6 @@
 'use client';
 
 import { supabase } from '@/lib/supabase';
-import { sendSystemNotification } from '@/lib/chat';
 import { getBotTierSettings } from './settings';
 
 const generateAddress = (prefix: string, length: number, chars: string): string => {
@@ -53,7 +52,7 @@ export type WalletData = {
     };
     squad: {
         referralCode: string;
-        squadLeader?: string;
+        squadLeader?: { id: string, username: string };
         members: string[];
     };
     profile: {
@@ -144,43 +143,63 @@ export async function createWallet(
     newWalletData.profile.contactNumber = contactNumber;
     newWalletData.profile.country = country;
 
+    // The new public wallet object to be inserted
+    const publicWalletData: any = {
+        id: userId,
+        username: username,
+        referral_code: newWalletData.squad.referralCode,
+    };
+
     // Handle referral logic
     if (referralCode) {
         // Find the leader by their referral code
         const { data: leaderData, error: leaderError } = await supabase
-            .from('wallets')
-            .select('id, data')
-            // Using a permissive policy for this lookup. In production, this should be a secure RPC call.
-            .eq('data->squad->>referralCode', referralCode.toUpperCase())
+            .from('wallets_public')
+            .select('id')
+            .eq('referral_code', referralCode.toUpperCase())
             .single();
 
         if (leaderData && !leaderError) {
-            const leaderId = leaderData.id;
-            const leaderWallet = leaderData.data as WalletData;
-            
-            // Set the squad leader for the new user
-            newWalletData.squad.squadLeader = leaderId;
-            // New member gets a $5 bonus for using a code
-            newWalletData.balances.usdt += 5; 
-            
-            // The logic to update the leader's wallet is correctly removed.
-            // Now, we just notify the admin so they can handle the leader's bonus manually.
-            const leaderUsername = leaderWallet.profile.username || leaderId;
-            await sendSystemNotification(
-                userId, // Log this in the new user's chat for context
-                `Referral successful. User '${email}' was referred by '${leaderUsername}'. Admin action required to credit leader's bonus.`
-            );
+            // Set the squad leader for the new user, this will be picked up by the trigger
+            publicWalletData.squad_leader_id = leaderData.id;
         }
     }
+    
+    // Insert into public table, which triggers the DB function for rewards
+    const { error: publicInsertError } = await supabase
+        .from('wallets_public')
+        .insert(publicWalletData);
 
-    const { error } = await supabase.from('wallets').insert({
+    if (publicInsertError) {
+        console.error("Error creating public wallet:", publicInsertError.message);
+        throw new Error("Could not create public wallet for new user.");
+    }
+
+    // Fetch the updated balances from the public table after the trigger has run
+    const { data: updatedPublicWallet, error: fetchError } = await supabase
+        .from('wallets_public')
+        .select('balances')
+        .eq('id', userId)
+        .single();
+    
+    if(fetchError || !updatedPublicWallet) {
+        console.error("Error fetching updated wallet after trigger:", fetchError);
+    } else {
+        // Sync balances from public table to private JSONB
+        newWalletData.balances = updatedPublicWallet.balances as WalletData['balances'];
+    }
+
+    // Create the private wallet data in the 'wallets' table
+    const { error: privateInsertError } = await supabase.from('wallets').insert({
         id: userId,
         data: newWalletData as any,
     });
 
-    if (error) {
-        console.error("Error creating wallet:", error.message);
-        throw new Error("Could not create wallet for new user.");
+    if (privateInsertError) {
+        console.error("Error creating private wallet:", privateInsertError.message);
+        // Attempt to clean up public wallet if private fails
+        await supabase.from('wallets_public').delete().eq('id', userId);
+        throw new Error("Could not create private wallet for new user.");
     }
     
     return newWalletData;
@@ -197,6 +216,19 @@ export async function getOrCreateWallet(userId: string): Promise<WalletData> {
 
     if (data) {
         const wallet = data.data as WalletData;
+
+        // Sync balances from public table on every load to ensure consistency
+        const { data: publicWallet } = await supabase.from('wallets_public').select('balances, squad_leader_id, squad_members').eq('id', userId).single();
+        if (publicWallet) {
+            wallet.balances = publicWallet.balances as WalletData['balances'];
+            wallet.squad.members = publicWallet.squad_members as string[];
+            if (publicWallet.squad_leader_id && !wallet.squad.squadLeader) {
+                 const { data: leaderProfile } = await supabase.from('wallets_public').select('id, username').eq('id', publicWallet.squad_leader_id).single();
+                 if (leaderProfile) {
+                    wallet.squad.squadLeader = { id: leaderProfile.id, username: leaderProfile.username || 'Leader' };
+                 }
+            }
+        }
         
         // Daily reset logic
         const now = Date.now();
@@ -219,8 +251,6 @@ export async function getOrCreateWallet(userId: string): Promise<WalletData> {
       if (!user) throw new Error("User not found, cannot create wallet.");
 
       console.log("No wallet found for user, creating a new one.");
-      // This path is for users who registered before the wallets table existed.
-      // It uses the user's email and provides default values for other profile info.
       const newWallet = await createWallet(user.id, user.email!, "User", "N/A", "N/A");
       return newWallet;
     }
@@ -232,14 +262,25 @@ export async function getOrCreateWallet(userId: string): Promise<WalletData> {
 
 // Updates a user's wallet data.
 export async function updateWallet(userId: string, newData: WalletData): Promise<void> {
-    const { error } = await supabase
+    const { error: privateError } = await supabase
         .from('wallets')
         .update({ data: newData as any })
         .eq('id', userId);
 
-    if (error) {
-        console.error("Error updating wallet:", error);
-        throw new Error("Failed to update wallet data.");
+    if (privateError) {
+        console.error("Error updating private wallet:", privateError);
+        throw new Error("Failed to update private wallet data.");
+    }
+    
+    // Also update the public balances
+    const { error: publicError } = await supabase
+        .from('wallets_public')
+        .update({ balances: newData.balances as any })
+        .eq('id', userId);
+    
+    if (publicError) {
+        console.error("Error updating public wallet balance:", publicError);
+        // Don't throw, as private update succeeded. Log it as a potential inconsistency.
     }
 }
 
