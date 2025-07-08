@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -39,12 +40,10 @@ import { Skeleton } from "../ui/skeleton";
 type CreatePasscodeValues = z.infer<typeof createWithdrawalPasscodeSchema>;
 type ChangePasscodeValues = z.infer<typeof changeWithdrawalPasscodeSchema>;
 
-export function SecurityView() {
+function PasscodeForm({ wallet, fetchWallet }: { wallet: WalletData | null; fetchWallet: () => void }) {
   const { toast } = useToast();
-  const [wallet, setWallet] = React.useState<WalletData | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-
+  
   const hasPasscode = !!wallet?.security.withdrawalPasscode;
 
   const form = useForm({
@@ -57,27 +56,6 @@ export function SecurityView() {
       ? { currentPasscode: "", newPasscode: "", confirmPasscode: "" }
       : { newPasscode: "", confirmPasscode: "" },
   });
-
-  const fetchWallet = React.useCallback(async () => {
-    setIsLoading(true);
-    const email = getCurrentUserEmail();
-    if (email) {
-      const data = await getOrCreateWallet(email);
-      setWallet(data);
-    }
-    setIsLoading(false);
-  }, []);
-
-  React.useEffect(() => {
-    fetchWallet();
-  }, [fetchWallet]);
-  
-  React.useEffect(() => {
-    form.reset(hasPasscode
-      ? { currentPasscode: "", newPasscode: "", confirmPasscode: "" }
-      : { newPasscode: "", confirmPasscode: "" });
-  }, [hasPasscode, form]);
-
 
   const onSubmit = async (values: CreatePasscodeValues | ChangePasscodeValues) => {
     const email = getCurrentUserEmail();
@@ -99,8 +77,8 @@ export function SecurityView() {
             title: "Passcode Updated",
             description: "Your withdrawal passcode has been changed successfully.",
           });
-          await fetchWallet();
           form.reset();
+          fetchWallet(); // Re-fetch to update parent state, which will re-key this component
         }
       } else {
         // Handle creating a new passcode
@@ -110,8 +88,8 @@ export function SecurityView() {
           title: "Passcode Created",
           description: "Your withdrawal passcode has been set successfully.",
         });
-        await fetchWallet();
         form.reset();
+        fetchWallet(); // Re-fetch to update parent state, which will re-key this component
       }
     } catch (error) {
       toast({
@@ -124,6 +102,86 @@ export function SecurityView() {
     }
   };
 
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {hasPasscode && (
+          <FormField
+            control={form.control}
+            name="currentPasscode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Current Passcode</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+        <FormField
+          control={form.control}
+          name="newPasscode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New 4-Digit Passcode</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPasscode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm New Passcode</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={isSubmitting} className="w-full">
+          {isSubmitting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : hasPasscode ? (
+            <ShieldCheck className="mr-2 h-4 w-4" />
+          ) : (
+            <Lock className="mr-2 h-4 w-4" />
+          )}
+          {hasPasscode ? "Change Passcode" : "Create Passcode"}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+
+export function SecurityView() {
+  const [wallet, setWallet] = React.useState<WalletData | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  
+  const hasPasscode = !!wallet?.security.withdrawalPasscode;
+
+  const fetchWallet = React.useCallback(async () => {
+    setIsLoading(true);
+    const email = getCurrentUserEmail();
+    if (email) {
+      const data = await getOrCreateWallet(email);
+      setWallet(data);
+    }
+    setIsLoading(false);
+  }, []);
+
+  React.useEffect(() => {
+    fetchWallet();
+  }, [fetchWallet]);
+  
   if (isLoading) {
     return (
       <Card className="w-full max-w-lg mx-auto">
@@ -154,61 +212,11 @@ export function SecurityView() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {hasPasscode && (
-              <FormField
-                control={form.control}
-                name="currentPasscode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current Passcode</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            <FormField
-              control={form.control}
-              name="newPasscode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>New 4-Digit Passcode</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPasscode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm New Passcode</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : hasPasscode ? (
-                <ShieldCheck className="mr-2 h-4 w-4" />
-              ) : (
-                <Lock className="mr-2 h-4 w-4" />
-              )}
-              {hasPasscode ? "Change Passcode" : "Create Passcode"}
-            </Button>
-          </form>
-        </Form>
+        <PasscodeForm 
+            key={hasPasscode ? 'change-form' : 'create-form'}
+            wallet={wallet}
+            fetchWallet={fetchWallet}
+        />
       </CardContent>
     </Card>
   );
