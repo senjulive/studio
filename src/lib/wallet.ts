@@ -265,3 +265,10 @@ export async function saveWithdrawalAddress(email: string, asset: string, addres
         localStorage.setItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY, JSON.stringify(allAddresses));
     }
 }
+
+export async function resetAllWithdrawalAddresses(): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY);
+    }
+}
