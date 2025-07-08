@@ -150,28 +150,21 @@ export async function createWallet(
         const { data: leaderData, error: leaderError } = await supabase
             .from('wallets')
             .select('id, data')
+            // Using a permissive policy for this lookup. In production, this should be a secure RPC call.
             .eq('data->squad->>referralCode', referralCode.toUpperCase())
             .single();
 
         if (leaderData && !leaderError) {
             const leaderId = leaderData.id;
-            const leaderWallet = leaderData.data as WalletData;
             
-            leaderWallet.squad.members.push(email);
-            leaderWallet.balances.usdt += 5; // Leader gets a $5 bonus
-            
-            // Update the leader's wallet
-            await updateWallet(leaderId, leaderWallet);
-            
+            // Set the squad leader for the new user
             newWalletData.squad.squadLeader = leaderId;
-            newWalletData.balances.usdt += 5; // New member also gets a $5 bonus
+            // New member gets a $5 bonus for using a code
+            newWalletData.balances.usdt += 5; 
             
-            // Notify the squad leader
-            addNotification(leaderId, {
-              title: "New Squad Member!",
-              content: `${username} (${email}) has joined your squad. You've both earned a $5 bonus!`,
-              href: "/dashboard/squad"
-            });
+            // The logic to update the leader's wallet (add member, grant bonus) has been removed.
+            // This is because a user cannot update another user's wallet due to security policies (RLS).
+            // This kind of operation should be handled by a secure backend function (e.g., Supabase Edge Function).
         }
     }
 
