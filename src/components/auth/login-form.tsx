@@ -34,6 +34,7 @@ import { getOrCreateWallet } from "@/lib/wallet";
 import { AstralLogo } from "../icons/astral-logo";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
+const REMEMBERED_PASSWORD_KEY = 'astral-remembered-password';
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -54,9 +55,13 @@ export function LoginForm() {
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
         const rememberedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY);
+        const rememberedPassword = localStorage.getItem(REMEMBERED_PASSWORD_KEY);
         if (rememberedEmail) {
             form.setValue('email', rememberedEmail);
             form.setValue('rememberMe', true);
+        }
+        if (rememberedPassword) {
+            form.setValue('password', rememberedPassword);
         }
     }
   }, [form]);
@@ -67,8 +72,10 @@ export function LoginForm() {
     if (typeof window !== 'undefined') {
         if (values.rememberMe) {
             localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
+            localStorage.setItem(REMEMBERED_PASSWORD_KEY, values.password);
         } else {
             localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+            localStorage.removeItem(REMEMBERED_PASSWORD_KEY);
         }
     }
     

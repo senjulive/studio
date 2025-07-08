@@ -39,6 +39,9 @@ import { sendSystemNotification } from "@/lib/chat";
 import { addNotification } from "@/lib/notifications";
 import Image from "next/image";
 import { format } from "date-fns";
+import { Checkbox } from "../ui/checkbox";
+
+const SAVED_PASSCODE_KEY = 'astral-saved-passcode';
 
 export function WithdrawView() {
   const { toast } = useToast();
@@ -48,6 +51,7 @@ export function WithdrawView() {
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
   const [withdrawalPasscode, setWithdrawalPasscode] = React.useState("");
+  const [savePasscode, setSavePasscode] = React.useState(false);
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -59,6 +63,16 @@ export function WithdrawView() {
     const email = getCurrentUserEmail();
     if (email) {
       setCurrentUserEmail(email);
+    }
+  }, []);
+  
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem(SAVED_PASSCODE_KEY);
+      if (saved) {
+        setWithdrawalPasscode(saved);
+        setSavePasscode(true);
+      }
     }
   }, []);
 
@@ -145,6 +159,15 @@ export function WithdrawView() {
         return;
     }
 
+    // Passcode is correct, handle sessionStorage
+    if (typeof window !== "undefined") {
+      if (savePasscode) {
+        sessionStorage.setItem(SAVED_PASSCODE_KEY, withdrawalPasscode);
+      } else {
+        sessionStorage.removeItem(SAVED_PASSCODE_KEY);
+      }
+    }
+
     const withdrawalRequest = {
         id: `wd_${Date.now()}`,
         amount: withdrawAmount,
@@ -177,7 +200,9 @@ export function WithdrawView() {
     });
 
     setAmount("");
-    setWithdrawalPasscode("");
+    if (!savePasscode) {
+        setWithdrawalPasscode("");
+    }
     toast({
       title: "Withdrawal Initiated",
       description: `Your withdrawal of ${withdrawAmount.toFixed(2)} ${asset.toUpperCase()} is being processed.`,
@@ -279,6 +304,12 @@ export function WithdrawView() {
                     maxLength={4}
                     inputMode="numeric"
                 />
+            </div>
+            <div className="flex items-center space-x-2">
+                <Checkbox id="save-passcode" checked={savePasscode} onCheckedChange={(checked) => setSavePasscode(!!checked)} />
+                <Label htmlFor="save-passcode" className="text-sm font-normal text-muted-foreground cursor-pointer">
+                    Save passcode for this session
+                </Label>
             </div>
             <Button type="submit" disabled={isWithdrawing || !amount} className="w-full">
             {isWithdrawing && (
