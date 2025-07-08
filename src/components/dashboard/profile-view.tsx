@@ -16,11 +16,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Inbox, User, Mail, BadgeInfo, Phone, MapPin, Award, Star, Shield, Users } from "lucide-react";
+import { Inbox, User, Mail, BadgeInfo, Phone, MapPin, Users } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
 import Image from "next/image";
+import { getUserRank } from "@/lib/ranks";
 
 function AnnouncementCard({ announcement }: { announcement: Announcement }) {
   return (
@@ -39,19 +40,6 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
     </Card>
   );
 }
-
-const getUserRank = (squadSize: number) => {
-    if (squadSize >= 10) {
-      return { name: "Gold", icon: Award, color: "text-amber-500" };
-    }
-    if (squadSize >= 5) {
-      return { name: "Silver", icon: Star, color: "text-slate-400" };
-    }
-    if (squadSize >= 1) {
-      return { name: "Bronze", icon: Shield, color: "text-orange-600" };
-    }
-    return { name: "Recruit", icon: User, color: "text-muted-foreground" };
-};
 
 const ProfileDetailItem = ({
   icon,
@@ -149,8 +137,8 @@ export function ProfileView() {
              <div className="p-6 pt-2 w-full">
                 <CardTitle className="text-2xl flex items-center justify-center gap-2">
                 {isLoading ? <Skeleton className="h-8 w-40" /> : profileDisplayName}
-                <Badge variant="outline" className={cn("flex items-center gap-1.5", rank.color)}>
-                    <rank.icon className="h-4 w-4" />
+                <Badge variant="outline" className={cn("flex items-center gap-1.5", rank.className)}>
+                    <rank.Icon className="h-5 w-5" />
                     {rank.name}
                 </Badge>
                 </CardTitle>
