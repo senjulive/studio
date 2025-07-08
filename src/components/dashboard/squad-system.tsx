@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Copy, Users, UserCheck, QrCode } from "lucide-react";
+import { Copy, Users, UserCheck, QrCode, User } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -25,24 +25,49 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { useUser } from "@/app/dashboard/layout";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import type { SquadMember } from "@/app/api/squad/route";
+
+const SubSquad = ({ members }: { members: SquadMember[] }) => {
+    if (members.length === 0) {
+        return <p className="text-sm text-muted-foreground py-2 pl-2">This member has not recruited anyone yet.</p>;
+    }
+
+    return (
+        <Accordion type="multiple" className="w-full pl-3 border-l ml-3">
+            {members.map(member => (
+                <AccordionItem value={member.id} key={member.id} className="border-b-0">
+                    <AccordionTrigger className="py-2">
+                        <div className="flex items-center gap-3">
+                            <User className="h-5 w-5 text-muted-foreground"/>
+                            <div>
+                                <p className="font-semibold text-sm">{member.username}</p>
+                                {member.team.length > 0 && <p className="text-xs text-muted-foreground">{member.team.length} members</p>}
+                            </div>
+                            {member.team.length > 0 && <Badge variant="secondary">Sub-Leader</Badge>}
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <SubSquad members={member.team} />
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
+        </Accordion>
+    );
+};
+
 
 export function SquadSystem() {
   const { toast } = useToast();
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [squadLink, setSquadLink] = React.useState("");
   const { user } = useUser();
+  const [squadTree, setSquadTree] = React.useState<SquadMember[]>([]);
+  const [isSquadLoading, setIsSquadLoading] = React.useState(true);
 
   const referralCode = walletData?.squad?.referralCode || "";
 
@@ -57,8 +82,31 @@ export function SquadSystem() {
   }, [user]);
 
   React.useEffect(() => {
+      if (user) {
+          const fetchSquad = async () => {
+              setIsSquadLoading(true);
+              try {
+                  const response = await fetch('/api/squad');
+                  if (!response.ok) {
+                      const err = await response.json();
+                      throw new Error(err.error || 'Failed to fetch squad data');
+                  }
+                  const data = await response.json();
+                  if (data.error) throw new Error(data.error);
+                  setSquadTree(data);
+              } catch (error: any) {
+                  console.error(error);
+                  toast({ title: "Could not load squad", description: error.message, variant: "destructive" });
+              } finally {
+                  setIsSquadLoading(false);
+              }
+          };
+          fetchSquad();
+      }
+  }, [user, toast]);
+
+  React.useEffect(() => {
     if (referralCode) {
-      // Ensure this runs only on the client to safely access window.location
       setSquadLink(`${window.location.origin}/register?referralCode=${referralCode}`);
     }
   }, [referralCode]);
@@ -77,9 +125,10 @@ export function SquadSystem() {
     }
   };
 
-  const squadMembers = walletData?.squad?.members || [];
   const squadLeader = walletData?.squad?.squadLeader;
-  const totalEarnings = squadMembers.length * 5;
+  const countMembers = (members: SquadMember[]): number => members.reduce((acc, member) => acc + 1 + countMembers(member.team), 0);
+  const totalMembers = countMembers(squadTree);
+  const totalEarnings = totalMembers * 5;
 
   if (!walletData) {
     return (
@@ -174,7 +223,7 @@ export function SquadSystem() {
             <CardContent>
               <div className="text-2xl font-bold">${totalEarnings.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">
-                From {squadMembers.length} squad member{squadMembers.length !== 1 && 's'}
+                From {totalMembers} squad member{totalMembers !== 1 && 's'}
               </p>
             </CardContent>
           </Card>
@@ -182,36 +231,22 @@ export function SquadSystem() {
             <CardHeader>
               <CardTitle>Squad Roster</CardTitle>
                <CardDescription>
-                A list of users who have joined your squad.
+                Your squad hierarchy. Expand to see the chain.
               </CardDescription>
             </Header>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Member Email</TableHead>
-                    <TableHead className="text-right">Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {squadMembers.length > 0 ? (
-                    squadMembers.map((memberEmail) => (
-                      <TableRow key={memberEmail}>
-                        <TableCell className="font-medium">{memberEmail}</TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="secondary">Active</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="h-24 text-center text-muted-foreground">
-                        Your squad is empty. Start inviting!
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              {isSquadLoading ? (
+                  <div className="space-y-2">
+                      <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-10 w-full" />
+                  </div>
+              ) : squadTree.length > 0 ? (
+                  <SubSquad members={squadTree} />
+              ) : (
+                  <div className="h-24 text-center flex items-center justify-center text-muted-foreground">
+                    Your squad is empty. Start inviting!
+                  </div>
+              )}
             </CardContent>
           </Card>
         </div>
