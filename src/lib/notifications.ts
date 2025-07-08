@@ -1,8 +1,8 @@
 
 'use client';
 
-import { getAnnouncements } from './announcements';
 import { supabase } from './supabase';
+import type { Announcement } from './announcements';
 
 export type Notification = {
   id: string;
@@ -13,12 +13,25 @@ export type Notification = {
   href?: string;
 };
 
+async function fetchAnnouncements(): Promise<Announcement[]> {
+    try {
+        const response = await fetch('/api/public-settings?key=announcements');
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data || [];
+    } catch (e) {
+        console.error("Failed to fetch announcements for notifications", e);
+        return [];
+    }
+}
+
+
 // Fetches notifications for a user, including unread announcements
 export async function getNotifications(userId: string): Promise<Notification[]> {
   // Fetch existing notifications and announcements in parallel
   const [notificationsResult, announcements] = await Promise.all([
     supabase.from('notifications').select('id, notification').eq('user_id', userId),
-    getAnnouncements()
+    fetchAnnouncements()
   ]);
 
   if (notificationsResult.error) {

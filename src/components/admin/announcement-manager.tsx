@@ -5,12 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import {
-  addAnnouncement,
-  deleteAnnouncement,
-  getAnnouncements,
-  type Announcement,
-} from "@/lib/announcements";
+import { defaultAnnouncements, type Announcement } from "@/lib/announcements";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, PlusCircle, Trash2, Megaphone } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "../ui/scroll-area";
+import { useAdmin } from "@/contexts/AdminContext";
 
 const announcementSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long."),
@@ -27,9 +23,11 @@ const announcementSchema = z.object({
 });
 
 type AnnouncementFormValues = z.infer<typeof announcementSchema>;
+const ANNOUNCEMENTS_KEY = 'announcements';
 
 export function AnnouncementManager() {
   const { toast } = useToast();
+  const { adminPassword } = useAdmin();
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -45,35 +43,81 @@ export function AnnouncementManager() {
 
   const fetchAnnouncements = React.useCallback(async () => {
     setIsLoading(true);
-    const data = getAnnouncements();
-    setAnnouncements(data);
-    setIsLoading(false);
-  }, []);
+    try {
+      const response = await fetch(`/api/public-settings?key=${ANNOUNCEMENTS_KEY}`);
+      if (!response.ok) throw new Error('Failed to fetch announcements.');
+      
+      const data = await response.json();
+      
+      const initialData = defaultAnnouncements.map((ann, index) => ({
+          ...ann,
+          id: `default-${index}-${Date.now()}`,
+          date: new Date(Date.now() - (defaultAnnouncements.length - index) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      })).reverse();
+
+      const currentAnnouncements = data || initialData;
+      setAnnouncements(currentAnnouncements.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      setAnnouncements([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   React.useEffect(() => {
     fetchAnnouncements();
   }, [fetchAnnouncements]);
 
+  const saveAnnouncements = async (newAnnouncements: Announcement[]) => {
+      if (!adminPassword) {
+        toast({ title: 'Error', description: 'Admin authentication not found.', variant: 'destructive' });
+        return false;
+      }
+      try {
+          const response = await fetch('/api/admin/settings', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ adminPassword, key: ANNOUNCEMENTS_KEY, value: newAnnouncements })
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Failed to save announcements.');
+          return true;
+      } catch (error: any) {
+          toast({ title: 'Error', description: error.message, variant: 'destructive' });
+          return false;
+      }
+  };
+
   const onSubmit = async (values: AnnouncementFormValues) => {
     setIsSubmitting(true);
-    await addAnnouncement(values.title, values.content);
-    toast({
-      title: "Alert Published",
-      description: "The new alert is now visible to all users.",
-    });
-    form.reset();
-    await fetchAnnouncements();
+    const newAnnouncement: Announcement = {
+        id: `announcement-${Date.now()}`,
+        title: values.title,
+        content: values.content,
+        date: new Date().toISOString().split('T')[0],
+    };
+    const updatedAnnouncements = [newAnnouncement, ...announcements];
+    
+    const success = await saveAnnouncements(updatedAnnouncements);
+
+    if (success) {
+        toast({ title: "Alert Published", description: "The new alert is now visible to all users." });
+        form.reset();
+        await fetchAnnouncements();
+    }
     setIsSubmitting(false);
   };
 
   const handleDelete = async (id: string) => {
     setIsDeleting(id);
-    await deleteAnnouncement(id);
-    toast({
-      title: "Alert Deleted",
-      description: "The alert has been removed.",
-    });
-    await fetchAnnouncements();
+    const updatedAnnouncements = announcements.filter(ann => ann.id !== id);
+    const success = await saveAnnouncements(updatedAnnouncements);
+
+    if (success) {
+        toast({ title: "Alert Deleted", description: "The alert has been removed." });
+        await fetchAnnouncements();
+    }
     setIsDeleting(null);
   };
 
@@ -116,7 +160,7 @@ export function AnnouncementManager() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={isSubmitting} className="w-full">
+                <Button type="submit" disabled={isSubmitting || !adminPassword} className="w-full">
                   {isSubmitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -158,7 +202,7 @@ export function AnnouncementManager() {
                         size="icon"
                         className="absolute top-2 right-2 h-7 w-7"
                         onClick={() => handleDelete(ann.id)}
-                        disabled={!!isDeleting}
+                        disabled={!!isDeleting || !adminPassword}
                       >
                         {isDeleting === ann.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />

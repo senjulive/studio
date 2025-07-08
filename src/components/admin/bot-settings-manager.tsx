@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getBotTierSettings, saveBotTierSettings, type TierSetting } from "@/lib/settings";
+import { defaultTierSettings, type TierSetting } from "@/lib/settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, Trash2, PlusCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAdmin } from "@/contexts/AdminContext";
 
 const tierSchema = z.object({
   id: z.string(),
@@ -26,9 +27,11 @@ const settingsSchema = z.object({
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
+const BOT_TIERS_KEY = 'botTierSettings';
 
 export function BotSettingsManager() {
   const { toast } = useToast();
+  const { adminPassword } = useAdmin();
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -47,24 +50,49 @@ export function BotSettingsManager() {
   React.useEffect(() => {
     async function fetchSettings() {
       setIsLoading(true);
-      const settings = await getBotTierSettings();
-      form.reset({ tiers: settings });
-      setIsLoading(false);
+      try {
+        const response = await fetch(`/api/public-settings?key=${BOT_TIERS_KEY}`);
+        if (!response.ok) throw new Error('Failed to fetch settings');
+        const data = await response.json();
+        const settings = data || defaultTierSettings;
+        form.reset({ tiers: settings.sort((a,b) => a.balanceThreshold - b.balanceThreshold) });
+      } catch (error: any) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        form.reset({ tiers: defaultTierSettings });
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchSettings();
-  }, [form]);
+  }, [form, toast]);
 
   const onSubmit = async (values: SettingsFormValues) => {
+    if (!adminPassword) {
+      toast({ title: 'Error', description: 'Admin authentication not found.', variant: 'destructive' });
+      return;
+    }
     setIsSaving(true);
-    // Ensure tiers are sorted by balance threshold before saving
     const sortedTiers = [...values.tiers].sort((a, b) => a.balanceThreshold - b.balanceThreshold);
-    await saveBotTierSettings(sortedTiers);
-    form.reset({ tiers: sortedTiers }); // Re-sync form with sorted data
-    setIsSaving(false);
-    toast({
-      title: "Settings Saved",
-      description: "The bot tier settings have been updated.",
-    });
+    
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminPassword, key: BOT_TIERS_KEY, value: sortedTiers })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Failed to save settings.');
+      
+      form.reset({ tiers: sortedTiers });
+      toast({
+        title: "Settings Saved",
+        description: "The bot tier settings have been updated.",
+      });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading) {
@@ -167,7 +195,7 @@ export function BotSettingsManager() {
                 Add Tier
               </Button>
             <div className="flex justify-end">
-              <Button type="submit" disabled={isSaving}>
+              <Button type="submit" disabled={isSaving || !adminPassword}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Save Settings
               </Button>

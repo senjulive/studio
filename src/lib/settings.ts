@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase';
 
 export type TierSetting = {
   id: string; // e.g., 'tier-1'
@@ -8,9 +7,7 @@ export type TierSetting = {
   clicks: number;
 };
 
-const BOT_TIERS_KEY = 'botTierSettings';
-
-const defaultTierSettings: TierSetting[] = [
+export const defaultTierSettings: TierSetting[] = [
   { id: 'tier-1', name: 'Tier 1', balanceThreshold: 0, dailyProfit: 0.02, clicks: 4 },
   { id: 'tier-2', name: 'Tier 2', balanceThreshold: 500, dailyProfit: 0.03, clicks: 5 },
   { id: 'tier-3', name: 'Tier 3', balanceThreshold: 1000, dailyProfit: 0.04, clicks: 6 },
@@ -19,33 +16,15 @@ const defaultTierSettings: TierSetting[] = [
   { id: 'tier-6', name: 'Tier 6', balanceThreshold: 15000, dailyProfit: 0.085, clicks: 10 },
 ];
 
-async function getSetting<T>(key: string, defaultValue: T): Promise<T> {
-  const { data, error } = await supabase
-    .from('settings')
-    .select('value')
-    .eq('key', key)
-    .single();
-
-  if (error || !data) {
-    await supabase.from('settings').upsert({ key, value: defaultValue as any });
-    return defaultValue;
-  }
-  return data.value as T;
-}
-
-async function saveSetting<T>(key: string, value: T): Promise<void> {
-  const { error } = await supabase.from('settings').upsert({ key, value: value as any });
-  if (error) {
-    console.error(`Error saving setting ${key}:`, error);
-    throw new Error(`Failed to save setting ${key}.`);
-  }
-}
-
 export async function getBotTierSettings(): Promise<TierSetting[]> {
-  const settings = await getSetting<TierSetting[]>(BOT_TIERS_KEY, defaultTierSettings);
-  return settings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
-}
-
-export async function saveBotTierSettings(settings: TierSetting[]): Promise<void> {
-  await saveSetting(BOT_TIERS_KEY, settings);
+    try {
+        const response = await fetch('/api/public-settings?key=botTierSettings');
+        if (!response.ok) return defaultTierSettings;
+        const data = await response.json();
+        const settings = data || defaultTierSettings;
+        return settings.sort((a: TierSetting, b: TierSetting) => a.balanceThreshold - b.balanceThreshold);
+    } catch(e) {
+        console.error("Failed to fetch bot tier settings", e);
+        return defaultTierSettings;
+    }
 }
