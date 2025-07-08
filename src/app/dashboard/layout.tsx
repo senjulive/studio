@@ -42,6 +42,7 @@ import { AboutIcon } from "@/components/icons/nav/about-icon";
 import { DownloadIcon } from "@/components/icons/nav/download-icon";
 import { SettingsIcon } from "@/components/icons/nav/settings-icon";
 import { LogoutIcon } from "@/components/icons/nav/logout-icon";
+import { SecurityIcon } from "@/components/icons/nav/security-icon";
 
 function DashboardLoading() {
   return (
@@ -91,6 +92,7 @@ export default function DashboardLayout({
     { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
     { href: "/dashboard/squad", label: "Squad", icon: SquadIcon },
     { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
+    { href: "/dashboard/security", label: "Security", icon: SecurityIcon },
     { href: "/dashboard/support", label: "Support", icon: SupportIcon },
     { href: "/dashboard/about", label: "About", icon: AboutIcon },
     {

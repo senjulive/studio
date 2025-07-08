@@ -5,7 +5,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle } from "lucide-react";
+import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle, KeyRound } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -53,7 +53,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { getAllWallets, updateWallet, type WalletData, resetWithdrawalAddressForUser } from "@/lib/wallet";
+import { getAllWallets, updateWallet, type WalletData, resetWithdrawalAddressForUser, resetWithdrawalPassword } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
@@ -94,6 +94,7 @@ export function WalletManager() {
   const [isCompleting, setIsCompleting] = React.useState<string | null>(null);
   const [isFetchingWallets, setIsFetchingWallets] = React.useState(true);
   const [isResettingAddress, setIsResettingAddress] = React.useState(false);
+  const [isResettingPassword, setIsResettingPassword] = React.useState(false);
 
   const addressForm = useForm<AddressUpdateFormValues>({
     resolver: zodResolver(addressUpdateSchema),
@@ -256,6 +257,18 @@ export function WalletManager() {
         description: `Successfully reset withdrawal address for ${selectedUserEmail}.`,
     });
     setIsResettingAddress(false);
+  };
+  
+  const handleResetPassword = async () => {
+    if (!selectedUserEmail) return;
+    
+    setIsResettingPassword(true);
+    await resetWithdrawalPassword(selectedUserEmail);
+    toast({
+        title: "Withdrawal Password Reset",
+        description: `Successfully reset withdrawal password for ${selectedUserEmail}. The user will need to create a new one.`,
+    });
+    setIsResettingPassword(false);
   };
 
 
@@ -496,10 +509,10 @@ export function WalletManager() {
                 Danger Zone
             </CardTitle>
             <CardDescription>
-              This action is irreversible. Please proceed with caution.
+              These actions are irreversible. Please proceed with caution.
             </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col sm:flex-row gap-4 items-start">
             <AlertDialog>
                 <AlertDialogTrigger asChild>
                     <Button variant="destructive" disabled={!selectedUserEmail || isResettingAddress}>
@@ -524,6 +537,35 @@ export function WalletManager() {
                         className="bg-destructive hover:bg-destructive/90"
                     >
                         {isResettingAddress && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Confirm Reset
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="destructive" disabled={!selectedUserEmail || isResettingPassword}>
+                    <KeyRound className="mr-2 h-4 w-4" />
+                    Reset Withdrawal Password
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This will delete the saved withdrawal password for{" "}
+                        <span className="font-bold">{selectedUserEmail}</span>.
+                        The user will need to create a new one to withdraw funds. This action cannot be undone.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel disabled={isResettingPassword}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={handleResetPassword}
+                        disabled={isResettingPassword}
+                        className="bg-destructive hover:bg-destructive/90"
+                    >
+                        {isResettingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Confirm Reset
                     </AlertDialogAction>
                     </AlertDialogFooter>

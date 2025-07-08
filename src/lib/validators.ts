@@ -29,3 +29,32 @@ export const registerSchema = z
 export const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
 });
+
+export const createWithdrawalPasswordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(6, "Password must be at least 6 characters long."),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+  
+export const changeWithdrawalPasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required."),
+    newPassword: z
+      .string()
+      .min(6, "New password must be at least 6 characters long."),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "New password must be different from the current one.",
+    path: ["newPassword"],
+  });

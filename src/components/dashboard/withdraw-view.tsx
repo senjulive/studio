@@ -2,7 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { Info, Loader2, Clock } from "lucide-react";
+import Link from "next/link";
+import { Info, Loader2, Clock, ShieldAlert } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ import {
   getOrCreateWallet,
   type WalletData,
   updateWallet,
+  verifyWithdrawalPassword,
 } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
@@ -46,6 +48,7 @@ export function WithdrawView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
+  const [withdrawalPassword, setWithdrawalPassword] = React.useState("");
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -120,7 +123,28 @@ export function WithdrawView() {
       return;
     }
 
+    if (!withdrawalPassword) {
+      toast({
+        title: "Password Required",
+        description: "Please enter your withdrawal password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsWithdrawing(true);
+
+    const isPasswordCorrect = await verifyWithdrawalPassword(currentUserEmail, withdrawalPassword);
+
+    if (!isPasswordCorrect) {
+        toast({
+            title: "Incorrect Password",
+            description: "The withdrawal password you entered is incorrect.",
+            variant: "destructive",
+        });
+        setIsWithdrawing(false);
+        return;
+    }
 
     const withdrawalRequest = {
         id: `wd_${Date.now()}`,
@@ -154,6 +178,7 @@ export function WithdrawView() {
     });
 
     setAmount("");
+    setWithdrawalPassword("");
     toast({
       title: "Withdrawal Initiated",
       description: `Your withdrawal of ${withdrawAmount.toFixed(2)} ${asset.toUpperCase()} is being processed.`,
@@ -161,9 +186,110 @@ export function WithdrawView() {
     setIsWithdrawing(false);
   };
 
-  const hasSavedAddress =
-    savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
+  const hasSavedAddress = savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
+  const hasWithdrawalPassword = walletData?.security.withdrawalPassword;
   const pendingWithdrawals = walletData?.pendingWithdrawals || [];
+  
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-1/3" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-1/4" />
+          </div>
+      );
+    }
+    
+    if (!hasWithdrawalPassword) {
+        return (
+            <Alert variant="destructive">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertTitle>Withdrawal Password Required</AlertTitle>
+                <AlertDescription>
+                    For your security, you must create a withdrawal password before you can make any withdrawals.
+                    <Button asChild variant="link" className="p-0 h-auto ml-1">
+                        <Link href="/dashboard/security">Go to Security Settings</Link>
+                    </Button>
+                </AlertDescription>
+            </Alert>
+        );
+    }
+
+    if (!hasSavedAddress) {
+      return (
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            You have not set a withdrawal address for{" "}
+            {asset.toUpperCase()}. Please add one to continue.
+          </p>
+          <div className="space-y-2">
+            <Label htmlFor="new-address">
+              New {asset.toUpperCase()} Withdrawal Address (TRC20)
+            </Label>
+            <Input
+              id="new-address"
+              placeholder="Enter your external TRC20 wallet address"
+              value={currentAddress}
+              onChange={(e) => setCurrentAddress(e.target.value)}
+            />
+          </div>
+          <Button
+            onClick={handleSaveAddress}
+            disabled={isSaving}
+          >
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save Address
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+        <form onSubmit={handleWithdraw} className="space-y-4">
+            <div className="space-y-2">
+            <Label>Your Saved USDT Address</Label>
+            <Input
+                value={
+                savedAddresses?.[asset as keyof WithdrawalAddresses] || ""
+                }
+                readOnly
+                className="font-mono text-sm"
+            />
+            </div>
+            <div className="space-y-2">
+            <Label htmlFor="amount">Amount to Withdraw (Available: ${walletData?.balances.usdt.toFixed(2)})</Label>
+            <Input
+                id="amount"
+                type="number"
+                placeholder="0.00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                disabled={isWithdrawing}
+            />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="withdrawal-password">Withdrawal Password</Label>
+                <Input
+                    id="withdrawal-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={withdrawalPassword}
+                    onChange={(e) => setWithdrawalPassword(e.target.value)}
+                    disabled={isWithdrawing}
+                />
+            </div>
+            <Button type="submit" disabled={isWithdrawing || !amount} className="w-full">
+            {isWithdrawing && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Withdraw {amount || ""}{" "}
+            {amount ? asset.toUpperCase() : ""}
+            </Button>
+        </form>
+    );
+  };
+
 
   return (
     <div className="space-y-6">
@@ -180,69 +306,7 @@ export function WithdrawView() {
       </CardHeader>
       <CardContent>
         <div className="space-y-6 py-4">
-          {isLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-8 w-1/3" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-1/4" />
-            </div>
-          ) : hasSavedAddress ? (
-            <form onSubmit={handleWithdraw} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Your Saved USDT Address</Label>
-                <Input
-                  value={
-                    savedAddresses?.[asset as keyof WithdrawalAddresses] || ""
-                  }
-                  readOnly
-                  className="font-mono text-sm"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount to Withdraw (Available: ${walletData?.balances.usdt.toFixed(2)})</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  disabled={isWithdrawing}
-                />
-              </div>
-              <Button type="submit" disabled={isWithdrawing || !amount} className="w-full">
-                {isWithdrawing && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Withdraw {amount || ""}{" "}
-                {amount ? asset.toUpperCase() : ""}
-              </Button>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                You have not set a withdrawal address for{" "}
-                {asset.toUpperCase()}. Please add one to continue.
-              </p>
-              <div className="space-y-2">
-                <Label htmlFor="new-address">
-                  New {asset.toUpperCase()} Withdrawal Address
-                </Label>
-                <Input
-                  id="new-address"
-                  placeholder="Enter your external TRC20 wallet address"
-                  value={currentAddress}
-                  onChange={(e) => setCurrentAddress(e.target.value)}
-                />
-              </div>
-              <Button
-                onClick={handleSaveAddress}
-                disabled={isSaving}
-              >
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Address
-              </Button>
-            </div>
-          )}
+          {renderContent()}
 
           <Alert className="mt-4 text-left">
             <Info className="h-4 w-4" />

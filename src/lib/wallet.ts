@@ -70,6 +70,9 @@ export type WalletData = {
         country: string;
         avatarUrl?: string;
     };
+    security: {
+        withdrawalPassword: string | null;
+    };
 };
 
 export type WithdrawalAddresses = {
@@ -117,6 +120,9 @@ const createNewWalletObject = (): WalletData => {
             contactNumber: '',
             country: '',
             avatarUrl: '',
+        },
+        security: {
+            withdrawalPassword: null,
         },
     };
 }
@@ -207,6 +213,7 @@ export async function getOrCreateWallet(email: string): Promise<WalletData> {
       growth: { ...defaultWallet.growth, ...(existingWallet.growth || {}), earningsHistory: existingWallet.growth?.earningsHistory || [] },
       squad: { ...defaultWallet.squad, ...(existingWallet.squad || {}) },
       profile: { ...defaultWallet.profile, ...(existingWallet.profile || {}) },
+      security: { ...defaultWallet.security, ...(existingWallet.security || {}) },
     };
     
     // Ensure `members` is an array if it's missing from older data
@@ -268,11 +275,44 @@ export async function saveWithdrawalAddress(email: string, asset: string, addres
 
 export async function resetWithdrawalAddressForUser(email: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 500));
-    if (typeof window === 'undefined') return;
+    if (typeof window !== 'undefined') return;
 
     const allAddresses = await getAllWithdrawalAddresses();
     if (allAddresses[email]) {
         delete allAddresses[email];
         localStorage.setItem(WITHDRAWAL_ADDRESSES_STORAGE_KEY, JSON.stringify(allAddresses));
     }
+}
+
+// --- Withdrawal Password Functions ---
+
+export async function setWithdrawalPassword(email: string, password: string): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    if (typeof window === 'undefined') return;
+
+    const wallet = await getWallet(email);
+    if (!wallet) throw new Error("Wallet not found.");
+
+    wallet.security.withdrawalPassword = password;
+    await updateWallet(email, wallet);
+}
+
+export async function verifyWithdrawalPassword(email: string, password: string): Promise<boolean> {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    const wallet = await getWallet(email);
+    if (!wallet || !wallet.security.withdrawalPassword) {
+        return false;
+    }
+    return wallet.security.withdrawalPassword === password;
+}
+
+export async function resetWithdrawalPassword(email: string): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (typeof window === 'undefined') return;
+
+    const wallet = await getWallet(email);
+    if (!wallet) throw new Error("Wallet not found.");
+    
+    wallet.security.withdrawalPassword = null;
+    await updateWallet(email, wallet);
 }
