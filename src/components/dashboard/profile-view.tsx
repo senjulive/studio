@@ -114,7 +114,8 @@ export function ProfileView() {
   const profile = walletData?.profile;
   const profileDisplayName = profile?.fullName || profile?.username || "User Profile";
   const squadSize = walletData?.squad?.members?.length ?? 0;
-  const rank = getUserRank(squadSize);
+  const usdtBalance = walletData?.balances?.usdt ?? 0;
+  const rank = getUserRank(usdtBalance);
 
   return (
     <Tabs defaultValue="profile" className="w-full">
