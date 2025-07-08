@@ -30,31 +30,33 @@ export const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
 });
 
-export const createWithdrawalPasswordSchema = z
+export const createWithdrawalPasscodeSchema = z
   .object({
-    newPassword: z
+    newPasscode: z
       .string()
-      .min(6, "Password must be at least 6 characters long."),
-    confirmPassword: z.string(),
+      .length(4, { message: "Passcode must be 4 digits." })
+      .regex(/^\d{4}$/, { message: "Passcode must only contain digits." }),
+    confirmPasscode: z.string(),
   })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ["confirmPassword"],
+  .refine((data) => data.newPasscode === data.confirmPasscode, {
+    message: "Passcodes do not match.",
+    path: ["confirmPasscode"],
   });
   
-export const changeWithdrawalPasswordSchema = z
+export const changeWithdrawalPasscodeSchema = z
   .object({
-    currentPassword: z.string().min(1, "Current password is required."),
-    newPassword: z
+    currentPasscode: z.string().min(1, "Current passcode is required."),
+    newPasscode: z
       .string()
-      .min(6, "New password must be at least 6 characters long."),
-    confirmPassword: z.string(),
+      .length(4, { message: "Passcode must be 4 digits." })
+      .regex(/^\d{4}$/, { message: "Passcode must only contain digits." }),
+    confirmPasscode: z.string(),
   })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ["confirmPassword"],
+  .refine((data) => data.newPasscode === data.confirmPasscode, {
+    message: "Passcodes do not match.",
+    path: ["confirmPasscode"],
   })
-  .refine((data) => data.currentPassword !== data.newPassword, {
-    message: "New password must be different from the current one.",
-    path: ["newPassword"],
+  .refine((data) => data.currentPasscode !== data.newPasscode, {
+    message: "New passcode must be different from the current one.",
+    path: ["newPasscode"],
   });

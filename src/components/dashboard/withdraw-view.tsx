@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -33,7 +32,7 @@ import {
   getOrCreateWallet,
   type WalletData,
   updateWallet,
-  verifyWithdrawalPassword,
+  verifyWithdrawalPasscode,
 } from "@/lib/wallet";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { sendSystemNotification } from "@/lib/chat";
@@ -48,7 +47,7 @@ export function WithdrawView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
-  const [withdrawalPassword, setWithdrawalPassword] = React.useState("");
+  const [withdrawalPasscode, setWithdrawalPasscode] = React.useState("");
   const [currentUserEmail, setCurrentUserEmail] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -123,10 +122,10 @@ export function WithdrawView() {
       return;
     }
 
-    if (!withdrawalPassword) {
+    if (!withdrawalPasscode) {
       toast({
-        title: "Password Required",
-        description: "Please enter your withdrawal password.",
+        title: "Passcode Required",
+        description: "Please enter your 4-digit withdrawal passcode.",
         variant: "destructive",
       });
       return;
@@ -134,12 +133,12 @@ export function WithdrawView() {
 
     setIsWithdrawing(true);
 
-    const isPasswordCorrect = await verifyWithdrawalPassword(currentUserEmail, withdrawalPassword);
+    const isPasscodeCorrect = await verifyWithdrawalPasscode(currentUserEmail, withdrawalPasscode);
 
-    if (!isPasswordCorrect) {
+    if (!isPasscodeCorrect) {
         toast({
-            title: "Incorrect Password",
-            description: "The withdrawal password you entered is incorrect.",
+            title: "Incorrect Passcode",
+            description: "The withdrawal passcode you entered is incorrect.",
             variant: "destructive",
         });
         setIsWithdrawing(false);
@@ -178,7 +177,7 @@ export function WithdrawView() {
     });
 
     setAmount("");
-    setWithdrawalPassword("");
+    setWithdrawalPasscode("");
     toast({
       title: "Withdrawal Initiated",
       description: `Your withdrawal of ${withdrawAmount.toFixed(2)} ${asset.toUpperCase()} is being processed.`,
@@ -187,7 +186,7 @@ export function WithdrawView() {
   };
 
   const hasSavedAddress = savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
-  const hasWithdrawalPassword = walletData?.security.withdrawalPassword;
+  const hasWithdrawalPasscode = walletData?.security.withdrawalPasscode;
   const pendingWithdrawals = walletData?.pendingWithdrawals || [];
   
   const renderContent = () => {
@@ -201,13 +200,13 @@ export function WithdrawView() {
       );
     }
     
-    if (!hasWithdrawalPassword) {
+    if (!hasWithdrawalPasscode) {
         return (
             <Alert variant="destructive">
                 <ShieldAlert className="h-4 w-4" />
-                <AlertTitle>Withdrawal Password Required</AlertTitle>
+                <AlertTitle>Withdrawal Passcode Required</AlertTitle>
                 <AlertDescription>
-                    For your security, you must create a withdrawal password before you can make any withdrawals.
+                    For your security, you must create a 4-digit withdrawal passcode before you can make any withdrawals.
                     <Button asChild variant="link" className="p-0 h-auto ml-1">
                         <Link href="/dashboard/security">Go to Security Settings</Link>
                     </Button>
@@ -269,14 +268,16 @@ export function WithdrawView() {
             />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="withdrawal-password">Withdrawal Password</Label>
+                <Label htmlFor="withdrawal-passcode">Withdrawal Passcode</Label>
                 <Input
-                    id="withdrawal-password"
+                    id="withdrawal-passcode"
                     type="password"
-                    placeholder="••••••••"
-                    value={withdrawalPassword}
-                    onChange={(e) => setWithdrawalPassword(e.target.value)}
+                    placeholder="••••"
+                    value={withdrawalPasscode}
+                    onChange={(e) => setWithdrawalPasscode(e.target.value)}
                     disabled={isWithdrawing}
+                    maxLength={4}
+                    inputMode="numeric"
                 />
             </div>
             <Button type="submit" disabled={isWithdrawing || !amount} className="w-full">

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -53,7 +52,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { getAllWallets, updateWallet, type WalletData, resetWithdrawalAddressForUser, resetWithdrawalPassword } from "@/lib/wallet";
+import { getAllWallets, updateWallet, type WalletData, resetWithdrawalAddressForUser, resetWithdrawalPasscode } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
@@ -94,7 +93,7 @@ export function WalletManager() {
   const [isCompleting, setIsCompleting] = React.useState<string | null>(null);
   const [isFetchingWallets, setIsFetchingWallets] = React.useState(true);
   const [isResettingAddress, setIsResettingAddress] = React.useState(false);
-  const [isResettingPassword, setIsResettingPassword] = React.useState(false);
+  const [isResettingPasscode, setIsResettingPasscode] = React.useState(false);
 
   const addressForm = useForm<AddressUpdateFormValues>({
     resolver: zodResolver(addressUpdateSchema),
@@ -259,16 +258,16 @@ export function WalletManager() {
     setIsResettingAddress(false);
   };
   
-  const handleResetPassword = async () => {
+  const handleResetPasscode = async () => {
     if (!selectedUserEmail) return;
     
-    setIsResettingPassword(true);
-    await resetWithdrawalPassword(selectedUserEmail);
+    setIsResettingPasscode(true);
+    await resetWithdrawalPasscode(selectedUserEmail);
     toast({
-        title: "Withdrawal Password Reset",
-        description: `Successfully reset withdrawal password for ${selectedUserEmail}. The user will need to create a new one.`,
+        title: "Withdrawal Passcode Reset",
+        description: `Successfully reset withdrawal passcode for ${selectedUserEmail}. The user will need to create a new one.`,
     });
-    setIsResettingPassword(false);
+    setIsResettingPasscode(false);
   };
 
 
@@ -544,28 +543,28 @@ export function WalletManager() {
             </AlertDialog>
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <Button variant="destructive" disabled={!selectedUserEmail || isResettingPassword}>
+                    <Button variant="destructive" disabled={!selectedUserEmail || isResettingPasscode}>
                     <KeyRound className="mr-2 h-4 w-4" />
-                    Reset Withdrawal Password
+                    Reset Withdrawal Passcode
                     </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This will delete the saved withdrawal password for{" "}
+                        This will delete the saved withdrawal passcode for{" "}
                         <span className="font-bold">{selectedUserEmail}</span>.
                         The user will need to create a new one to withdraw funds. This action cannot be undone.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isResettingPassword}>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel disabled={isResettingPasscode}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                        onClick={handleResetPassword}
-                        disabled={isResettingPassword}
+                        onClick={handleResetPasscode}
+                        disabled={isResettingPasscode}
                         className="bg-destructive hover:bg-destructive/90"
                     >
-                        {isResettingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {isResettingPasscode && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Confirm Reset
                     </AlertDialogAction>
                     </AlertDialogFooter>

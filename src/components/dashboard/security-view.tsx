@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -7,13 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   getOrCreateWallet,
-  setWithdrawalPassword,
-  verifyWithdrawalPassword,
+  setWithdrawalPasscode,
+  verifyWithdrawalPasscode,
   type WalletData,
 } from "@/lib/wallet";
 import {
-  createWithdrawalPasswordSchema,
-  changeWithdrawalPasswordSchema,
+  createWithdrawalPasscodeSchema,
+  changeWithdrawalPasscodeSchema,
 } from "@/lib/validators";
 import { getCurrentUserEmail } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -37,8 +36,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lock, ShieldCheck, KeyRound } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 
-type CreatePasswordValues = z.infer<typeof createWithdrawalPasswordSchema>;
-type ChangePasswordValues = z.infer<typeof changeWithdrawalPasswordSchema>;
+type CreatePasscodeValues = z.infer<typeof createWithdrawalPasscodeSchema>;
+type ChangePasscodeValues = z.infer<typeof changeWithdrawalPasscodeSchema>;
 
 export function SecurityView() {
   const { toast } = useToast();
@@ -46,17 +45,17 @@ export function SecurityView() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const hasPassword = !!wallet?.security.withdrawalPassword;
+  const hasPasscode = !!wallet?.security.withdrawalPasscode;
 
   const form = useForm({
     resolver: zodResolver(
-      hasPassword
-        ? changeWithdrawalPasswordSchema
-        : createWithdrawalPasswordSchema
+      hasPasscode
+        ? changeWithdrawalPasscodeSchema
+        : createWithdrawalPasscodeSchema
     ),
-    defaultValues: hasPassword
-      ? { currentPassword: "", newPassword: "", confirmPassword: "" }
-      : { newPassword: "", confirmPassword: "" },
+    defaultValues: hasPasscode
+      ? { currentPasscode: "", newPasscode: "", confirmPasscode: "" }
+      : { newPasscode: "", confirmPasscode: "" },
   });
 
   const fetchWallet = React.useCallback(async () => {
@@ -74,42 +73,42 @@ export function SecurityView() {
   }, [fetchWallet]);
   
   React.useEffect(() => {
-    form.reset(hasPassword
-      ? { currentPassword: "", newPassword: "", confirmPassword: "" }
-      : { newPassword: "", confirmPassword: "" });
-  }, [hasPassword, form]);
+    form.reset(hasPasscode
+      ? { currentPasscode: "", newPasscode: "", confirmPasscode: "" }
+      : { newPasscode: "", confirmPasscode: "" });
+  }, [hasPasscode, form]);
 
 
-  const onSubmit = async (values: CreatePasswordValues | ChangePasswordValues) => {
+  const onSubmit = async (values: CreatePasscodeValues | ChangePasscodeValues) => {
     const email = getCurrentUserEmail();
     if (!email) return;
 
     setIsSubmitting(true);
 
     try {
-      if (hasPassword) {
-        // Handle changing the password
-        const changeValues = values as ChangePasswordValues;
-        const isValid = await verifyWithdrawalPassword(email, changeValues.currentPassword);
+      if (hasPasscode) {
+        // Handle changing the passcode
+        const changeValues = values as ChangePasscodeValues;
+        const isValid = await verifyWithdrawalPasscode(email, changeValues.currentPasscode);
 
         if (!isValid) {
-          form.setError("currentPassword", { message: "Incorrect current password." });
+          form.setError("currentPasscode", { message: "Incorrect current passcode." });
         } else {
-          await setWithdrawalPassword(email, changeValues.newPassword);
+          await setWithdrawalPasscode(email, changeValues.newPasscode);
           toast({
-            title: "Password Updated",
-            description: "Your withdrawal password has been changed successfully.",
+            title: "Passcode Updated",
+            description: "Your withdrawal passcode has been changed successfully.",
           });
           await fetchWallet();
           form.reset();
         }
       } else {
-        // Handle creating a new password
-        const createValues = values as CreatePasswordValues;
-        await setWithdrawalPassword(email, createValues.newPassword);
+        // Handle creating a new passcode
+        const createValues = values as CreatePasscodeValues;
+        await setWithdrawalPasscode(email, createValues.newPasscode);
         toast({
-          title: "Password Created",
-          description: "Your withdrawal password has been set successfully.",
+          title: "Passcode Created",
+          description: "Your withdrawal passcode has been set successfully.",
         });
         await fetchWallet();
         form.reset();
@@ -117,7 +116,7 @@ export function SecurityView() {
     } catch (error) {
       toast({
         title: "Update Failed",
-        description: "An error occurred while updating your password.",
+        description: "An error occurred while updating your passcode.",
         variant: "destructive",
       });
     } finally {
@@ -146,26 +145,26 @@ export function SecurityView() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
             <KeyRound className="h-6 w-6"/>
-            <span>Withdrawal Password</span>
+            <span>Withdrawal Passcode</span>
         </CardTitle>
         <CardDescription>
-          {hasPassword
-            ? "Change your withdrawal password. This password is required for all withdrawal operations."
-            : "Create a withdrawal password to protect your funds. This password will be required for all withdrawals."}
+          {hasPasscode
+            ? "Change your 4-digit withdrawal passcode. This is required for all withdrawal operations."
+            : "Create a 4-digit withdrawal passcode to protect your funds. This will be required for all withdrawals."}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {hasPassword && (
+            {hasPasscode && (
               <FormField
                 control={form.control}
-                name="currentPassword"
+                name="currentPasscode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Current Password</FormLabel>
+                    <FormLabel>Current Passcode</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -174,12 +173,12 @@ export function SecurityView() {
             )}
             <FormField
               control={form.control}
-              name="newPassword"
+              name="newPasscode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel>New 4-Digit Passcode</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -187,12 +186,12 @@ export function SecurityView() {
             />
             <FormField
               control={form.control}
-              name="confirmPassword"
+              name="confirmPasscode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormLabel>Confirm New Passcode</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••" {...field} maxLength={4} inputMode="numeric" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -201,12 +200,12 @@ export function SecurityView() {
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : hasPassword ? (
+              ) : hasPasscode ? (
                 <ShieldCheck className="mr-2 h-4 w-4" />
               ) : (
                 <Lock className="mr-2 h-4 w-4" />
               )}
-              {hasPassword ? "Change Password" : "Create Password"}
+              {hasPasscode ? "Change Passcode" : "Create Passcode"}
             </Button>
           </form>
         </Form>
