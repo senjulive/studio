@@ -22,8 +22,6 @@ import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 import { LiveTradingChart } from "./live-trading-chart";
-import { summarizeMarket, type MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
-import { BrainCircuit } from "lucide-react";
 
 type CryptoData = {
   id: string;
@@ -99,9 +97,6 @@ export function MarketView() {
   const [data, setData] = React.useState<CryptoData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedCoin, setSelectedCoin] = React.useState<CryptoData | null>(null);
-  const [marketSummary, setMarketSummary] = React.useState<MarketSummaryOutput | null>(null);
-  const [isSummaryLoading, setIsSummaryLoading] = React.useState(true);
-  const summaryFetched = React.useRef(false);
 
   React.useEffect(() => {
     // Initial load with a delay to show skeletons
@@ -114,33 +109,6 @@ export function MarketView() {
 
     return () => clearTimeout(timer);
   }, []);
-
-  React.useEffect(() => {
-    // Fetch summary only once when data is available
-    if (data.length > 0 && !summaryFetched.current) {
-      summaryFetched.current = true; // Prevent re-fetching
-      const getSummary = async () => {
-        setIsSummaryLoading(true);
-        try {
-          // Prepare only the necessary data for the AI flow
-          const summaryInput = data.map(coin => ({
-            name: coin.name,
-            ticker: coin.ticker,
-            price: coin.price,
-            change24h: coin.change24h,
-          }));
-          const summary = await summarizeMarket({ coins: summaryInput });
-          setMarketSummary(summary);
-        } catch (error) {
-          console.error("Failed to generate market summary:", error);
-          setMarketSummary(null);
-        } finally {
-          setIsSummaryLoading(false);
-        }
-      };
-      getSummary();
-    }
-  }, [data]);
 
   React.useEffect(() => {
     if(isLoading) return;
@@ -261,31 +229,6 @@ export function MarketView() {
 
   return (
     <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BrainCircuit className="h-6 w-6 text-primary" />
-              <span>AI Market Analysis</span>
-            </CardTitle>
-            <CardDescription>
-              An AI-generated summary of the current market conditions. Refreshes on page load.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isSummaryLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ) : marketSummary?.summary ? (
-              <p className="text-sm text-foreground/80 leading-relaxed">{marketSummary.summary}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">Could not generate market summary at this time.</p>
-            )}
-          </CardContent>
-        </Card>
-
         {isLoading ? (
             <Skeleton className="h-[480px] w-full rounded-lg" />
         ) : (
