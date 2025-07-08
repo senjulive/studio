@@ -1,4 +1,4 @@
-'use client';
+import { supabase } from '@/lib/supabase';
 
 export type SiteSettings = {
   usdtDepositAddress: string;
@@ -6,7 +6,7 @@ export type SiteSettings = {
   btcDepositAddress: string;
 };
 
-const SITE_SETTINGS_STORAGE_KEY = 'astral-site-settings';
+const SITE_SETTINGS_KEY = 'siteSettings';
 
 const defaultSiteSettings: SiteSettings = {
   usdtDepositAddress: 'TPAj58tX5n2hXpYZAe5V6b4s8g1zB4hP7x', // Default placeholder
@@ -14,26 +14,33 @@ const defaultSiteSettings: SiteSettings = {
   btcDepositAddress: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', // Default placeholder
 };
 
-function safeJsonParse<T>(json: string | null, fallback: T): T {
-  if (!json) return fallback;
-  try {
-    const parsed = JSON.parse(json);
-    return parsed as T;
-  } catch (e) {
-    return fallback;
+async function getSetting<T>(key: string, defaultValue: T): Promise<T> {
+  const { data, error } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('key', key)
+    .single();
+
+  if (error || !data) {
+    await supabase.from('settings').upsert({ key, value: defaultValue as any });
+    return defaultValue;
+  }
+  return { ...defaultValue, ...(data.value as T) };
+}
+
+async function saveSetting<T>(key: string, value: T): Promise<void> {
+  const { error } = await supabase.from('settings').upsert({ key, value: value as any });
+  if (error) {
+    console.error(`Error saving setting ${key}:`, error);
+    throw new Error(`Failed to save setting ${key}.`);
   }
 }
 
+
 export async function getSiteSettings(): Promise<SiteSettings> {
-  await new Promise(resolve => setTimeout(resolve, 100));
-  if (typeof window === 'undefined') return defaultSiteSettings;
-  const stored = localStorage.getItem(SITE_SETTINGS_STORAGE_KEY);
-  const settings = safeJsonParse<SiteSettings>(stored, defaultSiteSettings);
-  return { ...defaultSiteSettings, ...settings };
+  return await getSetting<SiteSettings>(SITE_SETTINGS_KEY, defaultSiteSettings);
 }
 
 export async function saveSiteSettings(settings: SiteSettings): Promise<void> {
-  await new Promise(resolve => setTimeout(resolve, 200));
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(SITE_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  await saveSetting(SITE_SETTINGS_KEY, settings);
 }

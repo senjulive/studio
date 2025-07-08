@@ -1,4 +1,4 @@
-'use client';
+import { supabase } from '@/lib/supabase';
 
 export type Announcement = {
   id: string;
@@ -7,7 +7,7 @@ export type Announcement = {
   content: string;
 };
 
-const ANNOUNCEMENTS_STORAGE_KEY = 'astral-announcements';
+const ANNOUNCEMENTS_KEY = 'announcements';
 
 const defaultAnnouncements: Omit<Announcement, 'id' | 'date'>[] = [
   {
@@ -24,62 +24,55 @@ const defaultAnnouncements: Omit<Announcement, 'id' | 'date'>[] = [
   },
 ];
 
-function safeJsonParse<T>(json: string | null, fallback: T): T {
-  if (!json) return fallback;
-  try {
-    const parsed = JSON.parse(json);
-    return Array.isArray(parsed) ? (parsed as T) : fallback;
-  } catch (e) {
-    return fallback;
+const initialAnnouncements: Announcement[] = defaultAnnouncements.map((ann, index) => ({
+    ...ann,
+    id: `default-${index}-${Date.now()}`,
+    date: new Date(Date.now() - (defaultAnnouncements.length - index) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+})).reverse();
+
+
+async function getSetting<T>(key: string, defaultValue: T): Promise<T> {
+  const { data, error } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('key', key)
+    .single();
+
+  if (error || !data) {
+    // If not found, insert the default value and return it
+    await supabase.from('settings').upsert({ key, value: defaultValue as any });
+    return defaultValue;
+  }
+  return data.value as T;
+}
+
+async function saveSetting<T>(key: string, value: T): Promise<void> {
+  const { error } = await supabase.from('settings').upsert({ key, value: value as any });
+  if (error) {
+    console.error(`Error saving setting ${key}:`, error);
+    throw new Error(`Failed to save setting ${key}.`);
   }
 }
 
-// Function to initialize default announcements if none exist
-function initializeAnnouncements() {
-    if (typeof window === 'undefined') return;
-    const stored = localStorage.getItem(ANNOUNCEMENTS_STORAGE_KEY);
-    if (!stored || JSON.parse(stored).length === 0) {
-        const announcementsToStore: Announcement[] = defaultAnnouncements.map((ann, index) => ({
-            ...ann,
-            id: `default-${index}-${Date.now()}`,
-            date: new Date(Date.now() - (defaultAnnouncements.length - index) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        })).reverse();
-        localStorage.setItem(ANNOUNCEMENTS_STORAGE_KEY, JSON.stringify(announcementsToStore));
-    }
-}
-
-// Run initialization once
-if (typeof window !== 'undefined') {
-    initializeAnnouncements();
-}
-
-export function getAnnouncements(): Announcement[] {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(ANNOUNCEMENTS_STORAGE_KEY);
-  const announcements = safeJsonParse<Announcement[]>(stored, []);
+export async function getAnnouncements(): Promise<Announcement[]> {
+  const announcements = await getSetting<Announcement[]>(ANNOUNCEMENTS_KEY, initialAnnouncements);
   return announcements.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 export async function addAnnouncement(title: string, content: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    if (typeof window === 'undefined') return;
-
-    const announcements = getAnnouncements();
+    const announcements = await getAnnouncements();
     const newAnnouncement: Announcement = {
         id: `announcement-${Date.now()}`,
         title,
         content,
         date: new Date().toISOString().split('T')[0],
     };
-    announcements.unshift(newAnnouncement);
-    localStorage.setItem(ANNOUNCEMENTS_STORAGE_KEY, JSON.stringify(announcements));
+    const updatedAnnouncements = [newAnnouncement, ...announcements];
+    await saveSetting(ANNOUNCEMENTS_KEY, updatedAnnouncements);
 }
 
 export async function deleteAnnouncement(id: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    if (typeof window === 'undefined') return;
-
-    let announcements = getAnnouncements();
+    let announcements = await getAnnouncements();
     announcements = announcements.filter(ann => ann.id !== id);
-    localStorage.setItem(ANNOUNCEMENTS_STORAGE_KEY, JSON.stringify(announcements));
+    await saveSetting(ANNOUNCEMENTS_KEY, announcements);
 }

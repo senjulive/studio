@@ -1,4 +1,4 @@
-'use client';
+import { supabase } from '@/lib/supabase';
 
 export type TierSetting = {
   id: string; // e.g., 'tier-1'
@@ -8,7 +8,7 @@ export type TierSetting = {
   clicks: number;
 };
 
-const SETTINGS_STORAGE_KEY = 'astral-bot-settings';
+const BOT_TIERS_KEY = 'botTierSettings';
 
 const defaultTierSettings: TierSetting[] = [
   { id: 'tier-1', name: 'Tier 1', balanceThreshold: 0, dailyProfit: 0.02, clicks: 4 },
@@ -19,31 +19,33 @@ const defaultTierSettings: TierSetting[] = [
   { id: 'tier-6', name: 'Tier 6', balanceThreshold: 15000, dailyProfit: 0.085, clicks: 10 },
 ];
 
-function safeJsonParse<T>(json: string | null, fallback: T): T {
-  if (!json) return fallback;
-  try {
-    const parsed = JSON.parse(json);
-    // Basic validation to ensure it's an array
-    if (Array.isArray(parsed)) {
-      return parsed as T;
-    }
-    return fallback;
-  } catch (e) {
-    return fallback;
+async function getSetting<T>(key: string, defaultValue: T): Promise<T> {
+  const { data, error } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('key', key)
+    .single();
+
+  if (error || !data) {
+    await supabase.from('settings').upsert({ key, value: defaultValue as any });
+    return defaultValue;
+  }
+  return data.value as T;
+}
+
+async function saveSetting<T>(key: string, value: T): Promise<void> {
+  const { error } = await supabase.from('settings').upsert({ key, value: value as any });
+  if (error) {
+    console.error(`Error saving setting ${key}:`, error);
+    throw new Error(`Failed to save setting ${key}.`);
   }
 }
 
 export async function getBotTierSettings(): Promise<TierSetting[]> {
-  await new Promise(resolve => setTimeout(resolve, 100));
-  if (typeof window === 'undefined') return defaultTierSettings;
-  const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
-  const settings = safeJsonParse<TierSetting[]>(stored, defaultTierSettings);
-  // Ensure we return a list sorted by balance threshold for consistency
+  const settings = await getSetting<TierSetting[]>(BOT_TIERS_KEY, defaultTierSettings);
   return settings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
 export async function saveBotTierSettings(settings: TierSetting[]): Promise<void> {
-  await new Promise(resolve => setTimeout(resolve, 200));
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  await saveSetting(BOT_TIERS_KEY, settings);
 }
