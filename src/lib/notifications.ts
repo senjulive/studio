@@ -1,8 +1,7 @@
 
 'use client';
 
-import type { Announcement } from './announcements';
-import { defaultAnnouncements } from './announcements';
+import { getAnnouncements } from './announcements';
 
 export type Notification = {
   id: string;
@@ -14,9 +13,8 @@ export type Notification = {
 };
 
 // Since there is no DB, we'll use a local, in-memory store for notifications.
-let userNotifications: Notification[] = defaultAnnouncements.map((ann, index) => ({
+let userNotifications: Notification[] = getAnnouncements().map((ann) => ({
     ...ann,
-    id: `announcement-${index}`,
     date: new Date(ann.date).getTime(),
     read: false,
     href: '/dashboard/profile'

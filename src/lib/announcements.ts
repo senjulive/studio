@@ -21,3 +21,12 @@ export const defaultAnnouncements: Omit<Announcement, 'id' | 'date'>[] = [
     content: 'The platform will undergo scheduled maintenance on July 20th from 02:00 to 04:00 UTC. The AI Growth Engine may be temporarily unavailable during this period. Thank you for your understanding.',
   },
 ];
+
+// Since there is no database, we process the default announcements to be used in the app.
+export function getAnnouncements(): Announcement[] {
+  return defaultAnnouncements.map((ann, index) => ({
+      ...ann,
+      id: `default-announcement-${index}`,
+      date: new Date(Date.now() - (defaultAnnouncements.length - index) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  })).reverse();
+}

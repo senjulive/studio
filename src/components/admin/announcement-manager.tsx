@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import { defaultAnnouncements, type Announcement } from "@/lib/announcements";
+import { getAnnouncements, type Announcement } from "@/lib/announcements";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,11 +49,7 @@ export function AnnouncementManager() {
       
       const data = await response.json();
       
-      const initialData = defaultAnnouncements.map((ann, index) => ({
-          ...ann,
-          id: `default-${index}-${Date.now()}`,
-          date: new Date(Date.now() - (defaultAnnouncements.length - index) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      })).reverse();
+      const initialData = getAnnouncements();
 
       const currentAnnouncements = data || initialData;
       setAnnouncements(currentAnnouncements.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
