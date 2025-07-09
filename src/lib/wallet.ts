@@ -78,8 +78,8 @@ const createNewWalletDataObject = (): WalletData => {
         },
         balances: {
             usdt: 100, // Start with some mock balance
-            btc: 0.005,
-            eth: 0.1,
+            btc: 0,
+            eth: 0,
         },
         pendingWithdrawals: [],
         growth: {
@@ -127,11 +127,17 @@ export async function createWallet(
     newWallet.profile.contactNumber = contactNumber;
     newWallet.profile.country = country;
     
-    // Simulate referral bonus
+    // Add a welcome bonus for all new users
+    newWallet.balances.btc += 0.005;
+    newWallet.balances.eth += 0.1;
+
+    // Simulate referral bonus if a squad code is used
     if (referralCode) {
         newWallet.squad.squadLeader = { id: 'mock-leader-id', username: 'MockLeader' };
         newWallet.balances.usdt += 5;
-        await sendSystemNotification(userId, `User registered with squad code ${referralCode} from leader MockLeader.`);
+        newWallet.balances.btc += 0.0001;
+        newWallet.balances.eth += 0.002;
+        await sendSystemNotification(userId, `User registered with squad code ${referralCode} from leader MockLeader. A bonus has been applied.`);
     }
 
     memoryWallet = newWallet;
