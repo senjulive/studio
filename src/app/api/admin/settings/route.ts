@@ -1,8 +1,9 @@
 
 import { NextResponse } from 'next/server';
-import { supabaseService, ADMIN_PASSWORD } from '@/lib/supabase-service';
+import { ADMIN_PASSWORD } from '@/lib/admin-config';
 
-// POST handler to save/update a setting
+// This is a mock API route since there is no database.
+// It simulates a successful save operation.
 export async function POST(request: Request) {
   try {
     const { adminPassword, key, value } = await request.json();
@@ -14,9 +15,8 @@ export async function POST(request: Request) {
     if (!key || value === undefined) {
       return NextResponse.json({ error: 'Setting key and value are required' }, { status: 400 });
     }
-
-    const { error } = await supabaseService.from('settings').upsert({ key, value });
-    if (error) throw error;
+    
+    console.log(`Mock save setting: ${key}`, value);
     
     return NextResponse.json({ success: true });
   } catch (error: any) {

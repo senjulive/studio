@@ -1,75 +1,85 @@
 
 'use client';
 
-// This file handles auth using Supabase.
-import { supabase } from '@/lib/supabase';
-import type { SignInWithPasswordCredentials, SignUpWithPasswordCredentials, User } from '@supabase/supabase-js';
+// This file handles auth using a mock system as Supabase has been removed.
+// It allows the app to function without a real database.
 
-const isSupabaseConfigured = () => {
-    // Check if the environment variables are set and are not the placeholder values.
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    return url && key && !url.includes('localhost');
+// We import the types but not the implementation from the removed package.
+type User = {
+  id: string;
+  app_metadata: {
+    provider?: string;
+    [key: string]: any;
+  };
+  user_metadata: {
+    [key: string]: any;
+  };
+  aud: string;
+  confirmation_sent_at?: string;
+  recovery_sent_at?: string;
+  email_change_sent_at?: string;
+  new_email?: string;
+  new_phone?: string;
+  invited_at?: string;
+  action_link?: string;
+  email?: string;
+  phone?: string;
+  created_at: string;
+  confirmed_at?: string;
+  email_confirmed_at?: string;
+  phone_confirmed_at?: string;
+  last_sign_in_at?: string;
+  role?: string;
+  updated_at?: string;
+  identities?: any[];
 };
 
-export async function register(credentials: SignUpWithPasswordCredentials): Promise<User> {
-    if (!isSupabaseConfigured()) {
-        throw new Error("Supabase is not configured. Please add your credentials to the .env file.");
+type Credentials = {
+    email?: string;
+    password?: string;
+    phone?: string;
+    options?: {
+      emailRedirectTo?: string;
+      data?: object;
     }
-    const { data, error } = await supabase.auth.signUp(credentials);
-    if (error) {
-        throw new Error(error.message);
-    }
-    if (!data.user) {
-        throw new Error("Registration did not return a user.");
-    }
-    return data.user;
+};
+
+
+const mockUser: User = {
+    id: 'mock-user-123',
+    app_metadata: { provider: 'email' },
+    user_metadata: { name: 'Mock User', username: 'MockUser' },
+    aud: 'authenticated',
+    created_at: new Date().toISOString(),
+    email: 'user@example.com',
+};
+
+export async function register(credentials: Credentials): Promise<User> {
+    console.log('Mock register with:', credentials.email);
+    // In a real app, you'd save the user. Here, we just simulate success.
+    return Promise.resolve(mockUser);
 }
 
-export async function login(credentials: SignInWithPasswordCredentials): Promise<User> {
-    if (!isSupabaseConfigured()) {
-        throw new Error("Supabase is not configured. Please add your credentials to the .env file.");
-    }
-    const { data, error } = await supabase.auth.signInWithPassword(credentials);
-    if (error) {
-        if (error.message === 'Failed to fetch') {
-            throw new Error("Connection to Supabase failed. Please check your credentials and network connection.");
-        }
-        throw new Error(error.message);
-    }
-    if (!data.user) {
-        throw new Error("Login did not return a user.");
-    }
-    return data.user;
+export async function login(credentials: Credentials): Promise<User> {
+    console.log('Mock login with:', credentials.email);
+    // In a real app, you'd verify credentials. Here, we just simulate success.
+    return Promise.resolve(mockUser);
 }
 
 export async function logout(): Promise<void> {
-    if (!isSupabaseConfigured()) return; // Don't block logout if offline
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-        console.error('Error logging out:', error.message);
-    }
+    console.log('Mock logout');
+    // In a real app, you'd clear the session.
+    return Promise.resolve();
 }
 
-export async function getCurrentUser() {
-    if (!isSupabaseConfigured()) return null;
-    // Note: To be fully secure, this should ideally be called in a server component
-    // or an API route to avoid exposing the session to the client-side directly in all cases.
-    // For this app's structure, we'll use it on the client and protect routes.
-    const { data: { session } } = await supabase.auth.getSession();
-    return session?.user ?? null;
+export async function getCurrentUser(): Promise<User | null> {
+    // Always return the mock user to simulate being logged in.
+    return Promise.resolve(mockUser);
 }
 
 
 export async function resetPasswordForEmail(email: string): Promise<void> {
-  if (!isSupabaseConfigured()) {
-    throw new Error("Supabase is not configured. Please add your credentials to the .env file.");
-  }
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
-
-  if (error) {
-    // Don't expose specific errors like "User not found" for security reasons.
-    console.error("Password reset error:", error.message);
-    // We can throw a generic error or just return, the UI will show a generic message.
-  }
+  console.log(`Mock reset password for: ${email}`);
+  // In a real app, this would trigger an email.
+  return Promise.resolve();
 }

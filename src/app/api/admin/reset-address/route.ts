@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
-import { supabaseService, ADMIN_PASSWORD } from '@/lib/supabase-service';
-import type { WalletData } from '@/lib/wallet';
+import { ADMIN_PASSWORD } from '@/lib/admin-config';
+import { getOrCreateWallet, updateWallet } from '@/lib/wallet';
 
 export async function POST(request: Request) {
   try {
@@ -11,27 +11,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch the current wallet data
-    const { data: wallet, error: fetchError } = await supabaseService
-      .from('wallets')
-      .select('data')
-      .eq('id', userId)
-      .single();
-
-    if (fetchError || !wallet) {
-      throw new Error('Wallet not found for user.');
-    }
-    
-    const walletData = wallet.data as WalletData;
+    // In a real DB, you'd fetch the specific user's wallet.
+    // Here we use the mock getOrCreateWallet which returns the single in-memory wallet.
+    const walletData = await getOrCreateWallet(userId);
     walletData.security.withdrawalAddresses = {};
 
-    // Update the wallet data
-    const { error: updateError } = await supabaseService
-      .from('wallets')
-      .update({ data: walletData as any })
-      .eq('id', userId);
-
-    if (updateError) throw updateError;
+    // Update the mock wallet data
+    await updateWallet(userId, walletData);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

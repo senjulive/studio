@@ -1,6 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import { supabaseService, ADMIN_PASSWORD } from '@/lib/supabase-service';
+import { ADMIN_PASSWORD } from '@/lib/admin-config';
+import type { WalletData } from '@/lib/wallet';
+import { getOrCreateWallet } from '@/lib/wallet';
 
 export async function POST(request: Request) {
   try {
@@ -10,16 +12,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data, error } = await supabaseService.from('wallets').select('id, data');
-
-    if (error) {
-      throw error;
-    }
-
-    const wallets: Record<string, any> = {};
-    for (const row of data) {
-      wallets[row.id] = row.data;
-    }
+    const mockWallet = await getOrCreateWallet("mock-user-123");
+    
+    const wallets: Record<string, WalletData> = {
+      "mock-user-123": mockWallet,
+      "mock-user-456": {
+        ...mockWallet,
+        profile: {
+          ...mockWallet.profile,
+          username: 'Another User',
+        },
+        balances: {
+            usdt: 1234.56,
+            btc: 0.05,
+            eth: 1.2
+        }
+      }
+    };
 
     return NextResponse.json(wallets);
   } catch (error: any) {

@@ -16,15 +16,8 @@ export const defaultTierSettings: TierSetting[] = [
   { id: 'tier-6', name: 'Tier 6', balanceThreshold: 15000, dailyProfit: 0.085, clicks: 10 },
 ];
 
+// Returns the default settings directly as there is no database.
 export async function getBotTierSettings(): Promise<TierSetting[]> {
-    try {
-        const response = await fetch('/api/public-settings?key=botTierSettings');
-        if (!response.ok) return defaultTierSettings;
-        const data = await response.json();
-        const settings = data || defaultTierSettings;
-        return settings.sort((a: TierSetting, b: TierSetting) => a.balanceThreshold - b.balanceThreshold);
-    } catch(e) {
-        console.error("Failed to fetch bot tier settings", e);
-        return defaultTierSettings;
-    }
+    const settings = defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
+    return Promise.resolve(settings);
 }

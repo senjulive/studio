@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { ADMIN_PASSWORD } from '@/lib/supabase-service';
+import { ADMIN_PASSWORD } from '@/lib/admin-config';
 
 export async function POST(request: Request) {
   try {

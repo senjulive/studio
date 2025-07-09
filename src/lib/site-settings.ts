@@ -11,14 +11,7 @@ export const defaultSiteSettings: SiteSettings = {
   btcDepositAddress: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', // Default placeholder
 };
 
+// Returns the default settings directly as there is no database.
 export async function getSiteSettings(): Promise<SiteSettings> {
-  try {
-    const response = await fetch('/api/public-settings?key=siteSettings');
-    if (!response.ok) return defaultSiteSettings;
-    const data = await response.json();
-    return data || defaultSiteSettings;
-  } catch (e) {
-    console.error("Failed to fetch site settings", e);
-    return defaultSiteSettings;
-  }
+  return Promise.resolve(defaultSiteSettings);
 }
