@@ -233,7 +233,7 @@ export function SquadSystem() {
                <CardDescription>
                 Your squad hierarchy. Expand to see the chain.
               </CardDescription>
-            </Header>
+            </CardHeader>
             <CardContent>
               {isSquadLoading ? (
                   <div className="space-y-2">
