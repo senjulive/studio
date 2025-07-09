@@ -77,7 +77,7 @@ const createNewWalletDataObject = (): WalletData => {
             usdt: generateAddress('T', 33, trc20Chars),
         },
         balances: {
-            usdt: 100, // Start with some mock balance
+            usdt: 0,
             btc: 0,
             eth: 0,
         },
@@ -128,12 +128,14 @@ export async function createWallet(
     newWallet.profile.country = country;
     
     // Add a welcome bonus for all new users
+    newWallet.balances.usdt += 100;
     newWallet.balances.btc += 0.005;
     newWallet.balances.eth += 0.1;
 
     // Simulate referral bonus if a squad code is used
     if (referralCode) {
         newWallet.squad.squadLeader = { id: 'mock-leader-id', username: 'MockLeader' };
+        // Add *additional* bonuses
         newWallet.balances.usdt += 5;
         newWallet.balances.btc += 0.0001;
         newWallet.balances.eth += 0.002;

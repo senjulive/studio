@@ -40,7 +40,7 @@ import { useUser } from "@/app/dashboard/layout";
 type Transaction = {
   id: string;
   type: string;
-  asset: string;
+  asset: 'USDT' | 'BTC' | 'ETH';
   amount: number;
   date: string;
   status: "Completed" | "Pending" | "Failed";
@@ -188,35 +188,76 @@ export function WalletView() {
   }, []);
 
   const transactions = React.useMemo(() => {
-    if (!walletData) return [];
+    if (!walletData || !user?.created_at) return [];
 
     const history: Transaction[] = [];
+    const registrationDate = new Date(user.created_at).toISOString();
+
+    // Registration Bonus (All users get this)
+    history.push({
+      id: `reg-bonus-usdt`,
+      type: "Registration Bonus",
+      asset: "USDT",
+      amount: 100,
+      date: registrationDate,
+      status: "Completed",
+    });
+    history.push({
+      id: `reg-bonus-btc`,
+      type: "Registration Bonus",
+      asset: "BTC",
+      amount: 0.005,
+      date: registrationDate,
+      status: "Completed",
+    });
+    history.push({
+      id: `reg-bonus-eth`,
+      type: "Registration Bonus",
+      asset: "ETH",
+      amount: 0.1,
+      date: registrationDate,
+      status: "Completed",
+    });
+
+    // Invitation Bonus (only for users with a squad leader)
+    if (walletData.squad.squadLeader) {
+      history.push({
+        id: `invite-bonus-usdt`,
+        type: "Invitation Bonus",
+        asset: "USDT",
+        amount: 5,
+        date: registrationDate,
+        status: "Completed",
+      });
+      history.push({
+        id: `invite-bonus-btc`,
+        type: "Invitation Bonus",
+        asset: "BTC",
+        amount: 0.0001,
+        date: registrationDate,
+        status: "Completed",
+      });
+      history.push({
+        id: `invite-bonus-eth`,
+        type: "Invitation Bonus",
+        asset: "ETH",
+        amount: 0.002,
+        date: registrationDate,
+        status: "Completed",
+      });
+    }
 
     // Grid Profits from earnings history
     if (walletData.growth.earningsHistory) {
       walletData.growth.earningsHistory.forEach((earning, index) => {
         history.push({
           id: `grid-profit-${earning.timestamp}-${index}`,
-          type: 'Grid Profit',
-          asset: 'USDT',
+          type: "Grid Profit",
+          asset: "USDT",
           amount: earning.amount,
           date: new Date(earning.timestamp).toISOString(),
-          status: 'Completed',
+          status: "Completed",
         });
-      });
-    }
-
-    // Invitation Bonus
-    if (walletData.squad.squadLeader) {
-      history.push({
-        id: `invite-bonus`,
-        type: "Invitation Bonus",
-        asset: "USDT",
-        amount: 5,
-        date: new Date(
-          Date.now() - Math.random() * 5 * 24 * 60 * 60 * 1000
-        ).toISOString(),
-        status: "Completed",
       });
     }
 
@@ -236,15 +277,15 @@ export function WalletView() {
 
     // Pending Withdrawals from walletData
     if (walletData.pendingWithdrawals) {
-      walletData.pendingWithdrawals.forEach(w => {
-          history.push({
-              id: w.id,
-              type: 'Withdrawal',
-              asset: 'USDT',
-              amount: -w.amount,
-              date: new Date(w.timestamp).toISOString(),
-              status: 'Pending',
-          });
+      walletData.pendingWithdrawals.forEach((w) => {
+        history.push({
+          id: w.id,
+          type: "Withdrawal",
+          asset: "USDT",
+          amount: -w.amount,
+          date: new Date(w.timestamp).toISOString(),
+          status: "Pending",
+        });
       });
     }
 
@@ -258,11 +299,10 @@ export function WalletView() {
       status: "Completed",
     });
 
-
     return history.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
-  }, [walletData]);
+  }, [walletData, user]);
 
   const totalBalance = React.useMemo(() => {
     if (!walletData || allAssetsData.length === 0) return 0;
@@ -446,12 +486,18 @@ export function WalletView() {
                     <TableCell>{txn.asset}</TableCell>
                     <TableCell
                       className={cn(
+                        "font-mono",
                         txn.amount >= 0 ? "text-green-600" : "text-red-600"
                       )}
                     >
-                      {`${txn.amount >= 0 ? "+" : "-"}$${Math.abs(
-                        txn.amount
-                      ).toFixed(2)}`}
+                      {txn.asset === 'USDT' ? (
+                        `${txn.amount >= 0 ? "+" : "-"}$${Math.abs(txn.amount).toFixed(2)}`
+                      ) : (
+                        `${txn.amount >= 0 ? "+" : ""}${Math.abs(txn.amount).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 8,
+                        })} ${txn.asset}`
+                      )}
                     </TableCell>
                     <TableCell>
                       {new Date(txn.date).toLocaleDateString()}
