@@ -1,187 +1,162 @@
 
--- Enable the required extension for UUID generation
-create extension if not exists "uuid-ossp" with schema "extensions";
+-- Drop existing tables and types if they exist, in reverse order of dependency
+DROP FUNCTION IF EXISTS handle_new_user_referral();
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS chats;
+DROP TABLE IF EXISTS wallets;
+DROP TABLE IF EXISTS wallets_public;
+
 
 --
--- Wallets Public Table
+-- wallets_public: Publicly accessible wallet data
 --
--- This table stores public-facing wallet information.
--- It is designed to be accessible by authenticated users.
--- RLS policies should be configured to control access.
---
-create table if not exists public.wallets_public (
-  id uuid not null primary key,
-  username text,
-  balances jsonb not null default '{"usdt": 0, "btc": 0, "eth": 0}'::jsonb,
-  referral_code text not null unique,
-  squad_leader_id uuid references public.wallets_public(id),
-  squad_members uuid[] not null default '{}'
+CREATE TABLE wallets_public (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    username TEXT,
+    referral_code TEXT UNIQUE,
+    squad_leader_id UUID REFERENCES wallets_public(id),
+    squad_members UUID[] DEFAULT '{}',
+    balances JSONB DEFAULT '{"usdt": 0, "btc": 0, "eth": 0}'::jsonb
 );
-alter table public.wallets_public enable row level security;
+
+ALTER TABLE wallets_public ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to read all public wallet data (for usernames, etc.)
+CREATE POLICY "Public wallets are viewable by everyone."
+ON wallets_public FOR SELECT
+USING (true);
+
+-- Allow users to create their own public wallet entry
+CREATE POLICY "Users can create their own public wallet."
+ON wallets_public FOR INSERT
+WITH CHECK (auth.uid() = id);
+
+-- Allow users to update their own username
+CREATE POLICY "Users can update their own public wallet."
+ON wallets_public FOR UPDATE
+USING (auth.uid() = id)
+WITH CHECK (auth.uid() = id);
 
 
 --
--- Wallets Private Table
+-- wallets: Private, detailed wallet data stored in a single JSONB column
 --
--- This table stores sensitive wallet data in a single JSONB column.
--- It should only be accessible by the user who owns the data or by service roles.
---
-create table if not exists public.wallets (
-  id uuid not null primary key,
-  data jsonb,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE wallets (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    data JSONB
 );
-alter table public.wallets enable row level security;
+
+ALTER TABLE wallets ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to read, create, and update their own private wallet data
+CREATE POLICY "Users can manage their own private wallet."
+ON wallets FOR ALL
+USING (auth.uid() = id)
+WITH CHECK (auth.uid() = id);
 
 
 --
--- Chat History Table
+-- chats: Stores support chat messages
 --
--- Stores chat messages between users and administrators.
---
-create table if not exists public.chats (
-  id text not null primary key,
-  user_id uuid not null,
-  message jsonb,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE chats (
+    id TEXT PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    message JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
-alter table public.chats enable row level security;
 
+ALTER TABLE chats ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to manage their own chat messages
+CREATE POLICY "Users can manage their own chat messages."
+ON chats FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 
 --
--- Notifications Table
+-- notifications: Stores user-specific notifications
 --
--- Stores individual user notifications.
---
-create table if not exists public.notifications (
-  id text not null primary key,
-  user_id uuid not null,
-  notification jsonb
+CREATE TABLE notifications (
+    id TEXT,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    notification JSONB,
+    PRIMARY KEY (id, user_id)
 );
-alter table public.notifications enable row level security;
+
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to manage their own notifications
+CREATE POLICY "Users can manage their own notifications."
+ON notifications FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 
 
 --
--- Settings Table
+-- settings: Stores site-wide settings
 --
--- Stores global application settings as key-value pairs.
---
-create table if not exists public.settings (
-    key text not null primary key,
-    value jsonb,
-    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE settings (
+    key TEXT PRIMARY KEY,
+    value JSONB
 );
--- No RLS for settings, as it's managed via API with service key.
+
+ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
+
+-- Settings are read-only for authenticated users
+CREATE POLICY "Authenticated users can read settings."
+ON settings FOR SELECT
+USING (auth.role() = 'authenticated');
 
 
 --
--- Database Function for Squad Rewards
+-- handle_new_user_referral: DB function to handle referral bonuses
 --
--- This function automatically handles the rewards when a new user
--- joins a squad using a referral code.
---
-create or replace function public.handle_new_user_squad_referral()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  leader_id uuid;
-  leader_balances jsonb;
-  member_balances jsonb;
-  referral_bonus numeric := 5.00;
-begin
-  -- Check if the new user was referred by a leader
-  if new.squad_leader_id is not null then
-    leader_id := new.squad_leader_id;
+CREATE OR REPLACE FUNCTION handle_new_user_referral()
+RETURNS TRIGGER AS $$
+DECLARE
+    leader_id_val UUID;
+    leader_balances JSONB;
+BEGIN
+    -- Check if the new user has a squad leader
+    IF NEW.squad_leader_id IS NOT NULL THEN
+        leader_id_val := NEW.squad_leader_id;
 
-    -- Update the new member's balance
-    update public.wallets_public
-    set balances = jsonb_set(balances, '{usdt}', to_jsonb(coalesce((balances->>'usdt')::numeric, 0) + referral_bonus))
-    where id = new.id;
+        -- Give the new user a $5 bonus
+        NEW.balances := jsonb_set(NEW.balances, '{usdt}', to_jsonb( (NEW.balances->>'usdt')::numeric + 5 ));
 
-    -- Update the leader's balance
-    update public.wallets_public
-    set balances = jsonb_set(balances, '{usdt}', to_jsonb(coalesce((balances->>'usdt')::numeric, 0) + referral_bonus))
-    where id = leader_id;
+        -- Give the squad leader a $5 bonus
+        UPDATE wallets_public
+        SET balances = jsonb_set(balances, '{usdt}', to_jsonb( (balances->>'usdt')::numeric + 5 ))
+        WHERE id = leader_id_val;
 
-    -- Add the new member to the leader's squad_members array
-    update public.wallets_public
-    set squad_members = array_append(squad_members, new.id)
-    where id = leader_id;
-  end if;
-
-  return new;
-end;
-$$;
-
---
--- Database Trigger
---
--- This trigger calls the function whenever a new user is added
--- to the wallets_public table.
---
-create or replace trigger on_new_user_squad_creation
-  after insert on public.wallets_public
-  for each row execute procedure public.handle_new_user_squad_referral();
+        -- Add the new user to the squad leader's list of members
+        UPDATE wallets_public
+        SET squad_members = array_append(squad_members, NEW.id)
+        WHERE id = leader_id_val;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
 --
--- RLS Policies
+-- Trigger for the referral handling function
 --
-
--- Policy: Allow users to view their own private wallet data
-create policy "Allow individual read access on wallets"
-on public.wallets for select
-using (auth.uid() = id);
-
--- Policy: Allow users to create their own private wallet data
-create policy "Allow individual insert access on wallets"
-on public.wallets for insert
-with check (auth.uid() = id);
-
--- Policy: Allow users to update their own private wallet data
-create policy "Allow individual update access on wallets"
-on public.wallets for update
-using (auth.uid() = id);
+CREATE TRIGGER on_new_user_referral_trigger
+BEFORE INSERT ON wallets_public
+FOR EACH ROW EXECUTE FUNCTION handle_new_user_referral();
 
 
--- Policy: Allow authenticated users to view all public wallet data
-create policy "Allow all authenticated users to read wallets_public"
-on public.wallets_public for select
-to authenticated
-using (true);
+--
+-- Give anon and authenticated roles usage of the functions and tables
+--
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT ALL ON TABLE wallets TO anon, authenticated;
+GRANT ALL ON TABLE wallets_public TO anon, authenticated;
+GRANT ALL ON TABLE chats TO anon, authenticated;
+GRANT ALL ON TABLE notifications TO anon,authenticated;
+GRANT SELECT ON TABLE settings TO authenticated;
+GRANT ALL ON FUNCTION handle_new_user_referral() TO anon, authenticated;
 
--- Policy: Allow users to create their own public wallet entry
-create policy "Allow individual insert access on wallets_public"
-on public.wallets_public for insert
-to authenticated
-with check (auth.uid() = id);
-
-
--- Policy: Allow users to view their own chat messages
-create policy "Allow individual read access on chats"
-on public.chats for select
-using (auth.uid() = user_id);
-
--- Policy: Allow users to create their own chat messages
-create policy "Allow individual insert access on chats"
-on public.chats for insert
-with check (auth.uid() = user_id);
-
-
--- Policy: Allow users to view their own notifications
-create policy "Allow individual read access on notifications"
-on public.notifications for select
-using (auth.uid() = user_id);
-
--- Policy: Allow users to create their own notifications
-create policy "Allow individual insert access on notifications"
-on public.notifications for insert
-with check (auth.uid() = user_id);
-
--- Policy: Allow users to update their own notifications (for marking as read)
-create policy "Allow individual update access on notifications"
-on public.notifications for update
-using (auth.uid() = user_id);
+    
