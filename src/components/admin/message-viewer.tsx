@@ -77,7 +77,10 @@ export function MessageViewer() {
       setWallets(walletData);
       setIsLoading(false);
     }
-    fetchData();
+    
+    if (adminPassword) {
+      fetchData();
+    }
   }, [adminPassword, toast]);
 
   const handleSendMessage = async (userId: string) => {

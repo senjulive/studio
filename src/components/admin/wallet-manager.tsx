@@ -126,8 +126,10 @@ export function WalletManager() {
   }, [adminPassword, toast]);
 
   React.useEffect(() => {
-    refetchWallets();
-  }, [refetchWallets]);
+    if (adminPassword) {
+      refetchWallets();
+    }
+  }, [adminPassword, refetchWallets]);
   
   const postAdminUpdate = React.useCallback(async (url: string, body: object) => {
     setIsUpdating(true);
