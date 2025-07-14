@@ -96,6 +96,7 @@ export function NewsArticleView({ articleId }: { articleId: string }) {
                         layout="fill"
                         objectFit="cover"
                         className="transition-transform duration-300 hover:scale-105"
+                        data-ai-hint={article['data-ai-hint']}
                     />
                 </div>
             )}
