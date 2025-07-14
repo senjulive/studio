@@ -159,11 +159,7 @@ export function ProfileView() {
             </DialogContent>
         </Dialog>
         <Card className="max-w-md mx-auto">
-            <CardHeader className="items-center text-center p-0">
-                <div className="p-4 w-full">
-                <VirtualCard walletData={walletData} userEmail={user?.email || null} />
-                </div>
-                <div className="p-6 pt-2 w-full">
+            <CardHeader className="items-center text-center p-6">
                 <CardTitle className="text-2xl">
                     {isLoading ? <Skeleton className="h-8 w-40 mx-auto" /> : profileDisplayName}
                 </CardTitle>
@@ -183,46 +179,40 @@ export function ProfileView() {
                     </>
                     )}
                 </div>
-                </div>
             </CardHeader>
             <CardContent>
-            <div className="space-y-4 mb-6">
-                <Label className="text-xs text-muted-foreground">Asset Balances</Label>
+            <div className="mb-6">
+                <Label className="text-xs text-muted-foreground text-center block mb-4">Asset Balances</Label>
                 {isLoading ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                        <Skeleton className="h-8 w-8 rounded-full" />
-                        <div className="space-y-2">
-                            <Skeleton className="h-4 w-20" />
-                            <Skeleton className="h-3 w-10" />
-                        </div>
-                        </div>
-                        <Skeleton className="h-5 w-24" />
+                    <div className="flex justify-around">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                             <div key={i} className="flex flex-col items-center gap-2">
+                                <Skeleton className="h-10 w-10 rounded-full" />
+                                <Skeleton className="h-5 w-16" />
+                             </div>
+                        ))}
                     </div>
-                    ))
                 ) : (
-                    assetConfig.map(asset => (
-                    <div key={asset.ticker} className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                        <Image src={asset.iconUrl} alt={asset.name} width={32} height={32} className="rounded-full" />
-                        <div>
-                            <p className="font-medium">{asset.name}</p>
-                            <p className="text-sm text-muted-foreground">{asset.ticker}</p>
-                        </div>
-                        </div>
-                        <div className="text-right">
-                        <p className="font-medium font-mono text-green-600">
-                            {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 6,
-                            }) ?? '0.00'}
-                        </p>
-                        </div>
+                    <div className="flex justify-around text-center">
+                        {assetConfig.map(asset => (
+                            <div key={asset.ticker} className="flex flex-col items-center gap-2">
+                                <Image src={asset.iconUrl} alt={asset.name} width={40} height={40} className="rounded-full" />
+                                <span className="text-sm font-semibold font-mono">
+                                    {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 6,
+                                    }) ?? '0.00'}
+                                </span>
+                            </div>
+                        ))}
                     </div>
-                    ))
                 )}
             </div>
+
+            <div className="mb-6 p-4">
+              <VirtualCard walletData={walletData} userEmail={user?.email || null} />
+            </div>
+
             <Separator className="mb-6"/>
 
                 <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
