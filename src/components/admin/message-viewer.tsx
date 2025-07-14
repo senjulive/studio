@@ -30,9 +30,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { type WalletData } from "@/lib/wallet";
 import { useAdmin } from "@/contexts/AdminContext";
 
+type MappedWallet = WalletData & { user_id: string };
+
 export function MessageViewer() {
   const [chats, setChats] = React.useState<ChatHistory | null>(null);
-  const [wallets, setWallets] = React.useState<Record<string, WalletData> | null>(null);
+  const [wallets, setWallets] = React.useState<Record<string, MappedWallet> | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [replyMessages, setReplyMessages] = React.useState<Record<string, string>>({});
   const [isSending, setIsSending] = React.useState<Record<string, boolean>>({});
@@ -45,7 +47,7 @@ export function MessageViewer() {
     async function fetchData() {
       setIsLoading(true);
 
-      const fetchWallets = async () => {
+      const fetchWallets = async (): Promise<Record<string, MappedWallet>> => {
         if (!adminPassword) return {};
         try {
           const response = await fetch('/api/admin/wallets', {
@@ -311,5 +313,3 @@ export function MessageViewer() {
     </Accordion>
   );
 }
-
-    

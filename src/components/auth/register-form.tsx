@@ -36,7 +36,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
-import { createWallet } from "@/lib/wallet";
 import { AstralLogo } from "../icons/astral-logo";
 import { register } from "@/lib/auth";
 import { countries } from "@/lib/countries";
@@ -81,16 +80,23 @@ export function RegisterForm() {
     const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      const newUser = await register({ email: values.email, password: values.password });
-
-      await createWallet(
-        newUser.id,
-        values.email,
-        values.username,
-        fullContactNumber,
-        countryInfo.name,
-        values.referralCode
-      );
+      const error = await register({
+        email: values.email,
+        password: values.password,
+        options: {
+            data: {
+                username: values.username,
+                contact_number: fullContactNumber,
+                country: countryInfo.name,
+                referral_code: values.referralCode,
+            }
+        }
+      });
+      
+      if (error) {
+        throw new Error(error);
+      }
+      
       toast({
         title: "Account Created",
         description: "Please check your email to verify your account, then sign in.",

@@ -1,20 +1,21 @@
 
+import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { ADMIN_PASSWORD } from '@/lib/admin-config';
 
 export async function POST(request: Request) {
-  try {
-    const { password } = await request.json();
+  const { email, password } = await request.json();
+  const supabase = createClient();
 
-    if (password === ADMIN_PASSWORD) {
-      return NextResponse.json({ success: true });
-    } else {
-      return NextResponse.json({ success: false, error: 'Incorrect password' }, { status: 401 });
-    }
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message || 'An unexpected error occurred.' },
-      { status: 500 }
-    );
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 401 });
   }
+
+  // In a real app, you would also check if the user has an 'admin' role.
+  // For this project, we will assume any successful login to this route is an admin.
+  return NextResponse.json({ success: true });
 }

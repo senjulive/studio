@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -45,7 +46,10 @@ export function ForgotPasswordForm() {
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     setIsLoading(true);
     try {
-      await resetPasswordForEmail(values.email);
+      const error = await resetPasswordForEmail(values.email);
+      if (error) {
+        throw new Error(error);
+      }
       toast({
         title: "Password Reset Email Sent",
         description:

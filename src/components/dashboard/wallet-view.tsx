@@ -37,6 +37,7 @@ import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/app/dashboard/layout";
 import { getBotTierSettings, getCurrentTier, type TierSetting } from "@/lib/settings";
+import { createClient } from "@/lib/supabase/client";
 
 type Transaction = {
   id: string;
@@ -154,19 +155,42 @@ export function WalletView() {
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
   const [tierSettings, setTierSettings] = React.useState<TierSetting[]>([]);
 
-  React.useEffect(() => {
-    async function fetchData() {
-      if (user?.id) {
+  const fetchWalletData = React.useCallback(async () => {
+    if (user?.id) {
         const [wallet, tiers] = await Promise.all([
-          getOrCreateWallet(user.id),
+          getOrCreateWallet(),
           getBotTierSettings()
         ]);
         setWalletData(wallet);
         setTierSettings(tiers);
       }
-    }
-    fetchData();
   }, [user]);
+
+  React.useEffect(() => {
+    fetchWalletData();
+  }, [fetchWalletData]);
+  
+  React.useEffect(() => {
+    if (!user) return;
+    const client = createClient();
+    const channel = client
+      .channel('wallet-changes')
+      .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'wallets',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          fetchWalletData();
+        }
+      )
+      .subscribe();
+    return () => {
+      client.removeChannel(channel);
+    }
+  }, [user, fetchWalletData]);
+
 
   React.useEffect(() => {
     setAllAssetsData(initialCryptoData);
@@ -210,7 +234,7 @@ export function WalletView() {
     });
 
     // Invitation Bonus (only for users with a squad leader)
-    if (walletData.squad.squadLeader) {
+    if (walletData.squad.squad_leader) {
       history.push({
         id: `invite-bonus-usdt`,
         type: "Invitation Bonus",
@@ -222,8 +246,8 @@ export function WalletView() {
     }
 
     // Grid Profits from earnings history
-    if (walletData.growth.earningsHistory) {
-      walletData.growth.earningsHistory.forEach((earning, index) => {
+    if (walletData.growth.earnings_history) {
+      walletData.growth.earnings_history.forEach((earning, index) => {
         history.push({
           id: `grid-profit-${earning.timestamp}-${index}`,
           type: "Grid Profit",
@@ -250,8 +274,8 @@ export function WalletView() {
     });
 
     // Pending Withdrawals from walletData
-    if (walletData.pendingWithdrawals) {
-      walletData.pendingWithdrawals.forEach((w) => {
+    if (walletData.pending_withdrawals) {
+      walletData.pending_withdrawals.forEach((w) => {
         history.push({
           id: w.id,
           type: "Withdrawal",
@@ -262,16 +286,6 @@ export function WalletView() {
         });
       });
     }
-
-    // Mock deposit for demonstration, since there is no deposit history yet
-    history.push({
-      id: "txn-dep-1",
-      type: "Deposit",
-      asset: "USDT",
-      amount: Math.floor(Math.random() * (2000 - 500 + 1) + 500),
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      status: "Completed",
-    });
 
     return history.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -291,14 +305,14 @@ export function WalletView() {
     );
   }, [walletData, allAssetsData]);
 
-  const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
+  const dailyEarnings = walletData?.growth?.daily_earnings ?? 0;
   
   const rank = getUserRank(totalBalance);
   const tier = getCurrentTier(totalBalance, tierSettings);
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (user?.id) {
-      await updateWallet(user.id, newData);
+      await updateWallet(newData);
       setWalletData(newData);
     }
   };

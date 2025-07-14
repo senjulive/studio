@@ -31,7 +31,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
 import { login } from "@/lib/auth";
-import { getOrCreateWallet } from "@/lib/wallet";
 import { AstralLogo } from "../icons/astral-logo";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
@@ -74,14 +73,17 @@ export function LoginForm() {
     }
     
     try {
-      const user = await login({ email: values.email, password: values.password });
-      await getOrCreateWallet(user.id);
+      const error = await login({ email: values.email, password: values.password });
+      if (error) {
+        throw new Error(error);
+      }
       
       toast({
         title: "Login Successful",
         description: "Welcome to AstralCore!",
       });
       router.push("/dashboard");
+      router.refresh(); // Important to refresh server-side state
 
     } catch(error: any) {
         toast({

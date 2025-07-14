@@ -1,21 +1,17 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { getOrCreateWallet, updateWallet, getAllWallets, type WalletData } from '@/lib/wallet';
-
-// This is a mock implementation. In a real app, you'd use a database.
-async function isIdCardUnique(userId: string, idCardNo: string): Promise<boolean> {
-  const allWallets = await getAllWallets();
-  for (const id in allWallets) {
-    if (id !== userId && allWallets[id].profile.idCardNo === idCardNo) {
-      return false; // Found a duplicate
-    }
-  }
-  return true;
-}
 
 export async function POST(request: Request) {
   try {
     const { userId, fullName, idCardNo, address, dateOfBirth } = await request.json();
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || user.id !== userId) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
 
     if (!userId || !fullName || !idCardNo || !address || !dateOfBirth) {
       return NextResponse.json({ success: false, error: 'Missing required fields.' }, { status: 400 });
@@ -24,43 +20,59 @@ export async function POST(request: Request) {
     if (!/^\d{9,}$/.test(idCardNo)) {
         return NextResponse.json({ success: false, error: 'ID Card Number must be at least 9 digits.' }, { status: 400 });
     }
+    
+    const supabaseAdmin = createAdminClient();
 
     // Check for uniqueness
-    const isUnique = await isIdCardUnique(userId, idCardNo);
-    if (!isUnique) {
+    const { data: existingProfile, error: uniqueError } = await supabaseAdmin
+        .from('profiles')
+        .select('user_id')
+        .eq('id_card_no', idCardNo)
+        .neq('user_id', userId)
+        .maybeSingle();
+
+    if (uniqueError) throw uniqueError;
+
+    if (existingProfile) {
       return NextResponse.json({ success: false, error: 'This ID Card Number is already in use.' }, { status: 409 });
     }
 
-    const walletData = await getOrCreateWallet(userId);
+    // Update profile and wallet status
+    const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .update({
+            full_name: fullName,
+            id_card_no: idCardNo,
+            address,
+            date_of_birth: dateOfBirth,
+        })
+        .eq('user_id', userId);
+
+    if (profileError) throw profileError;
     
-    // Start verification process
-    const newWalletData: WalletData = {
-      ...walletData,
-      profile: {
-        ...walletData.profile,
-        fullName,
-        idCardNo,
-        address,
-        dateOfBirth,
-        verificationStatus: 'verifying',
-      },
-    };
-    
-    await updateWallet(userId, newWalletData);
+    const { error: walletError } = await supabaseAdmin
+        .from('wallets')
+        .update({ verification_status: 'verifying' })
+        .eq('user_id', userId);
+
+    if (walletError) throw walletError;
 
     // Simulate the 2-minute verification delay
     setTimeout(async () => {
       try {
-        const finalWalletData = await getOrCreateWallet(userId);
-        finalWalletData.profile.verificationStatus = 'verified';
-        await updateWallet(userId, finalWalletData);
+        const { error: verificationError } = await createAdminClient()
+            .from('wallets')
+            .update({ verification_status: 'verified' })
+            .eq('user_id', userId);
+        if (verificationError) throw verificationError;
         console.log(`Verification completed for user ${userId}`);
       } catch (error) {
         console.error(`Error completing verification for user ${userId}:`, error);
         // Optionally, handle the failure case (e.g., set status to 'failed')
-        const failedWalletData = await getOrCreateWallet(userId);
-        failedWalletData.profile.verificationStatus = 'unverified';
-        await updateWallet(userId, failedWalletData);
+        await createAdminClient()
+            .from('wallets')
+            .update({ verification_status: 'unverified' })
+            .eq('user_id', userId);
       }
     }, 2 * 60 * 1000); // 2 minutes
 

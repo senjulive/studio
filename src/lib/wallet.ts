@@ -1,224 +1,110 @@
 
-'use client';
+'use server';
 
 import { getBotTierSettings } from './settings';
-import { sendSystemNotification } from './chat';
-import { readDb, writeDb } from './db';
+import { createClient } from './supabase/server';
+import type { Database } from './database.types';
 
-const DB_FILE = 'wallets.json';
+export type WalletData = Database['public']['Tables']['wallets']['Row'];
+export type ProfileData = Database['public']['Tables']['profiles']['Row'];
+export type WithdrawalAddresses = WalletData['security']['withdrawalAddresses'];
 
-const generateAddress = (prefix: string, length: number, chars: string): string => {
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return prefix + result;
-};
+// Called only from a server component or API route
+export async function getOrCreateWallet(): Promise<WalletData> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-const generateReferralCode = (): string => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    for (let i = 0; i < 8; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-}
-
-export type WalletAddresses = {
-    usdt: string;
-};
-
-export type WithdrawalAddresses = {
-    usdt?: string;
-};
-
-
-export type WalletData = {
-    addresses: WalletAddresses;
-    balances: {
-        usdt: number;
-        btc: number;
-        eth: number;
-    };
-    pendingWithdrawals: {
-        id: string;
-        amount: number;
-        asset: 'usdt';
-        address: string;
-        timestamp: number;
-    }[];
-    growth: {
-        clicksLeft: number;
-        lastReset: number; // timestamp
-        dailyEarnings: number;
-        earningsHistory: { amount: number; timestamp: number }[];
-    };
-    squad: {
-        referralCode: string;
-        squadLeader?: { id: string, username: string };
-        members: string[];
-    };
-    profile: {
-        username: string;
-        fullName: string;
-        idCardNo: string;
-        contactNumber: string;
-        country: string;
-        address?: string;
-        dateOfBirth?: string;
-        avatarUrl?: string;
-        verificationStatus: 'unverified' | 'verifying' | 'verified';
-    };
-    security: {
-        withdrawalAddresses: WithdrawalAddresses;
-    };
-};
-
-// Helper to create a complete, new wallet data object with all required fields.
-const createNewWalletDataObject = (): WalletData => {
-    const trc20Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    return {
-        addresses: {
-            usdt: generateAddress('T', 33, trc20Chars),
-        },
-        balances: {
-            usdt: 0,
-            btc: 0,
-            eth: 0,
-        },
-        pendingWithdrawals: [],
-        growth: {
-            clicksLeft: 4,
-            lastReset: Date.now(),
-            dailyEarnings: 0,
-            earningsHistory: [],
-        },
-        squad: {
-            referralCode: generateReferralCode(),
-            members: ['mock-member-1', 'mock-member-2'],
-        },
-        profile: {
-            username: 'DefaultUser',
-            fullName: '',
-            idCardNo: '',
-            contactNumber: '+0000000000',
-            country: 'Default',
-            avatarUrl: '',
-            verificationStatus: 'unverified',
-        },
-        security: {
-            withdrawalAddresses: {},
-        },
-    };
-}
-
-// Called after a new user signs up.
-export async function createWallet(
-    userId: string,
-    email: string,
-    username: string,
-    contactNumber: string,
-    country: string,
-    referralCode?: string
-): Promise<WalletData> {
-    
-    const allWallets = await readDb(DB_FILE, {});
-    
-    const newWallet = createNewWalletDataObject();
-    newWallet.profile.username = username;
-    newWallet.profile.contactNumber = contactNumber;
-    newWallet.profile.country = country;
-    
-    newWallet.balances.usdt += 5;
-
-    if (referralCode) {
-        newWallet.squad.squadLeader = { id: 'mock-leader-id', username: 'MockLeader' };
-        newWallet.balances.usdt += 5;
+    if (!user) {
+        throw new Error("User not authenticated.");
     }
     
-    allWallets[userId] = newWallet;
-    await writeDb(DB_FILE, allWallets);
-
-    if (referralCode) {
-         await sendSystemNotification(userId, `User registered with squad code ${referralCode} from leader MockLeader. A bonus of $5.00 USDT has been applied.`);
-    }
-
-    return newWallet;
-}
-
-
-// Fetches the current user's wallet, creating it if it doesn't exist.
-export async function getOrCreateWallet(userId: string): Promise<WalletData> {
-    const allWallets = await readDb(DB_FILE, {});
-    let userWallet = allWallets[userId];
-
-    if (!userWallet) {
-        userWallet = createNewWalletDataObject();
-        allWallets[userId] = userWallet;
-    }
+    const { data: wallet, error } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
     
-    const now = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000;
-    if (now - (userWallet.growth?.lastReset ?? 0) > oneDay) {
-        const settings = await getBotTierSettings();
-        const currentTier = [...settings].reverse().find(tier => userWallet.balances.usdt >= tier.balanceThreshold) || settings[0];
-        
-        userWallet.growth.clicksLeft = currentTier.clicks;
-        userWallet.growth.lastReset = now;
-        userWallet.growth.dailyEarnings = 0;
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+        throw error;
     }
 
-    // Ensure verificationStatus exists for older wallets
-    if (!userWallet.profile.verificationStatus) {
-        userWallet.profile.verificationStatus = 'unverified';
-    }
+    if (wallet) {
+        // Check if daily reset is needed
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        if (now - new Date(wallet.growth.last_reset).getTime() > oneDay) {
+            const settings = await getBotTierSettings();
+            const currentTier = [...settings].reverse().find(tier => wallet.balances.usdt >= tier.balanceThreshold) || settings[0];
+            
+            const updatedGrowth = {
+                ...wallet.growth,
+                clicks_left: currentTier.clicks,
+                last_reset: new Date().toISOString(),
+                daily_earnings: 0,
+            };
 
-    await writeDb(DB_FILE, allWallets);
-
-    return userWallet;
-}
-
-export async function getAllWallets(): Promise<Record<string, WalletData>> {
-    const defaultWallets = {
-        "mock-user-123": createNewWalletDataObject(),
-        "mock-user-456": {
-            ...createNewWalletDataObject(),
-            profile: {
-                ...createNewWalletDataObject().profile,
-                username: 'Another User',
-            },
-            balances: {
-                usdt: 1234.56,
-                btc: 0.05,
-                eth: 1.2
-            }
+            const { data: updatedWallet, error: updateError } = await supabase
+                .from('wallets')
+                .update({ growth: updatedGrowth })
+                .eq('user_id', user.id)
+                .select()
+                .single();
+            
+            if (updateError) throw updateError;
+            return updatedWallet as WalletData;
         }
-    };
-    return readDb(DB_FILE, defaultWallets);
+        return wallet as WalletData;
+    }
+
+    // If no wallet, a trigger in Supabase should have created one.
+    // We try fetching again after a short delay.
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { data: newWallet, error: newWalletError } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+    if (newWalletError) {
+        throw new Error("Failed to create or find wallet for user.");
+    }
+
+    return newWallet as WalletData;
 }
 
 
 // Updates a user's own wallet data.
-export async function updateWallet(userId: string, newData: WalletData): Promise<void> {
-    const allWallets = await readDb(DB_FILE, {});
-    allWallets[userId] = newData;
-    await writeDb(DB_FILE, allWallets);
-}
+export async function updateWallet(newData: Partial<WalletData>): Promise<void> {
+    const supabase = createClient();
+     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("User not authenticated.");
 
+    const { error } = await supabase
+        .from('wallets')
+        .update(newData)
+        .eq('user_id', user.id);
 
-// The functions below are now wrappers around updateWallet for specific tasks.
-
-export async function saveWithdrawalAddress(userId: string, asset: string, address: string): Promise<void> {
-    const wallet = await getOrCreateWallet(userId);
-    if (!wallet.security.withdrawalAddresses) {
-        wallet.security.withdrawalAddresses = {};
+    if (error) {
+        console.error("Error updating wallet:", error);
+        throw error;
     }
-    wallet.security.withdrawalAddresses[asset as keyof WithdrawalAddresses] = address;
-    await updateWallet(userId, wallet);
 }
 
-export async function getWithdrawalAddresses(userId: string): Promise<WithdrawalAddresses> {
-    const wallet = await getOrCreateWallet(userId);
+export async function saveWithdrawalAddress(asset: string, address: string): Promise<void> {
+    const wallet = await getOrCreateWallet();
+    const newAddresses = {
+        ...wallet.security.withdrawalAddresses,
+        [asset]: address,
+    };
+    await updateWallet({ 
+        security: {
+            ...wallet.security,
+            withdrawalAddresses: newAddresses
+        } 
+    });
+}
+
+export async function getWithdrawalAddresses(): Promise<WithdrawalAddresses> {
+    const wallet = await getOrCreateWallet();
     return wallet.security.withdrawalAddresses || {};
 }

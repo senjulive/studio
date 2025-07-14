@@ -1,20 +1,36 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
-import { ADMIN_PASSWORD } from '@/lib/admin-config';
-import type { WalletData } from '@/lib/wallet';
-import { getAllWallets } from '@/lib/wallet';
 
 export async function POST(request: Request) {
   try {
-    const { adminPassword } = await request.json();
+    const supabaseAdmin = createAdminClient();
+    
+    const { data: wallets, error } = await supabaseAdmin
+        .from('wallets')
+        .select(`
+            *,
+            profile:profiles(username, full_name)
+        `);
 
-    if (adminPassword !== ADMIN_PASSWORD) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (error) throw error;
+    
+    const walletsMap = wallets.reduce((acc, wallet) => {
+        // The shape from the DB is slightly different, so we map it
+        const profileData = Array.isArray(wallet.profile) ? wallet.profile[0] : wallet.profile;
+        acc[wallet.user_id] = {
+            ...wallet,
+            profile: {
+                ...wallet.profile,
+                username: profileData?.username,
+                fullName: profileData?.full_name,
+            }
+        };
+        return acc;
+    }, {} as Record<string, any>);
 
-    const wallets = await getAllWallets();
 
-    return NextResponse.json(wallets);
+    return NextResponse.json(walletsMap);
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || 'An unexpected error occurred.' },

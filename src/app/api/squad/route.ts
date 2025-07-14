@@ -1,12 +1,10 @@
 
-import { NextResponse } from 'next/server';
 import { ranks, getUserRank } from '@/lib/ranks';
-import { defaultTierSettings, getCurrentTier } from '@/lib/settings';
+import { getCurrentTier, getBotTierSettings } from '@/lib/settings';
+import { createClient } from '@/lib/supabase/server';
 import type { Rank } from '@/lib/ranks';
 import type { TierSetting } from '@/lib/settings';
-
-// Since we removed Supabase, we can no longer get the current user from cookies this way.
-// The app will function in a mock state. We'll return a mock squad.
+import { NextResponse } from 'next/server';
 
 export type SquadMember = {
     id: string;
@@ -17,30 +15,45 @@ export type SquadMember = {
     team: SquadMember[];
 };
 
-function getMemberWithRankAndTier(id: string, username: string, balance: number, team: SquadMember[] = []): SquadMember {
-    const rank = getUserRank(balance);
-    const tier = getCurrentTier(balance, defaultTierSettings) || defaultTierSettings[0];
-    return {
-        id,
-        username,
-        balance,
-        rank: { name: rank.name, Icon: rank.Icon, className: rank.className },
-        tier: { name: tier.name, Icon: tier.Icon, className: tier.className },
-        team,
-    };
-}
-
-
-const mockSquad: SquadMember[] = [
-    getMemberWithRankAndTier('mock-member-1', 'SquadMemberOne', 1250, [
-        getMemberWithRankAndTier('mock-sub-member-1', 'SubMemberOne', 600)
-    ]),
-    getMemberWithRankAndTier('mock-member-2', 'SquadMemberTwo', 5500),
-    getMemberWithRankAndTier('mock-member-3', 'RecruitZero', 250),
-    getMemberWithRankAndTier('mock-member-4', 'DiamondHands', 16000),
-]
-
 export async function GET(request: Request) {
-    // Return mock data because there is no database to query.
-    return NextResponse.json(mockSquad);
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+        const tierSettings = await getBotTierSettings();
+
+        // This is a simplified version. A real implementation would use a recursive query
+        // or a more complex logic to fetch the entire squad hierarchy.
+        // For now, we fetch direct referrals.
+        const { data: members, error } = await supabase
+            .from('profiles')
+            .select('user_id, username, wallets(balances)')
+            .eq('squad_leader_id', user.id);
+
+        if (error) throw error;
+        
+        const squadList: SquadMember[] = members.map((member: any) => {
+            const balance = member.wallets?.balances?.usdt || 0;
+            const rank = getUserRank(balance);
+            const tier = getCurrentTier(balance, tierSettings);
+
+            return {
+                id: member.user_id,
+                username: member.username,
+                balance,
+                rank: { name: rank.name, Icon: rank.Icon, className: rank.className },
+                tier: tier ? { name: tier.name, Icon: tier.Icon, className: tier.className } : { name: 'N/A', Icon: () => null, className: '' },
+                team: [], // Nested teams not implemented in this version
+            };
+        });
+
+        return NextResponse.json(squadList);
+
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 }

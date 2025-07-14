@@ -1,21 +1,17 @@
 
-'use client';
+'use server';
 
-import { readDb, writeDb } from './db';
-
-const DB_FILE = 'chats.json';
+import { createClient } from './supabase/server';
+import { createAdminClient } from './supabase/admin';
 
 export type Message = {
   id: string;
+  user_id: string;
   text: string;
-  timestamp: number;
+  timestamp: string;
   sender: 'user' | 'admin';
   silent?: boolean;
-  file?: {
-    name: string;
-    type: string;
-    dataUrl: string;
-  };
+  file_url?: string;
 };
 
 export type ChatHistory = {
@@ -23,67 +19,131 @@ export type ChatHistory = {
 };
 
 
-const defaultChats: ChatHistory = {
-    'mock-user-123': [
-        { id: 'msg_1', text: 'Welcome to support! This is a mock chat system. Messages will not be saved.', timestamp: Date.now() - 10000, sender: 'admin' }
-    ]
-};
-
-// Admin function: Fetches all chats from the mock store.
+// Admin function: Fetches all chats from Supabase.
 export async function getAllChats(): Promise<ChatHistory> {
-  return await readDb(DB_FILE, defaultChats);
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .order('timestamp', { ascending: true });
+    
+    if (error) {
+        console.error('Error fetching chats:', error);
+        return {};
+    }
+
+    const chats: ChatHistory = {};
+    for (const message of data) {
+        if (!chats[message.user_id]) {
+            chats[message.user_id] = [];
+        }
+        chats[message.user_id].push(message as Message);
+    }
+
+    return chats;
 }
 
-// Fetches chat history for a single user from the mock store.
+// Fetches chat history for a single user.
 export async function getChatHistoryForUser(userId: string): Promise<Message[]> {
-  const chats = await getAllChats();
-  return chats[userId] || [];
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('user_id', userId)
+        .order('timestamp', { ascending: true });
+    
+    if (error) {
+        console.error('Error fetching chat history:', error);
+        return [];
+    }
+    return data as Message[];
 }
 
-// Universal function to send a message to the mock store.
-async function createMessage(userId: string, text: string, sender: 'user' | 'admin', silent: boolean, file?: Message['file']): Promise<Message> {
-  const chats = await getAllChats();
-  const newMessage: Message = {
-    id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-    text,
-    sender,
-    timestamp: Date.now(),
-    silent,
-    file,
-  };
+// Universal function to send a message.
+async function createMessage(
+  userId: string,
+  text: string,
+  sender: 'user' | 'admin',
+  silent: boolean,
+  file_url?: string
+): Promise<void> {
+    const supabase = createAdminClient();
+    const { error } = await supabase
+        .from('chat_messages')
+        .insert({
+            user_id: userId,
+            text,
+            sender,
+            silent,
+            file_url,
+        });
+    
+    if (error) {
+        throw new Error(`Failed to send message: ${error.message}`);
+    }
 
-  if (!chats[userId]) {
-    chats[userId] = [];
-  }
-  chats[userId].push(newMessage);
-  
-  if (sender === 'user' && !silent) {
-      const autoReply: Message = {
-          id: `msg_${Date.now()}_reply`,
-          text: "Thank you for your message. An admin will be with you shortly. (This is an automated reply)",
-          sender: 'admin',
-          timestamp: Date.now() + 1000 // ensure it appears after
-      };
-      chats[userId].push(autoReply);
-  }
-  
-  await writeDb(DB_FILE, chats);
-
-  return newMessage;
+    if (sender === 'user' && !silent) {
+        // Create an automated reply
+        await supabase.from('chat_messages').insert({
+            user_id: userId,
+            text: "Thank you for your message. An admin will be with you shortly. (This is an automated reply)",
+            sender: 'admin',
+            silent: false,
+        });
+    }
 }
-
 
 // Sends a message from a user.
-export async function sendMessage(userId: string, text: string, file?: Message['file']): Promise<Message> {
-  return createMessage(userId, text, 'user', false, file);
+export async function sendMessage(
+  userId: string,
+  text: string,
+  fileDataUrl?: string,
+  fileName?: string,
+  fileType?: string,
+): Promise<void> {
+  const supabase = createClient();
+  let file_url: string | undefined = undefined;
+
+  if (fileDataUrl && fileName && fileType) {
+    const filePath = `${userId}/${Date.now()}_${fileName}`;
+    const base64 = fileDataUrl.split(',')[1];
+    const { data, error } = await supabase.storage
+      .from('chat_files')
+      .upload(filePath, Buffer.from(base64, 'base64'), {
+        contentType: fileType,
+      });
+
+    if (error) {
+      throw new Error(`Failed to upload file: ${error.message}`);
+    }
+    
+    const { data: { publicUrl } } = supabase.storage.from('chat_files').getPublicUrl(data.path);
+    file_url = publicUrl;
+  }
+
+  return createMessage(userId, text, 'user', false, file_url);
 }
 
 // Sends a message from an admin.
-export async function sendAdminMessage(userId: string, text: string): Promise<Message> {
+export async function sendAdminMessage(userId: string, text: string): Promise<void> {
     return createMessage(userId, text, 'admin', false);
 }
 
 // Sends a silent system notification into the chat history.
-export async function sendSystemNotification(userId:string, text:string): Promise<void>{
-    await createMessage(userId, `[System Alert] ${text}`, 'admin', true);
+export async function sendSystemNotification(text: string): Promise<void> {
+    const supabase = createAdminClient();
+    const { data: users, error: userError } = await supabase.auth.admin.listUsers();
+    if (userError) {
+        console.error("Failed to fetch users for system notification:", userError);
+        return;
+    }
+    
+    const adminUser = users.users.find(u => u.email?.includes('admin')); // A simple way to find an admin
+    if (!adminUser) {
+        console.error("No admin user found to send system notification from.");
+        return;
+    }
+
+    // This sends a system alert to the admin's own chat thread.
+    await createMessage(adminUser.id, `[System Alert] ${text}`, 'admin', true);
 }

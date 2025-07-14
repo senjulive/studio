@@ -34,7 +34,7 @@ function AnnouncementCard({ announcement }: { announcement: Notification }) {
         <div className="flex justify-between items-start">
             <div>
                 <CardTitle className="text-lg">{announcement.title}</CardTitle>
-                <CardDescription>{new Date(announcement.date).toLocaleDateString()}</CardDescription>
+                <CardDescription>{new Date(announcement.created_at).toLocaleDateString()}</CardDescription>
             </div>
         </div>
       </CardHeader>

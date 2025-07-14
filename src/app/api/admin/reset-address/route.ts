@@ -1,23 +1,39 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
-import { ADMIN_PASSWORD } from '@/lib/admin-config';
-import { getOrCreateWallet, updateWallet } from '@/lib/wallet';
 
 export async function POST(request: Request) {
   try {
-    const { adminPassword, userId } = await request.json();
-
-    if (adminPassword !== ADMIN_PASSWORD) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId } = await request.json();
+    if (!userId) {
+        return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    // In a real DB, you'd fetch the specific user's wallet.
-    // Here we use the mock getOrCreateWallet which returns the single in-memory wallet.
-    const walletData = await getOrCreateWallet(userId);
-    walletData.security.withdrawalAddresses = {};
+    const supabaseAdmin = createAdminClient();
 
-    // Update the mock wallet data
-    await updateWallet(userId, walletData);
+    const { data: wallet, error: fetchError } = await supabaseAdmin
+      .from('wallets')
+      .select('security')
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError || !wallet) {
+      return NextResponse.json({ error: 'Wallet not found' }, { status: 404 });
+    }
+
+    const updatedSecurity = {
+      ...wallet.security,
+      withdrawalAddresses: {},
+    };
+
+    const { error: updateError } = await supabaseAdmin
+      .from('wallets')
+      .update({ security: updatedSecurity })
+      .eq('user_id', userId);
+
+    if (updateError) {
+      throw updateError;
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

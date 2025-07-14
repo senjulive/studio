@@ -59,6 +59,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
 import { useAdmin } from "@/contexts/AdminContext";
 
+type MappedWallet = WalletData & { user_id: string };
 
 const addressUpdateSchema = z.object({
   usdtAddress: z.string().min(1, { message: "Address is required." }),
@@ -88,9 +89,8 @@ export function WalletManager() {
   const { toast } = useToast();
   const { adminPassword } = useAdmin();
 
-  const [allWallets, setAllWallets] = React.useState<Record<string, WalletData> | null>(null);
+  const [allWallets, setAllWallets] = React.useState<Record<string, MappedWallet> | null>(null);
   const [selectedUserId, setSelectedUserId] = React.useState<string>("");
-  const [isLoading, setIsLoading] = React.useState(false);
   const [isUpdating, setIsUpdating] = React.useState(false);
   const [isCompleting, setIsCompleting] = React.useState<string | null>(null);
   const [isFetchingWallets, setIsFetchingWallets] = React.useState(true);
@@ -166,8 +166,7 @@ export function WalletManager() {
   const handleAddressUpdate = async (values: AddressUpdateFormValues) => {
     if (!selectedWalletData || !selectedUserId) return;
 
-    const newWalletData: WalletData = {
-      ...selectedWalletData,
+    const newWalletData: Partial<WalletData> = {
       addresses: { ...selectedWalletData.addresses, usdt: values.usdtAddress },
     };
 
@@ -208,7 +207,7 @@ export function WalletManager() {
       });
     }
 
-    const newWalletData: WalletData = { ...selectedWalletData, balances: newBalances };
+    const newWalletData: Partial<WalletData> = { balances: newBalances };
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
 
     toast({ title: "Balance Updated", description: `Successfully ${action}ed ${values.amount} ${asset.toUpperCase()} for ${selectedUserId}.` });
@@ -223,16 +222,15 @@ export function WalletManager() {
     if (!selectedWalletData || !selectedUserId) return;
     setIsCompleting(withdrawalId);
 
-    const withdrawal = selectedWalletData.pendingWithdrawals.find(w => w.id === withdrawalId);
+    const withdrawal = selectedWalletData.pending_withdrawals.find(w => w.id === withdrawalId);
     if (!withdrawal) {
         toast({ title: "Error", description: "Withdrawal not found.", variant: "destructive" });
         setIsCompleting(null);
         return;
     }
 
-    const newWalletData: WalletData = {
-        ...selectedWalletData,
-        pendingWithdrawals: selectedWalletData.pendingWithdrawals.filter(w => w.id !== withdrawalId),
+    const newWalletData: Partial<WalletData> = {
+        pending_withdrawals: selectedWalletData.pending_withdrawals.filter(w => w.id !== withdrawalId),
     };
 
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
@@ -261,8 +259,8 @@ export function WalletManager() {
           <SelectContent>
             {allWallets && Object.keys(allWallets).length > 0 ? (
               Object.values(allWallets).map((wallet) => (
-                <SelectItem key={Object.keys(allWallets).find(key => allWallets[key] === wallet)!} value={Object.keys(allWallets).find(key => allWallets[key] === wallet)!}>
-                  {wallet.profile?.username || Object.keys(allWallets).find(key => allWallets[key] === wallet)}
+                <SelectItem key={wallet.user_id} value={wallet.user_id}>
+                  {wallet.profile?.username || wallet.user_id}
                 </SelectItem>
               ))
             ) : (
@@ -298,7 +296,7 @@ export function WalletManager() {
           </div>
         ) : null)}
 
-       {selectedWalletData?.pendingWithdrawals && selectedWalletData.pendingWithdrawals.length > 0 && (
+       {selectedWalletData?.pending_withdrawals && selectedWalletData.pending_withdrawals.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Pending Withdrawals</CardTitle>
@@ -315,7 +313,7 @@ export function WalletManager() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {selectedWalletData.pendingWithdrawals.map((w) => (
+                  {selectedWalletData.pending_withdrawals.map((w) => (
                     <TableRow key={w.id}>
                       <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
                       <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>

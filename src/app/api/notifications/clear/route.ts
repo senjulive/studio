@@ -1,17 +1,22 @@
 
+import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { clearNotifications } from '@/lib/notifications';
-import { getCurrentUser } from '@/lib/auth'; // We need to identify the user
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    await clearNotifications(user.id);
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', user.id);
+    
+    if (error) throw error;
 
     return NextResponse.json({ success: true, message: 'Notifications cleared.' });
 

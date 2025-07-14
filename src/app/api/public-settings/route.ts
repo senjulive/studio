@@ -1,8 +1,6 @@
 
+import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { readDb } from '@/lib/db';
-
-const DB_FILE = 'settings.json';
 
 export async function GET(request: Request) {
   try {
@@ -12,22 +10,25 @@ export async function GET(request: Request) {
     if (!key) {
       return NextResponse.json({ error: 'A key is required' }, { status: 400 });
     }
-
-    const settings = await readDb(DB_FILE, {});
-    const value = settings[key];
-
-    if (value === undefined) {
-      // Return null or an empty object if the key is not found,
-      // so the frontend can use its default values.
-      return NextResponse.json(null);
-    }
     
-    return NextResponse.json(value);
-  } catch (error: any) {
-    // If the file doesn't exist or is invalid JSON, we'll fall back to defaults on the client.
-    if (error.code === 'ENOENT' || error instanceof SyntaxError) {
-      return NextResponse.json(null);
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', key)
+        .single();
+    
+    if (error) {
+        // If the key is not found, Supabase returns an error. We want to return null.
+        if (error.code === 'PGRST116') {
+            return NextResponse.json(null);
+        }
+        throw error;
     }
+
+    return NextResponse.json(data?.value || null);
+  } catch (error: any) {
+    console.error("Error fetching public setting:", error.message);
     return NextResponse.json(
       { error: error.message || 'An unexpected error occurred.' },
       { status: 500 }

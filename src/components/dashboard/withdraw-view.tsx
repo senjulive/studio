@@ -57,8 +57,8 @@ export function WithdrawView() {
     if (user?.id) {
         setIsLoading(true);
         const [addresses, wallet] = await Promise.all([
-          getWithdrawalAddresses(user.id),
-          getOrCreateWallet(user.id),
+          getWithdrawalAddresses(),
+          getOrCreateWallet(),
         ]);
         setSavedAddresses(addresses);
         setWalletData(wallet);
@@ -82,8 +82,8 @@ export function WithdrawView() {
     if (!user?.id) return;
 
     setIsSaving(true);
-    await saveWithdrawalAddress(user.id, asset, currentAddress);
-    const updatedAddresses = await getWithdrawalAddresses(user.id);
+    await saveWithdrawalAddress(asset, currentAddress);
+    const updatedAddresses = await getWithdrawalAddresses();
     setSavedAddresses(updatedAddresses);
     setIsSaving(false);
     toast({ title: "Address Saved", description: "Your withdrawal address has been saved." });
@@ -129,16 +129,14 @@ export function WithdrawView() {
             ...walletData.balances,
             usdt: walletData.balances.usdt - withdrawAmount,
         },
-        pendingWithdrawals: [...(walletData.pendingWithdrawals || []), withdrawalRequest]
+        pending_withdrawals: [...(walletData.pending_withdrawals || []), withdrawalRequest]
     };
 
-    await updateWallet(user.id, newWalletData);
+    await updateWallet(newWalletData);
     setWalletData(newWalletData);
 
-    const username = walletData?.profile.username || user.email;
     await sendSystemNotification(
-      user.id,
-      `User '${username}' (${user.email}) initiated a withdrawal of ${amount} ${asset.toUpperCase()} to address ${savedAddresses.usdt}.`
+      `User '${user.email}' initiated a withdrawal of ${amount} ${asset.toUpperCase()} to address ${savedAddresses.usdt}.`
     );
     await addNotification(user.id, {
       title: "Withdrawal Request Received",
@@ -155,7 +153,7 @@ export function WithdrawView() {
   };
 
   const hasSavedAddress = savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
-  const pendingWithdrawals = walletData?.pendingWithdrawals || [];
+  const pendingWithdrawals = walletData?.pending_withdrawals || [];
   
   const renderContent = () => {
     if (isLoading) {

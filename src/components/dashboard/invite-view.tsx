@@ -73,12 +73,12 @@ export function InviteView() {
     setIsClient(true);
   }, []);
 
-  const referralCode = walletData?.squad?.referralCode || "";
+  const referralCode = walletData?.squad?.referral_code || "";
 
   React.useEffect(() => {
     if (user?.id) {
       async function fetchWallet() {
-        const data = await getOrCreateWallet(user.id);
+        const data = await getOrCreateWallet();
         setWalletData(data);
       }
       fetchWallet();
@@ -105,7 +105,7 @@ export function InviteView() {
     }
   };
   
-  const squadLeader = walletData?.squad?.squadLeader;
+  const squadLeader = walletData?.squad?.squad_leader;
   const shareText = `Join my squad on AstralCore and we both get a $5 bonus! Use my code: ${referralCode}`;
   const encodedShareText = encodeURIComponent(shareText);
   const encodedSquadLink = encodeURIComponent(squadLink);

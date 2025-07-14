@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -20,6 +21,7 @@ import { getChatHistoryForUser, sendMessage, type Message } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useUser } from "@/app/dashboard/layout";
+import { createClient } from "@/lib/supabase/client";
 
 export function SupportChat() {
   const { toast } = useToast();
@@ -33,19 +35,44 @@ export function SupportChat() {
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
+  const fetchHistory = React.useCallback(async () => {
     if (user?.id) {
-      async function fetchHistory() {
-        setIsLoading(true);
         const history = await getChatHistoryForUser(user.id);
         setMessages(history.filter(m => !m.silent));
         setIsLoading(false);
-      }
-      fetchHistory();
     } else {
         setIsLoading(false);
     }
   }, [user]);
+
+  React.useEffect(() => {
+    if (user?.id) {
+      setIsLoading(true);
+      fetchHistory();
+    }
+  }, [user, fetchHistory]);
+
+  React.useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel('chat-messages')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'chat_messages', 
+        filter: `user_id=eq.${user.id}` 
+      },
+      (payload) => {
+        fetchHistory();
+      })
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    }
+  }, [user, fetchHistory]);
+
 
   React.useEffect(() => {
     if (scrollAreaRef.current) {
@@ -74,21 +101,20 @@ export function SupportChat() {
 
     setIsSending(true);
     
-    let fileData: Message['file'] | undefined = undefined;
+    let fileDataUrl: string | undefined = undefined;
+    let fileName: string | undefined = undefined;
+    let fileType: string | undefined = undefined;
+    
     if (selectedFile) {
       try {
-        fileData = await new Promise((resolve, reject) => {
+        fileDataUrl = await new Promise((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = (event) => {
-            resolve({
-              name: selectedFile.name,
-              type: selectedFile.type,
-              dataUrl: event.target?.result as string,
-            });
-          };
+          reader.onload = (event) => resolve(event.target?.result as string);
           reader.onerror = (error) => reject(error);
           reader.readAsDataURL(selectedFile);
         });
+        fileName = selectedFile.name;
+        fileType = selectedFile.type;
       } catch (error) {
         toast({ title: "Error reading file", description: "Could not process the selected file.", variant: "destructive" });
         setIsSending(false);
@@ -97,17 +123,17 @@ export function SupportChat() {
     }
     
     try {
-      const sentMessage = await sendMessage(user.id, newMessage, fileData);
-      setMessages((prev) => [...prev, sentMessage]);
+      await sendMessage(user.id, newMessage, fileDataUrl, fileName, fileType);
+      // No need to manually add to state, realtime subscription will handle it
       setNewMessage("");
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error Sending Message",
-        description: "Please try again later.",
+        description: error.message || "Please try again later.",
         variant: "destructive",
       });
     } finally {
@@ -164,9 +190,9 @@ export function SupportChat() {
                       )}
                     >
                       {message.text}
-                      {message.file && message.file.type.startsWith('image/') && (
+                      {message.file_url && (
                          // eslint-disable-next-line @next/next/no-img-element
-                        <img src={message.file.dataUrl} alt={message.file.name} className="mt-2 rounded-md max-w-full h-auto" />
+                        <img src={message.file_url} alt="Attached file" className="mt-2 rounded-md max-w-full h-auto" />
                       )}
                     </div>
                     <span className={cn(

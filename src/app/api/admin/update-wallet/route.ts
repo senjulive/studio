@@ -1,24 +1,33 @@
 
-import { NextResponse } from 'next/server';
-import { ADMIN_PASSWORD } from '@/lib/admin-config';
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { WalletData } from '@/lib/wallet';
-import { updateWallet } from '@/lib/wallet';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { adminPassword, userId, newWalletData } = (await request.json()) as {
-      adminPassword: string;
+    const { userId, newWalletData } = (await request.json()) as {
       userId: string;
       newWalletData: WalletData;
     };
+    
+    if (!userId || !newWalletData) {
+        return NextResponse.json({ error: 'User ID and new wallet data are required' }, { status: 400 });
+    }
+    
+    const supabaseAdmin = createAdminClient();
+    
+    const { data, error } = await supabaseAdmin
+      .from('wallets')
+      .update(newWalletData)
+      .eq('user_id', userId)
+      .select()
+      .single();
 
-    if (adminPassword !== ADMIN_PASSWORD) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (error) {
+        throw error;
     }
 
-    await updateWallet(userId, newWalletData);
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, data });
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || 'An unexpected error occurred.' },

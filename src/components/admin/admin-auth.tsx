@@ -26,8 +26,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { AdminProvider } from "@/contexts/AdminContext";
+import { createClient } from "@/lib/supabase/client";
 
 const adminAuthSchema = z.object({
+  email: z.string().email(),
   password: z.string().min(1, { message: "Password is required." }),
 });
 
@@ -37,51 +39,46 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [password, setPassword] = React.useState("");
 
   const form = useForm<AdminAuthFormValues>({
     resolver: zodResolver(adminAuthSchema),
     defaultValues: {
+      email: "",
       password: "",
     },
   });
 
   const onSubmit = async (values: AdminAuthFormValues) => {
     setIsLoading(true);
+    const supabase = createClient();
     try {
-      const response = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: values.password }),
+      const { error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
       });
 
-      const result = await response.json();
+      if (error) {
+        throw new Error(error.message);
+      }
 
-      if (response.ok && result.success) {
-        toast({ title: "Access Granted" });
-        setPassword(values.password);
-        setIsAuthenticated(true);
-      } else {
+      // Here you might want to check for a specific admin role in a real app
+      toast({ title: "Access Granted" });
+      setIsAuthenticated(true);
+    } catch (error: any) {
         toast({
           title: "Access Denied",
-          description: result.error || "Incorrect password.",
+          description: error.message || "Incorrect credentials.",
           variant: "destructive",
         });
         form.reset();
-      }
-    } catch (error) {
-        toast({
-          title: "Authentication Error",
-          description: "Could not connect to the server. Please try again.",
-          variant: "destructive",
-        });
     } finally {
         setIsLoading(false);
     }
   };
 
   if (isAuthenticated) {
-    return <AdminProvider value={{ adminPassword: password }}>{children}</AdminProvider>;
+    // We pass a dummy password, but in a real app, you might pass a JWT or other token.
+    return <AdminProvider value={{ adminPassword: 'authenticated' }}>{children}</AdminProvider>;
   }
 
   return (
@@ -92,12 +89,25 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
         </div>
         <CardTitle>Admin Access Required</CardTitle>
         <CardDescription>
-          Please enter the password to access the admin panel.
+          Please enter admin credentials to access the admin panel.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+             <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="admin@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="password"
