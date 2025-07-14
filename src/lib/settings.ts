@@ -1,4 +1,6 @@
 
+'use client';
+
 import type { SVGProps } from 'react';
 import { RecruitTierIcon } from '@/components/icons/tiers/recruit-tier-icon';
 import { BronzeTierIcon } from '@/components/icons/tiers/bronze-tier-icon';
