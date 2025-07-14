@@ -44,6 +44,7 @@ import { SettingsIcon } from "@/components/icons/nav/settings-icon";
 import { LogoutIcon } from "@/components/icons/nav/logout-icon";
 import { InboxIcon } from "@/components/icons/nav/inbox-icon";
 import { UserPlus, Repeat } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import type { User } from '@supabase/supabase-js';
 
@@ -229,7 +230,15 @@ export default function DashboardLayout({
                   )}
               </h1>
             </div>
-            <NotificationBell />
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                <Link href="/dashboard/inbox">
+                  <InboxIcon className="h-5 w-5" />
+                  <span className="sr-only">Inbox</span>
+                </Link>
+              </Button>
+              <NotificationBell />
+            </div>
           </header>
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
               {children}
