@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import { getAnnouncements, type Announcement } from "@/lib/announcements";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import {
   Card,
@@ -13,11 +12,10 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Inbox, User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
@@ -27,25 +25,6 @@ import { useUser } from "@/app/dashboard/layout";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from 'date-fns';
-
-
-function AnnouncementCard({ announcement }: { announcement: Announcement }) {
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-start">
-            <div>
-                <CardTitle className="text-lg">{announcement.title}</CardTitle>
-                <CardDescription>{announcement.date}</CardDescription>
-            </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">{announcement.content}</p>
-      </CardContent>
-    </Card>
-  );
-}
 
 const ProfileDetailItem = ({
   icon,
@@ -123,7 +102,6 @@ const VerificationStatusBadge = ({ status }: { status?: string }) => {
 export function ProfileView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
   const { user } = useUser();
   const [showVerificationPopup, setShowVerificationPopup] = React.useState(false);
 
@@ -146,7 +124,6 @@ export function ProfileView() {
 
   React.useEffect(() => {
     fetchWallet();
-    setAnnouncements(getAnnouncements());
 
     const interval = setInterval(() => {
         if (walletData?.profile.verificationStatus === 'verifying') {
@@ -181,133 +158,102 @@ export function ProfileView() {
                 </Button>
             </DialogContent>
         </Dialog>
-    <Tabs defaultValue="profile" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
-        <TabsTrigger value="profile">
-          <User className="mr-2 h-4 w-4" />
-          Profile
-        </TabsTrigger>
-        <TabsTrigger value="inbox">
-          <Inbox className="mr-2 h-4 w-4" />
-          Inbox
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="profile" className="mt-6">
-            <Card className="max-w-md mx-auto">
-              <CardHeader className="items-center text-center p-0">
-                 <div className="p-4 w-full">
-                    <VirtualCard walletData={walletData} userEmail={user?.email || null} />
-                 </div>
-                 <div className="p-6 pt-2 w-full">
-                    <CardTitle className="text-2xl">
-                      {isLoading ? <Skeleton className="h-8 w-40 mx-auto" /> : profileDisplayName}
-                    </CardTitle>
-                    <div className="mt-2 flex justify-center gap-2 items-center">
-                      {isLoading ? (
-                        <>
-                          <Skeleton className="h-8 w-24" />
-                          <Skeleton className="h-6 w-20" />
-                        </>
-                      ) : (
-                        <>
-                          <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                            <rank.Icon className="h-5 w-5" />
-                            <span>{rank.name}</span>
-                          </Badge>
-                          <VerificationStatusBadge status={profile?.verificationStatus} />
-                        </>
-                      )}
-                    </div>
-                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 mb-6">
-                    <Label className="text-xs text-muted-foreground">Asset Balances</Label>
+        <Card className="max-w-md mx-auto">
+            <CardHeader className="items-center text-center p-0">
+                <div className="p-4 w-full">
+                <VirtualCard walletData={walletData} userEmail={user?.email || null} />
+                </div>
+                <div className="p-6 pt-2 w-full">
+                <CardTitle className="text-2xl">
+                    {isLoading ? <Skeleton className="h-8 w-40 mx-auto" /> : profileDisplayName}
+                </CardTitle>
+                <div className="mt-2 flex justify-center gap-2 items-center">
                     {isLoading ? (
-                        Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                            <Skeleton className="h-8 w-8 rounded-full" />
-                            <div className="space-y-2">
-                                <Skeleton className="h-4 w-20" />
-                                <Skeleton className="h-3 w-10" />
-                            </div>
-                            </div>
-                            <Skeleton className="h-5 w-24" />
-                        </div>
-                        ))
+                    <>
+                        <Skeleton className="h-8 w-24" />
+                        <Skeleton className="h-6 w-20" />
+                    </>
                     ) : (
-                        assetConfig.map(asset => (
-                        <div key={asset.ticker} className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                            <Image src={asset.iconUrl} alt={asset.name} width={32} height={32} className="rounded-full" />
-                            <div>
-                                <p className="font-medium">{asset.name}</p>
-                                <p className="text-sm text-muted-foreground">{asset.ticker}</p>
-                            </div>
-                            </div>
-                            <div className="text-right">
-                            <p className="font-medium font-mono text-green-600">
-                                {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 6,
-                                }) ?? '0.00'}
-                            </p>
-                            </div>
-                        </div>
-                        ))
+                    <>
+                        <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
+                        <rank.Icon className="h-5 w-5" />
+                        <span>{rank.name}</span>
+                        </Badge>
+                        <VerificationStatusBadge status={profile?.verificationStatus} />
+                    </>
                     )}
                 </div>
-                <Separator className="mb-6"/>
-
-                  <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
-                      <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
-                      <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
-                      <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={user?.email} />
-                      <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="ID Card No." value={profile?.idCardNo} />
-                      <ProfileDetailItem isLoading={isLoading} icon={<Phone className="h-4 w-4" />} label="Contact Number" value={profile?.contactNumber} />
-                      <ProfileDetailItem isLoading={isLoading} icon={<MapPin className="h-4 w-4" />} label="Country" value={profile?.country} />
-                      {isVerified && (
-                        <>
-                            <ProfileDetailItem isLoading={isLoading} icon={<Home className="h-4 w-4" />} label="Address" value={profile?.address} />
-                            <ProfileDetailItem isLoading={isLoading} icon={<Calendar className="h-4 w-4" />} label="Date of Birth" value={profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set'} />
-                        </>
-                      )}
-                      <div className="sm:col-span-2">
-                          <ProfileDetailItem isLoading={isLoading} icon={<Users className="h-4 w-4" />} label="Squad Members" value={`${squadSize} member${squadSize !== 1 ? 's' : ''}`} />
-                      </div>
-                  </div>
-              </CardContent>
-              {!isVerified && !isLoading && (
-                 <CardFooter>
-                    <Button asChild className="w-full">
-                        <Link href="/dashboard/profile/verify">
-                            <ShieldCheck className="mr-2 h-4 w-4" />
-                            Start Verification
-                        </Link>
-                    </Button>
-                </CardFooter>
-              )}
-            </Card>
-      </TabsContent>
-      <TabsContent value="inbox" className="mt-6">
-         <Card>
-            <CardHeader>
-                <CardTitle>Announcements</CardTitle>
-                <CardDescription>Important updates and notifications from the AstralCore team.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-            {announcements.length > 0 ? (
-                announcements.map((item) => <AnnouncementCard key={item.id} announcement={item} />)
-            ) : (
-                <div className="flex h-48 items-center justify-center rounded-md border border-dashed">
-                    <p className="text-muted-foreground">Your inbox is empty.</p>
                 </div>
-            )}
+            </CardHeader>
+            <CardContent>
+            <div className="space-y-4 mb-6">
+                <Label className="text-xs text-muted-foreground">Asset Balances</Label>
+                {isLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-3 w-10" />
+                        </div>
+                        </div>
+                        <Skeleton className="h-5 w-24" />
+                    </div>
+                    ))
+                ) : (
+                    assetConfig.map(asset => (
+                    <div key={asset.ticker} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                        <Image src={asset.iconUrl} alt={asset.name} width={32} height={32} className="rounded-full" />
+                        <div>
+                            <p className="font-medium">{asset.name}</p>
+                            <p className="text-sm text-muted-foreground">{asset.ticker}</p>
+                        </div>
+                        </div>
+                        <div className="text-right">
+                        <p className="font-medium font-mono text-green-600">
+                            {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 6,
+                            }) ?? '0.00'}
+                        </p>
+                        </div>
+                    </div>
+                    ))
+                )}
+            </div>
+            <Separator className="mb-6"/>
+
+                <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
+                    <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
+                    <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
+                    <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={user?.email} />
+                    <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="ID Card No." value={profile?.idCardNo} />
+                    <ProfileDetailItem isLoading={isLoading} icon={<Phone className="h-4 w-4" />} label="Contact Number" value={profile?.contactNumber} />
+                    <ProfileDetailItem isLoading={isLoading} icon={<MapPin className="h-4 w-4" />} label="Country" value={profile?.country} />
+                    {isVerified && (
+                    <>
+                        <ProfileDetailItem isLoading={isLoading} icon={<Home className="h-4 w-4" />} label="Address" value={profile?.address} />
+                        <ProfileDetailItem isLoading={isLoading} icon={<Calendar className="h-4 w-4" />} label="Date of Birth" value={profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set'} />
+                    </>
+                    )}
+                    <div className="sm:col-span-2">
+                        <ProfileDetailItem isLoading={isLoading} icon={<Users className="h-4 w-4" />} label="Squad Members" value={`${squadSize} member${squadSize !== 1 ? 's' : ''}`} />
+                    </div>
+                </div>
             </CardContent>
-         </Card>
-      </TabsContent>
-    </Tabs>
+            {!isVerified && !isLoading && (
+                <CardFooter>
+                <Button asChild className="w-full">
+                    <Link href="/dashboard/profile/verify">
+                        <ShieldCheck className="mr-2 h-4 w-4" />
+                        Start Verification
+                    </Link>
+                </Button>
+            </CardFooter>
+            )}
+        </Card>
     </>
   );
 }

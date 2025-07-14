@@ -65,3 +65,11 @@ export async function markAllAsRead(userId: string): Promise<Notification[]> {
     }
     return [];
 }
+
+export async function clearNotifications(userId: string): Promise<void> {
+    const allUserNotifications = await readDb(DB_FILE, {});
+    if (allUserNotifications[userId]) {
+        allUserNotifications[userId] = [];
+        await writeDb(DB_FILE, allUserNotifications);
+    }
+}

@@ -42,6 +42,7 @@ import { AboutIcon } from "@/components/icons/nav/about-icon";
 import { DownloadIcon } from "@/components/icons/nav/download-icon";
 import { SettingsIcon } from "@/components/icons/nav/settings-icon";
 import { LogoutIcon } from "@/components/icons/nav/logout-icon";
+import { InboxIcon } from "@/components/icons/nav/inbox-icon";
 import { UserPlus, Repeat } from "lucide-react";
 
 import type { User } from '@supabase/supabase-js';
@@ -108,6 +109,7 @@ export default function DashboardLayout({
     { href: "/dashboard/squad", label: "Squad", icon: SquadIcon },
     { href: "/dashboard/invite", label: "Invite", icon: UserPlus },
     { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
+    { href: "/dashboard/inbox", label: "Inbox", icon: InboxIcon },
     { href: "/dashboard/support", label: "Support", icon: SupportIcon },
     { href: "/dashboard/about", label: "About", icon: AboutIcon },
     {
@@ -128,7 +130,7 @@ export default function DashboardLayout({
 
   const bottomNavItems = [
     { href: "/dashboard", label: "Home", icon: HomeIcon },
-    { href: "/dashboard/support", label: "Support", icon: SupportIcon },
+    { href: "/dashboard/inbox", label: "Inbox", icon: InboxIcon },
     { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
     { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
   ];
