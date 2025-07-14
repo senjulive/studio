@@ -36,6 +36,7 @@ import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/app/dashboard/layout";
+import { getCurrentTier } from "@/lib/settings";
 
 type Transaction = {
   id: string;
@@ -319,8 +320,8 @@ export function WalletView() {
 
   const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
   
-  const usdtBalance = walletData?.balances?.usdt ?? 0;
-  const rank = getUserRank(usdtBalance);
+  const rank = getUserRank(totalBalance);
+  const tier = getCurrentTier(totalBalance);
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (user?.id) {
@@ -353,13 +354,21 @@ export function WalletView() {
           }}
         />
         <CardHeader>
-           <CardTitle className="flex items-center gap-3">
+           <CardTitle className="flex flex-wrap items-center gap-x-3 gap-y-2">
             Available Assets
             {walletData && (
-              <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                <rank.Icon className="h-5 w-5" />
-                <span>{rank.name}</span>
-              </Badge>
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
+                  <rank.Icon className="h-5 w-5" />
+                  <span>{rank.name}</span>
+                </Badge>
+                {tier && (
+                  <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", tier.className)}>
+                    <tier.Icon className="h-5 w-5" />
+                    <span>{tier.name}</span>
+                  </Badge>
+                )}
+              </div>
             )}
           </CardTitle>
           <CardDescription>

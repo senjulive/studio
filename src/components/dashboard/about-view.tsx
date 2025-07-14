@@ -90,7 +90,12 @@ export function AboutView() {
                         <TableBody>
                             {tierSettings.map((tier) => (
                                 <TableRow key={tier.id}>
-                                    <TableCell className="font-medium">{tier.name}</TableCell>
+                                    <TableCell className="font-medium">
+                                        <div className="flex items-center gap-2">
+                                            <tier.Icon className="h-5 w-5" />
+                                            <span className={tier.className}>{tier.name}</span>
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="text-right font-mono">${tier.balanceThreshold.toLocaleString()}</TableCell>
                                     <TableCell className="text-right font-mono">{tier.clicks}</TableCell>
                                     <TableCell className="text-right font-mono text-green-600">~{(tier.dailyProfit * 100).toFixed(1)}%</TableCell>
