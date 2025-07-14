@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import Image from "next/image";
 import {
   Table,
@@ -23,40 +24,27 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 import { LiveTradingChart } from "./live-trading-chart";
 import { Button } from "../ui/button";
-import { BrainCircuit, Loader2, Newspaper } from "lucide-react";
+import { BrainCircuit, Loader2 } from "lucide-react";
 import type { MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TrendingUp, Scale, Landmark, Bitcoin } from 'lucide-react';
+import { allMockNews, type NewsItem } from "@/lib/news";
 
-type CryptoData = {
+
+type GenericAsset = {
   id: string;
   name: string;
   ticker: string;
-  iconUrl: string;
+  iconUrl?: string;
   price: number;
   change24h: number;
   volume24h: number;
-  marketCap: number;
+  marketCap?: number;
   priceHistory: { value: number }[];
 };
 
-type NewsItem = {
-    id: string;
-    source: string;
-    title: string;
-    timeAgo: string;
-    url: string;
-};
-
-const mockNews: NewsItem[] = [
-    { id: 'n1', source: 'CryptoNews', title: 'Bitcoin Surges Past $70,000 as Institutional Interest Grows', timeAgo: '2h ago', url: '#' },
-    { id: 'n2', source: 'CoinDesk', title: 'Ethereum\'s Next Upgrade "Pectra" Details Revealed', timeAgo: '4h ago', url: '#' },
-    { id: 'n3', source: 'The Block', title: 'Solana DeFi Protocol Announces Major Airdrop', timeAgo: '5h ago', url: '#' },
-    { id: 'n4', source: 'Decrypt', title: 'Regulatory Update: US Senator Proposes New Crypto Framework', timeAgo: '8h ago', url: '#' },
-    { id: 'n5', source: 'Cointelegraph', title: 'NFT Market Shows Signs of Recovery with New Blue-Chip Collection', timeAgo: '1d ago', url: '#' },
-];
-
-
-const initialCryptoData: CryptoData[] = [
+const initialCryptoData: GenericAsset[] = [
   {
     id: "bitcoin",
     name: "Bitcoin",
@@ -90,7 +78,7 @@ const initialCryptoData: CryptoData[] = [
     marketCap: 110000000000,
     priceHistory: Array.from({ length: 20 }, () => ({ value: 1 + (Math.random() - 0.5) * 0.01 })),
   },
-    {
+  {
     id: "solana",
     name: "Solana",
     ticker: "SOL",
@@ -101,66 +89,80 @@ const initialCryptoData: CryptoData[] = [
     marketCap: 70000000000,
     priceHistory: Array.from({ length: 20 }, () => ({ value: 150 + (Math.random() - 0.5) * 15 })),
   },
-  {
-    id: "ripple",
-    name: "XRP",
-    ticker: "XRP",
-    iconUrl: "https://assets.coincap.io/assets/icons/xrp@2x.png",
-    price: 0.48,
-    change24h: -0.5,
-    volume24h: 1500000000,
-    marketCap: 26000000000,
-    priceHistory: Array.from({ length: 20 }, () => ({ value: 0.48 + (Math.random() - 0.5) * 0.05 })),
-  },
 ];
 
+const initialStockData: GenericAsset[] = [
+    { id: 'aapl', name: 'Apple Inc.', ticker: 'AAPL', price: 172.25, change24h: 1.5, volume24h: 90000000, marketCap: 2800000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 172.25 + (Math.random() - 0.5) * 5 })) },
+    { id: 'googl', name: 'Alphabet Inc.', ticker: 'GOOGL', price: 139.74, change24h: -0.8, volume24h: 25000000, marketCap: 1700000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 139.74 + (Math.random() - 0.5) * 4 })) },
+    { id: 'tsla', name: 'Tesla, Inc.', ticker: 'TSLA', price: 250.50, change24h: 3.2, volume24h: 120000000, marketCap: 800000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 250.50 + (Math.random() - 0.5) * 10 })) },
+];
+
+const initialCommodityData: GenericAsset[] = [
+    { id: 'gold', name: 'Gold', ticker: 'XAU/USD', price: 2350.50, change24h: 0.5, volume24h: 20000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 2350.50 + (Math.random() - 0.5) * 20 })) },
+    { id: 'silver', name: 'Silver', ticker: 'XAG/USD', price: 28.75, change24h: 1.2, volume24h: 5000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 28.75 + (Math.random() - 0.5) * 1 })) },
+];
+
+const initialForexData: GenericAsset[] = [
+    { id: 'eurusd', name: 'Euro to US Dollar', ticker: 'EUR/USD', price: 1.0850, change24h: -0.2, volume24h: 500000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 1.0850 + (Math.random() - 0.5) * 0.01 })) },
+    { id: 'gbpusd', name: 'British Pound to US Dollar', ticker: 'GBP/USD', price: 1.2750, change24h: 0.1, volume24h: 300000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 1.2750 + (Math.random() - 0.5) * 0.01 })) },
+];
+
+
 export function MarketView() {
-  const [data, setData] = React.useState<CryptoData[]>([]);
+  const [data, setData] = React.useState<GenericAsset[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [selectedCoin, setSelectedCoin] = React.useState<CryptoData | null>(null);
+  const [selectedAsset, setSelectedAsset] = React.useState<GenericAsset | null>(null);
   const [summary, setSummary] = React.useState<MarketSummaryOutput | null>(null);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [news, setNews] = React.useState<NewsItem[]>([]);
-
+  
   React.useEffect(() => {
-    // Initial load with a delay to show skeletons
-    const timer = setTimeout(() => {
-        setData(initialCryptoData);
-        setNews(mockNews);
-        const usdtCoin = initialCryptoData.find(c => c.ticker === 'USDT');
-        setSelectedCoin(usdtCoin || initialCryptoData[0]);
-        setIsLoading(false);
-    }, 1500);
+    setData(initialCryptoData);
+    setSelectedAsset(initialCryptoData.find(c => c.ticker === 'BTC') || initialCryptoData[0]);
+    setIsLoading(false);
 
-    return () => clearTimeout(timer);
+    // Set up news cycling
+    let newsIndex = 0;
+    const cycleNews = () => {
+      setNews(allMockNews.slice(newsIndex, newsIndex + 5));
+      newsIndex = (newsIndex + 1) % (allMockNews.length - 4);
+    };
+    cycleNews(); // Initial set
+    const newsInterval = setInterval(cycleNews, 120000); // every 2 minutes
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(newsInterval);
+    };
+    
   }, []);
 
-  React.useEffect(() => {
-    if(isLoading) return;
-    
-    const interval = setInterval(() => {
-      setData((prevData) => {
-        const newData = prevData.map((coin) => {
-          const changeFactor = (Math.random() - 0.5) * 0.02; // small random change
-          const newPrice = coin.price * (1 + changeFactor);
-          const newChange24h = coin.change24h + (Math.random() - 0.5) * 0.1;
-          const newHistory = [...coin.priceHistory.slice(1), { value: newPrice }];
 
-          const updatedCoin = { ...coin, price: newPrice, change24h: newChange24h, priceHistory: newHistory };
+  const timer = setTimeout(() => {
+      const allData = {
+          crypto: initialCryptoData,
+          stocks: initialStockData,
+          commodities: initialCommodityData,
+          forex: initialForexData,
+      };
+      
+      setData(allData.crypto);
+      setSelectedAsset(allData.crypto[0]);
+      setIsLoading(false);
+  }, 1500);
 
-          if (selectedCoin && selectedCoin.id === coin.id) {
-            setSelectedCoin(updatedCoin);
-          }
-          
-          return updatedCoin;
-        });
-        return newData;
-      });
-    }, 2000); // Update every 2 seconds
-
-    return () => clearInterval(interval);
-  }, [isLoading, selectedCoin]);
-
+  const handleTabChange = (tab: string) => {
+    let newDataSet: GenericAsset[] = [];
+    switch(tab) {
+        case 'crypto': newDataSet = initialCryptoData; break;
+        case 'stocks': newDataSet = initialStockData; break;
+        case 'commodities': newDataSet = initialCommodityData; break;
+        case 'forex': newDataSet = initialForexData; break;
+    }
+    setData(newDataSet);
+    setSelectedAsset(newDataSet[0]);
+  }
+  
   const handleAnalyzeMarket = async () => {
     if (!data.length) return;
     setIsAnalyzing(true);
@@ -205,7 +207,7 @@ export function MarketView() {
     return `$${value.toFixed(2)}`;
   }
 
-  const renderRows = () => {
+  const renderRows = (currentData: GenericAsset[]) => {
     if (isLoading) {
       return Array.from({ length: 5 }).map((_, index) => (
         <TableRow key={index}>
@@ -221,56 +223,56 @@ export function MarketView() {
           <TableCell><Skeleton className="h-5 w-24" /></TableCell>
           <TableCell><Skeleton className="h-5 w-16" /></TableCell>
           <TableCell><Skeleton className="h-5 w-28" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+          {currentData[0]?.marketCap !== undefined && <TableCell><Skeleton className="h-5 w-24" /></TableCell>}
           <TableCell><Skeleton className="h-8 w-32" /></TableCell>
         </TableRow>
       ));
     }
 
-    return data.map((coin) => (
+    return currentData.map((asset) => (
       <TableRow 
-        key={coin.id}
-        onClick={() => setSelectedCoin(coin)}
+        key={asset.id}
+        onClick={() => setSelectedAsset(asset)}
         className={cn(
           "cursor-pointer",
-          selectedCoin?.id === coin.id && "bg-muted/50 hover:bg-muted/60"
+          selectedAsset?.id === asset.id && "bg-muted/50 hover:bg-muted/60"
         )}
       >
         <TableCell>
           <div className="flex items-center gap-3">
-            <Image
-              src={coin.iconUrl}
-              alt={`${coin.name} logo`}
+            {asset.iconUrl && <Image
+              src={asset.iconUrl}
+              alt={`${asset.name} logo`}
               width={32}
               height={32}
               className="rounded-full"
-            />
+            />}
             <div>
-              <div className="font-medium">{coin.name}</div>
-              <div className="text-xs text-muted-foreground">{coin.ticker}</div>
+              <div className="font-medium">{asset.name}</div>
+              <div className="text-xs text-muted-foreground">{asset.ticker}</div>
             </div>
           </div>
         </TableCell>
-        <TableCell className="font-mono text-right">{formatCurrency(coin.price, coin.price < 1 ? 4 : 2)}</TableCell>
+        <TableCell className="font-mono text-right">{formatCurrency(asset.price, asset.price < 1 ? 4 : 2)}</TableCell>
         <TableCell
           className={cn(
             "text-right",
-            coin.change24h >= 0 ? "text-green-600" : "text-red-600"
+            asset.change24h >= 0 ? "text-green-600" : "text-red-600"
           )}
         >
-          {coin.change24h >= 0 ? "+" : ""}
-          {coin.change24h.toFixed(2)}%
+          {asset.change24h >= 0 ? "+" : ""}
+          {asset.change24h.toFixed(2)}%
         </TableCell>
-        <TableCell className="text-right">{formatMarketCap(coin.volume24h)}</TableCell>
-        <TableCell className="text-right">{formatMarketCap(coin.marketCap)}</TableCell>
+        <TableCell className="text-right">{formatMarketCap(asset.volume24h)}</TableCell>
+        {asset.marketCap !== undefined && <TableCell className="text-right">{formatMarketCap(asset.marketCap)}</TableCell>}
         <TableCell>
           <div className="h-8 w-32">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={coin.priceHistory}>
+              <LineChart data={asset.priceHistory}>
                 <Line
                   type="monotone"
                   dataKey="value"
-                  stroke={coin.change24h >= 0 ? "hsl(var(--chart-2))" : "hsl(var(--destructive))"}
+                  stroke={asset.change24h >= 0 ? "hsl(var(--chart-2))" : "hsl(var(--destructive))"}
                   strokeWidth={2}
                   dot={false}
                 />
@@ -289,33 +291,72 @@ export function MarketView() {
           {isLoading ? (
               <Skeleton className="h-[480px] w-full rounded-lg" />
           ) : (
-              <LiveTradingChart coin={selectedCoin} />
+              <LiveTradingChart coin={selectedAsset} />
           )}
-          <Card>
-            <CardHeader>
-              <CardTitle>Live Crypto Market</CardTitle>
-              <CardDescription>
-                Select a cryptocurrency to view its live chart. Data updates automatically.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Asset</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="text-right">24h Change</TableHead>
-                    <TableHead className="text-right">24h Volume</TableHead>
-                    <TableHead className="text-right">Market Cap</TableHead>
-                    <TableHead>Last 7 Days</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {renderRows()}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="crypto" className="w-full" onValueChange={handleTabChange}>
+            <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="crypto"><Bitcoin className="mr-2"/>Crypto</TabsTrigger>
+                <TabsTrigger value="stocks"><TrendingUp className="mr-2"/>Stocks</TabsTrigger>
+                <TabsTrigger value="commodities"><Scale className="mr-2"/>Commodities</TabsTrigger>
+                <TabsTrigger value="forex"><Landmark className="mr-2"/>Forex</TabsTrigger>
+            </TabsList>
+            <TabsContent value="crypto">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Live Crypto Market</CardTitle>
+                    <CardDescription>Select a cryptocurrency to view its live chart.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead className="text-right">Market Cap</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
+                        <TableBody>{renderRows(data)}</TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="stocks">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Stock Market</CardTitle>
+                    <CardDescription>Select a stock to view its live chart.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead className="text-right">Market Cap</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
+                        <TableBody>{renderRows(data)}</TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+            </TabsContent>
+             <TabsContent value="commodities">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Commodities Market</CardTitle>
+                    <CardDescription>Select a commodity to view its live chart.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
+                        <TableBody>{renderRows(data)}</TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+            </TabsContent>
+             <TabsContent value="forex">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Forex Market</CardTitle>
+                    <CardDescription>Select a currency pair to view its live chart.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
+                        <TableBody>{renderRows(data)}</TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+            </TabsContent>
+          </Tabs>
       </div>
       <div className="lg:col-span-1 space-y-6">
         <Card>
@@ -364,13 +405,13 @@ export function MarketView() {
                 ) : (
                     <div className="space-y-4">
                         {news.map(item => (
-                            <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" className="block p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                            <Link key={item.id} href={`/dashboard/news/${item.id}`} className="block p-3 rounded-lg hover:bg-muted/50 transition-colors">
                                 <p className="font-semibold text-sm text-foreground">{item.title}</p>
                                 <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
                                     <span>{item.source}</span>
                                     <span>{item.timeAgo}</span>
                                 </div>
-                            </a>
+                            </Link>
                         ))}
                     </div>
                 )}
