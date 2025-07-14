@@ -4,9 +4,10 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Gem, Trophy, TrendingUp } from "lucide-react";
+import { Gem, Trophy, TrendingUp, Unlock } from "lucide-react";
 import { getBotTierSettings, type TierSetting } from "@/lib/settings";
 import { ranks } from "@/lib/ranks";
+import { Badge } from "@/components/ui/badge";
 
 const Section = ({ title, icon: Icon, children }: { title: string, icon?: React.ElementType, children: React.ReactNode }) => (
     <div className="space-y-4">
@@ -57,6 +58,7 @@ export function TradingInfoView() {
                                 <TableHead className="text-right">Min. Balance (USDT)</TableHead>
                                 <TableHead className="text-right">Daily Grids</TableHead>
                                 <TableHead className="text-right">Daily Profit Rate</TableHead>
+                                <TableHead className="text-right">Status</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -71,6 +73,16 @@ export function TradingInfoView() {
                                     <TableCell className="text-right font-mono">${tier.balanceThreshold.toLocaleString()}</TableCell>
                                     <TableCell className="text-right font-mono">{tier.clicks}</TableCell>
                                     <TableCell className="text-right font-mono text-green-600">~{(tier.dailyProfit * 100).toFixed(1)}%</TableCell>
+                                    <TableCell className="text-right">
+                                        {tier.name.includes('VII') || tier.name.includes('VIII') ? (
+                                            <Badge variant="secondary">Locked</Badge>
+                                        ) : (
+                                            <Badge variant="outline" className="text-green-600 border-green-600/50">
+                                                <Unlock className="mr-1 h-3 w-3" />
+                                                Available
+                                            </Badge>
+                                        )}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -95,7 +107,7 @@ export function TradingInfoView() {
                         </TableHeader>
                         <TableBody>
                             {tierSettings.filter(t => t.balanceThreshold > 0).map((tier) => (
-                                <TableRow key={`earnings-${tier.id}`}>
+                                <TableRow key={`earnings-${tier.id}`} className={tier.name.includes('VII') || tier.name.includes('VIII') ? 'opacity-50' : ''}>
                                     <TableCell className="font-medium">
                                         <div className="flex items-center gap-2">
                                             <tier.Icon className="h-5 w-5" />
@@ -123,6 +135,7 @@ export function TradingInfoView() {
                             <TableRow>
                                 <TableHead>Rank</TableHead>
                                 <TableHead className="text-right">Balance Requirement (USDT)</TableHead>
+                                <TableHead className="text-right">Status</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -135,6 +148,16 @@ export function TradingInfoView() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right font-mono">${rank.minBalance.toLocaleString()}</TableCell>
+                                    <TableCell className="text-right">
+                                         {rank.name === 'Astral' || rank.name === 'Cosmic' ? (
+                                            <Badge variant="secondary">Locked</Badge>
+                                        ) : (
+                                            <Badge variant="outline" className="text-green-600 border-green-600/50">
+                                                <Unlock className="mr-1 h-3 w-3" />
+                                                Available
+                                            </Badge>
+                                        )}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
