@@ -131,7 +131,7 @@ export default function DashboardLayout({
 
   const bottomNavItems = [
     { href: "/dashboard", label: "Home", icon: HomeIcon },
-    { href: "/dashboard/inbox", label: "Inbox", icon: InboxIcon },
+    { href: "/dashboard/support", label: "Support", icon: SupportIcon },
     { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
     { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
   ];
