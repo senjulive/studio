@@ -1,4 +1,4 @@
-import type {Metadata} from 'next';
+import type {Metadata, Viewport} from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -9,10 +9,31 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
+const APP_NAME = "AstralCore";
+const APP_DESCRIPTION = "Modern UI/UX Crypto Management Platform";
+
 export const metadata: Metadata = {
-  title: 'AstralCore',
-  description: 'Modern UI/UX Crypto Management Platform',
+  applicationName: APP_NAME,
+  title: {
+    default: APP_NAME,
+    template: `%s - ${APP_NAME}`,
+  },
+  description: APP_DESCRIPTION,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_NAME,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  manifest: "/manifest.webmanifest",
 };
+
+export const viewport: Viewport = {
+  themeColor: "#FFFFFF",
+};
+
 
 export default function RootLayout({
   children,
