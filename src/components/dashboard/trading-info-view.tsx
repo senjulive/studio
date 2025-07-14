@@ -4,7 +4,7 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Gem, Trophy } from "lucide-react";
+import { Gem, Trophy, TrendingUp } from "lucide-react";
 import { getBotTierSettings, type TierSetting } from "@/lib/settings";
 import { ranks } from "@/lib/ranks";
 
@@ -28,6 +28,13 @@ export function TradingInfoView() {
     }
     fetchSettings();
   }, []);
+  
+  const calculateEarnings = (balance: number, dailyProfit: number, days: number) => {
+    // Note: This is a simple projection and doesn't account for compounding.
+    const dailyEarning = balance * dailyProfit;
+    return dailyEarning * days;
+  };
+
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -64,6 +71,41 @@ export function TradingInfoView() {
                                     <TableCell className="text-right font-mono">${tier.balanceThreshold.toLocaleString()}</TableCell>
                                     <TableCell className="text-right font-mono">{tier.clicks}</TableCell>
                                     <TableCell className="text-right font-mono text-green-600">~{(tier.dailyProfit * 100).toFixed(1)}%</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Card>
+            </Section>
+
+            <Section title="Estimated Earnings" icon={TrendingUp}>
+                <p className="text-muted-foreground">
+                    The table below provides a projection of potential earnings based on the minimum balance required for each tier. These are estimates to illustrate how higher tiers can accelerate your growth on the platform.
+                </p>
+                 <Card>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Tier</TableHead>
+                                <TableHead className="text-right">15 Days</TableHead>
+                                <TableHead className="text-right">30 Days</TableHead>
+                                <TableHead className="text-right">60 Days</TableHead>
+                                <TableHead className="text-right">90 Days</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {tierSettings.filter(t => t.balanceThreshold > 0).map((tier) => (
+                                <TableRow key={`earnings-${tier.id}`}>
+                                    <TableCell className="font-medium">
+                                        <div className="flex items-center gap-2">
+                                            <tier.Icon className="h-5 w-5" />
+                                            <span className={tier.className}>{tier.name}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 15).toFixed(2)}</TableCell>
+                                    <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 30).toFixed(2)}</TableCell>
+                                    <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 60).toFixed(2)}</TableCell>
+                                    <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 90).toFixed(2)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
