@@ -22,6 +22,10 @@ import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 import { LiveTradingChart } from "./live-trading-chart";
+import { Button } from "../ui/button";
+import { BrainCircuit, Loader2, Newspaper } from "lucide-react";
+import type { MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 type CryptoData = {
   id: string;
@@ -34,6 +38,23 @@ type CryptoData = {
   marketCap: number;
   priceHistory: { value: number }[];
 };
+
+type NewsItem = {
+    id: string;
+    source: string;
+    title: string;
+    timeAgo: string;
+    url: string;
+};
+
+const mockNews: NewsItem[] = [
+    { id: 'n1', source: 'CryptoNews', title: 'Bitcoin Surges Past $70,000 as Institutional Interest Grows', timeAgo: '2h ago', url: '#' },
+    { id: 'n2', source: 'CoinDesk', title: 'Ethereum\'s Next Upgrade "Pectra" Details Revealed', timeAgo: '4h ago', url: '#' },
+    { id: 'n3', source: 'The Block', title: 'Solana DeFi Protocol Announces Major Airdrop', timeAgo: '5h ago', url: '#' },
+    { id: 'n4', source: 'Decrypt', title: 'Regulatory Update: US Senator Proposes New Crypto Framework', timeAgo: '8h ago', url: '#' },
+    { id: 'n5', source: 'Cointelegraph', title: 'NFT Market Shows Signs of Recovery with New Blue-Chip Collection', timeAgo: '1d ago', url: '#' },
+];
+
 
 const initialCryptoData: CryptoData[] = [
   {
@@ -97,11 +118,15 @@ export function MarketView() {
   const [data, setData] = React.useState<CryptoData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedCoin, setSelectedCoin] = React.useState<CryptoData | null>(null);
+  const [summary, setSummary] = React.useState<MarketSummaryOutput | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+  const [news, setNews] = React.useState<NewsItem[]>([]);
 
   React.useEffect(() => {
     // Initial load with a delay to show skeletons
     const timer = setTimeout(() => {
         setData(initialCryptoData);
+        setNews(mockNews);
         const usdtCoin = initialCryptoData.find(c => c.ticker === 'USDT');
         setSelectedCoin(usdtCoin || initialCryptoData[0]);
         setIsLoading(false);
@@ -135,6 +160,37 @@ export function MarketView() {
 
     return () => clearInterval(interval);
   }, [isLoading, selectedCoin]);
+
+  const handleAnalyzeMarket = async () => {
+    if (!data.length) return;
+    setIsAnalyzing(true);
+    setSummary(null);
+    
+    try {
+        const analysisInput = {
+            coins: data.map(c => ({
+                name: c.name,
+                ticker: c.ticker,
+                price: c.price,
+                change24h: c.change24h,
+            }))
+        };
+        const response = await fetch('/api/market-summary', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(analysisInput),
+        });
+        if (!response.ok) throw new Error('Failed to get market analysis.');
+        const result: MarketSummaryOutput = await response.json();
+        setSummary(result);
+    } catch (error) {
+        console.error(error);
+        setSummary({ summary: 'Could not retrieve market analysis at this time.' });
+    } finally {
+        setIsAnalyzing(false);
+    }
+  };
+
 
   const formatCurrency = (value: number, decimals = 2) =>
     `$${value.toLocaleString(undefined, {
@@ -228,37 +284,101 @@ export function MarketView() {
 
 
   return (
-    <div className="space-y-6">
-        {isLoading ? (
-            <Skeleton className="h-[480px] w-full rounded-lg" />
-        ) : (
-            <LiveTradingChart coin={selectedCoin} />
-        )}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 space-y-6">
+          {isLoading ? (
+              <Skeleton className="h-[480px] w-full rounded-lg" />
+          ) : (
+              <LiveTradingChart coin={selectedCoin} />
+          )}
+          <Card>
+            <CardHeader>
+              <CardTitle>Live Crypto Market</CardTitle>
+              <CardDescription>
+                Select a cryptocurrency to view its live chart. Data updates automatically.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Asset</TableHead>
+                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-right">24h Change</TableHead>
+                    <TableHead className="text-right">24h Volume</TableHead>
+                    <TableHead className="text-right">Market Cap</TableHead>
+                    <TableHead>Last 7 Days</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {renderRows()}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+      </div>
+      <div className="lg:col-span-1 space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Live Crypto Market</CardTitle>
-            <CardDescription>
-              Select a cryptocurrency to view its live chart. Data updates automatically.
-            </CardDescription>
+            <CardTitle>AI Market Summary</CardTitle>
+            <CardDescription>Get an AI-generated snapshot of the market.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Asset</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
-                  <TableHead className="text-right">24h Change</TableHead>
-                  <TableHead className="text-right">24h Volume</TableHead>
-                  <TableHead className="text-right">Market Cap</TableHead>
-                  <TableHead>Last 7 Days</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {renderRows()}
-              </TableBody>
-            </Table>
+            {isAnalyzing ? (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            ) : summary ? (
+              <p className="text-sm text-muted-foreground">{summary.summary}</p>
+            ) : (
+                <Alert>
+                    <BrainCircuit className="h-4 w-4" />
+                    <AlertTitle>Ready for analysis</AlertTitle>
+                    <AlertDescription>
+                        Click the button below to get a real-time market summary from our AI analyst.
+                    </AlertDescription>
+                </Alert>
+            )}
+          </CardContent>
+          <CardContent>
+            <Button onClick={handleAnalyzeMarket} disabled={isAnalyzing || isLoading} className="w-full">
+                {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
+                {summary ? 'Regenerate Summary' : 'Analyze Market'}
+            </Button>
           </CardContent>
         </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle>Market News</CardTitle>
+                <CardDescription>Latest headlines from the crypto world.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {isLoading ? (
+                     <div className="space-y-4">
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {news.map(item => (
+                            <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" className="block p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                                <p className="font-semibold text-sm text-foreground">{item.title}</p>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
+                                    <span>{item.source}</span>
+                                    <span>{item.timeAgo}</span>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
+
+    

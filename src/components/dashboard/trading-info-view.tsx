@@ -167,7 +167,7 @@ export function TradingInfoView() {
             
             <div>
                  <p className="text-sm text-center text-muted-foreground italic mt-8">
-                    Disclaimer: All trading involves risk. The earnings estimates are for illustrative purposes only and are not guaranteed. Past performance is not indicative of future results. Please invest responsibly.
+                    Disclaimer: All trading involves risk. The earnings estimates are projections based on current data. Past performance is not indicative of future results. Please invest responsibly.
                 </p>
             </div>
 
@@ -175,3 +175,5 @@ export function TradingInfoView() {
     </Card>
   );
 }
+
+    
