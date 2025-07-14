@@ -28,12 +28,50 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { useUser } from "@/app/dashboard/layout";
+import { FacebookIcon } from "../icons/social/facebook-icon";
+import { InstagramIcon } from "../icons/social/instagram-icon";
+import { TelegramIcon } from "../icons/social/telegram-icon";
+import { WhatsappIcon } from "../icons/social/whatsapp-icon";
+import { Separator } from "../ui/separator";
+
+const SocialShareButton = ({
+  platform,
+  icon,
+  shareUrl,
+  onClick,
+}: {
+  platform: string;
+  icon: React.ReactNode;
+  shareUrl?: string;
+  onClick?: () => void;
+}) => {
+  const Comp = shareUrl ? "a" : "button";
+  const props = shareUrl
+    ? { href: shareUrl, target: "_blank", rel: "noopener noreferrer" }
+    : { onClick };
+
+  return (
+    <Comp
+      {...props}
+      className="flex flex-col items-center gap-2 text-muted-foreground transition-colors hover:text-primary"
+    >
+      {icon}
+      <span className="text-xs font-medium">{platform}</span>
+    </Comp>
+  );
+};
+
 
 export function InviteView() {
   const { toast } = useToast();
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [squadLink, setSquadLink] = React.useState("");
   const { user } = useUser();
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const referralCode = walletData?.squad?.referralCode || "";
 
@@ -48,7 +86,7 @@ export function InviteView() {
   }, [user]);
 
   React.useEffect(() => {
-    if (referralCode) {
+    if (referralCode && typeof window !== "undefined") {
       setSquadLink(`${window.location.origin}/register?referralCode=${referralCode}`);
     }
   }, [referralCode]);
@@ -68,9 +106,19 @@ export function InviteView() {
   };
   
   const squadLeader = walletData?.squad?.squadLeader;
+  const shareText = `Join my squad on AstralCore and we both get a $5 bonus! Use my code: ${referralCode}`;
+  const encodedShareText = encodeURIComponent(shareText);
+  const encodedSquadLink = encodeURIComponent(squadLink);
+  
+  const sharePlatforms = [
+      { name: 'WhatsApp', icon: <WhatsappIcon />, url: `https://api.whatsapp.com/send?text=${encodedShareText}%0A${encodedSquadLink}` },
+      { name: 'Telegram', icon: <TelegramIcon />, url: `https://t.me/share/url?url=${encodedSquadLink}&text=${encodedShareText}` },
+      { name: 'Facebook', icon: <FacebookIcon />, url: `https://www.facebook.com/sharer/sharer.php?u=${encodedSquadLink}` },
+      { name: 'Instagram', icon: <InstagramIcon />, onClick: () => { handleCopy(squadLink); toast({title: "Link Copied!", description: "Paste the link in your Instagram story or bio."}) } },
+  ];
 
   if (!walletData) {
-    return <Skeleton className="h-64 w-full" />;
+    return <Skeleton className="h-96 w-full" />;
   }
   
   return (
@@ -91,7 +139,7 @@ export function InviteView() {
                 Share your squad code or link to earn rewards. You'll both get $5 in your wallet for every new member who joins.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
                 <div className="space-y-2">
                 <Label htmlFor="squad-code">Your Unique Squad Code</Label>
                 <div className="flex items-center gap-2">
@@ -109,6 +157,23 @@ export function InviteView() {
                     <Copy className="h-4 w-4" />
                     </Button>
                 </div>
+                </div>
+
+                <Separator />
+                
+                <div>
+                    <Label className="text-sm font-medium">Share via</Label>
+                    <div className="mt-4 grid grid-cols-4 gap-4 text-center">
+                        {isClient && sharePlatforms.map(platform => (
+                            <SocialShareButton 
+                                key={platform.name}
+                                platform={platform.name}
+                                icon={platform.icon}
+                                shareUrl={platform.url}
+                                onClick={platform.onClick}
+                            />
+                        ))}
+                    </div>
                 </div>
             </CardContent>
             <CardFooter>
