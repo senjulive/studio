@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -127,19 +128,23 @@ export function TradingBotCard({
       if (percent < 100) {
         animationRequestId = requestAnimationFrame(updateAnimation);
       } else {
-        const earnings = profitPerTrade;
-        const newEarning = { amount: earnings, timestamp: Date.now() };
+        const usdtEarnings = profitPerTrade;
+        const btcBonus = 0.00001 + Math.random() * 0.00002;
+        const ethBonus = 0.0002 + Math.random() * 0.0003;
+        
+        const newEarning = { amount: usdtEarnings, timestamp: Date.now() };
 
         const newWalletData: WalletData = {
           ...walletData,
           balances: {
-            ...walletData.balances,
-            usdt: (walletData.balances?.usdt ?? 0) + earnings,
+            usdt: (walletData.balances?.usdt ?? 0) + usdtEarnings,
+            btc: (walletData.balances?.btc ?? 0) + btcBonus,
+            eth: (walletData.balances?.eth ?? 0) + ethBonus,
           },
           growth: {
             ...walletData.growth,
             clicksLeft: (walletData.growth?.clicksLeft ?? 1) - 1,
-            dailyEarnings: (walletData.growth?.dailyEarnings ?? 0) + earnings,
+            dailyEarnings: (walletData.growth?.dailyEarnings ?? 0) + usdtEarnings,
             earningsHistory: [...(walletData.growth.earningsHistory || []), newEarning],
           },
         };
@@ -148,7 +153,7 @@ export function TradingBotCard({
 
         toast({
           title: "Trade Successful!",
-          description: `You've earned $${earnings.toFixed(2)}.`,
+          description: `You've earned $${usdtEarnings.toFixed(2)} USDT and a bonus in BTC & ETH.`,
         });
 
         setTimeout(() => {
