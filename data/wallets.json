@@ -28,7 +28,8 @@
       "idCardNo": "000000000",
       "contactNumber": "+0000000000",
       "country": "Default",
-      "avatarUrl": ""
+      "avatarUrl": "",
+      "verificationStatus": "unverified"
     },
     "security": {
       "withdrawalAddresses": {}

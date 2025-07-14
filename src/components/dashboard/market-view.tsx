@@ -360,6 +360,33 @@ export function MarketView() {
       </div>
       <div className="lg:col-span-1 space-y-6">
         <Card>
+            <CardHeader>
+                <CardTitle>Market News</CardTitle>
+                <CardDescription>Latest headlines from the crypto world.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {isLoading ? (
+                     <div className="space-y-4">
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {news.map(item => (
+                            <Link key={item.id} href={`/dashboard/news/${item.id}`} className="block p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                                <p className="font-semibold text-sm text-foreground">{item.title}</p>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
+                                    <span>{item.source}</span>
+                                    <span>{item.timeAgo}</span>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+        <Card>
           <CardHeader>
             <CardTitle>AI Market Summary</CardTitle>
             <CardDescription>Get an AI-generated snapshot of the market.</CardDescription>
@@ -390,36 +417,7 @@ export function MarketView() {
             </Button>
           </CardContent>
         </Card>
-        <Card>
-            <CardHeader>
-                <CardTitle>Market News</CardTitle>
-                <CardDescription>Latest headlines from the crypto world.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                {isLoading ? (
-                     <div className="space-y-4">
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {news.map(item => (
-                            <Link key={item.id} href={`/dashboard/news/${item.id}`} className="block p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                                <p className="font-semibold text-sm text-foreground">{item.title}</p>
-                                <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
-                                    <span>{item.source}</span>
-                                    <span>{item.timeAgo}</span>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
-            </CardContent>
-        </Card>
       </div>
     </div>
   );
 }
-
-    
