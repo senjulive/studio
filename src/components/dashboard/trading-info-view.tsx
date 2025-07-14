@@ -1,0 +1,105 @@
+
+"use client";
+
+import * as React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Gem, Trophy } from "lucide-react";
+import { getBotTierSettings, type TierSetting } from "@/lib/settings";
+import { ranks } from "@/lib/ranks";
+
+const Section = ({ title, icon: Icon, children }: { title: string, icon?: React.ElementType, children: React.ReactNode }) => (
+    <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground border-b pb-2 flex items-center gap-2">
+            {Icon && <Icon className="h-5 w-5 text-primary" />}
+            {title}
+        </h2>
+        {children}
+    </div>
+);
+
+export function TradingInfoView() {
+  const [tierSettings, setTierSettings] = React.useState<TierSetting[]>([]);
+
+  React.useEffect(() => {
+    async function fetchSettings() {
+        const settings = await getBotTierSettings();
+        setTierSettings(settings);
+    }
+    fetchSettings();
+  }, []);
+
+  return (
+    <Card className="w-full max-w-4xl mx-auto">
+        <CardHeader className="text-center">
+            <CardTitle className="text-3xl font-headline">Tiers & Ranks</CardTitle>
+            <CardDescription className="max-w-2xl mx-auto">
+                Understand how your balance unlocks higher profit potential and prestigious account ranks on the AstralCore platform.
+            </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8 pt-4">
+            <Section title="Trading Tiers & Profit Potential" icon={Gem}>
+                <p className="text-muted-foreground">
+                    Your profit potential is determined by your account tier, which is based on your total asset balance. Higher tiers unlock more daily grids and a better profit rate.
+                </p>
+                 <Card>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Tier Name</TableHead>
+                                <TableHead className="text-right">Min. Balance (USDT)</TableHead>
+                                <TableHead className="text-right">Daily Grids</TableHead>
+                                <TableHead className="text-right">Daily Profit Rate</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {tierSettings.map((tier) => (
+                                <TableRow key={tier.id}>
+                                    <TableCell className="font-medium">
+                                        <div className="flex items-center gap-2">
+                                            <tier.Icon className="h-5 w-5" />
+                                            <span className={tier.className}>{tier.name}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono">${tier.balanceThreshold.toLocaleString()}</TableCell>
+                                    <TableCell className="text-right font-mono">{tier.clicks}</TableCell>
+                                    <TableCell className="text-right font-mono text-green-600">~{(tier.dailyProfit * 100).toFixed(1)}%</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Card>
+            </Section>
+
+            <Section title="Account Ranks" icon={Trophy}>
+                <p className="text-muted-foreground">
+                    As your balance grows, you'll achieve new ranks that signify your status on the platform. Each rank is a milestone in your trading journey.
+                </p>
+                 <Card>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Rank</TableHead>
+                                <TableHead className="text-right">Balance Requirement (USDT)</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {ranks.map((rank) => (
+                                <TableRow key={rank.name}>
+                                    <TableCell className="font-medium">
+                                        <div className="flex items-center gap-2">
+                                            <rank.Icon className="h-5 w-5" />
+                                            <span className={rank.className}>{rank.name}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono">${rank.minBalance.toLocaleString()}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Card>
+            </Section>
+        </CardContent>
+    </Card>
+  );
+}

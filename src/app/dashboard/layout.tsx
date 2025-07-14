@@ -42,7 +42,7 @@ import { AboutIcon } from "@/components/icons/nav/about-icon";
 import { DownloadIcon } from "@/components/icons/nav/download-icon";
 import { SettingsIcon } from "@/components/icons/nav/settings-icon";
 import { LogoutIcon } from "@/components/icons/nav/logout-icon";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Repeat } from "lucide-react";
 
 import type { User } from '@supabase/supabase-js';
 
@@ -102,6 +102,7 @@ export default function DashboardLayout({
   const menuItems = [
     { href: "/dashboard", label: "Home", icon: HomeIcon },
     { href: "/dashboard/market", label: "Market", icon: MarketIcon },
+    { href: "/dashboard/trading", label: "Trading", icon: Repeat },
     { href: "/dashboard/deposit", label: "Deposit", icon: DepositIcon },
     { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
     { href: "/dashboard/squad", label: "Squad", icon: SquadIcon },
@@ -137,6 +138,7 @@ export default function DashboardLayout({
   }
   
   const getPageTitle = () => {
+    if (pathname === '/dashboard/trading') return 'Astral Core Trading';
     const currentItem = menuItems.find(item => item.href === pathname);
     return currentItem ? currentItem.label : (pathname.split('/').pop()?.replace('-', ' ') || 'Home');
   };
