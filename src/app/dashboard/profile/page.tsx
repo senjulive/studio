@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: "Profile - AstralCore",
-    description: "Manage your profile and view notifications.",
+    description: "Manage your profile, verification status, and view notifications.",
 };
 
 export default function ProfilePage() {

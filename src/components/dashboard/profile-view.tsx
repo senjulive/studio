@@ -2,9 +2,6 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { getAnnouncements, type Announcement } from "@/lib/announcements";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import {
@@ -15,36 +12,21 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Inbox, User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, Save, Loader2, AlertCircle } from "lucide-react";
+import { Inbox, User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/app/dashboard/layout";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { addNotification } from "@/lib/notifications";
+import Link from "next/link";
+
 
 function AnnouncementCard({ announcement }: { announcement: Announcement }) {
   return (
@@ -111,12 +93,6 @@ const assetConfig = [
     },
 ] as const;
 
-const profileSchema = z.object({
-  fullName: z.string().min(3, "Full name must be at least 3 characters.").max(50),
-  idCardNo: z.string().regex(/^\d{9,}$/, "ID Card Number must be at least 9 digits and contain only numbers."),
-});
-type ProfileFormValues = z.infer<typeof profileSchema>;
-
 const VerificationStatusBadge = ({ status }: { status?: string }) => {
   if (status === 'verified') {
     return (
@@ -148,31 +124,15 @@ export function ProfileView() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
   const { user } = useUser();
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showVerificationPopup, setShowVerificationPopup] = React.useState(false);
-
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      fullName: "",
-      idCardNo: "",
-    },
-  });
 
   const fetchWallet = React.useCallback(async () => {
     if (user?.id) {
         setIsLoading(true);
         const data = await getOrCreateWallet(user.id);
         setWalletData(data);
-        form.reset({
-            fullName: data.profile.fullName || "",
-            idCardNo: data.profile.idCardNo || "",
-        });
-
-        // Check if we should show the verification popup
+       
         if (data.profile.verificationStatus !== 'verified' && data.profile.verificationStatus !== 'verifying') {
-          // A small delay to let the page render before showing the popup
           setTimeout(() => setShowVerificationPopup(true), 1000);
         }
 
@@ -180,7 +140,7 @@ export function ProfileView() {
     } else {
         setIsLoading(false);
     }
-  }, [user, form]);
+  }, [user]);
 
 
   React.useEffect(() => {
@@ -188,7 +148,6 @@ export function ProfileView() {
     setAnnouncements(getAnnouncements());
 
     const interval = setInterval(() => {
-        // Only refetch if the status is 'verifying'
         if (walletData?.profile.verificationStatus === 'verifying') {
             fetchWallet();
         }
@@ -198,61 +157,13 @@ export function ProfileView() {
 
   }, [user, fetchWallet, walletData?.profile.verificationStatus]);
 
-  const onSubmit = async (values: ProfileFormValues) => {
-    if (!user?.id) return;
-    setIsSubmitting(true);
-    try {
-      const response = await fetch('/api/profile/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          fullName: values.fullName,
-          idCardNo: values.idCardNo,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to update profile.');
-      }
-
-      toast({
-        title: "Profile Submitted",
-        description: "Your information is being verified. This may take a few minutes.",
-      });
-
-      await addNotification(user.id, {
-        title: "Verification in Progress",
-        content: "Your profile information has been submitted for verification.",
-        href: "/dashboard/profile"
-      });
-
-      await fetchWallet();
-
-    } catch (error: any) {
-      toast({
-        title: "Update Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-
   const profile = walletData?.profile;
   const profileDisplayName = profile?.fullName || profile?.username || "User Profile";
   const squadSize = walletData?.squad?.members?.length ?? 0;
   const usdtBalance = walletData?.balances?.usdt ?? 0;
   const rank = getUserRank(usdtBalance);
   
-  const isProfileComplete = profile?.fullName && profile?.idCardNo;
   const isVerified = profile?.verificationStatus === 'verified';
-  const isVerifying = profile?.verificationStatus === 'verifying';
-  const canEditProfile = !isVerified && !isVerifying;
 
   return (
     <>
@@ -264,6 +175,9 @@ export function ProfileView() {
                         To access all features and ensure your account's security, please complete your profile. Verification is quick and helps us protect your assets.
                     </DialogDescription>
                 </DialogHeader>
+                <Button asChild onClick={() => setShowVerificationPopup(false)}>
+                    <Link href="/dashboard/profile/verify">Start Verification</Link>
+                </Button>
             </DialogContent>
         </Dialog>
     <Tabs defaultValue="profile" className="w-full">
@@ -278,8 +192,6 @@ export function ProfileView() {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="profile" className="mt-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
             <Card className="max-w-md mx-auto">
               <CardHeader className="items-center text-center p-0">
                  <div className="p-4 w-full">
@@ -347,36 +259,6 @@ export function ProfileView() {
                 </div>
                 <Separator className="mb-6"/>
 
-                {canEditProfile && !isLoading ? (
-                   <div className="space-y-4">
-                     <FormField
-                      control={form.control}
-                      name="fullName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your full name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="idCardNo"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>ID Card Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your national ID number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                ) : (
                   <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
                       <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
                       <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
@@ -388,23 +270,18 @@ export function ProfileView() {
                           <ProfileDetailItem isLoading={isLoading} icon={<Users className="h-4 w-4" />} label="Squad Members" value={`${squadSize} member${squadSize !== 1 ? 's' : ''}`} />
                       </div>
                   </div>
-                )}
               </CardContent>
-              {canEditProfile && !isLoading && (
+              {!isVerified && !isLoading && (
                  <CardFooter>
-                    <Button type="submit" className="w-full" disabled={isSubmitting}>
-                        {isSubmitting ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                            <Save className="mr-2 h-4 w-4" />
-                        )}
-                        Save & Verify Profile
+                    <Button asChild className="w-full">
+                        <Link href="/dashboard/profile/verify">
+                            <ShieldCheck className="mr-2 h-4 w-4" />
+                            Start Verification
+                        </Link>
                     </Button>
                 </CardFooter>
               )}
             </Card>
-          </form>
-        </Form>
       </TabsContent>
       <TabsContent value="inbox" className="mt-6">
          <Card>
