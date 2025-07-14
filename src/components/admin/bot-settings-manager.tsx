@@ -189,7 +189,7 @@ export function BotSettingsManager() {
              <Button
                 type="button"
                 variant="outline"
-                onClick={() => append({ id: `new-tier-${Date.now()}`, name: `Tier ${fields.length + 1}`, balanceThreshold: 20000, dailyProfit: 0.1, clicks: 12 })}
+                onClick={() => append({ id: `new-tier-${Date.now()}`, name: `VIP CORE ${fields.length + 1}`, balanceThreshold: 20000, dailyProfit: 0.1, clicks: 12 })}
               >
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add Tier
