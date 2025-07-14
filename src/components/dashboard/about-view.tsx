@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Bot, Layers, TrendingUp, Cpu, Info, Gem, Trophy } from "lucide-react";
-import { defaultTierSettings, TierSetting } from "@/lib/settings";
-import { ranks, Rank } from "@/lib/ranks";
+import { getBotTierSettings, type TierSetting } from "@/lib/settings";
+import { ranks } from "@/lib/ranks";
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
     <div className="flex items-start gap-4">
@@ -21,11 +21,10 @@ const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, titl
     </div>
 );
 
-const Section = ({ title, children }: { title: string, children: React.ReactNode }) => (
+const Section = ({ title, icon: Icon, children }: { title: string, icon?: React.ElementType, children: React.ReactNode }) => (
     <div className="space-y-4">
         <h2 className="text-xl font-semibold text-foreground border-b pb-2 flex items-center gap-2">
-            {title === "Trading Tiers & Profit Potential" && <Gem className="h-5 w-5 text-primary" />}
-            {title === "Account Ranks" && <Trophy className="h-5 w-5 text-primary" />}
+            {Icon && <Icon className="h-5 w-5 text-primary" />}
             {title}
         </h2>
         {children}
@@ -36,8 +35,11 @@ export function AboutView() {
   const [tierSettings, setTierSettings] = React.useState<TierSetting[]>([]);
 
   React.useEffect(() => {
-    // In a real app, you might fetch this from an API
-    setTierSettings(defaultTierSettings);
+    async function fetchSettings() {
+        const settings = await getBotTierSettings();
+        setTierSettings(settings);
+    }
+    fetchSettings();
   }, []);
 
   return (
@@ -71,7 +73,7 @@ export function AboutView() {
                 </Alert>
             </Section>
 
-            <Section title="Trading Tiers & Profit Potential">
+            <Section title="Trading Tiers & Profit Potential" icon={Gem}>
                 <p className="text-muted-foreground">
                     Your profit potential is determined by your account tier, which is based on your total asset balance. Higher tiers unlock more daily grids and a better profit rate.
                 </p>
@@ -99,7 +101,7 @@ export function AboutView() {
                 </Card>
             </Section>
 
-            <Section title="Account Ranks">
+            <Section title="Account Ranks" icon={Trophy}>
                 <p className="text-muted-foreground">
                     As your balance grows, you'll achieve new ranks that signify your status on the platform. Each rank is a milestone in your trading journey.
                 </p>

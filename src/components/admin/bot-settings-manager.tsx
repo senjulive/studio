@@ -29,6 +29,19 @@ const settingsSchema = z.object({
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 const BOT_TIERS_KEY = 'botTierSettings';
 
+const toRoman = (num: number): string => {
+    const romanMap: { [key: number]: string } = { 1: 'I', 4: 'IV', 5: 'V', 9: 'IX', 10: 'X', 40: 'XL', 50: 'L', 90: 'XC', 100: 'C' };
+    let result = '';
+    const sortedKeys = Object.keys(romanMap).map(Number).sort((a,b) => b-a);
+    for (const val of sortedKeys) {
+        while (num >= val) {
+            result += romanMap[val];
+            num -= val;
+        }
+    }
+    return result || num.toString();
+};
+
 export function BotSettingsManager() {
   const { toast } = useToast();
   const { adminPassword } = useAdmin();
@@ -93,6 +106,20 @@ export function BotSettingsManager() {
     } finally {
       setIsSaving(false);
     }
+  };
+  
+  const handleAddNewTier = () => {
+    const nextTierNumber = fields.length + 1;
+    const romanNumeral = toRoman(nextTierNumber);
+    const newTierName = `VIP CORE ${romanNumeral}`;
+    
+    append({ 
+      id: `new-tier-${Date.now()}`, 
+      name: newTierName, 
+      balanceThreshold: 20000, 
+      dailyProfit: 0.1, 
+      clicks: 12 
+    });
   };
 
   if (isLoading) {
@@ -189,7 +216,7 @@ export function BotSettingsManager() {
              <Button
                 type="button"
                 variant="outline"
-                onClick={() => append({ id: `new-tier-${Date.now()}`, name: `VIP CORE ${fields.length + 1}`, balanceThreshold: 20000, dailyProfit: 0.1, clicks: 12 })}
+                onClick={handleAddNewTier}
               >
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add Tier
