@@ -86,9 +86,9 @@ export function InviteView() {
         )}
         <Card>
             <CardHeader>
-                <CardTitle>Build Your Squad</CardTitle>
+                <CardTitle>Invite and Build Your Squad</CardTitle>
                 <CardDescription>
-                Share your squad code or link. You'll both earn $5 in your wallet for every new member who joins.
+                Share your squad code or link to earn rewards. You'll both get $5 in your wallet for every new member who joins.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
