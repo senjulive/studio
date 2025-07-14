@@ -40,7 +40,7 @@ export function TradingInfoView() {
         <CardContent className="space-y-8 pt-4">
             <Section title="Trading Tiers & Profit Potential" icon={Gem}>
                 <p className="text-muted-foreground">
-                    Your profit potential is determined by your account tier, which is based on your total asset balance. Higher tiers unlock more daily grids and a better profit rate.
+                    Your profit potential is directly linked to your account tier, which is determined by your total asset balance. As you climb the tiers, you unlock more daily grid trades and a higher profit rate, allowing our bot to generate more returns for you. The system is designed to reward growth and investment in your portfolio.
                 </p>
                  <Card>
                     <Table>
@@ -73,7 +73,7 @@ export function TradingInfoView() {
 
             <Section title="Account Ranks" icon={Trophy}>
                 <p className="text-muted-foreground">
-                    As your balance grows, you'll achieve new ranks that signify your status on the platform. Each rank is a milestone in your trading journey.
+                    As your balance grows, you'll achieve new ranks that signify your status and journey on the platform. Each rank is a badge of honor, representing a significant milestone in your trading success. Ranks provide a clear path of progression and are displayed proudly on your profile.
                 </p>
                  <Card>
                     <Table>
