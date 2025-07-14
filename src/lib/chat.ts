@@ -1,8 +1,9 @@
 
 'use client';
 
-// This file uses a mock, in-memory data store as Supabase has been removed.
-// Chat history will reset on page refresh.
+import { readDb, writeDb } from './db';
+
+const DB_FILE = 'chats.json';
 
 export type Message = {
   id: string;
@@ -22,7 +23,7 @@ export type ChatHistory = {
 };
 
 
-const mockChats: ChatHistory = {
+const defaultChats: ChatHistory = {
     'mock-user-123': [
         { id: 'msg_1', text: 'Welcome to support! This is a mock chat system. Messages will not be saved.', timestamp: Date.now() - 10000, sender: 'admin' }
     ]
@@ -30,16 +31,18 @@ const mockChats: ChatHistory = {
 
 // Admin function: Fetches all chats from the mock store.
 export async function getAllChats(): Promise<ChatHistory> {
-  return Promise.resolve(mockChats);
+  return await readDb(DB_FILE, defaultChats);
 }
 
 // Fetches chat history for a single user from the mock store.
 export async function getChatHistoryForUser(userId: string): Promise<Message[]> {
-  return Promise.resolve(mockChats[userId] || []);
+  const chats = await getAllChats();
+  return chats[userId] || [];
 }
 
 // Universal function to send a message to the mock store.
 async function createMessage(userId: string, text: string, sender: 'user' | 'admin', silent: boolean, file?: Message['file']): Promise<Message> {
+  const chats = await getAllChats();
   const newMessage: Message = {
     id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     text,
@@ -49,22 +52,22 @@ async function createMessage(userId: string, text: string, sender: 'user' | 'adm
     file,
   };
 
-  if (!mockChats[userId]) {
-    mockChats[userId] = [];
+  if (!chats[userId]) {
+    chats[userId] = [];
   }
-  mockChats[userId].push(newMessage);
+  chats[userId].push(newMessage);
   
-  if (sender === 'user') {
-      setTimeout(() => {
-          const autoReply: Message = {
-              id: `msg_${Date.now()}_reply`,
-              text: "Thank you for your message. An admin will be with you shortly. (This is an automated reply)",
-              sender: 'admin',
-              timestamp: Date.now()
-          };
-          mockChats[userId].push(autoReply);
-      }, 2000);
+  if (sender === 'user' && !silent) {
+      const autoReply: Message = {
+          id: `msg_${Date.now()}_reply`,
+          text: "Thank you for your message. An admin will be with you shortly. (This is an automated reply)",
+          sender: 'admin',
+          timestamp: Date.now() + 1000 // ensure it appears after
+      };
+      chats[userId].push(autoReply);
   }
+  
+  await writeDb(DB_FILE, chats);
 
   return newMessage;
 }

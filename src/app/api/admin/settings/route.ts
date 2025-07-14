@@ -1,9 +1,10 @@
 
 import { NextResponse } from 'next/server';
 import { ADMIN_PASSWORD } from '@/lib/admin-config';
+import { readDb, writeDb } from '@/lib/db';
 
-// This is a mock API route since there is no database.
-// It simulates a successful save operation.
+const DB_FILE = 'settings.json';
+
 export async function POST(request: Request) {
   try {
     const { adminPassword, key, value } = await request.json();
@@ -16,7 +17,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Setting key and value are required' }, { status: 400 });
     }
     
-    console.log(`Mock save setting: ${key}`, value);
+    const settings = await readDb(DB_FILE, {});
+    settings[key] = value;
+    await writeDb(DB_FILE, settings);
     
     return NextResponse.json({ success: true });
   } catch (error: any) {

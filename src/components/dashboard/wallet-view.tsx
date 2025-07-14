@@ -36,7 +36,7 @@ import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/app/dashboard/layout";
-import { getCurrentTier } from "@/lib/settings";
+import { getBotTierSettings, getCurrentTier, type TierSetting } from "@/lib/settings";
 
 type Transaction = {
   id: string;
@@ -62,7 +62,7 @@ type CryptoData = {
 const quickAccessItems = [
   { href: "/dashboard/market", label: "Market", icon: MarketIcon },
   { href: "/dashboard/deposit", label: "Deposit", icon: DepositIcon },
-  { href: "/dashboard/market", label: "Trade", icon: Repeat },
+  { href: "/dashboard/trading", label: "Trade", icon: Repeat },
   { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
   { href: "/dashboard/support", label: "Support", icon: SupportIcon },
   { href: "/dashboard/squad", label: "Squad", icon: SquadIcon },
@@ -152,15 +152,20 @@ export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const { user } = useUser();
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
+  const [tierSettings, setTierSettings] = React.useState<TierSetting[]>([]);
 
   React.useEffect(() => {
-    if (user?.id) {
-      async function fetchWallet() {
-        const data = await getOrCreateWallet(user.id);
-        setWalletData(data);
+    async function fetchData() {
+      if (user?.id) {
+        const [wallet, tiers] = await Promise.all([
+          getOrCreateWallet(user.id),
+          getBotTierSettings()
+        ]);
+        setWalletData(wallet);
+        setTierSettings(tiers);
       }
-      fetchWallet();
     }
+    fetchData();
   }, [user]);
 
   React.useEffect(() => {
@@ -289,7 +294,7 @@ export function WalletView() {
   const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
   
   const rank = getUserRank(totalBalance);
-  const tier = getCurrentTier(totalBalance);
+  const tier = getCurrentTier(totalBalance, tierSettings);
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (user?.id) {
@@ -402,6 +407,7 @@ export function WalletView() {
         walletData={walletData}
         onUpdate={handleWalletUpdate}
         totalBalance={totalBalance}
+        tierSettings={tierSettings}
       />
 
       <Card>

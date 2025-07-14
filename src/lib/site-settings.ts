@@ -1,4 +1,5 @@
 
+
 export type SiteSettings = {
   usdtDepositAddress: string;
   ethDepositAddress: string;
@@ -11,7 +12,25 @@ export const defaultSiteSettings: SiteSettings = {
   btcDepositAddress: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', // Default placeholder
 };
 
-// Returns the default settings directly as there is no database.
+let cachedSettings: SiteSettings | null = null;
+
 export async function getSiteSettings(): Promise<SiteSettings> {
-  return Promise.resolve(defaultSiteSettings);
+  if (cachedSettings) {
+    return cachedSettings;
+  }
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/public-settings?key=siteSettings`);
+    if (response.ok) {
+        const data = await response.json();
+        if (data) {
+            cachedSettings = data;
+            return data;
+        }
+    }
+  } catch (error) {
+    console.error("Could not fetch site settings, using defaults.", error);
+  }
+
+  cachedSettings = defaultSiteSettings;
+  return defaultSiteSettings;
 }

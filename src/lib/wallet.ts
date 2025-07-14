@@ -3,6 +3,9 @@
 
 import { getBotTierSettings } from './settings';
 import { sendSystemNotification } from './chat';
+import { readDb, writeDb } from './db';
+
+const DB_FILE = 'wallets.json';
 
 const generateAddress = (prefix: string, length: number, chars: string): string => {
     let result = '';
@@ -93,23 +96,18 @@ const createNewWalletDataObject = (): WalletData => {
             members: ['mock-member-1', 'mock-member-2'],
         },
         profile: {
-            username: 'MockUser',
-            fullName: 'Mock User',
-            idCardNo: '123456789',
-            contactNumber: '+1234567890',
-            country: 'United States',
+            username: 'DefaultUser',
+            fullName: 'Default User',
+            idCardNo: '000000000',
+            contactNumber: '+0000000000',
+            country: 'Default',
             avatarUrl: '',
         },
         security: {
-            withdrawalAddresses: {
-                usdt: 'TPAj58tX5n2hXpYZAe5V6b4s8g1zB4hP7x'
-            },
+            withdrawalAddresses: {},
         },
     };
 }
-
-// In-memory store for the wallet data since there is no database.
-let memoryWallet: WalletData = createNewWalletDataObject();
 
 // Called after a new user signs up.
 export async function createWallet(
@@ -121,51 +119,82 @@ export async function createWallet(
     referralCode?: string
 ): Promise<WalletData> {
     
-    console.log(`Mock: Creating wallet for ${username}`);
+    const allWallets = await readDb(DB_FILE, {});
+    
     const newWallet = createNewWalletDataObject();
     newWallet.profile.username = username;
     newWallet.profile.contactNumber = contactNumber;
     newWallet.profile.country = country;
     
-    // Add a welcome bonus of 5 USDT for all new users.
     newWallet.balances.usdt += 5;
 
-    // Simulate referral bonus if a squad code is used
     if (referralCode) {
         newWallet.squad.squadLeader = { id: 'mock-leader-id', username: 'MockLeader' };
-        // Add *additional* 5 USDT bonus. No BTC or ETH.
         newWallet.balances.usdt += 5;
-        await sendSystemNotification(userId, `User registered with squad code ${referralCode} from leader MockLeader. A bonus of $5.00 USDT has been applied.`);
+    }
+    
+    allWallets[userId] = newWallet;
+    await writeDb(DB_FILE, allWallets);
+
+    if (referralCode) {
+         await sendSystemNotification(userId, `User registered with squad code ${referralCode} from leader MockLeader. A bonus of $5.00 USDT has been applied.`);
     }
 
-    memoryWallet = newWallet;
     return newWallet;
 }
 
 
 // Fetches the current user's wallet, creating it if it doesn't exist.
 export async function getOrCreateWallet(userId: string): Promise<WalletData> {
-    // Daily reset logic for the mock wallet
+    const allWallets = await readDb(DB_FILE, {});
+    let userWallet = allWallets[userId];
+
+    if (!userWallet) {
+        userWallet = createNewWalletDataObject();
+        allWallets[userId] = userWallet;
+    }
+    
     const now = Date.now();
     const oneDay = 24 * 60 * 60 * 1000;
-    if (now - (memoryWallet.growth?.lastReset ?? 0) > oneDay) {
-        const tierSettings = await getBotTierSettings();
-        const currentTier = [...tierSettings].reverse().find(tier => memoryWallet.balances.usdt >= tier.balanceThreshold) || tierSettings[0];
+    if (now - (userWallet.growth?.lastReset ?? 0) > oneDay) {
+        const settings = await getBotTierSettings();
+        const currentTier = [...settings].reverse().find(tier => userWallet.balances.usdt >= tier.balanceThreshold) || settings[0];
         
-        memoryWallet.growth.clicksLeft = currentTier.clicks;
-        memoryWallet.growth.lastReset = now;
-        memoryWallet.growth.dailyEarnings = 0;
-        memoryWallet.growth.earningsHistory = [];
+        userWallet.growth.clicksLeft = currentTier.clicks;
+        userWallet.growth.lastReset = now;
+        userWallet.growth.dailyEarnings = 0;
     }
-    return Promise.resolve(memoryWallet);
+
+    await writeDb(DB_FILE, allWallets);
+
+    return userWallet;
+}
+
+export async function getAllWallets(): Promise<Record<string, WalletData>> {
+    const defaultWallets = {
+        "mock-user-123": createNewWalletDataObject(),
+        "mock-user-456": {
+            ...createNewWalletDataObject(),
+            profile: {
+                ...createNewWalletDataObject().profile,
+                username: 'Another User',
+            },
+            balances: {
+                usdt: 1234.56,
+                btc: 0.05,
+                eth: 1.2
+            }
+        }
+    };
+    return readDb(DB_FILE, defaultWallets);
 }
 
 
 // Updates a user's own wallet data.
 export async function updateWallet(userId: string, newData: WalletData): Promise<void> {
-    console.log(`Mock: Updating wallet for ${userId}`);
-    memoryWallet = newData;
-    return Promise.resolve();
+    const allWallets = await readDb(DB_FILE, {});
+    allWallets[userId] = newData;
+    await writeDb(DB_FILE, allWallets);
 }
 
 

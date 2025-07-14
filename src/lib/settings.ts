@@ -31,15 +31,37 @@ export const defaultTierSettings: TierSetting[] = [
   { id: 'tier-8', name: 'VIP CORE VIII', balanceThreshold: 100000, dailyProfit: 0.12, clicks: 15, Icon: Lock, className: 'text-muted-foreground' },
 ];
 
-// Returns the default settings directly as there is no database.
+let cachedSettings: TierSetting[] | null = null;
+let currentTier: TierSetting | null = null;
+
 export async function getBotTierSettings(): Promise<TierSetting[]> {
-    const settings = defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
-    return Promise.resolve(settings);
+    if (cachedSettings) {
+      return cachedSettings;
+    }
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/public-settings?key=botTierSettings`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data) && data.length > 0) {
+                // The backend just stores the data, so we need to add back the icons and classNames
+                const settingsWithIcons = data.map((tier) => {
+                    const defaultTier = defaultTierSettings.find(d => d.id === tier.id) || defaultTierSettings[0];
+                    return { ...tier, Icon: defaultTier.Icon, className: defaultTier.className };
+                });
+                cachedSettings = settingsWithIcons.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
+                return cachedSettings;
+            }
+        }
+    } catch (error) {
+        console.error("Could not fetch bot tier settings, using defaults.", error);
+    }
+    
+    cachedSettings = defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
+    return cachedSettings;
 }
 
-
-export const getCurrentTier = (balance: number): TierSetting | null => {
-    if (defaultTierSettings.length === 0) return null;
-    const applicableTier = [...defaultTierSettings].reverse().find(tier => balance >= tier.balanceThreshold && tier.Icon !== Lock);
+export const getCurrentTier = (balance: number, tiers: TierSetting[]): TierSetting | null => {
+    if (tiers.length === 0) return null;
+    const applicableTier = [...tiers].reverse().find(tier => balance >= tier.balanceThreshold && tier.Icon !== Lock);
     return applicableTier || null;
 };

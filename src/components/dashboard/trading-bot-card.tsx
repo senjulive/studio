@@ -9,7 +9,7 @@ import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BotAnimationPreview } from "./bot-animation-preview";
 import { AstralLogo } from "../icons/astral-logo";
-import { getBotTierSettings, type TierSetting } from "@/lib/settings";
+import { type TierSetting, getCurrentTier } from "@/lib/settings";
 import { GridTradingAnimation } from "./grid-trading-animation";
 
 export function TradingBotCard({
@@ -17,33 +17,19 @@ export function TradingBotCard({
   onUpdate,
   totalBalance,
   className,
+  tierSettings,
 }: {
   walletData: WalletData;
   onUpdate: (data: WalletData) => void;
   totalBalance: number;
   className?: string;
+  tierSettings: TierSetting[];
 }) {
   const [isAnimating, setIsAnimating] = React.useState(false);
-  const [tierSettings, setTierSettings] = React.useState<TierSetting[]>([]);
 
   const { toast } = useToast();
 
-  React.useEffect(() => {
-    async function fetchSettings() {
-      const settings = await getBotTierSettings();
-      setTierSettings(settings);
-    }
-    fetchSettings();
-  }, []);
-
-  const getCurrentTier = React.useCallback((balance: number): TierSetting | null => {
-    if (tierSettings.length === 0) return null;
-    // Tiers are pre-sorted by balance ascending, so we find the highest applicable tier by reversing
-    const applicableTier = [...tierSettings].reverse().find(tier => balance >= tier.balanceThreshold && tier.Icon !== Zap);
-    return applicableTier || null;
-  }, [tierSettings]);
-
-  const currentTier = getCurrentTier(totalBalance);
+  const currentTier = getCurrentTier(totalBalance, tierSettings);
   
   const profitPerTrade = currentTier && totalBalance > 0 
     ? (totalBalance * currentTier.dailyProfit) / currentTier.clicks 
@@ -82,17 +68,14 @@ export function TradingBotCard({
     // Simulate the animation and trading process
     setTimeout(() => {
         const usdtEarnings = profitPerTrade;
-        const btcBonus = 0.00001 + Math.random() * 0.00002;
-        const ethBonus = 0.0002 + Math.random() * 0.0003;
         
         const newEarning = { amount: usdtEarnings, timestamp: Date.now() };
 
         const newWalletData: WalletData = {
           ...walletData,
           balances: {
+            ...walletData.balances,
             usdt: (walletData.balances?.usdt ?? 0) + usdtEarnings,
-            btc: (walletData.balances?.btc ?? 0) + btcBonus,
-            eth: (walletData.balances?.eth ?? 0) + ethBonus,
           },
           growth: {
             ...walletData.growth,
@@ -106,7 +89,7 @@ export function TradingBotCard({
 
         toast({
           title: "Trade Successful!",
-          description: `You've earned $${usdtEarnings.toFixed(2)} USDT and a bonus in BTC & ETH.`,
+          description: `You've earned $${usdtEarnings.toFixed(2)} USDT.`,
         });
 
         setIsAnimating(false);

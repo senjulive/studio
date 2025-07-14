@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { ADMIN_PASSWORD } from '@/lib/admin-config';
 import type { WalletData } from '@/lib/wallet';
-import { getOrCreateWallet } from '@/lib/wallet';
+import { getAllWallets } from '@/lib/wallet';
 
 export async function POST(request: Request) {
   try {
@@ -12,23 +12,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const mockWallet = await getOrCreateWallet("mock-user-123");
-    
-    const wallets: Record<string, WalletData> = {
-      "mock-user-123": mockWallet,
-      "mock-user-456": {
-        ...mockWallet,
-        profile: {
-          ...mockWallet.profile,
-          username: 'Another User',
-        },
-        balances: {
-            usdt: 1234.56,
-            btc: 0.05,
-            eth: 1.2
-        }
-      }
-    };
+    const wallets = await getAllWallets();
 
     return NextResponse.json(wallets);
   } catch (error: any) {
