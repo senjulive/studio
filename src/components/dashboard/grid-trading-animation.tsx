@@ -3,24 +3,31 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 
-export function GridTradingAnimation() {
-  const [price, setPrice] = useState(45234.56);
-  const [pnl, setPnl] = useState(1234.56);
+export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPercentage }: { totalBalance: number, profitPerTrade: number, profitPercentage: number }) {
+  const [price, setPrice] = useState(totalBalance);
+  const [pnl, setPnl] = useState(0);
   const [transactions, setTransactions] = useState<{ id: number; type: string; x: number; y: number; }[]>([]);
   const chartAreaRef = useRef<HTMLDivElement>(null);
   let transId = 0;
 
   useEffect(() => {
+    // Animate the price around the total balance
     const priceInterval = setInterval(() => {
       setPrice(prevPrice => {
-        const variation = (Math.random() - 0.5) * 100;
-        return prevPrice + variation;
+        const variation = (Math.random() - 0.5) * (totalBalance * 0.001); // Smaller, more realistic flicker
+        return totalBalance + variation;
       });
-      setPnl(prevPnl => {
-        const pnlVariation = (Math.random() - 0.3) * 50;
-        return prevPnl + pnlVariation;
-      });
-    }, 1000);
+    }, 500);
+
+    // Animate the P&L up to the final profit amount
+    const pnlInterval = setInterval(() => {
+        setPnl(prevPnl => {
+            if (prevPnl < profitPerTrade) {
+                return Math.min(prevPnl + profitPerTrade / 50, profitPerTrade); // Smoothly increment P&L
+            }
+            return profitPerTrade;
+        });
+    }, 100);
 
     const transactionInterval = setInterval(() => {
       const type = Math.random() > 0.5 ? 'buy' : 'sell';
@@ -29,8 +36,10 @@ export function GridTradingAnimation() {
       
       setTransactions(currentTransactions => {
         const newTransaction = { id: transId++, type, x, y };
-        const updatedTransactions = [...currentTransactions, newTransaction];
+        // Limit transactions on screen to avoid performance issues
+        const updatedTransactions = [...currentTransactions.slice(-20), newTransaction];
         
+        // This timeout is for the animation of a single transaction dot
         setTimeout(() => {
           setTransactions(trs => trs.filter(t => t.id !== newTransaction.id));
         }, 1000);
@@ -42,9 +51,11 @@ export function GridTradingAnimation() {
 
     return () => {
       clearInterval(priceInterval);
+      clearInterval(pnlInterval);
       clearInterval(transactionInterval);
     };
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profitPerTrade, totalBalance]);
 
   return (
     <>
@@ -279,7 +290,7 @@ export function GridTradingAnimation() {
       `}</style>
       <div className="trading-container">
         <div className="header">
-            <div className="ticker">BTC/USDT</div>
+            <div className="ticker">TOTAL BALANCE</div>
             <div className="price">${price.toFixed(2)}</div>
         </div>
         <div className="main-content">
@@ -305,10 +316,11 @@ export function GridTradingAnimation() {
                     <span>GRID ACTIVE</span>
                 </div>
                 <div className="profit-loss">
-                    <div>P&L</div>
+                    <div>PROFIT</div>
                     <div className={`pnl-value ${pnl >= 0 ? 'positive' : 'negative'}`}>
                       {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
                     </div>
+                    <div className="text-xs text-green-400">({profitPercentage.toFixed(4)}%)</div>
                 </div>
                 {transactions.map(t => (
                   <div key={t.id} className={`transaction ${t.type}`} style={{ left: `${t.x}%`, top: `${t.y}%` }}></div>
@@ -318,15 +330,15 @@ export function GridTradingAnimation() {
                 <div className="order-book-header">ORDER BOOK</div>
                 <div className="orders-section">
                     <div className="section-title">SELL ORDERS</div>
-                    <div className="order-row sell"><span>45,250</span><span>0.125</span></div>
-                    <div className="order-row sell"><span>45,245</span><span>0.234</span></div>
-                    <div className="order-row sell"><span>45,240</span><span>0.456</span></div>
+                    <div className="order-row sell"><span>{(totalBalance * 1.0005).toFixed(2)}</span><span>0.125</span></div>
+                    <div className="order-row sell"><span>{(totalBalance * 1.0003).toFixed(2)}</span><span>0.234</span></div>
+                    <div className="order-row sell"><span>{(totalBalance * 1.0001).toFixed(2)}</span><span>0.456</span></div>
                 </div>
                 <div className="orders-section">
                     <div className="section-title">BUY ORDERS</div>
-                    <div className="order-row buy"><span>45,230</span><span>0.345</span></div>
-                    <div className="order-row buy"><span>45,225</span><span>0.567</span></div>
-                    <div className="order-row buy"><span>45,220</span><span>0.789</span></div>
+                    <div className="order-row buy"><span>{(totalBalance * 0.9999).toFixed(2)}</span><span>0.345</span></div>
+                    <div className="order-row buy"><span>{(totalBalance * 0.9997).toFixed(2)}</span><span>0.567</span></div>
+                    <div className="order-row buy"><span>{(totalBalance * 0.9995).toFixed(2)}</span><span>0.789</span></div>
                 </div>
             </div>
         </div>

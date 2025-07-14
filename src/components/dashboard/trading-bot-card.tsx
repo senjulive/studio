@@ -39,7 +39,7 @@ export function TradingBotCard({
   const getCurrentTier = React.useCallback((balance: number): TierSetting | null => {
     if (tierSettings.length === 0) return null;
     // Tiers are pre-sorted by balance ascending, so we find the highest applicable tier by reversing
-    const applicableTier = [...tierSettings].reverse().find(tier => balance >= tier.balanceThreshold);
+    const applicableTier = [...tierSettings].reverse().find(tier => balance >= tier.balanceThreshold && tier.Icon !== Zap);
     return applicableTier || null;
   }, [tierSettings]);
 
@@ -47,6 +47,10 @@ export function TradingBotCard({
   
   const profitPerTrade = currentTier && totalBalance > 0 
     ? (totalBalance * currentTier.dailyProfit) / currentTier.clicks 
+    : 0;
+  
+  const profitPercentagePerTrade = currentTier && totalBalance > 0 
+    ? (currentTier.dailyProfit / currentTier.clicks) * 100
     : 0;
 
   const canStart =
@@ -119,8 +123,8 @@ export function TradingBotCard({
         className
       )}
     >
-        {isAnimating ? (
-            <GridTradingAnimation />
+        {isAnimating && currentTier ? (
+            <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} />
         ) : (
             <>
                 <CardHeader className="flex-row items-start justify-between pb-4">
