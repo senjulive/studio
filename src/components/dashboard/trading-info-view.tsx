@@ -141,6 +141,13 @@ export function TradingInfoView() {
                     </Table>
                 </Card>
             </Section>
+            
+            <div>
+                 <p className="text-sm text-center text-muted-foreground italic mt-8">
+                    Disclaimer: All trading involves risk. The earnings estimates are for illustrative purposes only and are not guaranteed. Past performance is not indicative of future results. Please invest responsibly.
+                </p>
+            </div>
+
         </CardContent>
     </Card>
   );
