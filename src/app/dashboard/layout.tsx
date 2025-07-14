@@ -42,6 +42,7 @@ import { AboutIcon } from "@/components/icons/nav/about-icon";
 import { DownloadIcon } from "@/components/icons/nav/download-icon";
 import { SettingsIcon } from "@/components/icons/nav/settings-icon";
 import { LogoutIcon } from "@/components/icons/nav/logout-icon";
+import { UserPlus } from "lucide-react";
 
 import type { User } from '@supabase/supabase-js';
 
@@ -104,6 +105,7 @@ export default function DashboardLayout({
     { href: "/dashboard/deposit", label: "Deposit", icon: DepositIcon },
     { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
     { href: "/dashboard/squad", label: "Squad", icon: SquadIcon },
+    { href: "/dashboard/invite", label: "Invite", icon: UserPlus },
     { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
     { href: "/dashboard/support", label: "Support", icon: SupportIcon },
     { href: "/dashboard/about", label: "About", icon: AboutIcon },
