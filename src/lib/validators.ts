@@ -13,11 +13,7 @@ export const registerSchema = z
     email: z.string().email({ message: "Please enter a valid email address." }),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters long." })
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
-      ),
+      .min(6, { message: "Password must be at least 6 characters long." }),
     confirmPassword: z.string(),
     country: z.string().min(2, { message: "Please select a country." }),
     contactNumber: z.string().min(5, { message: "Please enter a valid contact number." }),
