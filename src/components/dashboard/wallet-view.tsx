@@ -335,10 +335,7 @@ export function WalletView() {
         className="relative overflow-hidden"
       >
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-blue-200 via-blue-100 to-white -z-10"
-          style={{
-            clipPath: 'ellipse(100% 70% at 0% 100%)'
-          }}
+          className="absolute inset-0 bg-primary/5 -z-10"
         />
         <CardHeader>
            <CardTitle className="flex flex-wrap items-center gap-x-3 gap-y-2">
