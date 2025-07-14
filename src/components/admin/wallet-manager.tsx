@@ -132,6 +132,10 @@ export function WalletManager() {
   }, [adminPassword, refetchWallets]);
   
   const postAdminUpdate = React.useCallback(async (url: string, body: object) => {
+    if (!adminPassword) {
+        toast({ title: "Authentication Error", description: "Admin credentials not found.", variant: "destructive" });
+        return;
+    }
     setIsUpdating(true);
     try {
         const response = await fetch(url, {

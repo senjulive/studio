@@ -45,6 +45,8 @@ export function MessageViewer() {
 
   React.useEffect(() => {
     async function fetchData() {
+      if (!adminPassword) return;
+
       setIsLoading(true);
 
       const fetchWallets = async (): Promise<Record<string, MappedWallet>> => {
@@ -80,9 +82,7 @@ export function MessageViewer() {
       setIsLoading(false);
     }
     
-    if (adminPassword) {
-      fetchData();
-    }
+    fetchData();
   }, [adminPassword, toast]);
 
   const handleSendMessage = async (userId: string) => {
@@ -138,8 +138,8 @@ export function MessageViewer() {
 
   const sortedChats = chats
     ? Object.entries(chats).sort(([, a], [, b]) => {
-        const lastMsgA = a[a.length - 1]?.timestamp ?? 0;
-        const lastMsgB = b[b.length - 1]?.timestamp ?? 0;
+        const lastMsgA = new Date(a[a.length - 1]?.timestamp ?? 0).getTime();
+        const lastMsgB = new Date(b[b.length - 1]?.timestamp ?? 0).getTime();
         return lastMsgB - lastMsgA;
       })
     : [];
@@ -265,9 +265,9 @@ export function MessageViewer() {
                           )}
                         >
                           <p>{message.text}</p>
-                           {message.file && message.file.type.startsWith('image/') && (
+                           {message.file_url && (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={message.file.dataUrl} alt={message.file.name} className="mt-2 rounded-md max-w-full h-auto" />
+                            <img src={message.file_url} alt="Attached file" className="mt-2 rounded-md max-w-full h-auto" />
                           )}
                         </div>
                       </div>
