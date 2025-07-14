@@ -15,10 +15,12 @@ import { getBotTierSettings, type TierSetting } from "@/lib/settings";
 export function TradingBotCard({
   walletData,
   onUpdate,
+  totalBalance,
   className,
 }: {
   walletData: WalletData;
   onUpdate: (data: WalletData) => void;
+  totalBalance: number;
   className?: string;
 }) {
   const [isAnimating, setIsAnimating] = React.useState(false);
@@ -44,7 +46,6 @@ export function TradingBotCard({
     return applicableTier || null;
   }, [tierSettings]);
 
-  const totalBalance = (walletData?.balances?.usdt ?? 0);
   const currentTier = getCurrentTier(totalBalance);
   
   const profitPerTrade = currentTier && totalBalance > 0 

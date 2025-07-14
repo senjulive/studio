@@ -421,7 +421,11 @@ export function WalletView() {
         </CardContent>
       </Card>
 
-      <TradingBotCard walletData={walletData} onUpdate={handleWalletUpdate} />
+      <TradingBotCard
+        walletData={walletData}
+        onUpdate={handleWalletUpdate}
+        totalBalance={totalBalance}
+      />
 
       <Card>
         <CardHeader>
