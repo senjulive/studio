@@ -52,12 +52,16 @@ export function VirtualCard({ walletData, userEmail, className }: VirtualCardPro
 
   return (
     <div className={cn(
-        "w-full max-w-sm aspect-[1.586] rounded-xl shadow-2xl p-6 flex flex-col justify-between relative bg-gradient-to-br from-primary via-purple-700 to-indigo-800 text-primary-foreground overflow-hidden", 
+        "w-full max-w-sm aspect-[1.586] rounded-xl shadow-2xl p-6 flex flex-col justify-between relative bg-gradient-to-br from-primary to-purple-600 text-primary-foreground overflow-hidden", 
         className
     )}>
-      <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full opacity-50"></div>
-      <div className="absolute -bottom-12 -left-8 w-32 h-32 bg-white/5 rounded-full opacity-50"></div>
-      
+      {/* Background abstract elements */}
+      <div className="absolute inset-0 z-0 opacity-10">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="currentColor" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)"/></svg>
+      </div>
+      <div className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 bg-white/10 rounded-full filter blur-3xl"></div>
+      <div className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 bg-white/5 rounded-full filter blur-3xl"></div>
+
       <header className="flex justify-between items-start z-10">
         <div className="flex items-center gap-2">
             <div className="bg-white/20 rounded-md p-1">
@@ -67,7 +71,7 @@ export function VirtualCard({ walletData, userEmail, className }: VirtualCardPro
         </div>
         <div className="text-right">
             <p className="text-xs uppercase opacity-70">Balance</p>
-            <p className="font-semibold text-lg">${balance.toFixed(2)}</p>
+            <p className="font-semibold text-lg tracking-wider">${balance.toFixed(2)}</p>
         </div>
       </header>
 
@@ -82,15 +86,10 @@ export function VirtualCard({ walletData, userEmail, className }: VirtualCardPro
         <div className="space-y-1">
           <p className="text-xs uppercase opacity-70">Card Holder</p>
           <p className="font-medium truncate">{fullName}</p>
-          <p className="text-xs font-mono truncate">{userEmail}</p>
         </div>
         <div className="text-right space-y-1">
           <p className="text-xs uppercase opacity-70">Expires</p>
           <p className="font-medium font-mono">{cardDetails?.expiryDate || 'MM/YY'}</p>
-        </div>
-        <div className="text-right space-y-1">
-          <p className="text-xs uppercase opacity-70">CVV</p>
-          <p className="font-medium font-mono">{cardDetails?.cvv || '***'}</p>
         </div>
       </footer>
     </div>
