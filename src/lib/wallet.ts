@@ -65,6 +65,7 @@ export type WalletData = {
         contactNumber: string;
         country: string;
         avatarUrl?: string;
+        verificationStatus: 'unverified' | 'verifying' | 'verified';
     };
     security: {
         withdrawalAddresses: WithdrawalAddresses;
@@ -97,11 +98,12 @@ const createNewWalletDataObject = (): WalletData => {
         },
         profile: {
             username: 'DefaultUser',
-            fullName: 'Default User',
-            idCardNo: '000000000',
+            fullName: '',
+            idCardNo: '',
             contactNumber: '+0000000000',
             country: 'Default',
             avatarUrl: '',
+            verificationStatus: 'unverified',
         },
         security: {
             withdrawalAddresses: {},
@@ -163,6 +165,11 @@ export async function getOrCreateWallet(userId: string): Promise<WalletData> {
         userWallet.growth.clicksLeft = currentTier.clicks;
         userWallet.growth.lastReset = now;
         userWallet.growth.dailyEarnings = 0;
+    }
+
+    // Ensure verificationStatus exists for older wallets
+    if (!userWallet.profile.verificationStatus) {
+        userWallet.profile.verificationStatus = 'unverified';
     }
 
     await writeDb(DB_FILE, allWallets);
