@@ -21,6 +21,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -160,6 +161,9 @@ export function RegisterForm() {
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
+                   <FormDescription>
+                    Must be 8+ characters with uppercase, lowercase, number, and special characters.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
