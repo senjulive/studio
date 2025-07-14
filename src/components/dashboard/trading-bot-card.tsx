@@ -110,7 +110,7 @@ export function TradingBotCard({
         });
 
         setIsAnimating(false);
-    }, 5000); // Animation duration
+    }, 60000); // Animation duration
   };
 
   return (

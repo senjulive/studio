@@ -3,10 +3,21 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 
+const statusMessages = [
+    "Connecting to Exchange...",
+    "Analyzing Market...",
+    "Placing Buy Orders...",
+    "Placing Sell Orders...",
+    "Executing Grid...",
+    "Finalizing Grid..."
+];
+
+
 export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPercentage }: { totalBalance: number, profitPerTrade: number, profitPercentage: number }) {
   const [price, setPrice] = useState(totalBalance);
   const [pnl, setPnl] = useState(0);
   const [transactions, setTransactions] = useState<{ id: number; type: string; x: number; y: number; }[]>([]);
+  const [statusText, setStatusText] = useState(statusMessages[0]);
   const chartAreaRef = useRef<HTMLDivElement>(null);
   let transId = 0;
 
@@ -23,7 +34,7 @@ export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPerce
     const pnlInterval = setInterval(() => {
         setPnl(prevPnl => {
             if (prevPnl < profitPerTrade) {
-                return Math.min(prevPnl + profitPerTrade / 50, profitPerTrade); // Smoothly increment P&L
+                return Math.min(prevPnl + profitPerTrade / 500, profitPerTrade); // Smoothly increment P&L over animation duration
             }
             return profitPerTrade;
         });
@@ -49,10 +60,18 @@ export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPerce
 
     }, 800);
 
+    // Cycle through status messages
+    let statusIndex = 0;
+    const statusInterval = setInterval(() => {
+        statusIndex = (statusIndex + 1) % statusMessages.length;
+        setStatusText(statusMessages[statusIndex]);
+    }, 10000); // Change status every 10 seconds
+
     return () => {
       clearInterval(priceInterval);
       clearInterval(pnlInterval);
       clearInterval(transactionInterval);
+      clearInterval(statusInterval);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profitPerTrade, totalBalance]);
@@ -287,6 +306,21 @@ export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPerce
             0%, 100% { opacity: 0.2; }
             50% { opacity: 0.8; }
         }
+        .dynamic-status {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            animation: fadeInOut 10s infinite;
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
       `}</style>
       <div className="trading-container">
         <div className="header">
@@ -325,6 +359,7 @@ export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPerce
                 {transactions.map(t => (
                   <div key={t.id} className={`transaction ${t.type}`} style={{ left: `${t.x}%`, top: `${t.y}%` }}></div>
                 ))}
+                <div className="dynamic-status">{statusText}</div>
             </div>
             <div className="order-book">
                 <div className="order-book-header">ORDER BOOK</div>
