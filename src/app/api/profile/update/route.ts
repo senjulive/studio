@@ -15,9 +15,9 @@ async function isIdCardUnique(userId: string, idCardNo: string): Promise<boolean
 
 export async function POST(request: Request) {
   try {
-    const { userId, fullName, idCardNo } = await request.json();
+    const { userId, fullName, idCardNo, address, dateOfBirth } = await request.json();
 
-    if (!userId || !fullName || !idCardNo) {
+    if (!userId || !fullName || !idCardNo || !address || !dateOfBirth) {
       return NextResponse.json({ success: false, error: 'Missing required fields.' }, { status: 400 });
     }
 
@@ -40,6 +40,8 @@ export async function POST(request: Request) {
         ...walletData.profile,
         fullName,
         idCardNo,
+        address,
+        dateOfBirth,
         verificationStatus: 'verifying',
       },
     };

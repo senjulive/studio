@@ -64,6 +64,8 @@ export type WalletData = {
         idCardNo: string;
         contactNumber: string;
         country: string;
+        address?: string;
+        dateOfBirth?: string;
         avatarUrl?: string;
         verificationStatus: 'unverified' | 'verifying' | 'verified';
     };

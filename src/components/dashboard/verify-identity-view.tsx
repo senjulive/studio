@@ -5,6 +5,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { format } from "date-fns";
 import {
   Card,
   CardContent,
@@ -15,18 +16,25 @@ import {
 } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/app/dashboard/layout";
 import { addNotification } from "@/lib/notifications";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, ShieldCheck, Upload, Image as ImageIcon, X } from "lucide-react";
+import { Loader2, Save, ShieldCheck, Upload, Image as ImageIcon, X, Calendar as CalendarIcon } from "lucide-react";
 import Image from "next/image";
-import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 const profileSchema = z.object({
   fullName: z.string().min(3, "Full name must be at least 3 characters.").max(50),
   idCardNo: z.string().regex(/^\d{9,}$/, "ID Card Number must be at least 9 digits and contain only numbers."),
+  address: z.string().min(10, "Please enter a full address.").max(100, "Address is too long."),
+  dateOfBirth: z.date({
+    required_error: "A date of birth is required.",
+  }),
   idCardFront: z.instanceof(File, { message: "Front of ID card is required." }),
   idCardBack: z.instanceof(File, { message: "Back of ID card is required." }),
 });
@@ -116,6 +124,7 @@ export function VerifyIdentityView() {
     defaultValues: {
       fullName: "",
       idCardNo: "",
+      address: "",
     },
   });
 
@@ -157,6 +166,8 @@ export function VerifyIdentityView() {
           userId: user.id,
           fullName: values.fullName,
           idCardNo: values.idCardNo,
+          address: values.address,
+          dateOfBirth: values.dateOfBirth.toISOString(),
         }),
       });
 
@@ -205,27 +216,83 @@ export function VerifyIdentityView() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
-            <FormField
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Full Name (as on ID)</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Enter your full legal name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="idCardNo"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>ID Card Number</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Enter your national ID number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
+             <FormField
               control={form.control}
-              name="fullName"
+              name="dateOfBirth"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name (as on ID)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your full legal name" {...field} />
-                  </FormControl>
+                <FormItem className="flex flex-col">
+                  <FormLabel>Date of birth</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
-              name="idCardNo"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ID Card Number</FormLabel>
+                  <FormLabel>Full Residential Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your national ID number" {...field} />
+                    <Textarea placeholder="Enter your full address" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
