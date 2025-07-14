@@ -127,19 +127,15 @@ export async function createWallet(
     newWallet.profile.contactNumber = contactNumber;
     newWallet.profile.country = country;
     
-    // Add a welcome bonus for all new users
-    newWallet.balances.usdt += 100;
-    newWallet.balances.btc += 0.005;
-    newWallet.balances.eth += 0.1;
+    // Add a welcome bonus of 5 USDT for all new users.
+    newWallet.balances.usdt += 5;
 
     // Simulate referral bonus if a squad code is used
     if (referralCode) {
         newWallet.squad.squadLeader = { id: 'mock-leader-id', username: 'MockLeader' };
-        // Add *additional* bonuses
+        // Add *additional* 5 USDT bonus. No BTC or ETH.
         newWallet.balances.usdt += 5;
-        newWallet.balances.btc += 0.0001;
-        newWallet.balances.eth += 0.002;
-        await sendSystemNotification(userId, `User registered with squad code ${referralCode} from leader MockLeader. A bonus has been applied.`);
+        await sendSystemNotification(userId, `User registered with squad code ${referralCode} from leader MockLeader. A bonus of $5.00 USDT has been applied.`);
     }
 
     memoryWallet = newWallet;

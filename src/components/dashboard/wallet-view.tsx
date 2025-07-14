@@ -199,23 +199,7 @@ export function WalletView() {
       id: `reg-bonus-usdt`,
       type: "Registration Bonus",
       asset: "USDT",
-      amount: 100,
-      date: registrationDate,
-      status: "Completed",
-    });
-    history.push({
-      id: `reg-bonus-btc`,
-      type: "Registration Bonus",
-      asset: "BTC",
-      amount: 0.005,
-      date: registrationDate,
-      status: "Completed",
-    });
-    history.push({
-      id: `reg-bonus-eth`,
-      type: "Registration Bonus",
-      asset: "ETH",
-      amount: 0.1,
+      amount: 5,
       date: registrationDate,
       status: "Completed",
     });
@@ -227,22 +211,6 @@ export function WalletView() {
         type: "Invitation Bonus",
         asset: "USDT",
         amount: 5,
-        date: registrationDate,
-        status: "Completed",
-      });
-      history.push({
-        id: `invite-bonus-btc`,
-        type: "Invitation Bonus",
-        asset: "BTC",
-        amount: 0.0001,
-        date: registrationDate,
-        status: "Completed",
-      });
-      history.push({
-        id: `invite-bonus-eth`,
-        type: "Invitation Bonus",
-        asset: "ETH",
-        amount: 0.002,
         date: registrationDate,
         status: "Completed",
       });
