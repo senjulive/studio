@@ -22,18 +22,17 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/app/dashboard/layout";
 import { addNotification } from "@/lib/notifications";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, ShieldCheck, Upload, Image as ImageIcon, X, Calendar as CalendarIcon } from "lucide-react";
+import { Loader2, Save, ShieldCheck, Upload, Image as ImageIcon, X } from "lucide-react";
 import Image from "next/image";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 
 const profileSchema = z.object({
   fullName: z.string().min(3, "Full name must be at least 3 characters.").max(50),
   idCardNo: z.string().regex(/^\d{9,}$/, "ID Card Number must be at least 9 digits and contain only numbers."),
   address: z.string().min(10, "Please enter a full address.").max(100, "Address is too long."),
-  dateOfBirth: z.date({
-    required_error: "A date of birth is required.",
+  dateOfBirth: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format. Please use YYYY-MM-DD.",
+  }).refine((val) => new Date(val) < new Date() && new Date(val) > new Date("1900-01-01"), {
+    message: "Please enter a valid date of birth."
   }),
   idCardFront: z.instanceof(File, { message: "Front of ID card is required." }),
   idCardBack: z.instanceof(File, { message: "Back of ID card is required." }),
@@ -125,6 +124,7 @@ export function VerifyIdentityView() {
       fullName: "",
       idCardNo: "",
       address: "",
+      dateOfBirth: "",
     },
   });
 
@@ -167,7 +167,7 @@ export function VerifyIdentityView() {
           fullName: values.fullName,
           idCardNo: values.idCardNo,
           address: values.address,
-          dateOfBirth: values.dateOfBirth.toISOString(),
+          dateOfBirth: new Date(values.dateOfBirth).toISOString(),
         }),
       });
 
@@ -248,39 +248,11 @@ export function VerifyIdentityView() {
               control={form.control}
               name="dateOfBirth"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date of birth</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
+                <FormItem>
+                  <FormLabel>Date of Birth</FormLabel>
+                  <FormControl>
+                    <Input placeholder="YYYY-MM-DD" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
