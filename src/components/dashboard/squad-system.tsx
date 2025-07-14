@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Users, User, UserCheck } from "lucide-react";
+import { Users, UserCheck } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -13,48 +13,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { useUser } from "@/app/dashboard/layout";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import type { SquadMember } from "@/app/api/squad/route";
+import { cn } from "@/lib/utils";
 
-const SubSquad = ({ members }: { members: SquadMember[] }) => {
-    if (members.length === 0) {
-        return <p className="text-sm text-muted-foreground py-2 pl-2">This member has not recruited anyone yet.</p>;
-    }
-
-    return (
-        <Accordion type="multiple" className="w-full pl-3 border-l ml-3">
-            {members.map(member => (
-                <AccordionItem value={member.id} key={member.id} className="border-b-0">
-                    <AccordionTrigger className="py-2">
-                        <div className="flex items-center gap-3">
-                            <User className="h-5 w-5 text-muted-foreground"/>
-                            <div>
-                                <p className="font-semibold text-sm">{member.username}</p>
-                                {member.team.length > 0 && <p className="text-xs text-muted-foreground">{member.team.length} members</p>}
-                            </div>
-                            {member.team.length > 0 && <Badge variant="secondary">Sub-Leader</Badge>}
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <SubSquad members={member.team} />
-                    </AccordionContent>
-                </AccordionItem>
-            ))}
-        </Accordion>
-    );
+const flattenSquad = (members: SquadMember[]): Omit<SquadMember, 'team'>[] => {
+    let flatList: Omit<SquadMember, 'team'>[] = [];
+    members.forEach(member => {
+        const { team, ...memberWithoutTeam } = member;
+        flatList.push(memberWithoutTeam);
+        if (team && team.length > 0) {
+            flatList = flatList.concat(flattenSquad(team));
+        }
+    });
+    return flatList;
 };
-
 
 export function SquadSystem() {
   const { toast } = useToast();
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const { user } = useUser();
-  const [squadTree, setSquadTree] = React.useState<SquadMember[]>([]);
+  const [squadList, setSquadList] = React.useState<Omit<SquadMember, 'team'>[]>([]);
   const [isSquadLoading, setIsSquadLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -79,7 +70,7 @@ export function SquadSystem() {
                   }
                   const data = await response.json();
                   if (data.error) throw new Error(data.error);
-                  setSquadTree(data);
+                  setSquadList(flattenSquad(data));
               } catch (error: any) {
                   console.error(error);
                   toast({ title: "Could not load squad", description: error.message, variant: "destructive" });
@@ -92,8 +83,7 @@ export function SquadSystem() {
   }, [user, toast]);
   
   const squadLeader = walletData?.squad?.squadLeader;
-  const countMembers = (members: SquadMember[]): number => members.reduce((acc, member) => acc + 1 + countMembers(member.team), 0);
-  const totalMembers = countMembers(squadTree);
+  const totalMembers = squadList.length;
   const totalEarnings = totalMembers * 5;
 
   if (!walletData) {
@@ -116,7 +106,7 @@ export function SquadSystem() {
             </AlertDescription>
         </Alert>
       )}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6">
         <Card className="lg:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Squad Earnings</CardTitle>
@@ -131,9 +121,9 @@ export function SquadSystem() {
         </Card>
         <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>Squad</CardTitle>
+              <CardTitle>Squad Members</CardTitle>
                <CardDescription>
-                Your squad hierarchy. Expand to see the chain.
+                Your squad hierarchy and their current status.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -142,8 +132,35 @@ export function SquadSystem() {
                       <Skeleton className="h-10 w-full" />
                       <Skeleton className="h-10 w-full" />
                   </div>
-              ) : squadTree.length > 0 ? (
-                  <SubSquad members={squadTree} />
+              ) : squadList.length > 0 ? (
+                  <Table>
+                      <TableHeader>
+                          <TableRow>
+                              <TableHead>Username</TableHead>
+                              <TableHead>Rank</TableHead>
+                              <TableHead>Tier</TableHead>
+                          </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                          {squadList.map(member => (
+                              <TableRow key={member.id}>
+                                  <TableCell className="font-medium">{member.username}</TableCell>
+                                  <TableCell>
+                                      <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5 w-fit", member.rank.className)}>
+                                          <member.rank.Icon className="h-5 w-5" />
+                                          <span>{member.rank.name}</span>
+                                      </Badge>
+                                  </TableCell>
+                                  <TableCell>
+                                      <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5 w-fit", member.tier.className)}>
+                                          <member.tier.Icon className="h-5 w-5" />
+                                          <span>{member.tier.name}</span>
+                                      </Badge>
+                                  </TableCell>
+                              </TableRow>
+                          ))}
+                      </TableBody>
+                  </Table>
               ) : (
                   <div className="h-24 text-center flex items-center justify-center text-muted-foreground">
                     Your squad is empty. Start inviting!
