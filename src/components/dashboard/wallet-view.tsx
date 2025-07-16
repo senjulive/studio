@@ -223,7 +223,6 @@ export function WalletView() {
     const history: Transaction[] = [];
     const registrationDate = new Date(walletData.created_at).toISOString();
 
-    // Registration Bonus (All users get this)
     history.push({
       id: `reg-bonus-usdt-${registrationDate}`,
       type: "Registration Bonus",
@@ -233,7 +232,6 @@ export function WalletView() {
       status: "Completed",
     });
 
-    // Invitation Bonus (only for users with a squad leader)
     if (walletData.squad.squad_leader) {
       history.push({
         id: `invite-bonus-usdt-${registrationDate}`,
@@ -259,21 +257,21 @@ export function WalletView() {
       });
     }
 
-    // Team Earnings from squad members
-    walletData.squad.members.forEach((member, index) => {
-      history.push({
-        id: `squad-bonus-${index}`,
-        type: "Team Earnings",
-        asset: "USDT",
-        amount: 5,
-        date: new Date(
-          Date.now() - Math.random() * (index + 2) * 24 * 60 * 60 * 1000
-        ).toISOString(),
-        status: "Completed",
+    if(walletData.squad.members) {
+      walletData.squad.members.forEach((member, index) => {
+        history.push({
+          id: `squad-bonus-${index}-${member.id}`,
+          type: "Team Earnings",
+          asset: "USDT",
+          amount: 5,
+          date: new Date(
+            Date.now() - Math.random() * (index + 2) * 24 * 60 * 60 * 1000
+          ).toISOString(),
+          status: "Completed",
+        });
       });
-    });
+    }
 
-    // Pending Withdrawals from walletData
     if (walletData.pending_withdrawals) {
         walletData.pending_withdrawals.forEach((w: any) => {
         history.push({
@@ -313,8 +311,11 @@ export function WalletView() {
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (user?.id) {
-      await updateWallet(newData);
-      setWalletData(newData);
+      const updatedWallet = await updateWallet(newData);
+      if (updatedWallet) {
+        // Force a re-fetch of all wallet data to ensure consistency
+        await fetchWalletData();
+      }
     }
   };
 

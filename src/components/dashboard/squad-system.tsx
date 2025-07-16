@@ -51,7 +51,7 @@ export function SquadSystem() {
   React.useEffect(() => {
     if (user?.id) {
       async function fetchWallet() {
-        const data = await getOrCreateWallet(user.id);
+        const data = await getOrCreateWallet();
         setWalletData(data);
       }
       fetchWallet();
@@ -82,7 +82,7 @@ export function SquadSystem() {
       }
   }, [user, toast]);
   
-  const squadLeader = walletData?.squad?.squadLeader;
+  const squadLeader = walletData?.squad?.squad_leader;
   const totalMembers = squadList.length;
   const totalEarnings = totalMembers * 5;
 
@@ -115,7 +115,7 @@ export function SquadSystem() {
             <CardContent>
               <div className="text-2xl font-bold">${totalEarnings.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">
-                From {totalMembers} squad member{totalMembers !== 1 && 's'}
+                From {totalMembers} squad member{totalMembers !== 1 ? 's' : ''}
               </p>
             </CardContent>
         </Card>
@@ -162,8 +162,9 @@ export function SquadSystem() {
                       </TableBody>
                   </Table>
               ) : (
-                  <div className="h-24 text-center flex items-center justify-center text-muted-foreground border-dashed border rounded-md">
-                    Your squad is empty. Start inviting new members!
+                  <div className="h-24 text-center flex flex-col items-center justify-center text-muted-foreground border-dashed border rounded-md p-4">
+                    <p className="font-medium">Your squad is empty.</p>
+                    <p className="text-sm">Start inviting new members to earn rewards!</p>
                   </div>
               )}
             </CardContent>
