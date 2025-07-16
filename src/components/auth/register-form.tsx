@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -99,7 +98,7 @@ export function RegisterForm() {
       
       toast({
         title: "Account Created",
-        description: "Please check your email to verify your account, then sign in.",
+        description: "Your account has been created successfully. You can now log in.",
       });
       router.push("/");
     } catch (error: any) {
@@ -114,119 +113,125 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-full max-w-sm border-border/50">
+    <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <AstralLogo className="mx-auto mb-2" />
-        <CardTitle className="text-2xl font-headline">System Registration</CardTitle>
+        <AstralLogo className="mx-auto" />
+        <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
         <CardDescription>
-          Complete the form below to register your account.
+          Join Astral Core and start your automated trading journey.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your unique username" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Username</FormLabel>
                         <FormControl>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select your country" />
-                            </SelectTrigger>
+                            <Input placeholder="your_username" {...field} />
                         </FormControl>
-                        <SelectContent>
-                            {countries.map(c => (
-                                <SelectItem key={c.code} value={c.code}>
-                                    <div className="flex items-center gap-2">
-                                        <span>{c.flag}</span>
-                                        <span>{c.name}</span>
-                                    </div>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                            <Input placeholder="name@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
                     <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="contactNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contact Number</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-10 w-24 items-center justify-center rounded-md border bg-muted px-3 text-sm shrink-0">
-                         <span className="mr-2">{selectedCountry.flag}</span>
-                         <span>{selectedCountry.dial_code}</span>
-                      </div>
-                      <Input
-                        placeholder="Your phone number"
-                        {...field}
-                        className="flex-1"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Country</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select your country" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {countries.map(c => (
+                                    <SelectItem key={c.code} value={c.code}>
+                                        <div className="flex items-center gap-2">
+                                            <span>{c.flag}</span>
+                                            <span>{c.name}</span>
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="contactNumber"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Contact Number</FormLabel>
+                    <FormControl>
+                        <div className="flex items-center gap-2">
+                        <div className="flex h-10 w-24 items-center justify-center rounded-md border bg-muted px-3 text-sm shrink-0">
+                            <span className="mr-2">{selectedCountry.flag}</span>
+                            <span>{selectedCountry.dial_code}</span>
+                        </div>
+                        <Input
+                            placeholder="Your phone number"
+                            {...field}
+                            className="flex-1"
+                        />
+                        </div>
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
             <FormField
               control={form.control}
               name="referralCode"
@@ -250,9 +255,11 @@ export function RegisterForm() {
       <CardFooter className="text-center text-sm">
         <p className="w-full text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/" className="font-semibold text-primary/90 hover:text-primary">
-            Authorize Access
-          </Link>
+          <Button variant="link" asChild className="p-0 h-auto">
+            <Link href="/" className="font-semibold text-primary hover:text-primary/90">
+                Login
+            </Link>
+          </Button>
         </p>
       </CardFooter>
     </Card>

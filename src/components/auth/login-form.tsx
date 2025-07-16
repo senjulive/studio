@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -6,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -93,7 +92,6 @@ export function LoginForm() {
       } else {
         router.push("/dashboard");
       }
-      // No router.refresh() here to allow layout to handle user state
     } catch(error: any) {
         toast({
             title: "Login Failed",
@@ -106,10 +104,10 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-sm border-border/50">
+    <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <AstralLogo className="mx-auto mb-2" />
-        <CardTitle className="text-2xl font-headline">AstralCore</CardTitle>
+        <AstralLogo className="mx-auto" />
+        <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
         <CardDescription>
           Enter your credentials to access your account.
         </CardDescription>
@@ -137,12 +135,14 @@ export function LoginForm() {
                 <FormItem>
                   <div className="flex items-center justify-between">
                     <FormLabel>Password</FormLabel>
-                    <Link
-                      href="/forgot-password"
-                      className="text-sm font-medium text-primary/80 hover:text-primary"
-                    >
-                      Forgot password?
-                    </Link>
+                    <Button variant="link" asChild className="p-0 h-auto text-sm">
+                      <Link
+                        href="/forgot-password"
+                        className="font-medium text-primary/80 hover:text-primary"
+                      >
+                        Forgot password?
+                      </Link>
+                    </Button>
                   </div>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
@@ -175,12 +175,8 @@ export function LoginForm() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Lock className="mr-2 h-4 w-4" />
-              )}
-              {isLoading ? 'Authorizing...' : 'Authorize Access'}
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading ? 'Authorizing...' : 'Login'}
             </Button>
           </form>
         </Form>
@@ -188,12 +184,14 @@ export function LoginForm() {
       <CardFooter className="text-center text-sm">
         <p className="w-full text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="font-semibold text-primary/90 hover:text-primary"
-          >
-            System Registration
-          </Link>
+          <Button variant="link" asChild className="p-0 h-auto">
+            <Link
+                href="/register"
+                className="font-semibold text-primary hover:text-primary/90"
+            >
+                Register
+            </Link>
+          </Button>
         </p>
       </CardFooter>
     </Card>

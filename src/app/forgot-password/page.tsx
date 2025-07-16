@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function ForgotPasswordPage() {
   return (
     <main
-      className="flex min-h-dvh items-center justify-center p-4"
+      className="flex min-h-dvh items-center justify-center p-4 bg-background"
     >
       <ForgotPasswordForm />
     </main>

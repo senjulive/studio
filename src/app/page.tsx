@@ -1,4 +1,3 @@
-
 import { redirect } from 'next/navigation';
 import { LoginForm } from "@/components/auth/login-form";
 import { createClient } from '@/lib/supabase/server';
@@ -14,7 +13,7 @@ export default async function LoginPage() {
 
   return (
     <main
-      className="flex min-h-dvh items-center justify-center p-4"
+      className="flex min-h-dvh items-center justify-center p-4 bg-background"
     >
       <LoginForm />
     </main>

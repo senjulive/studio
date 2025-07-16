@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 244 100% 98%;
+    --background: 240 33% 97%;
     --foreground: 247 38% 15%;
     --card: 0 0% 100%;
     --card-foreground: 247 38% 15%;
     --popover: 0 0% 100%;
     --popover-foreground: 247 38% 15%;
-    --primary: 246 80% 59%;
+    --primary: 272 100% 25%;
     --primary-foreground: 0 0% 100%;
     --secondary: 240 10% 99%;
     --secondary-foreground: 247 38% 15%;
     --muted: 246 80% 96%;
     --muted-foreground: 240 3.8% 46.1%;
-    --accent: 246 80% 96%;
-    --accent-foreground: 246 80% 59%;
+    --accent: 274 100% 50%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     --border: 246 30% 92%;
     --input: 246 30% 92%;
-    --ring: 246 80% 59%;
-    --chart-1: 246 80% 59%;
+    --ring: 274 100% 50%;
+    --chart-1: 272 100% 25%;
     --chart-2: 142.1 76.2% 36.3%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
@@ -33,12 +33,12 @@
     /* Custom Sidebar Vars */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 247 38% 15%;
-    --sidebar-primary: 246 80% 59%;
+    --sidebar-primary: 272 100% 25%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 246 80% 96%;
-    --sidebar-accent-foreground: 246 80% 59%;
+    --sidebar-accent-foreground: 272 100% 25%;
     --sidebar-border: 246 30% 92%;
-    --sidebar-ring: 246 80% 59%;
+    --sidebar-ring: 272 100% 25%;
   }
 }
 
