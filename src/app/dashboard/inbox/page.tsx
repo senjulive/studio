@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: "Inbox - AstralCore",
-    description: "View your notifications and announcements.",
+    description: "View your notifications, announcements, and active promotions.",
 };
 
 export default function InboxPage() {

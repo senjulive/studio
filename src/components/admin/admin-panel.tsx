@@ -23,6 +23,7 @@ import {
   Settings,
   Bell,
   UserCheck,
+  Gift,
 } from "lucide-react";
 import { WalletManager } from "./wallet-manager";
 import { MessageViewer } from "./message-viewer";
@@ -31,6 +32,7 @@ import { AnnouncementManager } from "./announcement-manager";
 import { SiteSettingsManager } from "./site-settings-manager";
 import { VerificationManager } from "./verification-manager";
 import { NotificationViewer } from "./notification-viewer";
+import { PromotionManager } from "./promotion-manager";
 
 export function AdminPanel() {
   return (
@@ -51,13 +53,14 @@ export function AdminPanel() {
       <CardContent>
         <Tabs defaultValue="wallets" className="w-full">
           <TooltipProvider>
-            <TabsList className="grid w-full grid-cols-7 gap-2">
+            <TabsList className="grid w-full grid-cols-8 gap-2">
               <Tooltip><TooltipTrigger asChild><TabsTrigger value="wallets"><WalletCards /><span className="sr-only">Wallets</span></TabsTrigger></TooltipTrigger><TooltipContent><p>Manage Wallets</p></TooltipContent></Tooltip>
               <Tooltip><TooltipTrigger asChild><TabsTrigger value="verifications"><UserCheck /><span className="sr-only">Verifications</span></TabsTrigger></TooltipTrigger><TooltipContent><p>Manage Verifications</p></TooltipContent></Tooltip>
               <Tooltip><TooltipTrigger asChild><TabsTrigger value="messages"><Mail /><span className="sr-only">Messages</span></TabsTrigger></TooltipTrigger><TooltipContent><p>View Messages</p></TooltipContent></Tooltip>
               <Tooltip><TooltipTrigger asChild><TabsTrigger value="notifications"><Bell /><span className="sr-only">Notifications</span></TabsTrigger></TooltipTrigger><TooltipContent><p>Admin Notifications</p></TooltipContent></Tooltip>
               <Tooltip><TooltipTrigger asChild><TabsTrigger value="bot-settings"><Bot /><span className="sr-only">Bot Settings</span></TabsTrigger></TooltipTrigger><TooltipContent><p>Bot Settings</p></TooltipContent></Tooltip>
               <Tooltip><TooltipTrigger asChild><TabsTrigger value="announcements"><Megaphone /><span className="sr-only">Announcements</span></TabsTrigger></TooltipTrigger><TooltipContent><p>Announcements</p></TooltipContent></Tooltip>
+              <Tooltip><TooltipTrigger asChild><TabsTrigger value="promotions"><Gift /><span className="sr-only">Promotions</span></TabsTrigger></TooltipTrigger><TooltipContent><p>Promotions</p></TooltipContent></Tooltip>
               <Tooltip><TooltipTrigger asChild><TabsTrigger value="site-settings"><Settings /><span className="sr-only">Site Settings</span></TabsTrigger></TooltipTrigger><TooltipContent><p>Site Settings</p></TooltipContent></Tooltip>
             </TabsList>
           </TooltipProvider>
@@ -78,6 +81,9 @@ export function AdminPanel() {
           </TabsContent>
            <TabsContent value="announcements" className="mt-6">
             <AnnouncementManager />
+          </TabsContent>
+           <TabsContent value="promotions" className="mt-6">
+            <PromotionManager />
           </TabsContent>
            <TabsContent value="site-settings" className="mt-6">
             <SiteSettingsManager />

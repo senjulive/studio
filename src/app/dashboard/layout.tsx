@@ -43,7 +43,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Repeat } from 'lucide-react';
+import { UserPlus, Repeat, Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import type { User } from '@supabase/supabase-js';
@@ -126,6 +126,7 @@ export default function DashboardLayout({
     { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
     { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
+    { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
     { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
     { href: '/dashboard/about', label: 'About', icon: AboutIcon },
