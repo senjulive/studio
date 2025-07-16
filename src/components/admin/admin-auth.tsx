@@ -2,8 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Loader2, Shield, ShieldAlert } from "lucide-react";
-
+import { Loader2, ShieldAlert } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,12 +13,11 @@ import {
 import { AdminProvider } from "@/contexts/AdminContext";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
+import { AdminLoginForm } from "./admin-login-form";
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
-  const [isAdmin, setIsAdmin] = React.useState(false);
 
   React.useEffect(() => {
     const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
@@ -27,7 +25,6 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
     if (!adminEmail) {
         console.error("CRITICAL: NEXT_PUBLIC_ADMIN_EMAIL is not set in the environment.");
         setAuthStatus("unauthed");
-        setIsAdmin(false);
         return;
     }
 
@@ -37,23 +34,20 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
 
       if (user && user.email === adminEmail) {
         setAuthStatus("authed");
-        setIsAdmin(true);
       } else {
         setAuthStatus("unauthed");
-        setIsAdmin(false);
       }
     };
     
     checkAdmin();
 
+    const supabase = createClient();
     const { data: authListener } = supabase.auth.onAuthStateChange(
         (_event, session) => {
             if (session?.user && session.user.email === adminEmail) {
                 setAuthStatus("authed");
-                setIsAdmin(true);
             } else {
                 setAuthStatus("unauthed");
-                setIsAdmin(false);
             }
         }
     );
@@ -63,6 +57,11 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
     };
 
   }, []);
+
+  const handleLoginSuccess = () => {
+    setAuthStatus("authed");
+    router.refresh();
+  };
 
   if (authStatus === "loading") {
     return (
@@ -80,26 +79,10 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (authStatus === "authed" && isAdmin) {
-    return <AdminProvider value={{ adminPassword: 'authenticated' }}>{children}</AdminProvider>;
+  if (authStatus === "authed") {
+    return <AdminProvider>{children}</AdminProvider>;
   }
 
-  return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <div className="mx-auto bg-destructive/10 p-3 rounded-full mb-2">
-            <ShieldAlert className="h-8 w-8 text-destructive" />
-        </div>
-        <CardTitle>Access Denied</CardTitle>
-        <CardDescription>
-          You do not have permission to view this page. Please log in with an administrator account.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Button onClick={() => router.push('/')} className="w-full">
-            Return to Login
-        </Button>
-      </CardContent>
-    </Card>
-  );
+  // If not authenticated, show the login form.
+  return <AdminLoginForm onLoginSuccess={handleLoginSuccess} />;
 }
