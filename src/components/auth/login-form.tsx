@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -87,11 +88,8 @@ export function LoginForm() {
         description: isAdmin ? "Welcome, Administrator!" : "Welcome to AstralCore!",
       });
 
-      if (isAdmin) {
-        router.push("/admin");
-      } else {
-        router.push("/dashboard");
-      }
+      router.refresh(); // This forces a reload of server components and redirects
+
     } catch(error: any) {
         toast({
             title: "Login Failed",

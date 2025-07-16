@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -100,7 +101,7 @@ export function RegisterForm() {
         title: "Account Created",
         description: "Your account has been created successfully. You can now log in.",
       });
-      router.push("/");
+      router.push("/dashboard");
     } catch (error: any) {
       toast({
         title: "Registration Failed",
