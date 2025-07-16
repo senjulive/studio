@@ -1,117 +1,69 @@
---
--- RLS POLICIES
---
--- This script contains all the necessary Row Level Security (RLS) policies
--- for the AstralCore application. Run this script in your Supabase SQL Editor
--- to secure your database tables.
---
+-- Enable RLS and define policies for all tables
 
--- -----------------------------------------------------------------------------
 -- PROFILES TABLE
--- Users should be able to see their own profile and update it.
--- Authenticated users should be able to see limited public data of others (e.g., usernames).
--- -----------------------------------------------------------------------------
--- 1. Enable RLS on the profiles table
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
--- 2. Drop existing policies (if any) to start fresh
 DROP POLICY IF EXISTS "Allow individual user access to their own profile" ON public.profiles;
-DROP POLICY IF EXISTS "Allow authenticated users to read public profile info" ON public.profiles;
-DROP POLICY IF EXISTS "Allow users to update their own profile" ON public.profiles;
-
--- 3. Create new policies for profiles
 CREATE POLICY "Allow individual user access to their own profile"
+ON public.profiles FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Allow authenticated users to read squad leader and member profiles" ON public.profiles;
+CREATE POLICY "Allow authenticated users to read squad leader and member profiles"
 ON public.profiles FOR SELECT
-USING (auth.uid() = user_id);
+USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Allow authenticated users to read public profile info"
-ON public.profiles FOR SELECT
-TO authenticated
-USING (true);
 
-CREATE POLICY "Allow users to update their own profile"
-ON public.profiles FOR UPDATE
-USING (auth.uid() = user_id);
-
--- -----------------------------------------------------------------------------
--- MESSAGES TABLE
--- Users should only be able to read and write messages in their own support thread.
--- -----------------------------------------------------------------------------
--- 1. Enable RLS on the messages table
-ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
-
--- 2. Drop existing policy (if any)
-DROP POLICY IF EXISTS "Allow users to manage their own chat messages" ON public.messages;
-
--- 3. Create new policy for messages
-CREATE POLICY "Allow users to manage their own chat messages"
-ON public.messages FOR ALL
-USING (auth.uid() = user_id);
-
--- -----------------------------------------------------------------------------
 -- WALLETS TABLE
--- Users should only have access to their own wallet.
--- -----------------------------------------------------------------------------
--- 1. Enable RLS on the wallets table
 ALTER TABLE public.wallets ENABLE ROW LEVEL SECURITY;
-
--- 2. Drop existing policy (if any)
 DROP POLICY IF EXISTS "Allow individual user access to their own wallet" ON public.wallets;
-
--- 3. Create new policy for wallets
 CREATE POLICY "Allow individual user access to their own wallet"
 ON public.wallets FOR ALL
-USING (auth.uid() = user_id);
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 
--- -----------------------------------------------------------------------------
+
+-- MESSAGES TABLE
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow users to manage their own messages" ON public.messages;
+CREATE POLICY "Allow users to manage their own messages"
+ON public.messages FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+
+
 -- NOTIFICATIONS TABLE
--- Users should only have access to their own notifications.
--- -----------------------------------------------------------------------------
--- 1. Enable RLS on the notifications table
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
-
--- 2. Drop existing policy (if any)
-DROP POLICY IF EXISTS "Allow individual user access to their own notifications" ON public.notifications;
-
--- 3. Create new policy for notifications
-CREATE POLICY "Allow individual user access to their own notifications"
+DROP POLICY IF EXISTS "Allow individual access to own notifications" ON public.notifications;
+CREATE POLICY "Allow individual access to own notifications"
 ON public.notifications FOR ALL
-USING (auth.uid() = user_id);
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 
--- -----------------------------------------------------------------------------
--- PROMOTIONS TABLE
--- All authenticated users should be able to view promotions.
--- -----------------------------------------------------------------------------
--- 1. Enable RLS on the promotions table
+
+-- PROMOTIONS TABLE (publicly viewable)
 ALTER TABLE public.promotions ENABLE ROW LEVEL SECURITY;
-
--- 2. Drop existing policy (if any)
-DROP POLICY IF EXISTS "Allow authenticated users to read promotions" ON public.promotions;
-
--- 3. Create new policy for promotions
-CREATE POLICY "Allow authenticated users to read promotions"
+DROP POLICY IF EXISTS "Allow all authenticated users to view promotions" ON public.promotions;
+CREATE POLICY "Allow all authenticated users to view promotions"
 ON public.promotions FOR SELECT
-TO authenticated
-USING (true);
+USING (auth.role() = 'authenticated');
 
--- -----------------------------------------------------------------------------
--- SETTINGS, ACTION_LOGS, SUPPORT_THREADS TABLES
--- These tables should not be directly accessible by users. Access is handled
--- through secure server-side API routes with the admin client.
--- We will enable RLS and DENY all access by default as a safeguard.
--- -----------------------------------------------------------------------------
+
+-- SETTINGS TABLE (publicly viewable)
 ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Deny all access to settings" ON public.settings;
-CREATE POLICY "Deny all access to settings" ON public.settings FOR ALL USING (false);
+DROP POLICY IF EXISTS "Allow all authenticated users to view settings" ON public.settings;
+CREATE POLICY "Allow all authenticated users to view settings"
+ON public.settings FOR SELECT
+USING (auth.role() = 'authenticated');
 
-ALTER TABLE public.action_logs ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Deny all access to action_logs" ON public.action_logs;
-CREATE POLICY "Deny all access to action_logs" ON public.action_logs FOR ALL USING (false);
 
+-- SUPPORT_THREADS TABLE (moderator/admin access only)
 ALTER TABLE public.support_threads ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Deny all access to support_threads" ON public.support_threads;
-CREATE POLICY "Deny all access to support_threads" ON public.support_threads FOR ALL USING (false);
+-- No policies defined by default, access is restricted to service_role key.
+-- Moderators will interact via admin API calls.
 
---
--- END OF POLICIES
---
+
+-- ACTION_LOGS TABLE (admin access only)
+ALTER TABLE public.action_logs ENABLE ROW LEVEL SECURITY;
+-- No policies defined by default, access is restricted to service_role key.
+-- Actions are logged via admin/moderator API calls.

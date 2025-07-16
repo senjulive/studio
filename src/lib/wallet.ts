@@ -3,6 +3,7 @@
 
 import { getBotTierSettings } from './settings';
 import { createClient } from './supabase/server';
+import { createAdminClient } from './supabase/admin';
 import type { Database } from './database.types';
 
 export type WalletData = Database['public']['Tables']['wallets']['Row'] & { profile: ProfileData } & { squad: { squad_leader: { username: string } | null, members: any[] } };
@@ -18,7 +19,7 @@ export async function getOrCreateWallet(): Promise<WalletData> {
         throw new Error("User not authenticated.");
     }
     
-    // Retry mechanism to handle replication delay
+    // Retry mechanism to handle replication delay from the trigger
     for (let i = 0; i < 3; i++) {
         const { data: wallet, error } = await supabase
             .from('wallets')
@@ -27,8 +28,8 @@ export async function getOrCreateWallet(): Promise<WalletData> {
             .maybeSingle();
 
         if (error) {
-            console.error(`Attempt ${i+1} failed:`, error.message);
-            throw error;
+            console.error(`Attempt ${i+1} to fetch wallet failed:`, error.message);
+            // Don't throw immediately, allow retries
         }
 
         if (wallet) {
@@ -62,11 +63,32 @@ export async function getOrCreateWallet(): Promise<WalletData> {
             return wallet as WalletData;
         }
         
-        // If no wallet, wait and retry. The trigger should have created it.
+        // If no wallet after a short delay, try to create it manually as a fallback.
         await new Promise(resolve => setTimeout(resolve, 500));
     }
     
-    throw new Error("Failed to create or find wallet for user after multiple attempts.");
+    // If wallet is still not found after retries, create it manually.
+    // This is a fallback for the database trigger.
+    console.warn(`Wallet not found for user ${user.id} after retries. Manually creating.`);
+    const supabaseAdmin = createAdminClient();
+    const { data: newWallet, error: creationError } = await supabaseAdmin.rpc('handle_new_user');
+    
+    if (creationError) {
+        throw new Error(`Failed to create wallet for user ${user.id}: ${creationError.message}`);
+    }
+
+    // Fetch the newly created wallet one last time
+    const { data: finalWallet, error: finalError } = await supabase
+        .from('wallets')
+        .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
+        .eq('user_id', user.id)
+        .single();
+    
+    if (finalError || !finalWallet) {
+        throw new Error("Failed to retrieve wallet even after manual creation.");
+    }
+    
+    return finalWallet as WalletData;
 }
 
 

@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 import { addNotification } from "@/lib/notifications";
 import { useRouter } from "next/navigation";
 import { Loader2, Save, ShieldCheck, Upload, X } from "lucide-react";
