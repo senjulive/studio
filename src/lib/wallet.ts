@@ -19,76 +19,82 @@ export async function getOrCreateWallet(): Promise<WalletData> {
         throw new Error("User not authenticated.");
     }
     
-    // Retry mechanism to handle replication delay from the trigger
-    for (let i = 0; i < 3; i++) {
+    const fetchWalletWithRetry = async (attempt: number): Promise<WalletData | null> => {
         const { data: wallet, error } = await supabase
             .from('wallets')
             .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
             .eq('user_id', user.id)
             .maybeSingle();
-
+        
         if (error) {
-            console.error(`Attempt ${i+1} to fetch wallet failed:`, error.message);
-            // Don't throw immediately, allow retries
+            console.error(`Attempt ${attempt} to fetch wallet failed:`, error.message);
         }
 
         if (wallet) {
-            // Check if daily reset is needed
-            const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
-            const lastReset = (wallet.growth as any)?.last_reset ? new Date((wallet.growth as any).last_reset).getTime() : 0;
-
-            if (now - lastReset > oneDay) {
-                const settings = await getBotTierSettings();
-                const balance = (wallet.balances as any)?.usdt || 0;
-                const currentTier = [...settings].reverse().find(tier => balance >= tier.balanceThreshold) || settings[0];
-                
-                const updatedGrowth = {
-                    ...(wallet.growth as any),
-                    clicks_left: currentTier.clicks,
-                    last_reset: new Date().toISOString(),
-                    daily_earnings: 0,
-                };
-
-                const { data: updatedWallet, error: updateError } = await supabase
-                    .from('wallets')
-                    .update({ growth: updatedGrowth })
-                    .eq('user_id', user.id)
-                    .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
-                    .single();
-                
-                if (updateError) throw updateError;
-                return updatedWallet as WalletData;
-            }
             return wallet as WalletData;
         }
-        
-        // If no wallet after a short delay, try to create it manually as a fallback.
-        await new Promise(resolve => setTimeout(resolve, 500));
-    }
-    
-    // If wallet is still not found after retries, create it manually.
-    // This is a fallback for the database trigger.
-    console.warn(`Wallet not found for user ${user.id} after retries. Manually creating.`);
-    const supabaseAdmin = createAdminClient();
-    const { data: newWallet, error: creationError } = await supabaseAdmin.rpc('handle_new_user');
-    
-    if (creationError) {
-        throw new Error(`Failed to create wallet for user ${user.id}: ${creationError.message}`);
+
+        return null;
     }
 
-    // Fetch the newly created wallet one last time
-    const { data: finalWallet, error: finalError } = await supabase
-        .from('wallets')
-        .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
-        .eq('user_id', user.id)
-        .single();
-    
-    if (finalError || !finalWallet) {
-        throw new Error("Failed to retrieve wallet even after manual creation.");
+    // Retry mechanism to handle replication delay from the trigger
+    let wallet = await fetchWalletWithRetry(1);
+    if (!wallet) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        wallet = await fetchWalletWithRetry(2);
+    }
+    if (!wallet) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        wallet = await fetchWalletWithRetry(3);
+    }
+
+    if (!wallet) {
+        // Fallback: If trigger didn't run, manually invoke the setup logic.
+        // This is a failsafe and should not be the normal path.
+        console.warn(`Wallet not found for user ${user.id} after retries. Manually invoking creation logic.`);
+        const supabaseAdmin = createAdminClient();
+        const { error: rpcError } = await supabaseAdmin.rpc('handle_new_user_by_id', { user_id_param: user.id });
+
+        if (rpcError) {
+            throw new Error(`Manual wallet creation failed: ${rpcError.message}`);
+        }
+        
+        wallet = await fetchWalletWithRetry(4);
+        if (!wallet) {
+            throw new Error(`Failed to retrieve wallet even after manual creation for user ${user.id}.`);
+        }
+    }
+            
+    // Check if daily reset is needed
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+    const growthData = wallet.growth as any;
+    const lastReset = growthData?.last_reset ? new Date(growthData.last_reset).getTime() : 0;
+
+    if (now - lastReset > oneDay) {
+        const settings = await getBotTierSettings();
+        const balance = (wallet.balances as any)?.usdt || 0;
+        const currentTier = [...settings].reverse().find(tier => balance >= tier.balanceThreshold) || settings[0];
+        
+        const updatedGrowth = {
+            ...growthData,
+            clicks_left: currentTier.clicks,
+            last_reset: new Date().toISOString(),
+            daily_earnings: 0,
+        };
+
+        const { data: updatedWallet, error: updateError } = await supabase
+            .from('wallets')
+            .update({ growth: updatedGrowth })
+            .eq('user_id', user.id)
+            .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
+            .single();
+        
+        if (updateError) throw updateError;
+        return updatedWallet as WalletData;
     }
     
-    return finalWallet as WalletData;
+    return wallet as WalletData;
 }
 
 

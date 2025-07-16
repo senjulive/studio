@@ -1,3 +1,4 @@
+
 'use server';
 
 import {createClient} from './supabase/server';
@@ -44,12 +45,8 @@ export async function logModeratorAction(
 
   if (!user) return;
 
-  // Check if the user is the admin.
-  const isAdmin = user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-  const actorId = isAdmin ? user.id : user.id;
-
   const {error} = await supabase.from('action_logs').insert({
-    user_id: actorId,
+    user_id: user.id,
     action,
     metadata,
   });

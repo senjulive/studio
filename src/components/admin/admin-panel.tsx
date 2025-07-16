@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -58,7 +59,7 @@ export function AdminPanel() {
         <Tabs defaultValue="wallets" className="w-full">
           <TooltipProvider>
             <TabsList className="grid w-full grid-cols-10 gap-2">
-              <Tooltip>
+               <Tooltip>
                 <TooltipTrigger asChild>
                   <TabsTrigger value="wallets">
                     <WalletCards />
@@ -69,18 +70,7 @@ export function AdminPanel() {
                   <p>Manage Wallets</p>
                 </TooltipContent>
               </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="verifications">
-                    <UserCheck />
-                    <span className="sr-only">Verifications</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Manage Verifications</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
+               <Tooltip>
                 <TooltipTrigger asChild>
                   <TabsTrigger value="messages">
                     <Mail />
@@ -93,13 +83,13 @@ export function AdminPanel() {
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="notifications">
-                    <Bell />
-                    <span className="sr-only">Notifications</span>
+                  <TabsTrigger value="verifications">
+                    <UserCheck />
+                    <span className="sr-only">Verifications</span>
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Admin Notifications</p>
+                  <p>Manage Verifications</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -124,15 +114,15 @@ export function AdminPanel() {
                   <p>Moderator Action Log</p>
                 </TooltipContent>
               </Tooltip>
-              <Tooltip>
+               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="bot-settings">
-                    <Bot />
-                    <span className="sr-only">Bot Settings</span>
+                  <TabsTrigger value="notifications">
+                    <Bell />
+                    <span className="sr-only">Notifications</span>
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Bot Settings</p>
+                  <p>Admin Notifications</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -157,6 +147,17 @@ export function AdminPanel() {
                   <p>Promotions</p>
                 </TooltipContent>
               </Tooltip>
+                <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="bot-settings">
+                    <Bot />
+                    <span className="sr-only">Bot Settings</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Bot Settings</p>
+                </TooltipContent>
+              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <TabsTrigger value="site-settings">
@@ -173,29 +174,29 @@ export function AdminPanel() {
           <TabsContent value="wallets" className="mt-6">
             <WalletManager />
           </TabsContent>
+           <TabsContent value="messages" className="mt-6">
+            <MessageViewer />
+          </TabsContent>
           <TabsContent value="verifications" className="mt-6">
             <VerificationManager />
           </TabsContent>
-          <TabsContent value="messages" className="mt-6">
-            <MessageViewer />
-          </TabsContent>
-          <TabsContent value="notifications" className="mt-6">
-            <NotificationViewer />
-          </TabsContent>
-          <TabsContent value="moderators" className="mt-6">
+           <TabsContent value="moderators" className="mt-6">
             <ModeratorManager />
           </TabsContent>
           <TabsContent value="action-log" className="mt-6">
             <ActionLogViewer />
           </TabsContent>
-          <TabsContent value="bot-settings" className="mt-6">
-            <BotSettingsManager />
+          <TabsContent value="notifications" className="mt-6">
+            <NotificationViewer />
           </TabsContent>
           <TabsContent value="announcements" className="mt-6">
             <AnnouncementManager />
           </TabsContent>
           <TabsContent value="promotions" className="mt-6">
             <PromotionManager />
+          </TabsContent>
+          <TabsContent value="bot-settings" className="mt-6">
+            <BotSettingsManager />
           </TabsContent>
           <TabsContent value="site-settings" className="mt-6">
             <SiteSettingsManager />
