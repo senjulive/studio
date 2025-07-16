@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A support agent AI flow for the admin panel.
@@ -44,14 +45,14 @@ const prompt = ai.definePrompt({
 Your task is to analyze a support conversation and assist the admin.
 
 Based on the message history provided, which may include text and images from the user, please do the following:
-1.  **Summarize the Issue:** Write a concise, one-sentence summary of the user's problem or question. If they provided an image, refer to it in your summary (e.g., "The user is asking about an error shown in their screenshot.").
+1.  **Summarize the Issue:** Write a concise, one-sentence summary of the user's problem or question. If they provided an image (indicated by a 'file_url'), explicitly mention that you have analyzed the screenshot in your summary (e.g., "The user is asking about an error shown in their screenshot.").
 2.  **Draft a Reply:** Compose a helpful, professional, and empathetic response to the user. Be direct and clear. Address their concerns directly. If their issue seems resolved, draft a polite closing message.
 
 Here is the conversation history:
 {{#each messages}}
 [{{sender}}] {{text}}
 {{#if file_url}}
-[Attached Image: {{file_url}}]
+[Image attached by user]
 {{/if}}
 {{/each}}
 `,

@@ -35,15 +35,15 @@ export async function getOrCreateWallet(): Promise<WalletData> {
             // Check if daily reset is needed
             const now = Date.now();
             const oneDay = 24 * 60 * 60 * 1000;
-            const lastReset = wallet.growth?.last_reset ? new Date(wallet.growth.last_reset).getTime() : 0;
+            const lastReset = (wallet.growth as any)?.last_reset ? new Date((wallet.growth as any).last_reset).getTime() : 0;
 
             if (now - lastReset > oneDay) {
                 const settings = await getBotTierSettings();
-                const balance = wallet.balances?.usdt || 0;
+                const balance = (wallet.balances as any)?.usdt || 0;
                 const currentTier = [...settings].reverse().find(tier => balance >= tier.balanceThreshold) || settings[0];
                 
                 const updatedGrowth = {
-                    ...wallet.growth,
+                    ...(wallet.growth as any),
                     clicks_left: currentTier.clicks,
                     last_reset: new Date().toISOString(),
                     daily_earnings: 0,
@@ -91,13 +91,14 @@ export async function updateWallet(newData: Partial<WalletData>): Promise<void> 
 
 export async function saveWithdrawalAddress(asset: string, address: string): Promise<void> {
     const wallet = await getOrCreateWallet();
+    const currentSecurity = wallet.security as any || {};
     const newAddresses = {
-        ...(wallet.security?.withdrawalAddresses || {}),
+        ...(currentSecurity.withdrawalAddresses || {}),
         [asset]: address,
     };
     await updateWallet({ 
         security: {
-            ...(wallet.security || {}),
+            ...currentSecurity,
             withdrawalAddresses: newAddresses
         } 
     });
@@ -105,5 +106,5 @@ export async function saveWithdrawalAddress(asset: string, address: string): Pro
 
 export async function getWithdrawalAddresses(): Promise<WithdrawalAddresses> {
     const wallet = await getOrCreateWallet();
-    return wallet.security?.withdrawalAddresses || {};
+    return (wallet.security as any)?.withdrawalAddresses || {};
 }

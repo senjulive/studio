@@ -218,10 +218,10 @@ export function WalletView() {
   }, []);
 
   const transactions = React.useMemo(() => {
-    if (!walletData || !user?.created_at) return [];
+    if (!walletData || !walletData.created_at) return [];
 
     const history: Transaction[] = [];
-    const registrationDate = new Date(user.created_at).toISOString();
+    const registrationDate = new Date(walletData.created_at).toISOString();
 
     // Registration Bonus (All users get this)
     history.push({
@@ -245,9 +245,9 @@ export function WalletView() {
       });
     }
 
-    // Grid Profits from earnings history
-    if (walletData.growth.earnings_history) {
-      walletData.growth.earnings_history.forEach((earning, index) => {
+    const growth = walletData.growth as any;
+    if (growth.earnings_history) {
+        growth.earnings_history.forEach((earning: any, index: number) => {
         history.push({
           id: `grid-profit-${earning.timestamp}-${index}`,
           type: "Grid Profit",
@@ -275,7 +275,7 @@ export function WalletView() {
 
     // Pending Withdrawals from walletData
     if (walletData.pending_withdrawals) {
-      walletData.pending_withdrawals.forEach((w) => {
+        walletData.pending_withdrawals.forEach((w: any) => {
         history.push({
           id: w.id,
           type: "Withdrawal",
@@ -290,7 +290,7 @@ export function WalletView() {
     return history.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
-  }, [walletData, user]);
+  }, [walletData]);
 
   const totalBalance = React.useMemo(() => {
     if (!walletData || allAssetsData.length === 0) return 0;
@@ -298,14 +298,15 @@ export function WalletView() {
     const btcPrice = allAssetsData.find(c => c.ticker === "BTC")?.price ?? 0;
     const ethPrice = allAssetsData.find(c => c.ticker === "ETH")?.price ?? 0;
 
+    const balances = walletData.balances as any;
     return (
-        walletData.balances.usdt +
-        (walletData.balances.btc * btcPrice) +
-        (walletData.balances.eth * ethPrice)
+        balances.usdt +
+        (balances.btc * btcPrice) +
+        (balances.eth * ethPrice)
     );
   }, [walletData, allAssetsData]);
 
-  const dailyEarnings = walletData?.growth?.daily_earnings ?? 0;
+  const dailyEarnings = (walletData?.growth as any)?.daily_earnings ?? 0;
   
   const rank = getUserRank(totalBalance);
   const tier = getCurrentTier(totalBalance, tierSettings);
@@ -327,7 +328,8 @@ export function WalletView() {
     );
   }
   
-  const assetsWithFunds = assetConfig.filter(asset => walletData.balances[asset.balanceKey] > 0);
+  const balances = walletData.balances as any;
+  const assetsWithFunds = assetConfig.filter(asset => balances[asset.balanceKey] > 0);
 
   return (
     <div className="space-y-6">
@@ -398,10 +400,10 @@ export function WalletView() {
                       </div>
                       <p className="text-2xl font-bold mt-1">
                           {asset.balanceKey === 'usdt' && '$'}
-                          {walletData.balances[asset.balanceKey].toLocaleString(undefined, {
+                          {balances[asset.balanceKey].toLocaleString(undefined, {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: asset.balanceKey === 'usdt' ? 2 : 6,
-                          })}
+                          }) ?? '0.00'}
                       </p>
                   </div>
               ))}
