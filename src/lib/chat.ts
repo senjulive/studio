@@ -4,6 +4,7 @@
 import { createClient } from './supabase/server';
 import { createAdminClient } from './supabase/admin';
 import { addPlatformNotification } from './notifications';
+import { Buffer } from 'buffer';
 
 export type Message = {
   id: string;
@@ -111,7 +112,7 @@ export async function sendMessage(
   fileName?: string,
   fileType?: string,
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = createAdminClient();
   let file_url: string | undefined = undefined;
 
   if (fileDataUrl && fileName && fileType) {

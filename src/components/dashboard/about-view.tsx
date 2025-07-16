@@ -8,7 +8,7 @@ import { Bot, Layers, TrendingUp, Cpu, Info } from "lucide-react";
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
     <div className="flex items-start gap-4">
-        <div className="bg-primary/10 text-primary p-3 rounded-full">
+        <div className="bg-primary/10 text-primary p-3 rounded-full mt-1">
             {icon}
         </div>
         <div>
@@ -42,13 +42,13 @@ export function AboutView() {
         </CardHeader>
         <CardContent className="space-y-8 pt-4">
             <Section title="What is AstralCore?">
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground leading-relaxed">
                     AstralCore is an intelligent crypto management platform designed to simplify and automate your trading strategy. At its heart is a sophisticated trading bot that employs a time-tested technique known as **Grid Trading**. Our goal is to empower users, from beginners to experts, to consistently generate profits by leveraging the natural price fluctuations of the cryptocurrency market.
                 </p>
             </Section>
             
             <Section title="The Power of Grid Trading">
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground leading-relaxed">
                     Grid Trading is a strategy that automates buying and selling cryptocurrencies at preset intervals around a static price. It involves placing a series of buy and sell orders at incrementally increasing and decreasing prices, creating a "grid" of orders. This approach thrives in volatile, sideways markets, turning price fluctuations into profitable opportunities.
                 </p>
                 <Alert className="bg-muted/50 border-l-primary">
@@ -61,7 +61,7 @@ export function AboutView() {
             </Section>
 
             <Section title="Why Choose AstralCore?">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                     <FeatureCard 
                         icon={<Bot className="h-6 w-6" />}
                         title="Fully Automated"
