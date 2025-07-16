@@ -6,21 +6,22 @@ export async function POST(request: Request) {
   try {
     const supabaseAdmin = createAdminClient();
     
+    // Use a left join to ensure wallets are returned even if profile is missing
     const { data: wallets, error } = await supabaseAdmin
         .from('wallets')
         .select(`
             *,
-            profile:profiles!inner(username, full_name)
+            profile:profiles(username, full_name)
         `);
 
     if (error) throw error;
     
     const walletsMap = wallets.reduce((acc, wallet) => {
+        // The profile can be null with a left join, handle that case.
         const profileData = Array.isArray(wallet.profile) ? wallet.profile[0] : wallet.profile;
         acc[wallet.user_id] = {
             ...wallet,
             profile: {
-                ...profileData,
                 username: profileData?.username,
                 fullName: profileData?.full_name,
             }

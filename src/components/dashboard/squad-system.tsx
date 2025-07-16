@@ -162,8 +162,8 @@ export function SquadSystem() {
                       </TableBody>
                   </Table>
               ) : (
-                  <div className="h-24 text-center flex items-center justify-center text-muted-foreground">
-                    Your squad is empty. Start inviting!
+                  <div className="h-24 text-center flex items-center justify-center text-muted-foreground border-dashed border rounded-md">
+                    Your squad is empty. Start inviting new members!
                   </div>
               )}
             </CardContent>

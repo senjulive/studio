@@ -225,7 +225,7 @@ export function WalletView() {
 
     // Registration Bonus (All users get this)
     history.push({
-      id: `reg-bonus-usdt`,
+      id: `reg-bonus-usdt-${registrationDate}`,
       type: "Registration Bonus",
       asset: "USDT",
       amount: 5,
@@ -236,7 +236,7 @@ export function WalletView() {
     // Invitation Bonus (only for users with a squad leader)
     if (walletData.squad.squad_leader) {
       history.push({
-        id: `invite-bonus-usdt`,
+        id: `invite-bonus-usdt-${registrationDate}`,
         type: "Invitation Bonus",
         asset: "USDT",
         amount: 5,
@@ -428,7 +428,7 @@ export function WalletView() {
           <CardTitle>Quick Access</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-7 gap-2 text-center">
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 text-center">
             {quickAccessItems.map((item, index) => (
               <Link
                 key={index}

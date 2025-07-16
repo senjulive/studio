@@ -22,7 +22,8 @@ export async function getOrCreateWallet(): Promise<WalletData> {
     const fetchWalletWithRetry = async (attempt: number): Promise<WalletData | null> => {
         const { data: wallet, error } = await supabase
             .from('wallets')
-            .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
+            // Use a left join (default) instead of inner to be more resilient
+            .select('*, profile:profiles(*), squad:profiles(squad_leader:profiles(username))')
             .eq('user_id', user.id)
             .maybeSingle();
         
@@ -30,7 +31,8 @@ export async function getOrCreateWallet(): Promise<WalletData> {
             console.error(`Attempt ${attempt} to fetch wallet failed:`, error.message);
         }
 
-        if (wallet) {
+        // Also check if the profile relation exists
+        if (wallet && wallet.profile) {
             return wallet as WalletData;
         }
 
@@ -49,8 +51,6 @@ export async function getOrCreateWallet(): Promise<WalletData> {
     }
 
     if (!wallet) {
-        // Fallback: If trigger didn't run, manually invoke the setup logic.
-        // This is a failsafe and should not be the normal path.
         console.warn(`Wallet not found for user ${user.id} after retries. Manually invoking creation logic.`);
         const supabaseAdmin = createAdminClient();
         const { error: rpcError } = await supabaseAdmin.rpc('handle_new_user_by_id', { user_id_param: user.id });
@@ -59,7 +59,9 @@ export async function getOrCreateWallet(): Promise<WalletData> {
             throw new Error(`Manual wallet creation failed: ${rpcError.message}`);
         }
         
+        await new Promise(resolve => setTimeout(resolve, 500)); // wait after manual creation
         wallet = await fetchWalletWithRetry(4);
+
         if (!wallet) {
             throw new Error(`Failed to retrieve wallet even after manual creation for user ${user.id}.`);
         }
@@ -87,7 +89,7 @@ export async function getOrCreateWallet(): Promise<WalletData> {
             .from('wallets')
             .update({ growth: updatedGrowth })
             .eq('user_id', user.id)
-            .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
+            .select('*, profile:profiles(*), squad:profiles(squad_leader:profiles(username))')
             .single();
         
         if (updateError) throw updateError;
