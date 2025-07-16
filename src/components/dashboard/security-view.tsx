@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { KeyRound } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 
 export function SecurityView() {
   const [wallet, setWallet] = React.useState<WalletData | null>(null);

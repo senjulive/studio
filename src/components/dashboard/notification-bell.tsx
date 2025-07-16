@@ -20,7 +20,7 @@ import {
   type Notification,
 } from "@/lib/notifications";
 import { cn } from "@/lib/utils";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 import { createClient } from "@/lib/supabase/client";
 
 function NotificationItem({ notification }: { notification: Notification }) {

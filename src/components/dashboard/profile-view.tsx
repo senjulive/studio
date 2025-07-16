@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from 'date-fns';

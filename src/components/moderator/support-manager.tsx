@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -26,7 +27,7 @@ import {useToast} from '@/hooks/use-toast';
 import {type SupportAgentOutput} from '@/ai/flows/support-agent-flow';
 import {Card, CardContent} from '@/components/ui/card';
 import {type WalletData} from '@/lib/wallet';
-import {useUser} from '@/app/dashboard/layout';
+import {useUser} from '@/contexts/UserContext';
 import {logModeratorAction} from '@/lib/moderator';
 
 type MappedWallet = WalletData & {user_id: string};

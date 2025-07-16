@@ -35,7 +35,7 @@ import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 import { getBotTierSettings, getCurrentTier, type TierSetting } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/client";
 

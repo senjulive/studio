@@ -24,7 +24,7 @@ import { addAdminNotification, addNotification } from "@/lib/notifications";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import Image from "next/image";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 
 const DepositAddressDisplay = ({
   address,

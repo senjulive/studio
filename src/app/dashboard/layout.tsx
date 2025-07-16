@@ -45,16 +45,11 @@ import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
 import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { UserProvider } from '@/contexts/UserContext';
 
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import { getModeratorStatus } from '@/lib/moderator';
-
-// Create a context to hold the user data
-const UserContext = React.createContext<{ user: User | null }>({ user: null });
-
-// Custom hook to use the UserContext
-export const useUser = () => React.useContext(UserContext);
 
 function DashboardLoading() {
   return (
@@ -215,7 +210,7 @@ export default function DashboardLayout({
   const isClient = typeof window !== 'undefined';
 
   return (
-    <UserContext.Provider value={{ user }}>
+    <UserProvider value={{ user }}>
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
@@ -343,6 +338,6 @@ export default function DashboardLayout({
           </nav>
         </SidebarInset>
       </SidebarProvider>
-    </UserContext.Provider>
+    </UserProvider>
   );
 }

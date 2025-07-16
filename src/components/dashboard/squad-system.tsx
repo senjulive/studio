@@ -25,7 +25,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 import type { SquadMember } from "@/app/api/squad/route";
 import { cn } from "@/lib/utils";
 

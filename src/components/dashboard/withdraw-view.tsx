@@ -36,7 +36,7 @@ import {
 import { addAdminNotification, addNotification } from "@/lib/notifications";
 import Image from "next/image";
 import { format } from "date-fns";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 
 export function WithdrawView() {
   const { toast } = useToast();

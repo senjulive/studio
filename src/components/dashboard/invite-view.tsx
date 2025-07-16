@@ -27,7 +27,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 import { FacebookIcon } from "../icons/social/facebook-icon";
 import { InstagramIcon } from "../icons/social/instagram-icon";
 import { TelegramIcon } from "../icons/social/telegram-icon";

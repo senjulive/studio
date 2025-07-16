@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getChatHistoryForUser, sendMessage, type Message } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 import { createClient } from "@/lib/supabase/client";
 
 export function SupportChat() {

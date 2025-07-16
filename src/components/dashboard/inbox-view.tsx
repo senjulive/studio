@@ -25,7 +25,7 @@ import {
   } from "@/components/ui/alert-dialog";
 import { Inbox, Trash2, Loader2, Bell, Megaphone, Gift, AlertCircle, Calendar } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
-import { useUser } from "@/app/dashboard/layout";
+import { useUser } from "@/contexts/UserContext";
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
