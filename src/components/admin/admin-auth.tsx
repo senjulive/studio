@@ -2,12 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Lock, Loader2, Shield } from "lucide-react";
+import { Loader2, Shield, ShieldAlert } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,122 +11,84 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { createClient } from "@/lib/supabase/client";
-
-const adminAuthSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1, { message: "Password is required." }),
-});
-
-type AdminAuthFormValues = z.infer<typeof adminAuthSchema>;
+import type { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const router = useRouter();
+  const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
 
-  const form = useForm<AdminAuthFormValues>({
-    resolver: zodResolver(adminAuthSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+  React.useEffect(() => {
+    const checkAdmin = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
 
-  const onSubmit = async (values: AdminAuthFormValues) => {
-    setIsLoading(true);
-    const supabase = createClient();
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
-
-      if (error) {
-        throw new Error(error.message);
+      if (user && user.email?.startsWith('admin')) {
+        setAuthStatus("authed");
+      } else {
+        setAuthStatus("unauthed");
       }
+    };
+    
+    checkAdmin();
 
-      // Here you might want to check for a specific admin role in a real app
-      toast({ title: "Access Granted" });
-      setIsAuthenticated(true);
-    } catch (error: any) {
-        toast({
-          title: "Access Denied",
-          description: error.message || "Incorrect credentials.",
-          variant: "destructive",
-        });
-        form.reset();
-    } finally {
-        setIsLoading(false);
-    }
-  };
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+        (_event, session) => {
+            if (session?.user && session.user.email?.startsWith('admin')) {
+                setAuthStatus("authed");
+            } else {
+                setAuthStatus("unauthed");
+            }
+        }
+    );
 
-  if (isAuthenticated) {
-    // We pass a dummy password, but in a real app, you might pass a JWT or other token.
+    return () => {
+        authListener.subscription.unsubscribe();
+    };
+
+  }, []);
+
+  if (authStatus === "loading") {
+    return (
+        <Card className="w-full max-w-sm">
+            <CardHeader className="text-center">
+                <div className="mx-auto bg-primary/10 p-3 rounded-full mb-2">
+                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                </div>
+                <CardTitle>Verifying Access</CardTitle>
+                <CardDescription>
+                Please wait while we check your credentials.
+                </CardDescription>
+            </CardHeader>
+        </Card>
+    );
+  }
+
+  if (authStatus === "authed") {
+    // We pass a dummy value. In a real-world scenario, API calls would use the user's JWT.
     return <AdminProvider value={{ adminPassword: 'authenticated' }}>{children}</AdminProvider>;
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <div className="mx-auto bg-primary/10 p-3 rounded-full mb-2">
-            <Shield className="h-8 w-8 text-primary" />
+        <div className="mx-auto bg-destructive/10 p-3 rounded-full mb-2">
+            <ShieldAlert className="h-8 w-8 text-destructive" />
         </div>
-        <CardTitle>Admin Access Required</CardTitle>
+        <CardTitle>Access Denied</CardTitle>
         <CardDescription>
-          Please enter admin credentials to access the admin panel.
+          You do not have permission to view this page. Please log in with an administrator account.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-             <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="admin@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Lock className="mr-2 h-4 w-4" />
-              )}
-              Unlock
-            </Button>
-          </form>
-        </Form>
+        <Button onClick={() => router.push('/')} className="w-full">
+            Return to Login
+        </Button>
       </CardContent>
     </Card>
   );
