@@ -11,27 +11,36 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { createClient } from "@/lib/supabase/client";
-import type { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
-  const { toast } = useToast();
   const router = useRouter();
   const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
+  const [isAdmin, setIsAdmin] = React.useState(false);
 
   React.useEffect(() => {
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
+    if (!adminEmail) {
+        console.error("CRITICAL: NEXT_PUBLIC_ADMIN_EMAIL is not set in the environment.");
+        setAuthStatus("unauthed");
+        setIsAdmin(false);
+        return;
+    }
+
     const checkAdmin = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
 
-      if (user && user.email?.startsWith('admin')) {
+      if (user && user.email === adminEmail) {
         setAuthStatus("authed");
+        setIsAdmin(true);
       } else {
         setAuthStatus("unauthed");
+        setIsAdmin(false);
       }
     };
     
@@ -39,10 +48,12 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
         (_event, session) => {
-            if (session?.user && session.user.email?.startsWith('admin')) {
+            if (session?.user && session.user.email === adminEmail) {
                 setAuthStatus("authed");
+                setIsAdmin(true);
             } else {
                 setAuthStatus("unauthed");
+                setIsAdmin(false);
             }
         }
     );
@@ -69,8 +80,7 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (authStatus === "authed") {
-    // We pass a dummy value. In a real-world scenario, API calls would use the user's JWT.
+  if (authStatus === "authed" && isAdmin) {
     return <AdminProvider value={{ adminPassword: 'authenticated' }}>{children}</AdminProvider>;
   }
 
