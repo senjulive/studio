@@ -43,7 +43,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Repeat, Megaphone } from 'lucide-react';
+import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import type { User } from '@supabase/supabase-js';
@@ -73,17 +73,23 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = React.useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
   React.useEffect(() => {
     const supabase = createClient();
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
     const checkUser = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
+        if (session.user.email === adminEmail) {
+            setIsAdmin(true);
+        }
         setIsInitializing(false);
       } else {
         router.push('/');
@@ -95,8 +101,14 @@ export default function DashboardLayout({
       (_event, session) => {
         if (session?.user) {
           setUser(session.user);
+          if (session.user.email === adminEmail) {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
         } else {
           setUser(null);
+          setIsAdmin(false);
           router.push('/');
         }
       }
@@ -117,7 +129,7 @@ export default function DashboardLayout({
     }
   }, []);
 
-  const menuItems = [
+  const baseMenuItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
     { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
@@ -130,13 +142,21 @@ export default function DashboardLayout({
     { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
     { href: '/dashboard/about', label: 'About', icon: AboutIcon },
-    {
-      href: downloadHref,
-      label: 'Download App',
-      icon: DownloadIcon,
-      download: 'AstralCore.url',
-    },
   ];
+  
+  if (isAdmin) {
+    baseMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
+  }
+
+  const menuItems = [
+      ...baseMenuItems,
+      {
+        href: downloadHref,
+        label: 'Download App',
+        icon: DownloadIcon,
+        download: 'AstralCore.url',
+      },
+  ]
 
   const handleLogout = async () => {
     await logout();
