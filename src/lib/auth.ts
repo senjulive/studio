@@ -7,11 +7,11 @@ import { createAdminClient } from './supabase/admin';
 
 export async function login(credentials: { email?: string; password?: string; }) {
   const supabase = createClient();
-  const { error } = await supabase.auth.signInWithPassword(credentials);
+  const { data, error } = await supabase.auth.signInWithPassword(credentials);
   if (error) {
-    return error.message;
+    return { error: error.message };
   }
-  return null;
+  return { data, error: null };
 }
 
 export async function register(credentials: { email?: string; password?: string, options?: any }) {
