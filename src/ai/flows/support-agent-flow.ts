@@ -18,11 +18,7 @@ const MessageSchema = z.object({
   timestamp: z.number(),
   sender: z.enum(['user', 'admin']),
   silent: z.boolean().optional(),
-  file: z.object({
-    name: z.string(),
-    type: z.string(),
-    dataUrl: z.string().describe("An image file attached to the message, as a data URI."),
-  }).optional(),
+  file_url: z.string().url().optional().describe("URL of an image file attached to the message."),
 });
 
 const SupportAgentInputSchema = z.object({
@@ -31,8 +27,8 @@ const SupportAgentInputSchema = z.object({
 export type SupportAgentInput = z.infer<typeof SupportAgentInputSchema>;
 
 const SupportAgentOutputSchema = z.object({
-  summary: z.string().describe("A brief summary of the user's issue or question, considering any attached images."),
-  suggestedReply: z.string().describe("A professionally drafted reply to send to the user, considering any attached images."),
+  summary: z.string().describe("A one-sentence summary of the user's issue or question."),
+  suggestedReply: z.string().describe("A concise, professional reply to send to the user."),
 });
 export type SupportAgentOutput = z.infer<typeof SupportAgentOutputSchema>;
 
@@ -48,14 +44,14 @@ const prompt = ai.definePrompt({
 Your task is to analyze a support conversation and assist the admin.
 
 Based on the message history provided, which may include text and images from the user, please do the following:
-1.  **Summarize the Issue:** Write a one or two-sentence summary of the user's problem or question. If they provided an image, refer to it in your summary (e.g., "The user is asking about an error shown in their screenshot.").
-2.  **Draft a Reply:** Compose a helpful, professional, and empathetic response to the user. Address their concerns directly. If their issue seems resolved, draft a polite closing message.
+1.  **Summarize the Issue:** Write a concise, one-sentence summary of the user's problem or question. If they provided an image, refer to it in your summary (e.g., "The user is asking about an error shown in their screenshot.").
+2.  **Draft a Reply:** Compose a helpful, professional, and empathetic response to the user. Be direct and clear. Address their concerns directly. If their issue seems resolved, draft a polite closing message.
 
 Here is the conversation history:
 {{#each messages}}
 [{{sender}}] {{text}}
-{{#if file}}
-{{media url=file.dataUrl}}
+{{#if file_url}}
+[Attached Image: {{file_url}}]
 {{/if}}
 {{/each}}
 `,

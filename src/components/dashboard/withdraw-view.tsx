@@ -70,10 +70,10 @@ export function WithdrawView() {
   }, [fetchWalletData]);
 
   const handleSaveAddress = async () => {
-    if (!currentAddress) {
+    if (!currentAddress || !/T[A-Za-z1-9]{33}/.test(currentAddress)) {
       toast({
-        title: "Address is required",
-        description: "Please enter a valid wallet address.",
+        title: "Invalid TRC20 Address",
+        description: "Please enter a valid TRC20 address for USDT.",
         variant: "destructive",
       });
       return;
@@ -98,6 +98,15 @@ export function WithdrawView() {
       toast({
         title: "Invalid Amount",
         description: "Please enter a valid amount to withdraw.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (withdrawAmount < 10) {
+      toast({
+        title: "Minimum Withdrawal",
+        description: `The minimum withdrawal amount is $10.00 USDT.`,
         variant: "destructive",
       });
       return;
@@ -214,7 +223,7 @@ export function WithdrawView() {
             <Input
                 id="amount"
                 type="number"
-                placeholder="0.00"
+                placeholder="Minimum $10.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 disabled={isWithdrawing}
