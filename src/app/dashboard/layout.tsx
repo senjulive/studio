@@ -85,8 +85,15 @@ export default function DashboardLayout({
 
     const checkUser = async () => {
       const {
-        data: { session },
+        data: { session }, error
       } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("Error fetching session:", error);
+        router.push('/');
+        return;
+      }
+
       if (session?.user) {
         setUser(session.user);
         if (session.user.email === adminEmail) {
@@ -120,6 +127,7 @@ export default function DashboardLayout({
                 setIsModerator(false);
             }
           }
+          if (isInitializing) setIsInitializing(false);
         } else {
           setUser(null);
           setIsAdmin(false);
@@ -132,7 +140,7 @@ export default function DashboardLayout({
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, isInitializing]);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {

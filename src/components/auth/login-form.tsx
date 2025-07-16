@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
 import { login } from "@/lib/auth";
 import { AstralLogo } from "../icons/astral-logo";
+import { createClient } from "@/lib/supabase/client";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
 
@@ -78,7 +79,9 @@ export function LoginForm() {
         throw new Error(error);
       }
       
-      const isAdmin = values.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
       
       toast({
         title: "Login Successful",
@@ -90,8 +93,7 @@ export function LoginForm() {
       } else {
         router.push("/dashboard");
       }
-      router.refresh();
-
+      // No router.refresh() here to allow layout to handle user state
     } catch(error: any) {
         toast({
             title: "Login Failed",

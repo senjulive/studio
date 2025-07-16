@@ -1,5 +1,4 @@
 
-
 'use server';
 
 import { createClient } from './supabase/server';
@@ -91,12 +90,12 @@ export async function register(credentials: { email?: string; password?: string,
             return { user_id: user.id };
         });
 
-        return null; // Success
+        return { error: null }; // Success
     } catch (error: any) {
         // The transaction will automatically rollback on error.
         // Return a user-friendly message.
         console.error("Registration transaction failed:", error.message);
-        return error.message;
+        return { error: error.message };
     }
 }
 

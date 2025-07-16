@@ -80,7 +80,7 @@ export function RegisterForm() {
     const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      const error = await register({
+      const { error } = await register({
         email: values.email,
         password: values.password,
         options: {
