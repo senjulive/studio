@@ -21,9 +21,8 @@ export async function login(credentials: { email?: string; password?: string; })
 
 export async function register(credentials: { email?: string; password?: string, options?: any }) {
   const supabase = createClient();
-  const adminSupabase = createAdminClient();
-
-  // 1. Create the user in the auth system
+  
+  // Create user in auth
   const { data: { user }, error: signUpError } = await supabase.auth.signUp({
     email: credentials.email,
     password: credentials.password,
@@ -42,16 +41,23 @@ export async function register(credentials: { email?: string; password?: string,
     return 'Registration failed: User not created.';
   }
 
+  // The rest of the logic MUST use the admin client to bypass RLS
+  // because the user's session is not available in this server-side context yet.
+  const adminSupabase = createAdminClient();
+  
   try {
     const { username, contact_number, country, referral_code: squad_referral_code } = credentials.options.data;
 
     let squad_leader_id_val: string | null = null;
     if (squad_referral_code) {
-      const { data: leaderProfile } = await adminSupabase
+      const { data: leaderProfile, error: leaderError } = await adminSupabase
         .from('profiles')
         .select('user_id')
         .eq('referral_code', squad_referral_code)
         .single();
+      
+      if (leaderError && leaderError.code !== 'PGRST116') throw leaderError;
+
       if (leaderProfile) {
         squad_leader_id_val = leaderProfile.user_id;
       }
@@ -61,11 +67,14 @@ export async function register(credentials: { email?: string; password?: string,
     let isUnique = false;
     while (!isUnique) {
         generated_referral_code = Math.random().toString(36).substring(2, 10).toUpperCase();
-        const { data: existingProfile } = await adminSupabase
+        const { data: existingProfile, error: checkError } = await adminSupabase
             .from('profiles')
             .select('user_id')
             .eq('referral_code', generated_referral_code)
             .single();
+        
+        if (checkError && checkError.code !== 'PGRST116') throw checkError;
+        
         if (!existingProfile) {
             isUnique = true;
         }
@@ -74,6 +83,7 @@ export async function register(credentials: { email?: string; password?: string,
     const { error: profileError } = await adminSupabase.from('profiles').insert({
       user_id: user.id,
       username: username,
+      full_name: username, // Set full_name to username by default
       contact_number: contact_number,
       country: country,
       squad_leader_id: squad_leader_id_val,
@@ -81,8 +91,9 @@ export async function register(credentials: { email?: string; password?: string,
     });
     
     if (profileError) {
+      // If profile insertion fails, we must delete the auth user to allow them to try again.
       await adminSupabase.auth.admin.deleteUser(user.id);
-      return `Database error: ${profileError.message}`;
+      return `Database error saving new user profile: ${profileError.message}`;
     }
 
     const { error: walletError } = await adminSupabase.from('wallets').insert({
@@ -91,17 +102,18 @@ export async function register(credentials: { email?: string; password?: string,
 
     if (walletError) {
       await adminSupabase.auth.admin.deleteUser(user.id);
-      return `Database error creating wallet: ${walletError.message}`;
+      return `Database error creating user wallet: ${walletError.message}`;
     }
 
   } catch (error: any) {
-    const adminSupabase = createAdminClient();
+    // Catch any other unexpected errors
     await adminSupabase.auth.admin.deleteUser(user.id);
-    return `An unexpected error occurred during registration: ${error.message}`;
+    return `An unexpected error occurred during profile creation: ${error.message}`;
   }
 
   return null;
 }
+
 
 export async function logout() {
   const supabase = createClient();
