@@ -5,7 +5,7 @@ import { getBotTierSettings } from './settings';
 import { createClient } from './supabase/server';
 import type { Database } from './database.types';
 
-export type WalletData = Database['public']['Tables']['wallets']['Row'] & { profile: ProfileData };
+export type WalletData = Database['public']['Tables']['wallets']['Row'] & { profile: ProfileData } & { squad: { squad_leader: { username: string } | null, members: any[] } };
 export type ProfileData = Database['public']['Tables']['profiles']['Row'];
 export type WithdrawalAddresses = WalletData['security']['withdrawalAddresses'];
 
@@ -20,7 +20,7 @@ export async function getOrCreateWallet(): Promise<WalletData> {
     
     const { data: wallet, error } = await supabase
         .from('wallets')
-        .select('*, profile:profiles!inner(*)')
+        .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
         .eq('user_id', user.id)
         .single();
     
@@ -32,9 +32,12 @@ export async function getOrCreateWallet(): Promise<WalletData> {
         // Check if daily reset is needed
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000;
-        if (now - new Date(wallet.growth.last_reset).getTime() > oneDay) {
+        const lastReset = wallet.growth?.last_reset ? new Date(wallet.growth.last_reset).getTime() : 0;
+
+        if (now - lastReset > oneDay) {
             const settings = await getBotTierSettings();
-            const currentTier = [...settings].reverse().find(tier => wallet.balances.usdt >= tier.balanceThreshold) || settings[0];
+            const balance = wallet.balances?.usdt || 0;
+            const currentTier = [...settings].reverse().find(tier => balance >= tier.balanceThreshold) || settings[0];
             
             const updatedGrowth = {
                 ...wallet.growth,
@@ -47,7 +50,7 @@ export async function getOrCreateWallet(): Promise<WalletData> {
                 .from('wallets')
                 .update({ growth: updatedGrowth })
                 .eq('user_id', user.id)
-                .select('*, profile:profiles!inner(*)')
+                .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
                 .single();
             
             if (updateError) throw updateError;
@@ -61,7 +64,7 @@ export async function getOrCreateWallet(): Promise<WalletData> {
     await new Promise(resolve => setTimeout(resolve, 1000));
     const { data: newWallet, error: newWalletError } = await supabase
         .from('wallets')
-        .select('*, profile:profiles!inner(*)')
+        .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
         .eq('user_id', user.id)
         .single();
 
@@ -79,7 +82,7 @@ export async function updateWallet(newData: Partial<WalletData>): Promise<void> 
      const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("User not authenticated.");
 
-    const { profile, ...walletData } = newData;
+    const { profile, squad, ...walletData } = newData;
 
     const { error } = await supabase
         .from('wallets')
@@ -95,12 +98,12 @@ export async function updateWallet(newData: Partial<WalletData>): Promise<void> 
 export async function saveWithdrawalAddress(asset: string, address: string): Promise<void> {
     const wallet = await getOrCreateWallet();
     const newAddresses = {
-        ...wallet.security.withdrawalAddresses,
+        ...(wallet.security?.withdrawalAddresses || {}),
         [asset]: address,
     };
     await updateWallet({ 
         security: {
-            ...wallet.security,
+            ...(wallet.security || {}),
             withdrawalAddresses: newAddresses
         } 
     });
@@ -108,5 +111,5 @@ export async function saveWithdrawalAddress(asset: string, address: string): Pro
 
 export async function getWithdrawalAddresses(): Promise<WithdrawalAddresses> {
     const wallet = await getOrCreateWallet();
-    return wallet.security.withdrawalAddresses || {};
+    return wallet.security?.withdrawalAddresses || {};
 }

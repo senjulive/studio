@@ -7,20 +7,18 @@ export async function POST(request: Request) {
   try {
     const supabaseAdmin = createAdminClient();
 
-    const {data: verifications, error} = await supabaseAdmin
-      .from('wallets')
-      .select(
-        `
-            user_id,
-            verification_status,
-            profile:profiles!inner(*)
-        `
-      )
-      .in('verification_status', ['verifying', 'unverified']);
+    const {
+      data: {users},
+      error,
+    } = await supabaseAdmin.auth.admin.listUsers();
 
     if (error) throw error;
 
-    return NextResponse.json(verifications);
+    // Filter out the admin user from the list
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    const regularUsers = users.filter(u => u.email !== adminEmail);
+
+    return NextResponse.json(regularUsers);
   } catch (error: any) {
     return NextResponse.json(
       {error: error.message || 'An unexpected error occurred.'},

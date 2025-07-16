@@ -28,7 +28,6 @@ import { useToast } from "@/hooks/use-toast";
 import { type SupportAgentOutput } from "@/ai/flows/support-agent-flow";
 import { Card, CardContent } from "@/components/ui/card";
 import { type WalletData } from "@/lib/wallet";
-import { useAdmin } from "@/contexts/AdminContext";
 
 type MappedWallet = WalletData & { user_id: string };
 
@@ -41,33 +40,18 @@ export function MessageViewer() {
   const [analysis, setAnalysis] = React.useState<Record<string, SupportAgentOutput | null>>({});
   const [isAnalyzing, setIsAnalyzing] = React.useState<Record<string, boolean>>({});
   const { toast } = useToast();
-  const { adminPassword } = useAdmin();
 
   React.useEffect(() => {
     async function fetchData() {
-      if (!adminPassword) return;
-
       setIsLoading(true);
 
       const fetchWallets = async (): Promise<Record<string, MappedWallet>> => {
-        if (!adminPassword) return {};
         try {
-          const response = await fetch('/api/admin/wallets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminPassword }),
-          });
-          if (!response.ok) {
-            console.error("Failed to fetch wallets:", response.statusText);
-            return {};
-          };
+          const response = await fetch('/api/admin/wallets', { method: 'POST' });
+          if (!response.ok) return {};
           return await response.json();
         } catch (error: any) {
-          toast({
-            title: 'Error Fetching Wallets',
-            description: `Could not fetch wallets for display names: ${error.message}`,
-            variant: 'destructive',
-          });
+          toast({ title: 'Error Fetching Wallets', variant: 'destructive' });
           return {};
         }
       };
@@ -83,25 +67,17 @@ export function MessageViewer() {
     }
     
     fetchData();
-  }, [adminPassword, toast]);
+  }, [toast]);
 
   const handleSendMessage = async (userId: string) => {
     const text = replyMessages[userId];
     if (!text || !text.trim()) return;
 
     setIsSending((prev) => ({ ...prev, [userId]: true }));
-
     await sendAdminMessage(userId, text);
-
-    await addNotification(userId, {
-      title: "AstralCore Support",
-      content: "An administrator has replied to your support ticket.",
-      href: "/dashboard/support"
-    });
-
+    await addNotification(userId, { title: "AstralCore Support", content: "An administrator has replied.", href: "/dashboard/support"});
     const data = await getAllChats();
     setChats(data);
-
     setReplyMessages((prev) => ({ ...prev, [userId]: "" }));
     setIsSending((prev) => ({ ...prev, [userId]: false }));
   };
@@ -112,25 +88,14 @@ export function MessageViewer() {
     try {
       const response = await fetch('/api/support-agent', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages }),
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to get analysis from the server.');
-      }
-
+      if (!response.ok) throw new Error('Failed to get analysis.');
       const result: SupportAgentOutput = await response.json();
       setAnalysis((prev) => ({ ...prev, [userId]: result }));
     } catch (e) {
-      console.error(e);
-      toast({
-        title: "AI Analysis Failed",
-        description: "Could not analyze the conversation.",
-        variant: "destructive",
-      });
+      toast({ title: "AI Analysis Failed", variant: "destructive" });
     } finally {
       setIsAnalyzing((prev) => ({ ...prev, [userId]: false }));
     }
@@ -192,54 +157,18 @@ export function MessageViewer() {
                  <Card className="bg-muted/30">
                   <CardContent className="p-4 space-y-4">
                     <div>
-                      <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleAnalyze(userId, messages)} 
-                          disabled={isAnalyzing[userId] || isLoading}
-                      >
-                          {isAnalyzing[userId] ? (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                              <BrainCircuit className="mr-2 h-4 w-4" />
-                          )}
+                      <Button variant="outline" size="sm" onClick={() => handleAnalyze(userId, messages)} disabled={isAnalyzing[userId] || isLoading}>
+                          {isAnalyzing[userId] ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
                           Analyze with AI
                       </Button>
                     </div>
 
-                    {isAnalyzing[userId] && (
-                        <div className="space-y-3">
-                            <div className="space-y-1">
-                                <Skeleton className="h-4 w-24" />
-                                <Skeleton className="h-3 w-full" />
-                                <Skeleton className="h-3 w-4/5" />
-                            </div>
-                             <div className="space-y-1">
-                                <Skeleton className="h-4 w-32" />
-                                <Skeleton className="h-3 w-full" />
-                                <Skeleton className="h-3 w-full" />
-                                <Skeleton className="h-3 w-1/2" />
-                            </div>
-                        </div>
-                    )}
-
+                    {isAnalyzing[userId] && <div className="space-y-1"><Skeleton className="h-4 w-24" /><Skeleton className="h-3 w-full" /></div>}
                     {analysis[userId] && (
                         <div className="space-y-3 animate-in fade-in-50">
-                            <div>
-                                <h4 className="font-semibold text-sm text-foreground">AI Summary</h4>
-                                <p className="text-sm text-muted-foreground">{analysis[userId]?.summary}</p>
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-sm text-foreground">Suggested Reply</h4>
-                                <p className="text-sm text-muted-foreground whitespace-pre-wrap p-3 bg-background rounded-md border">{analysis[userId]?.suggestedReply}</p>
-                                <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    className="mt-2 px-2"
-                                    onClick={() => setReplyMessages(prev => ({ ...prev, [userId]: analysis[userId]?.suggestedReply || '' }))}
-                                >
-                                    Use this reply
-                                </Button>
+                            <div><h4 className="font-semibold text-sm text-foreground">AI Summary</h4><p className="text-sm text-muted-foreground">{analysis[userId]?.summary}</p></div>
+                            <div><h4 className="font-semibold text-sm text-foreground">Suggested Reply</h4><p className="text-sm text-muted-foreground whitespace-pre-wrap p-3 bg-background rounded-md border">{analysis[userId]?.suggestedReply}</p>
+                                <Button size="sm" variant="ghost" className="mt-2 px-2" onClick={() => setReplyMessages(prev => ({ ...prev, [userId]: analysis[userId]?.suggestedReply || '' }))}>Use this reply</Button>
                             </div>
                         </div>
                     )}
@@ -251,58 +180,21 @@ export function MessageViewer() {
                     {messages.map((message) => (
                       <div key={message.id} className="flex flex-col">
                         <div className="text-xs text-muted-foreground flex justify-between">
-                          <span className="font-bold">
-                            {message.sender === "user" ? displayName : "AstralCore Support"}
-                          </span>
+                          <span className="font-bold">{message.sender === "user" ? displayName : "AstralCore Support"}</span>
                           <span>{format(new Date(message.timestamp), "PPp")}</span>
                         </div>
-                        <div
-                          className={cn(
-                            "rounded-md p-3 text-sm",
-                            message.silent
-                              ? "bg-accent text-accent-foreground/80 italic"
-                              : "bg-muted/50"
-                          )}
-                        >
+                        <div className={cn("rounded-md p-3 text-sm", message.silent ? "bg-accent text-accent-foreground/80 italic" : "bg-muted/50")}>
                           <p>{message.text}</p>
-                           {message.file_url && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={message.file_url} alt="Attached file" className="mt-2 rounded-md max-w-full h-auto" />
-                          )}
+                           {message.file_url && <img src={message.file_url} alt="Attached file" className="mt-2 rounded-md max-w-full h-auto" />}
                         </div>
                       </div>
                     ))}
                   </div>
                 </ScrollArea>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSendMessage(userId);
-                  }}
-                  className="flex w-full items-center space-x-2 border-t pt-4"
-                >
-                  <Input
-                    value={replyMessages[userId] || ""}
-                    onChange={(e) =>
-                      setReplyMessages((prev) => ({
-                        ...prev,
-                        [userId]: e.target.value,
-                      }))
-                    }
-                    placeholder="Type your reply..."
-                    disabled={isSending[userId]}
-                  />
-                  <Button
-                    type="submit"
-                    size="icon"
-                    disabled={isSending[userId] || !replyMessages[userId]?.trim()}
-                  >
-                    {isSending[userId] ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                    <span className="sr-only">Send</span>
+                <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(userId); }} className="flex w-full items-center space-x-2 border-t pt-4">
+                  <Input value={replyMessages[userId] || ""} onChange={(e) => setReplyMessages((prev) => ({ ...prev, [userId]: e.target.value }))} placeholder="Type your reply..." disabled={isSending[userId]} />
+                  <Button type="submit" size="icon" disabled={isSending[userId] || !replyMessages[userId]?.trim()}>
+                    {isSending[userId] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </Button>
                 </form>
               </div>

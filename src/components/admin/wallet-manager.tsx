@@ -5,7 +5,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle, ShieldCheck } from "lucide-react";
+import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -57,8 +57,8 @@ import type { WalletData } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
-import { useAdmin } from "@/contexts/AdminContext";
 import { Badge } from "../ui/badge";
+import { logModeratorAction } from "@/lib/moderator";
 
 type MappedWallet = WalletData & { user_id: string };
 
@@ -88,8 +88,6 @@ const formatBalance = (amount: number) => {
 
 export function WalletManager() {
   const { toast } = useToast();
-  const { adminPassword } = useAdmin();
-
   const [allWallets, setAllWallets] = React.useState<Record<string, MappedWallet> | null>(null);
   const [selectedUserId, setSelectedUserId] = React.useState<string>("");
   const [isUpdating, setIsUpdating] = React.useState(false);
@@ -107,14 +105,9 @@ export function WalletManager() {
   });
 
   const refetchWallets = React.useCallback(async () => {
-    if (!adminPassword) return;
     setIsFetchingWallets(true);
     try {
-        const response = await fetch('/api/admin/wallets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminPassword })
-        });
+        const response = await fetch('/api/admin/wallets', { method: 'POST' });
         if (!response.ok) throw new Error('Failed to fetch wallets');
         const data = await response.json();
         setAllWallets(data);
@@ -124,30 +117,22 @@ export function WalletManager() {
     } finally {
         setIsFetchingWallets(false);
     }
-  }, [adminPassword, toast]);
+  }, [toast]);
 
   React.useEffect(() => {
-    if (adminPassword) {
-      refetchWallets();
-    }
-  }, [adminPassword, refetchWallets]);
+    refetchWallets();
+  }, [refetchWallets]);
   
   const postAdminUpdate = React.useCallback(async (url: string, body: object) => {
-    if (!adminPassword) {
-        toast({ title: "Authentication Error", description: "Admin credentials not found.", variant: "destructive" });
-        return;
-    }
     setIsUpdating(true);
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...body, adminPassword }),
+            body: JSON.stringify(body),
         });
         const result = await response.json();
-        if (!response.ok || result.error) {
-            throw new Error(result.error || 'API request failed');
-        }
+        if (!response.ok || result.error) throw new Error(result.error || 'API request failed');
         await refetchWallets();
         return result;
     } catch (error: any) {
@@ -155,7 +140,7 @@ export function WalletManager() {
     } finally {
         setIsUpdating(false);
     }
-  }, [adminPassword, refetchWallets, toast]);
+  }, [refetchWallets, toast]);
 
   const selectedWalletData = selectedUserId && allWallets ? allWallets[selectedUserId] : null;
 
@@ -170,22 +155,14 @@ export function WalletManager() {
 
   const handleAddressUpdate = async (values: AddressUpdateFormValues) => {
     if (!selectedWalletData || !selectedUserId) return;
-
     const newWalletData: Partial<WalletData> = {
       addresses: { ...selectedWalletData.addresses, usdt: values.usdtAddress },
     };
-
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
-    toast({
-      title: "Address Updated",
-      description: `Successfully updated USDT address for ${selectedUserId}.`,
-    });
+    toast({ title: "Address Updated", description: `Successfully updated USDT address for ${selectedUserId}.`});
   };
 
-  const handleBalanceUpdate = async (
-    values: BalanceUpdateFormValues,
-    action: "add" | "remove"
-  ) => {
+  const handleBalanceUpdate = async (values: BalanceUpdateFormValues, action: "add" | "remove") => {
     if (!selectedWalletData || !selectedUserId) return;
     
     setIsUpdating(true);
@@ -201,15 +178,11 @@ export function WalletManager() {
     }
 
     if (action === "add") {
-      await sendAdminMessage(
-        selectedUserId,
-        `Credit received: ${values.amount.toFixed(8)} ${asset.toUpperCase()} has been added to your account by an administrator.`
-      );
-      await addNotification(selectedUserId, {
-        title: "AstralCore Deposit",
-        content: `Your balance has been credited with ${values.amount} ${asset.toUpperCase()}.`,
-        href: "/dashboard",
-      });
+      await sendAdminMessage(selectedUserId, `Credit received: ${values.amount.toFixed(8)} ${asset.toUpperCase()} has been added to your account.`);
+      await addNotification(selectedUserId, { title: "AstralCore Deposit", content: `Your balance has been credited with ${values.amount} ${asset.toUpperCase()}.`, href: "/dashboard" });
+      await logModeratorAction(`Credited ${selectedWalletData.profile.username} with ${values.amount} ${asset.toUpperCase()}.`);
+    } else {
+      await logModeratorAction(`Debited ${selectedWalletData.profile.username} by ${values.amount} ${asset.toUpperCase()}.`);
     }
 
     const newWalletData: Partial<WalletData> = { balances: newBalances };
@@ -241,7 +214,8 @@ export function WalletManager() {
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
     await sendAdminMessage(selectedUserId, `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`);
     await addNotification(selectedUserId, { title: "AstralCore Withdrawal", content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`, href: "/dashboard/withdraw" });
-
+    await logModeratorAction(`Completed withdrawal of ${withdrawal.amount.toFixed(2)} USDT for ${selectedWalletData.profile.username}.`);
+    
     toast({ title: "Withdrawal Marked as Complete" });
     setIsCompleting(null);
   };
@@ -249,6 +223,7 @@ export function WalletManager() {
   const handleResetAddress = async () => {
     if (!selectedUserId) return;
     await postAdminUpdate('/api/admin/reset-address', { userId: selectedUserId });
+    await logModeratorAction(`Reset withdrawal address for ${selectedWalletData?.profile.username}.`);
     toast({ title: "Withdrawal Address Reset", description: `Successfully reset withdrawal address for ${selectedUserId}.` });
   };
 

@@ -10,6 +10,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      action_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           created_at: string
@@ -95,6 +127,7 @@ export type Database = {
           avatar_url: string | null
           contact_number: string | null
           country: string | null
+          created_at: string
           date_of_birth: string | null
           full_name: string | null
           id_card_back_url: string | null
@@ -110,6 +143,7 @@ export type Database = {
           avatar_url?: string | null
           contact_number?: string | null
           country?: string | null
+          created_at?: string
           date_of_birth?: string | null
           full_name?: string | null
           id_card_back_url?: string | null
@@ -125,6 +159,7 @@ export type Database = {
           avatar_url?: string | null
           contact_number?: string | null
           country?: string | null
+          created_at?: string
           date_of_birth?: string | null
           full_name?: string | null
           id_card_back_url?: string | null
@@ -152,6 +187,33 @@ export type Database = {
           },
         ]
       }
+      promotions: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          status: Database["public"]["Enums"]["promotion_status"]
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          status: Database["public"]["Enums"]["promotion_status"]
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          status?: Database["public"]["Enums"]["promotion_status"]
+          title?: string
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           created_at: string
@@ -170,6 +232,39 @@ export type Database = {
         }
         Relationships: []
       }
+      support_threads: {
+        Row: {
+          created_at: string
+          handler_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          handler_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          handler_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_threads_handler_id_fkey"
+            columns: ["handler_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_threads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallets: {
         Row: {
           addresses: Json
@@ -179,7 +274,6 @@ export type Database = {
           id: string
           pending_withdrawals: Json[]
           security: Json
-          squad: Json
           user_id: string
           verification_status: string
         }
@@ -191,7 +285,6 @@ export type Database = {
           id?: string
           pending_withdrawals?: Json[]
           security?: Json
-          squad?: Json
           user_id: string
           verification_status?: string
         }
@@ -203,7 +296,6 @@ export type Database = {
           id?: string
           pending_withdrawals?: Json[]
           security?: Json
-          squad?: Json
           user_id?: string
           verification_status?: string
         }
@@ -226,6 +318,7 @@ export type Database = {
     }
     Enums: {
       chat_sender: "user" | "admin"
+      promotion_status: "Upcoming" | "Active" | "Expired"
     }
     CompositeTypes: {
       [_ in never]: never

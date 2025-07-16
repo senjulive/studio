@@ -3,7 +3,7 @@
 
 import { createClient } from './supabase/server';
 import { createAdminClient } from './supabase/admin';
-import { addAdminNotification } from './notifications';
+import { addPlatformNotification } from './notifications';
 
 export type Message = {
   id: string;
@@ -87,7 +87,7 @@ async function createMessage(
         const { data: { user } } = await createClient().auth.getUser();
 
         // Notify admin of new message
-        await addAdminNotification({
+        await addPlatformNotification({
             title: "New Support Message",
             content: `New message from ${user?.email}: "${text.substring(0, 50)}..."`,
             href: '/admin'

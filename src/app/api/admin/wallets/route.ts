@@ -10,25 +10,23 @@ export async function POST(request: Request) {
         .from('wallets')
         .select(`
             *,
-            profile:profiles(username, full_name)
+            profile:profiles!inner(username, full_name)
         `);
 
     if (error) throw error;
     
     const walletsMap = wallets.reduce((acc, wallet) => {
-        // The shape from the DB is slightly different, so we map it
         const profileData = Array.isArray(wallet.profile) ? wallet.profile[0] : wallet.profile;
         acc[wallet.user_id] = {
             ...wallet,
             profile: {
-                ...wallet.profile,
+                ...profileData,
                 username: profileData?.username,
                 fullName: profileData?.full_name,
             }
         };
         return acc;
     }, {} as Record<string, any>);
-
 
     return NextResponse.json(walletsMap);
   } catch (error: any) {

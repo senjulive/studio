@@ -48,6 +48,7 @@ import { Button } from '@/components/ui/button';
 
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
+import { getModeratorStatus } from '@/lib/moderator';
 
 // Create a context to hold the user data
 const UserContext = React.createContext<{ user: User | null }>({ user: null });
@@ -74,6 +75,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [user, setUser] = React.useState<User | null>(null);
   const [isAdmin, setIsAdmin] = React.useState(false);
+  const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
@@ -89,6 +91,11 @@ export default function DashboardLayout({
         setUser(session.user);
         if (session.user.email === adminEmail) {
             setIsAdmin(true);
+        } else {
+            const modStatus = await getModeratorStatus(session.user.id);
+            if (modStatus?.status === 'active') {
+                setIsModerator(true);
+            }
         }
         setIsInitializing(false);
       } else {
@@ -98,17 +105,25 @@ export default function DashboardLayout({
     checkUser();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         if (session?.user) {
           setUser(session.user);
           if (session.user.email === adminEmail) {
             setIsAdmin(true);
+            setIsModerator(false);
           } else {
             setIsAdmin(false);
+            const modStatus = await getModeratorStatus(session.user.id);
+            if (modStatus?.status === 'active') {
+                setIsModerator(true);
+            } else {
+                setIsModerator(false);
+            }
           }
         } else {
           setUser(null);
           setIsAdmin(false);
+          setIsModerator(false);
           router.push('/');
         }
       }
@@ -147,6 +162,10 @@ export default function DashboardLayout({
   if (isAdmin) {
     baseMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
   }
+  if (isModerator) {
+    baseMenuItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
+  }
+
 
   const menuItems = [
       ...baseMenuItems,

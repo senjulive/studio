@@ -1,78 +1,103 @@
+'use server';
 
-import { createAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
-import { addAdminNotification } from '@/lib/notifications';
-import { NextResponse } from 'next/server';
+import {createAdminClient} from '@/lib/supabase/admin';
+import {createClient} from '@/lib/supabase/server';
+import {addPlatformNotification} from '@/lib/notifications';
+import {NextResponse} from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { userId, fullName, idCardNo, address, dateOfBirth, idCardFrontUrl, idCardBackUrl } = await request.json();
+    const {
+      userId,
+      fullName,
+      idCardNo,
+      address,
+      dateOfBirth,
+      idCardFrontUrl,
+      idCardBackUrl,
+    } = await request.json();
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: {user},
+    } = await supabase.auth.getUser();
 
     if (!user || user.id !== userId) {
-        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json(
+        {success: false, error: 'Unauthorized'},
+        {status: 401}
+      );
     }
 
     if (!userId || !fullName || !idCardNo || !address || !dateOfBirth) {
-      return NextResponse.json({ success: false, error: 'Missing required fields.' }, { status: 400 });
+      return NextResponse.json(
+        {success: false, error: 'Missing required fields.'},
+        {status: 400}
+      );
     }
 
     if (!/^\d{9,}$/.test(idCardNo)) {
-        return NextResponse.json({ success: false, error: 'ID Card Number must be at least 9 digits.' }, { status: 400 });
+      return NextResponse.json(
+        {success: false, error: 'ID Card Number must be at least 9 digits.'},
+        {status: 400}
+      );
     }
-    
+
     const supabaseAdmin = createAdminClient();
 
     // Check for uniqueness
-    const { data: existingProfile, error: uniqueError } = await supabaseAdmin
-        .from('profiles')
-        .select('user_id')
-        .eq('id_card_no', idCardNo)
-        .neq('user_id', userId)
-        .maybeSingle();
+    const {data: existingProfile, error: uniqueError} = await supabaseAdmin
+      .from('profiles')
+      .select('user_id')
+      .eq('id_card_no', idCardNo)
+      .neq('user_id', userId)
+      .maybeSingle();
 
     if (uniqueError) throw uniqueError;
 
     if (existingProfile) {
-      return NextResponse.json({ success: false, error: 'This ID Card Number is already in use.' }, { status: 409 });
+      return NextResponse.json(
+        {success: false, error: 'This ID Card Number is already in use.'},
+        {status: 409}
+      );
     }
 
     // Update profile and wallet status
-    const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .update({
-            full_name: fullName,
-            id_card_no: idCardNo,
-            address,
-            date_of_birth: dateOfBirth,
-            id_card_front_url: idCardFrontUrl,
-            id_card_back_url: idCardBackUrl,
-        })
-        .eq('user_id', userId);
+    const {error: profileError} = await supabaseAdmin
+      .from('profiles')
+      .update({
+        full_name: fullName,
+        id_card_no: idCardNo,
+        address,
+        date_of_birth: dateOfBirth,
+        id_card_front_url: idCardFrontUrl,
+        id_card_back_url: idCardBackUrl,
+      })
+      .eq('user_id', userId);
 
     if (profileError) throw profileError;
-    
-    const { error: walletError } = await supabaseAdmin
-        .from('wallets')
-        .update({ verification_status: 'verifying' })
-        .eq('user_id', userId);
+
+    const {error: walletError} = await supabaseAdmin
+      .from('wallets')
+      .update({verification_status: 'verifying'})
+      .eq('user_id', userId);
 
     if (walletError) throw walletError;
 
     // Notify admin
-    await addAdminNotification({
+    await addPlatformNotification({
       title: 'New Verification Request',
       content: `User ${fullName} (${user.email}) submitted their documents for verification.`,
-      href: '/admin'
+      href: '/admin',
     });
 
-    return NextResponse.json({ success: true, message: 'Profile update received. Verification is in progress.' });
-
+    return NextResponse.json({
+      success: true,
+      message: 'Profile update received. Verification is in progress.',
+    });
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, error: error.message || 'An unexpected error occurred.' },
-      { status: 500 }
+      {success: false, error: error.message || 'An unexpected error occurred.'},
+      {status: 500}
     );
   }
 }

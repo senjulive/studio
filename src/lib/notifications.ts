@@ -46,27 +46,54 @@ export async function addNotification(userId: string, notificationData: Omit<Not
     }
 }
 
-// Adds a notification for the admin user
-export async function addAdminNotification(notificationData: Omit<Notification, 'id' | 'created_at' | 'read' | 'user_id'>): Promise<void> {
-    const supabase = createAdminClient();
+
+// Adds a notification for the admin and all active moderators
+export async function addPlatformNotification(notificationData: Omit<Notification, 'id' | 'created_at' | 'read' | 'user_id'>): Promise<void> {
+    const supabaseAdmin = createAdminClient();
     
-    // For this app, we will assume a single admin user model.
-    // In a real app, this would be more sophisticated.
-    const { data: { users }, error: userError } = await supabase.auth.admin.listUsers();
+    const { data: { users }, error: userError } = await supabaseAdmin.auth.admin.listUsers();
     if (userError) {
-        console.error("Failed to fetch users for admin notification:", userError);
+        console.error("Failed to fetch users for platform notification:", userError);
         return;
     }
     
-    // A simple way to find an admin user.
-    const adminUser = users.find(u => u.email?.startsWith('admin'));
-    if (!adminUser) {
-        console.error("Admin user not found, cannot create notification.");
+    const adminUser = users.find(u => u.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL);
+    
+    // Get active moderators
+    const { data: modSettings } = await supabaseAdmin
+        .from('settings')
+        .select('value')
+        .eq('key', 'moderators')
+        .single();
+    
+    const moderatorIds: string[] = (modSettings?.value || [])
+        .filter((mod: any) => mod.status === 'active')
+        .map((mod: any) => mod.userId);
+    
+    const recipientIds = new Set<string>();
+    if (adminUser) {
+        recipientIds.add(adminUser.id);
+    }
+    moderatorIds.forEach(id => recipientIds.add(id));
+
+    if (recipientIds.size === 0) {
+        console.error("No recipients found for platform notification.");
         return;
     }
+
+    const notificationsToInsert = Array.from(recipientIds).map(id => ({
+        user_id: id,
+        ...notificationData
+    }));
     
-    await addNotification(adminUser.id, notificationData);
+    const { error } = await supabaseAdmin.from('notifications').insert(notificationsToInsert);
+    if (error) {
+        console.error("Error adding platform notifications:", error);
+    }
 }
+
+// Backwards compatibility
+export const addAdminNotification = addPlatformNotification;
 
 
 export async function markAllAsRead(userId: string): Promise<Notification[]> {

@@ -2,10 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
 import { Loader2, ShieldCheck, User, RefreshCw } from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
-
+import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +23,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import type { WalletData, ProfileData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAdmin } from "@/contexts/AdminContext";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
 import {
@@ -35,6 +32,7 @@ import {
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog";
+import { logModeratorAction } from "@/lib/moderator";
 
 type VerificationData = WalletData & {
     profile: ProfileData
@@ -42,21 +40,14 @@ type VerificationData = WalletData & {
 
 export function VerificationManager() {
   const { toast } = useToast();
-  const { adminPassword } = useAdmin();
-
   const [verifications, setVerifications] = React.useState<VerificationData[]>([]);
   const [isUpdating, setIsUpdating] = React.useState<string | null>(null);
   const [isFetching, setIsFetching] = React.useState(true);
 
   const refetchVerifications = React.useCallback(async () => {
-    if (!adminPassword) return;
     setIsFetching(true);
     try {
-        const response = await fetch('/api/admin/verifications', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminPassword })
-        });
+        const response = await fetch('/api/admin/verifications', { method: 'POST' });
         if (!response.ok) throw new Error('Failed to fetch verification data');
         const data = await response.json();
         setVerifications(data);
@@ -66,41 +57,29 @@ export function VerificationManager() {
     } finally {
         setIsFetching(false);
     }
-  }, [adminPassword, toast]);
+  }, [toast]);
 
   React.useEffect(() => {
-    if (adminPassword) {
-      refetchVerifications();
-    }
-  }, [adminPassword, refetchVerifications]);
+    refetchVerifications();
+  }, [refetchVerifications]);
   
-  const postAdminUpdate = React.useCallback(async (url: string, body: object) => {
-    if (!adminPassword) {
-        toast({ title: "Authentication Error", description: "Admin credentials not found.", variant: "destructive" });
-        return;
-    }
-    
+  const handleManualVerify = async (userId: string, username: string) => {
+    setIsUpdating(userId);
     try {
-        const response = await fetch(url, {
+        const response = await fetch('/api/admin/verify-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...body, adminPassword }),
+            body: JSON.stringify({ userId }),
         });
         const result = await response.json();
-        if (!response.ok || result.error) {
-            throw new Error(result.error || 'API request failed');
-        }
+        if (!response.ok || result.error) throw new Error(result.error || 'API request failed');
+        
         await refetchVerifications();
-        return result;
+        await logModeratorAction(`Verified user ${username}.`);
+        toast({ title: "User Manually Verified", description: `Successfully verified ${username}.` });
     } catch (error: any) {
         toast({ title: "Update Failed", description: error.message, variant: "destructive" });
     }
-  }, [adminPassword, refetchVerifications, toast]);
-
-  const handleManualVerify = async (userId: string) => {
-    setIsUpdating(userId);
-    await postAdminUpdate('/api/admin/verify-user', { userId });
-    toast({ title: "User Manually Verified", description: `Successfully verified ${userId}.` });
     setIsUpdating(null);
   };
 
@@ -171,7 +150,7 @@ export function VerificationManager() {
                                             </div>
                                         </DialogContent>
                                     </Dialog>
-                                    <Button size="sm" onClick={() => handleManualVerify(v.user_id)} disabled={isUpdating === v.user_id}>
+                                    <Button size="sm" onClick={() => handleManualVerify(v.user_id, v.profile.username)} disabled={isUpdating === v.user_id}>
                                         {isUpdating === v.user_id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
                                         Approve
                                     </Button>
