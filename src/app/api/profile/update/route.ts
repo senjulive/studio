@@ -1,6 +1,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { addAdminNotification } from '@/lib/notifications';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -59,24 +60,12 @@ export async function POST(request: Request) {
 
     if (walletError) throw walletError;
 
-    // Simulate the 2-minute verification delay
-    setTimeout(async () => {
-      try {
-        const { error: verificationError } = await createAdminClient()
-            .from('wallets')
-            .update({ verification_status: 'verified' })
-            .eq('user_id', userId);
-        if (verificationError) throw verificationError;
-        console.log(`Verification completed for user ${userId}`);
-      } catch (error) {
-        console.error(`Error completing verification for user ${userId}:`, error);
-        // Optionally, handle the failure case (e.g., set status to 'failed')
-        await createAdminClient()
-            .from('wallets')
-            .update({ verification_status: 'unverified' })
-            .eq('user_id', userId);
-      }
-    }, 2 * 60 * 1000); // 2 minutes
+    // Notify admin
+    await addAdminNotification({
+      title: 'New Verification Request',
+      content: `User ${fullName} (${user.email}) submitted their documents for verification.`,
+      href: '/admin'
+    });
 
     return NextResponse.json({ success: true, message: 'Profile update received. Verification is in progress.' });
 

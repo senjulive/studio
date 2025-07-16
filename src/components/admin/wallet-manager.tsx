@@ -206,7 +206,7 @@ export function WalletManager() {
         `Credit received: ${values.amount.toFixed(8)} ${asset.toUpperCase()} has been added to your account by an administrator.`
       );
       await addNotification(selectedUserId, {
-        title: "Account Credited by Admin",
+        title: "AstralCore Deposit",
         content: `Your balance has been credited with ${values.amount} ${asset.toUpperCase()}.`,
         href: "/dashboard",
       });
@@ -240,7 +240,7 @@ export function WalletManager() {
 
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
     await sendAdminMessage(selectedUserId, `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`);
-    await addNotification(selectedUserId, { title: "Withdrawal Completed", content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`, href: "/dashboard" });
+    await addNotification(selectedUserId, { title: "AstralCore Withdrawal", content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`, href: "/dashboard/withdraw" });
 
     toast({ title: "Withdrawal Marked as Complete" });
     setIsCompleting(null);
@@ -250,12 +250,6 @@ export function WalletManager() {
     if (!selectedUserId) return;
     await postAdminUpdate('/api/admin/reset-address', { userId: selectedUserId });
     toast({ title: "Withdrawal Address Reset", description: `Successfully reset withdrawal address for ${selectedUserId}.` });
-  };
-  
-  const handleManualVerify = async () => {
-    if (!selectedUserId) return;
-    await postAdminUpdate('/api/admin/verify-user', { userId: selectedUserId });
-    toast({ title: "User Manually Verified", description: `Successfully verified ${selectedUserId}.` });
   };
 
 
@@ -347,21 +341,6 @@ export function WalletManager() {
             </CardContent>
           </Card>
        )}
-        
-      {selectedWalletData?.verification_status !== 'verified' && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Verification Actions</CardTitle>
-            <CardDescription>Manually verify this user if their documentation is correct but automated verification failed.</CardDescription>
-          </CardHeader>
-          <CardContent>
-              <Button onClick={handleManualVerify} disabled={isUpdating || !selectedUserId}>
-                <ShieldCheck className="mr-2 h-4 w-4" />
-                Manual Verify User
-              </Button>
-          </CardContent>
-        </Card>
-      )}
 
       <Card>
         <CardHeader>

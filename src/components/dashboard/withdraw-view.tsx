@@ -33,8 +33,7 @@ import {
   type WalletData,
   updateWallet,
 } from "@/lib/wallet";
-import { sendSystemNotification } from "@/lib/chat";
-import { addNotification } from "@/lib/notifications";
+import { addAdminNotification, addNotification } from "@/lib/notifications";
 import Image from "next/image";
 import { format } from "date-fns";
 import { useUser } from "@/app/dashboard/layout";
@@ -135,11 +134,14 @@ export function WithdrawView() {
     await updateWallet(newWalletData);
     setWalletData(newWalletData);
 
-    await sendSystemNotification(
-      `User '${user.email}' initiated a withdrawal of ${amount} ${asset.toUpperCase()} to address ${savedAddresses.usdt}.`
-    );
+    await addAdminNotification({
+        title: "New Withdrawal Request",
+        content: `User '${user.email}' initiated a withdrawal of ${amount} ${asset.toUpperCase()} to address ${savedAddresses.usdt}.`,
+        href: "/admin"
+    });
+
     await addNotification(user.id, {
-      title: "Withdrawal Request Received",
+      title: "AstralCore Withdrawal",
       content: `Your request to withdraw $${amount} USDT is now pending review.`,
       href: "/dashboard/withdraw"
     });

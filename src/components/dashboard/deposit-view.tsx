@@ -20,8 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getSiteSettings } from "@/lib/site-settings";
 import { Skeleton } from "../ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { sendSystemNotification } from "@/lib/chat";
-import { addNotification } from "@/lib/notifications";
+import { addAdminNotification, addNotification } from "@/lib/notifications";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import Image from "next/image";
@@ -129,13 +128,16 @@ const PersonalDepositRequest = () => {
 
     try {
       const username = wallet?.profile.username || user.email;
-      await sendSystemNotification(
-        user.id,
-        `User '${username}' (${user.email}) has initiated a deposit request for ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()}. Please verify payment and credit their account manually via the Wallet Management tab.`
-      );
+      const content = `User '${username}' (${user.email}) has initiated a deposit request for ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()}. Please verify payment and credit their account manually.`;
+      
+      await addAdminNotification({
+        title: "New Deposit Request",
+        content,
+        href: "/admin"
+      });
 
       await addNotification(user.id, {
-        title: "Deposit Request Submitted",
+        title: "AstralCore Deposit",
         content: `Your request to deposit ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()} has been received and is pending approval.`,
         href: "/dashboard/deposit",
       });

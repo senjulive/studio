@@ -3,8 +3,8 @@ import { AdminAuth } from "@/components/admin/admin-auth";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: "Admin Panel - AstralCore",
-    description: "Manage user wallets.",
+    title: "AstralCore AI - Admin Panel",
+    description: "Manage the AstralCore Platform.",
 };
 
 export default function AdminPage() {

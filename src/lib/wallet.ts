@@ -5,7 +5,7 @@ import { getBotTierSettings } from './settings';
 import { createClient } from './supabase/server';
 import type { Database } from './database.types';
 
-export type WalletData = Database['public']['Tables']['wallets']['Row'];
+export type WalletData = Database['public']['Tables']['wallets']['Row'] & { profile: ProfileData };
 export type ProfileData = Database['public']['Tables']['profiles']['Row'];
 export type WithdrawalAddresses = WalletData['security']['withdrawalAddresses'];
 
@@ -20,7 +20,7 @@ export async function getOrCreateWallet(): Promise<WalletData> {
     
     const { data: wallet, error } = await supabase
         .from('wallets')
-        .select('*')
+        .select('*, profile:profiles!inner(*)')
         .eq('user_id', user.id)
         .single();
     
@@ -47,7 +47,7 @@ export async function getOrCreateWallet(): Promise<WalletData> {
                 .from('wallets')
                 .update({ growth: updatedGrowth })
                 .eq('user_id', user.id)
-                .select()
+                .select('*, profile:profiles!inner(*)')
                 .single();
             
             if (updateError) throw updateError;
@@ -61,7 +61,7 @@ export async function getOrCreateWallet(): Promise<WalletData> {
     await new Promise(resolve => setTimeout(resolve, 1000));
     const { data: newWallet, error: newWalletError } = await supabase
         .from('wallets')
-        .select('*')
+        .select('*, profile:profiles!inner(*)')
         .eq('user_id', user.id)
         .single();
 
@@ -79,9 +79,11 @@ export async function updateWallet(newData: Partial<WalletData>): Promise<void> 
      const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("User not authenticated.");
 
+    const { profile, ...walletData } = newData;
+
     const { error } = await supabase
         .from('wallets')
-        .update(newData)
+        .update(walletData)
         .eq('user_id', user.id);
 
     if (error) {

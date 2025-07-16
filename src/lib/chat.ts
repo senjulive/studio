@@ -3,6 +3,7 @@
 
 import { createClient } from './supabase/server';
 import { createAdminClient } from './supabase/admin';
+import { addAdminNotification } from './notifications';
 
 export type Message = {
   id: string;
@@ -83,6 +84,15 @@ async function createMessage(
     }
 
     if (sender === 'user' && !silent) {
+        const { data: { user } } = await createClient().auth.getUser();
+
+        // Notify admin of new message
+        await addAdminNotification({
+            title: "New Support Message",
+            content: `New message from ${user?.email}: "${text.substring(0, 50)}..."`,
+            href: '/admin'
+        });
+
         // Create an automated reply
         await supabase.from('chat_messages').insert({
             user_id: userId,
@@ -127,23 +137,4 @@ export async function sendMessage(
 // Sends a message from an admin.
 export async function sendAdminMessage(userId: string, text: string): Promise<void> {
     return createMessage(userId, text, 'admin', false);
-}
-
-// Sends a silent system notification into the chat history.
-export async function sendSystemNotification(text: string): Promise<void> {
-    const supabase = createAdminClient();
-    const { data: users, error: userError } = await supabase.auth.admin.listUsers();
-    if (userError) {
-        console.error("Failed to fetch users for system notification:", userError);
-        return;
-    }
-    
-    const adminUser = users.users.find(u => u.email?.includes('admin')); // A simple way to find an admin
-    if (!adminUser) {
-        console.error("No admin user found to send system notification from.");
-        return;
-    }
-
-    // This sends a system alert to the admin's own chat thread.
-    await createMessage(adminUser.id, `[System Alert] ${text}`, 'admin', true);
 }

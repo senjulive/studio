@@ -94,7 +94,7 @@ export function MessageViewer() {
     await sendAdminMessage(userId, text);
 
     await addNotification(userId, {
-      title: "New Support Message",
+      title: "AstralCore Support",
       content: "An administrator has replied to your support ticket.",
       href: "/dashboard/support"
     });
@@ -252,7 +252,7 @@ export function MessageViewer() {
                       <div key={message.id} className="flex flex-col">
                         <div className="text-xs text-muted-foreground flex justify-between">
                           <span className="font-bold">
-                            {message.sender === "user" ? displayName : "Admin"}
+                            {message.sender === "user" ? displayName : "AstralCore Support"}
                           </span>
                           <span>{format(new Date(message.timestamp), "PPp")}</span>
                         </div>
