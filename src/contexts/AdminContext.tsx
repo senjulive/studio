@@ -3,23 +3,15 @@
 
 import * as React from 'react';
 
-type AdminContextType = {
-    adminPassword: string | null;
-    setAdminPassword: React.Dispatch<React.SetStateAction<string | null>> | null;
-}
+// This context is now simplified as we no longer need to pass the password around.
+// The primary use is to provide a container for the admin-only section of the app.
+type AdminContextType = {};
 
-const AdminContext = React.createContext<AdminContextType>({
-    adminPassword: null,
-    setAdminPassword: null,
-});
+const AdminContext = React.createContext<AdminContextType>({});
 
 export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
-    // In a real app, this would be a more secure way to manage the admin's session or proof of auth.
-    // For this prototype, we'll just keep it simple and store the password in context for API calls.
-    const [adminPassword, setAdminPassword] = React.useState<string | null>(null);
-
     return (
-        <AdminContext.Provider value={{ adminPassword, setAdminPassword }}>
+        <AdminContext.Provider value={{}}>
             {children}
         </AdminContext.Provider>
     );

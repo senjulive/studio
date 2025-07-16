@@ -25,8 +25,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { login } from "@/lib/auth";
-import { useAdmin } from "@/contexts/AdminContext";
-import { createClient } from "@/lib/supabase/client";
 
 const adminLoginSchema = z.object({
   email: z.string().email(),
@@ -38,7 +36,6 @@ type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
 export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
-  const { setAdminPassword } = useAdmin();
 
   const form = useForm<AdminLoginFormValues>({
     resolver: zodResolver(adminLoginSchema),
@@ -52,35 +49,10 @@ export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void 
     setIsLoading(true);
 
     try {
-      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-      const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+      const { error } = await login({ email: values.email, password: values.password });
 
-      if (!adminEmail || !adminPass) {
-        throw new Error("Admin credentials are not configured in the environment.");
-      }
-      
-      if (values.email !== adminEmail || values.password !== adminPass) {
-        throw new Error("Invalid admin credentials.");
-      }
-      
-      // Manually create a session for the admin. This is a workaround for the user's request.
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
-
-      // We expect "Invalid login credentials" since the user may not exist in Supabase auth,
-      // but we still want to proceed if the .env check passes.
-      // We only throw for other unexpected errors (e.g. network).
-      if (error && error.message !== 'Invalid login credentials') {
-        throw new Error(`Admin session could not be initiated: ${error.message}`);
-      }
-      
-      // For tools that might need it, we'll store the password in context.
-      // NOTE: This is NOT a secure practice for a production application.
-      if (setAdminPassword) {
-        setAdminPassword(values.password);
+      if (error) {
+        throw new Error(error);
       }
       
       toast({

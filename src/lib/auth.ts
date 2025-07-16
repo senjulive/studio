@@ -8,15 +8,34 @@ import { createAdminClient } from './supabase/admin';
 export async function login(credentials: { email?: string; password?: string; }) {
   const supabase = createClient();
   const { data, error } = await supabase.auth.signInWithPassword(credentials);
+  
   if (error) {
     return { error: error.message };
   }
+
   return { data, error: null };
 }
 
 export async function register(credentials: { email?: string; password?: string, options?: any }) {
   const supabase = createClient();
   const adminSupabase = createAdminClient();
+
+  // --- Ensure Admin User Exists ---
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+
+  if (adminEmail && adminPassword) {
+    const { data: { users }, error: listError } = await adminSupabase.auth.admin.listUsers();
+    if (!listError && !users.find(u => u.email === adminEmail)) {
+      // Admin does not exist, create it.
+      await adminSupabase.auth.admin.createUser({
+        email: adminEmail,
+        password: adminPassword,
+        email_confirm: true, // Auto-confirm admin email
+      });
+    }
+  }
+  // --- End Admin Creation ---
 
   // 1. Create the user in the auth system
   const { data: { user }, error: signUpError } = await supabase.auth.signUp({
