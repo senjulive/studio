@@ -13,7 +13,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, Trash2, PlusCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAdmin } from "@/contexts/AdminContext";
 
 const tierSchema = z.object({
   id: z.string(),
@@ -45,7 +44,6 @@ const toRoman = (num: number): string => {
 
 export function BotSettingsManager() {
   const { toast } = useToast();
-  const { adminPassword } = useAdmin();
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -81,10 +79,6 @@ export function BotSettingsManager() {
   }, [form, toast]);
 
   const onSubmit = async (values: SettingsFormValues) => {
-    if (!adminPassword) {
-      toast({ title: 'Error', description: 'Admin authentication not found.', variant: 'destructive' });
-      return;
-    }
     setIsSaving(true);
     const sortedTiers = [...values.tiers].sort((a, b) => a.balanceThreshold - b.balanceThreshold);
     
@@ -92,7 +86,7 @@ export function BotSettingsManager() {
       const response = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adminPassword, key: BOT_TIERS_KEY, value: sortedTiers })
+        body: JSON.stringify({ key: BOT_TIERS_KEY, value: sortedTiers })
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Failed to save settings.');
@@ -223,7 +217,7 @@ export function BotSettingsManager() {
                 Add Tier
               </Button>
             <div className="flex justify-end">
-              <Button type="submit" disabled={isSaving || !adminPassword}>
+              <Button type="submit" disabled={isSaving}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Save Settings
               </Button>

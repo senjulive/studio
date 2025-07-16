@@ -1,8 +1,8 @@
+
 'use client';
 
 import * as React from 'react';
 import {formatDistanceToNow} from 'date-fns';
-import {useAdmin} from '@/contexts/AdminContext';
 import {useToast} from '@/hooks/use-toast';
 import {type Notification} from '@/lib/notifications';
 import {
@@ -24,7 +24,6 @@ type AdminNotification = Notification & {
 };
 
 export function NotificationViewer() {
-  const {adminPassword} = useAdmin();
   const {toast} = useToast();
   const [notifications, setNotifications] = React.useState<AdminNotification[]>(
     []
@@ -32,13 +31,12 @@ export function NotificationViewer() {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const fetchNotifications = React.useCallback(async () => {
-    if (!adminPassword) return;
     setIsLoading(true);
     try {
       const response = await fetch('/api/admin/notifications', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({adminPassword}),
+        body: JSON.stringify({}), // Empty body as password is no longer needed
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -57,7 +55,7 @@ export function NotificationViewer() {
     } finally {
       setIsLoading(false);
     }
-  }, [adminPassword, toast]);
+  }, [toast]);
 
   React.useEffect(() => {
     fetchNotifications();

@@ -16,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, PlusCircle, Trash2, Megaphone } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "../ui/scroll-area";
-import { useAdmin } from "@/contexts/AdminContext";
 
 const announcementSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long."),
@@ -28,7 +27,6 @@ const ANNOUNCEMENTS_KEY = 'announcements';
 
 export function AnnouncementManager() {
   const { toast } = useToast();
-  const { adminPassword } = useAdmin();
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -67,15 +65,11 @@ export function AnnouncementManager() {
   }, [fetchAnnouncements]);
 
   const saveAnnouncements = async (newAnnouncements: Announcement[]) => {
-      if (!adminPassword) {
-        toast({ title: 'Error', description: 'Admin authentication not found.', variant: 'destructive' });
-        return false;
-      }
       try {
           const response = await fetch('/api/admin/settings', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ adminPassword, key: ANNOUNCEMENTS_KEY, value: newAnnouncements })
+              body: JSON.stringify({ key: ANNOUNCEMENTS_KEY, value: newAnnouncements })
           });
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || 'Failed to save announcements.');
@@ -157,7 +151,7 @@ export function AnnouncementManager() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={isSubmitting || !adminPassword} className="w-full">
+                <Button type="submit" disabled={isSubmitting} className="w-full">
                   {isSubmitting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -199,7 +193,7 @@ export function AnnouncementManager() {
                         size="icon"
                         className="absolute top-2 right-2 h-7 w-7"
                         onClick={() => handleDelete(ann.id)}
-                        disabled={!!isDeleting || !adminPassword}
+                        disabled={!!isDeleting}
                       >
                         {isDeleting === ann.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />

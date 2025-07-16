@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -57,7 +58,6 @@ import {
   Edit,
 } from 'lucide-react';
 import Image from 'next/image';
-import {useAdmin} from '@/contexts/AdminContext';
 import {type Promotion} from '@/lib/promotions';
 import {createClient} from '@/lib/supabase/client';
 import {Badge} from '@/components/ui/badge';
@@ -75,7 +75,6 @@ type PromotionFormValues = z.infer<typeof promotionSchema>;
 
 export function PromotionManager() {
   const {toast} = useToast();
-  const {adminPassword} = useAdmin();
   const [promotions, setPromotions] = React.useState<Promotion[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -128,7 +127,7 @@ export function PromotionManager() {
       const response = await fetch(`/api/admin/promotions`, {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({adminPassword, promotionId}),
+        body: JSON.stringify({ promotionId }),
       });
       if (!response.ok) {
         const result = await response.json();
@@ -145,14 +144,6 @@ export function PromotionManager() {
   };
 
   const onSubmit = async (values: PromotionFormValues) => {
-    if (!adminPassword) {
-      toast({
-        title: 'Auth Error',
-        description: 'Admin password not found.',
-        variant: 'destructive',
-      });
-      return;
-    }
     setIsSubmitting(true);
 
     try {
@@ -184,7 +175,6 @@ export function PromotionManager() {
         method,
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          adminPassword,
           title: values.title,
           description: values.description,
           status: values.status,

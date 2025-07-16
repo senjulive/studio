@@ -78,11 +78,18 @@ export function LoginForm() {
         throw new Error(error);
       }
       
+      const isAdmin = values.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+      
       toast({
         title: "Login Successful",
-        description: "Welcome to AstralCore!",
+        description: isAdmin ? "Welcome, Administrator!" : "Welcome to AstralCore!",
       });
-      router.push("/dashboard");
+
+      if (isAdmin) {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
       router.refresh();
 
     } catch(error: any) {

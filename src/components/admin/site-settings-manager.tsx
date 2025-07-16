@@ -26,7 +26,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAdmin } from "@/contexts/AdminContext";
 
 const settingsSchema = z.object({
   usdtDepositAddress: z.string().min(1, "Address is required."),
@@ -39,7 +38,6 @@ const SITE_SETTINGS_KEY = 'siteSettings';
 
 export function SiteSettingsManager() {
   const { toast } = useToast();
-  const { adminPassword } = useAdmin();
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -76,16 +74,12 @@ export function SiteSettingsManager() {
   }, [form, toast]);
 
   const onSubmit = async (values: SettingsFormValues) => {
-    if (!adminPassword) {
-      toast({ title: 'Error', description: 'Admin authentication not found.', variant: 'destructive' });
-      return;
-    }
     setIsSaving(true);
     try {
         const response = await fetch('/api/admin/settings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminPassword, key: SITE_SETTINGS_KEY, value: values })
+            body: JSON.stringify({ key: SITE_SETTINGS_KEY, value: values })
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Failed to save settings.');
@@ -172,7 +166,7 @@ export function SiteSettingsManager() {
                 )}
               />
                <div className="flex justify-end">
-                <Button type="submit" disabled={isSaving || !adminPassword}>
+                <Button type="submit" disabled={isSaving}>
                   {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                   Save Settings
                 </Button>
