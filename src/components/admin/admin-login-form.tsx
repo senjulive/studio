@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { login } from "@/lib/auth";
+import { useAdmin } from "@/contexts/AdminContext";
 
 const adminLoginSchema = z.object({
   email: z.string().email(),
@@ -36,6 +37,7 @@ type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
 export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
+  const { setAdminPassword } = useAdmin();
 
   const form = useForm<AdminLoginFormValues>({
     resolver: zodResolver(adminLoginSchema),
@@ -50,16 +52,23 @@ export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void 
 
     try {
       const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-      if (!adminEmail) {
-        throw new Error("Admin email is not configured.");
+      const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+
+      if (!adminEmail || !adminPass) {
+        throw new Error("Admin credentials are not configured in the environment.");
       }
-      if (values.email !== adminEmail) {
+      
+      if (values.email !== adminEmail || values.password !== adminPass) {
         throw new Error("Invalid admin credentials.");
       }
-
-      const error = await login(values);
-      if (error) {
-        throw new Error(error);
+      
+      // Since we are bypassing Supabase for this login, we can't use the standard login function.
+      // We will simulate a successful login and trigger the success callback.
+      
+      // For tools that need it, we'll store the password in context.
+      // NOTE: This is NOT a secure practice for a production application.
+      if (setAdminPassword) {
+        setAdminPassword(values.password);
       }
       
       toast({
