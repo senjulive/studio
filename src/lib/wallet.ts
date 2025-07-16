@@ -18,61 +18,55 @@ export async function getOrCreateWallet(): Promise<WalletData> {
         throw new Error("User not authenticated.");
     }
     
-    const { data: wallet, error } = await supabase
-        .from('wallets')
-        .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
-        .eq('user_id', user.id)
-        .single();
-    
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-        throw error;
-    }
+    // Retry mechanism to handle replication delay
+    for (let i = 0; i < 3; i++) {
+        const { data: wallet, error } = await supabase
+            .from('wallets')
+            .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
+            .eq('user_id', user.id)
+            .maybeSingle();
 
-    if (wallet) {
-        // Check if daily reset is needed
-        const now = Date.now();
-        const oneDay = 24 * 60 * 60 * 1000;
-        const lastReset = wallet.growth?.last_reset ? new Date(wallet.growth.last_reset).getTime() : 0;
-
-        if (now - lastReset > oneDay) {
-            const settings = await getBotTierSettings();
-            const balance = wallet.balances?.usdt || 0;
-            const currentTier = [...settings].reverse().find(tier => balance >= tier.balanceThreshold) || settings[0];
-            
-            const updatedGrowth = {
-                ...wallet.growth,
-                clicks_left: currentTier.clicks,
-                last_reset: new Date().toISOString(),
-                daily_earnings: 0,
-            };
-
-            const { data: updatedWallet, error: updateError } = await supabase
-                .from('wallets')
-                .update({ growth: updatedGrowth })
-                .eq('user_id', user.id)
-                .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
-                .single();
-            
-            if (updateError) throw updateError;
-            return updatedWallet as WalletData;
+        if (error) {
+            console.error(`Attempt ${i+1} failed:`, error.message);
+            throw error;
         }
-        return wallet as WalletData;
+
+        if (wallet) {
+            // Check if daily reset is needed
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
+            const lastReset = wallet.growth?.last_reset ? new Date(wallet.growth.last_reset).getTime() : 0;
+
+            if (now - lastReset > oneDay) {
+                const settings = await getBotTierSettings();
+                const balance = wallet.balances?.usdt || 0;
+                const currentTier = [...settings].reverse().find(tier => balance >= tier.balanceThreshold) || settings[0];
+                
+                const updatedGrowth = {
+                    ...wallet.growth,
+                    clicks_left: currentTier.clicks,
+                    last_reset: new Date().toISOString(),
+                    daily_earnings: 0,
+                };
+
+                const { data: updatedWallet, error: updateError } = await supabase
+                    .from('wallets')
+                    .update({ growth: updatedGrowth })
+                    .eq('user_id', user.id)
+                    .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
+                    .single();
+                
+                if (updateError) throw updateError;
+                return updatedWallet as WalletData;
+            }
+            return wallet as WalletData;
+        }
+        
+        // If no wallet, wait and retry. The trigger should have created it.
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
-
-    // If no wallet, a trigger in Supabase should have created one.
-    // We try fetching again after a short delay.
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const { data: newWallet, error: newWalletError } = await supabase
-        .from('wallets')
-        .select('*, profile:profiles!inner(*), squad:profiles!inner(squad_leader:profiles(username))')
-        .eq('user_id', user.id)
-        .single();
-
-    if (newWalletError) {
-        throw new Error("Failed to create or find wallet for user.");
-    }
-
-    return newWallet as WalletData;
+    
+    throw new Error("Failed to create or find wallet for user after multiple attempts.");
 }
 
 
