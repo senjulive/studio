@@ -42,7 +42,7 @@ export type Database = {
           },
         ]
       }
-      chat_messages: {
+      messages: {
         Row: {
           created_at: string
           file_url: string | null

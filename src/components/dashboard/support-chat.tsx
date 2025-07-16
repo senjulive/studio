@@ -56,11 +56,11 @@ export function SupportChat() {
     if (!user) return;
     const supabase = createClient();
     const channel = supabase
-      .channel('chat-messages')
+      .channel('messages')
       .on('postgres_changes', { 
         event: '*', 
         schema: 'public', 
-        table: 'chat_messages', 
+        table: 'messages', 
         filter: `user_id=eq.${user.id}` 
       },
       (payload) => {

@@ -25,7 +25,7 @@ export type ChatHistory = {
 export async function getAllChats(): Promise<ChatHistory> {
     const supabase = createAdminClient();
     const { data, error } = await supabase
-        .from('chat_messages')
+        .from('messages')
         .select('*')
         .order('timestamp', { ascending: true });
     
@@ -49,7 +49,7 @@ export async function getAllChats(): Promise<ChatHistory> {
 export async function getChatHistoryForUser(userId: string): Promise<Message[]> {
     const supabase = createClient();
     const { data, error } = await supabase
-        .from('chat_messages')
+        .from('messages')
         .select('*')
         .eq('user_id', userId)
         .order('timestamp', { ascending: true });
@@ -71,7 +71,7 @@ async function createMessage(
 ): Promise<void> {
     const supabase = createAdminClient();
     const { error } = await supabase
-        .from('chat_messages')
+        .from('messages')
         .insert({
             user_id: userId,
             text,
@@ -95,7 +95,7 @@ async function createMessage(
         });
 
         // Create an automated reply
-        await supabase.from('chat_messages').insert({
+        await supabase.from('messages').insert({
             user_id: userId,
             text: "Thank you for your message. An admin will be with you shortly. (This is an automated reply)",
             sender: 'admin',
