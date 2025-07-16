@@ -5,7 +5,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle } from "lucide-react";
+import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle, ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,7 @@ import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
 import { useAdmin } from "@/contexts/AdminContext";
+import { Badge } from "../ui/badge";
 
 type MappedWallet = WalletData & { user_id: string };
 
@@ -250,6 +251,12 @@ export function WalletManager() {
     await postAdminUpdate('/api/admin/reset-address', { userId: selectedUserId });
     toast({ title: "Withdrawal Address Reset", description: `Successfully reset withdrawal address for ${selectedUserId}.` });
   };
+  
+  const handleManualVerify = async () => {
+    if (!selectedUserId) return;
+    await postAdminUpdate('/api/admin/verify-user', { userId: selectedUserId });
+    toast({ title: "User Manually Verified", description: `Successfully verified ${selectedUserId}.` });
+  };
 
 
   return (
@@ -278,10 +285,15 @@ export function WalletManager() {
 
       {selectedUserId && (isFetchingWallets ? ( <Skeleton className="h-48 w-full" /> ) : selectedWalletData ? (
           <div className="mb-6 rounded-lg border bg-muted/30 p-4 space-y-4">
-            <div className="border-b pb-4">
-                <p className="text-sm font-medium text-muted-foreground flex items-center gap-2"><User className="h-4 w-4" /> User Details</p>
-                <p className="text-lg font-bold">{selectedWalletData.profile.username || 'N/A'}</p>
-                <p className="text-sm text-muted-foreground">{selectedUserId}</p>
+            <div className="border-b pb-4 flex justify-between items-start">
+              <div>
+                  <p className="text-sm font-medium text-muted-foreground flex items-center gap-2"><User className="h-4 w-4" /> User Details</p>
+                  <p className="text-lg font-bold">{selectedWalletData.profile.username || 'N/A'}</p>
+                  <p className="text-sm text-muted-foreground">{selectedUserId}</p>
+              </div>
+              <Badge variant={selectedWalletData.verification_status === 'verified' ? 'default' : 'secondary'} className={selectedWalletData.verification_status === 'verified' ? 'bg-green-600' : ''}>
+                {selectedWalletData.verification_status}
+              </Badge>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div>
@@ -335,6 +347,21 @@ export function WalletManager() {
             </CardContent>
           </Card>
        )}
+        
+      {selectedWalletData?.verification_status !== 'verified' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Verification Actions</CardTitle>
+            <CardDescription>Manually verify this user if their documentation is correct but automated verification failed.</CardDescription>
+          </CardHeader>
+          <CardContent>
+              <Button onClick={handleManualVerify} disabled={isUpdating || !selectedUserId}>
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Manual Verify User
+              </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

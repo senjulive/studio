@@ -97,6 +97,8 @@ export type Database = {
           country: string | null
           date_of_birth: string | null
           full_name: string | null
+          id_card_back_url: string | null
+          id_card_front_url: string | null
           id_card_no: string | null
           referral_code: string | null
           squad_leader_id: string | null
@@ -110,6 +112,8 @@ export type Database = {
           country?: string | null
           date_of_birth?: string | null
           full_name?: string | null
+          id_card_back_url?: string | null
+          id_card_front_url?: string | null
           id_card_no?: string | null
           referral_code?: string | null
           squad_leader_id?: string | null
@@ -123,6 +127,8 @@ export type Database = {
           country?: string | null
           date_of_birth?: string | null
           full_name?: string | null
+          id_card_back_url?: string | null
+          id_card_front_url?: string | null
           id_card_no?: string | null
           referral_code?: string | null
           squad_leader_id?: string | null

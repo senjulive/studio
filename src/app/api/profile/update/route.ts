@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { userId, fullName, idCardNo, address, dateOfBirth } = await request.json();
+    const { userId, fullName, idCardNo, address, dateOfBirth, idCardFrontUrl, idCardBackUrl } = await request.json();
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -45,6 +45,8 @@ export async function POST(request: Request) {
             id_card_no: idCardNo,
             address,
             date_of_birth: dateOfBirth,
+            id_card_front_url: idCardFrontUrl,
+            id_card_back_url: idCardBackUrl,
         })
         .eq('user_id', userId);
 
@@ -85,4 +87,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

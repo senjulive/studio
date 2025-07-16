@@ -5,7 +5,6 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
 import {
   Card,
   CardContent,
@@ -22,8 +21,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/app/dashboard/layout";
 import { addNotification } from "@/lib/notifications";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, ShieldCheck, Upload, Image as ImageIcon, X } from "lucide-react";
+import { Loader2, Save, ShieldCheck, Upload, X } from "lucide-react";
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
 
 const profileSchema = z.object({
   fullName: z.string().min(3, "Full name must be at least 3 characters.").max(50),
@@ -155,10 +155,27 @@ export function VerifyIdentityView() {
   const onSubmit = async (values: ProfileFormValues) => {
     if (!user?.id) return;
     setIsSubmitting(true);
+    const supabase = createClient();
+
     try {
-      // NOTE: We are not actually uploading the files, just the text data.
-      // In a real application, you would upload `values.idCardFront` and `values.idCardBack`
-      // to a secure storage service and pass their URLs to the API.
+      const uploadFile = async (file: File, side: 'front' | 'back') => {
+        const filePath = `verification/${user.id}/${Date.now()}_${side}_${file.name}`;
+        const { data, error } = await supabase.storage
+          .from('verifications')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+        if (error) {
+          throw new Error(`Failed to upload ${side} ID: ${error.message}`);
+        }
+        const { data: { publicUrl } } = supabase.storage.from('verifications').getPublicUrl(data.path);
+        return publicUrl;
+      };
+
+      const idCardFrontUrl = await uploadFile(values.idCardFront, 'front');
+      const idCardBackUrl = await uploadFile(values.idCardBack, 'back');
+
       const response = await fetch('/api/profile/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -168,6 +185,8 @@ export function VerifyIdentityView() {
           idCardNo: values.idCardNo,
           address: values.address,
           dateOfBirth: new Date(values.dateOfBirth).toISOString(),
+          idCardFrontUrl,
+          idCardBackUrl,
         }),
       });
 
@@ -251,7 +270,7 @@ export function VerifyIdentityView() {
                 <FormItem>
                   <FormLabel>Date of Birth</FormLabel>
                   <FormControl>
-                    <Input placeholder="YYYY-MM-DD" {...field} />
+                    <Input type="date" placeholder="YYYY-MM-DD" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
