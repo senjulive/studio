@@ -1,201 +1,249 @@
 --
--- Enums
+-- Users Table
 --
-CREATE TYPE public.chat_sender AS ENUM ('user', 'admin');
-CREATE TYPE public.promotion_status AS ENUM ('Upcoming', 'Active', 'Expired');
+create table profiles (
+  user_id uuid not null references auth.users on delete cascade,
+  username text not null unique,
+  full_name text,
+  avatar_url text,
+  contact_number text,
+  country text,
+  referral_code text,
+  squad_leader_id uuid references auth.users(id),
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  id_card_no text,
+  address text,
+  date_of_birth date,
+  id_card_front_url text,
+  id_card_back_url text,
+
+  primary key (user_id),
+  constraint username_length check (char_length(username) >= 3)
+);
+alter table profiles enable row level security;
 
 --
--- Tables
+-- Wallets Table
 --
+create table wallets (
+    id uuid default gen_random_uuid() not null,
+    user_id uuid not null references auth.users on delete cascade,
+    -- Balance for different assets. Stored as JSON for flexibility.
+    balances jsonb not null default '{"usdt": 5.00, "btc": 0.00, "eth": 0.00}',
+    -- Contains user's withdrawal addresses, security question, etc.
+    security jsonb not null default '{}',
+    -- Tracks growth bot usage
+    growth jsonb not null default '{"clicks_left": 4, "last_reset": "2023-01-01T00:00:00Z", "daily_earnings": 0, "earnings_history": []}',
+    -- Stores pending withdrawals
+    pending_withdrawals jsonb[] not null default '{}',
+    verification_status text not null default 'unverified', -- unverified, verifying, verified
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
 
--- PROFILES
-CREATE TABLE public.profiles (
-    user_id uuid NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    username text NOT NULL,
-    full_name text,
-    avatar_url text,
-    contact_number text,
-    country text,
-    id_card_no text,
-    address text,
-    date_of_birth date,
-    id_card_front_url text,
-    id_card_back_url text,
-    referral_code text,
-    squad_leader_id uuid,
-    CONSTRAINT profiles_pkey PRIMARY KEY (user_id),
-    CONSTRAINT profiles_username_key UNIQUE (username),
-    CONSTRAINT profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
-    CONSTRAINT profiles_squad_leader_id_fkey FOREIGN KEY (squad_leader_id) REFERENCES auth.users(id) ON DELETE SET NULL
+    primary key (id),
+    unique(user_id)
 );
-COMMENT ON TABLE public.profiles IS 'Stores public-facing user profile information.';
+alter table wallets enable row level security;
 
--- WALLETS
-CREATE TABLE public.wallets (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    addresses jsonb DEFAULT '{"usdt": ""}'::jsonb NOT NULL,
-    balances jsonb DEFAULT '{"usdt": 0, "btc": 0, "eth": 0}'::jsonb NOT NULL,
-    growth jsonb DEFAULT '{"clicksLeft": 4, "lastReset": null, "dailyEarnings": 0, "earningsHistory": []}'::jsonb NOT NULL,
-    security jsonb DEFAULT '{"withdrawalAddresses": {}}'::jsonb NOT NULL,
-    pending_withdrawals jsonb[] DEFAULT ARRAY[]::jsonb[],
-    verification_status text DEFAULT 'unverified'::text NOT NULL,
-    CONSTRAINT wallets_pkey PRIMARY KEY (id),
-    CONSTRAINT wallets_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
-);
-COMMENT ON TABLE public.wallets IS 'Stores user financial data, including balances and transaction info.';
-
--- MESSAGES (for support chat)
-CREATE TABLE public.messages (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    timestamp timestamp with time zone DEFAULT now() NOT NULL,
-    sender public.chat_sender NOT NULL,
-    text text NOT NULL,
-    file_url text,
-    silent boolean DEFAULT false,
-    CONSTRAINT chat_messages_pkey PRIMARY KEY (id),
-    CONSTRAINT messages_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
-);
-CREATE INDEX idx_messages_user_id ON public.messages (user_id);
-COMMENT ON TABLE public.messages IS 'Stores messages for the user support chat.';
-
--- NOTIFICATIONS
-CREATE TABLE public.notifications (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    title text NOT NULL,
-    content text NOT NULL,
-    read boolean DEFAULT false NOT NULL,
+--
+-- Notifications Table
+--
+create table notifications (
+    id uuid default gen_random_uuid() not null,
+    user_id uuid not null references auth.users on delete cascade,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    title text not null,
+    content text not null,
+    read boolean default false not null,
     href text,
-    CONSTRAINT notifications_pkey PRIMARY KEY (id),
-    CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
-);
-COMMENT ON TABLE public.notifications IS 'Stores user-specific notifications.';
 
--- PROMOTIONS
-CREATE TABLE public.promotions (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    title text NOT NULL,
-    description text NOT NULL,
-    image_url text,
-    status public.promotion_status NOT NULL,
-    CONSTRAINT promotions_pkey PRIMARY KEY (id)
+    primary key (id)
 );
-COMMENT ON TABLE public.promotions IS 'Stores platform-wide promotions.';
+alter table notifications enable row level security;
 
--- SETTINGS
-CREATE TABLE public.settings (
-    key text NOT NULL,
+--
+-- Chat Messages Table
+--
+create type public.chat_sender as enum ('user', 'admin');
+create table messages (
+    id uuid default gen_random_uuid() not null,
+    user_id uuid not null references auth.users on delete cascade,
+    timestamp timestamp with time zone default timezone('utc'::text, now()) not null,
+    sender public.chat_sender not null,
+    text text not null,
+    silent boolean default false,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    file_url text,
+
+    primary key (id)
+);
+alter table messages enable row level security;
+
+--
+-- Settings Table
+-- A key-value store for global application settings.
+--
+create table settings (
+    key text not null primary key,
     value jsonb,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT settings_pkey PRIMARY KEY (key)
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-COMMENT ON TABLE public.settings IS 'Stores global application settings.';
+alter table settings enable row level security;
 
--- ACTION_LOGS (for moderator/admin actions)
-CREATE TABLE public.action_logs (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    user_id uuid NOT NULL,
-    action text NOT NULL,
+
+--
+-- Promotions Table
+--
+create type public.promotion_status as enum ('Upcoming', 'Active', 'Expired');
+create table promotions (
+    id uuid default gen_random_uuid() not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    title text not null,
+    description text not null,
+    image_url text,
+    status public.promotion_status not null,
+    primary key (id)
+);
+alter table promotions enable row level security;
+
+--
+-- Moderator Action Logs Table
+--
+create table action_logs (
+    id uuid default gen_random_uuid() not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    user_id uuid not null references auth.users on delete cascade,
+    action text not null,
     metadata jsonb,
-    CONSTRAINT action_logs_pkey PRIMARY KEY (id),
-    CONSTRAINT action_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+    primary key (id)
 );
-COMMENT ON TABLE public.action_logs IS 'Audit trail for moderator and admin actions.';
+alter table action_logs enable row level security;
 
--- SUPPORT_THREADS (for tracking support ticket claims)
-CREATE TABLE public.support_threads (
-    user_id uuid NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    handler_id uuid,
-    CONSTRAINT support_threads_pkey PRIMARY KEY (user_id),
-    CONSTRAINT support_threads_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
-    CONSTRAINT support_threads_handler_id_fkey FOREIGN KEY (handler_id) REFERENCES auth.users(id) ON DELETE SET NULL
-);
-COMMENT ON TABLE public.support_threads IS 'Tracks which moderator is handling a support ticket.';
 
 --
--- Functions and Triggers
+-- Support Ticket Claim Table
 --
+create table support_threads (
+    user_id uuid not null references auth.users on delete cascade,
+    handler_id uuid references auth.users(id),
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    primary key (user_id)
+);
+alter table support_threads enable row level security;
 
--- Function to generate a random referral code
-CREATE OR REPLACE FUNCTION generate_referral_code()
-RETURNS TEXT AS $$
-DECLARE
-    chars TEXT[] := '{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,0,1,2,3,4,5,6,7,8,9}';
-    result TEXT := '';
-    i INTEGER := 0;
-BEGIN
-    FOR i IN 1..8 LOOP
-        result := result || chars[1+random()*(array_length(chars, 1)-1)];
-    END LOOP;
-    RETURN result;
-END;
-$$ LANGUAGE plpgsql;
 
--- Function to handle new user setup
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-DECLARE
-    squad_leader_user_id uuid;
-    bonus_amount numeric := 5.00;
-BEGIN
-    -- Create Profile
-    INSERT INTO public.profiles (user_id, username, contact_number, country, referral_code)
-    VALUES (
-        new.id,
-        new.raw_user_meta_data->>'username',
-        new.raw_user_meta_data->>'contact_number',
-        new.raw_user_meta_data->>'country',
-        generate_referral_code()
-    );
+--
+-- Handle New User Function
+-- This trigger automatically creates a profile and wallet for new users.
+--
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  profile_username text;
+  squad_leader_id_val uuid;
+begin
+  -- Extract username from metadata, fallback to a default
+  profile_username := new.raw_user_meta_data->>'username';
+  if profile_username is null or char_length(profile_username) < 3 then
+    profile_username := 'user' || substr(new.id::text, 1, 8);
+  end if;
 
-    -- Create Wallet with initial bonus
-    INSERT INTO public.wallets (user_id, balances)
-    VALUES (new.id, jsonb_build_object('usdt', bonus_amount, 'btc', 0, 'eth', 0));
-    
-    -- Check for referral and assign squad leader
-    IF new.raw_user_meta_data->>'referral_code' IS NOT NULL THEN
-        SELECT p.user_id INTO squad_leader_user_id
-        FROM public.profiles p
-        WHERE p.referral_code = new.raw_user_meta_data->>'referral_code'
-        LIMIT 1;
+  -- Check for referral code and find squad leader
+  if new.raw_user_meta_data->>'referral_code' is not null then
+    select p.user_id into squad_leader_id_val
+    from public.profiles p
+    where p.referral_code = new.raw_user_meta_data->>'referral_code'
+    limit 1;
+  end if;
+  
+  -- Insert into public.profiles
+  insert into public.profiles (user_id, username, contact_number, country, squad_leader_id, referral_code)
+  values (
+    new.id,
+    profile_username,
+    new.raw_user_meta_data->>'contact_number',
+    new.raw_user_meta_data->>'country',
+    squad_leader_id_val,
+    left(upper(replace(gen_random_uuid()::text, '-', '')), 8)
+  );
 
-        IF squad_leader_user_id IS NOT NULL THEN
-            -- Update new user's profile with squad leader
-            UPDATE public.profiles
-            SET squad_leader_id = squad_leader_user_id
-            WHERE user_id = new.id;
-            
-            -- Add invitation bonus to new user
-            UPDATE public.wallets
-            SET balances = jsonb_set(balances, '{usdt}', (balances->>'usdt')::numeric + bonus_amount)
-            WHERE user_id = new.id;
-            
-            -- Add referral bonus to squad leader
-            UPDATE public.wallets
-            SET balances = jsonb_set(balances, '{usdt}', (balances->>'usdt')::numeric + bonus_amount)
-            WHERE user_id = squad_leader_user_id;
-        END IF;
-    END IF;
+  -- Insert into public.wallets
+  insert into public.wallets (user_id)
+  values (new.id);
+  
+  return new;
+end;
+$$;
 
-    RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+--
+-- Trigger for Handle New User
+--
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
 
--- Trigger to call the function on new user sign-up
-CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+--
+-- RPC for manual user creation (used in wallet lib as a fallback)
+--
+create or replace function public.handle_new_user_by_id(user_id_param uuid)
+returns void as $$
+declare
+  usr record;
+begin
+  select * into usr from auth.users where id = user_id_param;
+  
+  -- Check if profile exists
+  if not exists (select 1 from public.profiles where user_id = user_id_param) then
+    -- Manually call the logic from the trigger function
+    declare
+      profile_username text;
+      squad_leader_id_val uuid;
+    begin
+      profile_username := usr.raw_user_meta_data->>'username';
+      if profile_username is null or char_length(profile_username) < 3 then
+        profile_username := 'user' || substr(usr.id::text, 1, 8);
+      end if;
 
--- Initial Admin Email Setting (Replace with your actual admin email)
-INSERT INTO public.settings (key, value)
-VALUES ('adminEmail', '""')
-ON CONFLICT (key) DO NOTHING;
+      if usr.raw_user_meta_data->>'referral_code' is not null then
+        select p.user_id into squad_leader_id_val
+        from public.profiles p
+        where p.referral_code = usr.raw_user_meta_data->>'referral_code'
+        limit 1;
+      end if;
+
+      insert into public.profiles (user_id, username, contact_number, country, squad_leader_id, referral_code)
+      values (
+        usr.id,
+        profile_username,
+        usr.raw_user_meta_data->>'contact_number',
+        usr.raw_user_meta_data->>'country',
+        squad_leader_id_val,
+        left(upper(replace(gen_random_uuid()::text, '-', '')), 8)
+      );
+    end;
+  end if;
+
+  -- Check if wallet exists
+  if not exists (select 1 from public.wallets where user_id = user_id_param) then
+    insert into public.wallets (user_id) values (user_id_param);
+  end if;
+end;
+$$ language plpgsql security definer;
+
+
+-- Grant permissions for new tables
+grant all on table public.settings to service_role;
+grant all on table public.promotions to service_role;
+grant all on table public.action_logs to service_role;
+grant all on table public.support_threads to service_role;
+
+grant select on table public.settings to anon, authenticated;
+grant select on table public.promotions to anon, authenticated;
+grant select on table public.action_logs to authenticated;
+grant select on table public.support_threads to authenticated;
+
+grant insert, update, delete on table public.action_logs to authenticated;
+grant insert, update, delete on table public.support_threads to authenticated;
