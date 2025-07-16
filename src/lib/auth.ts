@@ -6,72 +6,17 @@ import type { EmailOtpType } from '@supabase/supabase-js';
 import { createAdminClient } from './supabase/admin';
 
 export async function login(credentials: { email?: string; password?: string; }) {
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-  const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
-  // Special handling for admin login to bypass standard flow if needed
-  // and ensure the admin user exists.
-  if (credentials.email === adminEmail) {
-    if (credentials.password !== adminPassword) {
-        return { error: "Invalid password for admin." };
-    }
-
-    const supabaseAdmin = createAdminClient();
-
-    // Check if admin user exists in Supabase Auth
-    const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers({
-      page: 1,
-      perPage: 1,
-    });
-
-    if (listError) {
-        return { error: `Failed to query users: ${listError.message}` };
-    }
-
-    let adminUser = users.find(u => u.email === adminEmail);
-
-    // If admin does not exist, create it.
-    if (!adminUser) {
-        const { data: { user }, error: createError } = await supabaseAdmin.auth.admin.createUser({
-            email: adminEmail,
-            password: adminPassword,
-            email_confirm: true, // Auto-confirm admin email
-        });
-
-        if (createError) {
-            return { error: `Failed to create admin user: ${createError.message}` };
-        }
-        if (!user) {
-            return { error: "Failed to create admin user, no user returned." };
-        }
-        adminUser = user;
-
-        // Also create a profile and wallet for the admin
-        await supabaseAdmin.from('profiles').insert({ user_id: adminUser.id, username: 'admin' });
-        await supabaseAdmin.from('wallets').insert({ user_id: adminUser.id });
-    }
-    
-    // Now that we're sure the user exists, sign them in with the server client
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword(credentials);
-
-    if (signInError) {
-        // This might happen if there's a temporary issue, but the user does exist.
-        return { error: `Admin sign-in failed: ${signInError.message}`};
-    }
-
-    return { data: null, error: null };
-  }
-
-  // Standard user login
   const supabase = createClient();
-  const { data, error } = await supabase.auth.signInWithPassword(credentials);
+  const { error } = await supabase.auth.signInWithPassword({
+    email: credentials.email!,
+    password: credentials.password!,
+  });
   
   if (error) {
     return { error: error.message };
   }
 
-  return { data, error: null };
+  return { error: null };
 }
 
 export async function register(credentials: { email?: string; password?: string, options?: any }) {
