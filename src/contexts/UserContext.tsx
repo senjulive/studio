@@ -2,7 +2,13 @@
 'use client';
 
 import * as React from 'react';
-import type { User } from '@supabase/supabase-js';
+
+// A generic user type for when Supabase is removed.
+type User = {
+    id: string;
+    email: string;
+    // Add other user properties as needed
+};
 
 type UserContextType = {
     user: User | null;

@@ -47,9 +47,11 @@ import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 
-import type { User } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
-import { getModeratorStatus } from '@/lib/moderator';
+// Mock user object since Supabase is removed
+const mockUser = {
+  id: 'mock-user-123',
+  email: 'user@example.com',
+};
 
 function DashboardLoading() {
   return (
@@ -68,74 +70,22 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = React.useState<User | null>(null);
+  const [user, setUser] = React.useState<any | null>(null);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
   React.useEffect(() => {
-    const supabase = createClient();
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-
-    const checkUser = async () => {
-      const {
-        data: { session }, error
-      } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error("Error fetching session:", error);
-        router.push('/');
-        return;
-      }
-
-      if (session?.user) {
-        setUser(session.user);
-        if (session.user.email === adminEmail) {
-            setIsAdmin(true);
-        } else {
-            const modStatus = await getModeratorStatus(session.user.id);
-            if (modStatus?.status === 'active') {
-                setIsModerator(true);
-            }
-        }
-        setIsInitializing(false);
-      } else {
-        router.push('/');
-      }
-    };
-    checkUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-          if (session.user.email === adminEmail) {
-            setIsAdmin(true);
-            setIsModerator(false);
-          } else {
-            setIsAdmin(false);
-            const modStatus = await getModeratorStatus(session.user.id);
-            if (modStatus?.status === 'active') {
-                setIsModerator(true);
-            } else {
-                setIsModerator(false);
-            }
-          }
-          if (isInitializing) setIsInitializing(false);
-        } else {
-          setUser(null);
-          setIsAdmin(false);
-          setIsModerator(false);
-          router.push('/');
-        }
-      }
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [router, isInitializing]);
+    // Simulate user session check
+    setTimeout(() => {
+      setUser(mockUser);
+      // You can toggle this to test admin/moderator views
+      setIsAdmin(false); 
+      setIsModerator(false);
+      setIsInitializing(false);
+    }, 500);
+  }, []);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -210,7 +160,7 @@ export default function DashboardLayout({
   const isClient = typeof window !== 'undefined';
 
   return (
-    <UserProvider value={{ user }}>
+    <UserProvider value={{ user: user as any }}>
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>

@@ -32,7 +32,6 @@ import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
 import { login } from "@/lib/auth";
 import { AstralLogo } from "../icons/astral-logo";
-import { createClient } from "@/lib/supabase/client";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
 
@@ -73,32 +72,17 @@ export function LoginForm() {
         }
     }
     
-    try {
-      const { error } = await login({ email: values.email, password: values.password });
-      if (error) {
-        throw new Error(error);
-      }
-      
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-      
-      toast({
-        title: "Login Successful",
-        description: isAdmin ? "Welcome, Administrator!" : "Welcome to AstralCore!",
-      });
+    // Since Supabase is removed, this will just simulate a login
+    // and redirect.
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast({
+      title: "Login Successful",
+      description: "Welcome to AstralCore! (Demo Mode)",
+    });
 
-      router.refresh(); // This forces a reload of server components and redirects
-
-    } catch(error: any) {
-        toast({
-            title: "Login Failed",
-            description: error.message || "Invalid credentials. Please try again.",
-            variant: "destructive",
-        });
-    } finally {
-        setIsLoading(false);
-    }
+    router.push('/dashboard');
+    setIsLoading(false);
   };
 
   return (

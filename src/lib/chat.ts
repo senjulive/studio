@@ -1,16 +1,17 @@
 
 'use server';
 
-import { createClient } from './supabase/server';
-import { createAdminClient } from './supabase/admin';
+// Mock implementation of chat functionality using a simple JSON structure.
+import initialChats from '../../data/chats.json';
 import { addPlatformNotification } from './notifications';
-import { Buffer } from 'buffer';
+
+let mockChats: Record<string, any[]> = initialChats;
 
 export type Message = {
   id: string;
   user_id: string;
   text: string;
-  timestamp: string;
+  timestamp: number;
   sender: 'user' | 'admin';
   silent?: boolean;
   file_url?: string;
@@ -21,44 +22,14 @@ export type ChatHistory = {
 };
 
 
-// Admin function: Fetches all chats from Supabase.
+// Admin function: Fetches all chats from the mock data.
 export async function getAllChats(): Promise<ChatHistory> {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .order('timestamp', { ascending: true });
-    
-    if (error) {
-        console.error('Error fetching chats:', error);
-        return {};
-    }
-
-    const chats: ChatHistory = {};
-    for (const message of data) {
-        if (!chats[message.user_id]) {
-            chats[message.user_id] = [];
-        }
-        chats[message.user_id].push(message as Message);
-    }
-
-    return chats;
+    return mockChats;
 }
 
-// Fetches chat history for a single user.
+// Fetches chat history for a single user from the mock data.
 export async function getChatHistoryForUser(userId: string): Promise<Message[]> {
-    const supabase = createClient();
-    const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('user_id', userId)
-        .order('timestamp', { ascending: true });
-    
-    if (error) {
-        console.error('Error fetching chat history:', error);
-        return [];
-    }
-    return data as Message[];
+    return mockChats[userId] || [];
 }
 
 // Universal function to send a message.
@@ -69,38 +40,37 @@ async function createMessage(
   silent: boolean,
   file_url?: string
 ): Promise<void> {
-    const supabase = createAdminClient();
-    const { error } = await supabase
-        .from('messages')
-        .insert({
-            user_id: userId,
-            text,
-            sender,
-            silent,
-            file_url,
-        });
-    
-    if (error) {
-        throw new Error(`Failed to send message: ${error.message}`);
+    if (!mockChats[userId]) {
+        mockChats[userId] = [];
     }
+    const newMessage: Message = {
+        id: `msg-${Date.now()}`,
+        user_id: userId,
+        text,
+        sender,
+        silent,
+        timestamp: Date.now(),
+        file_url,
+    };
+    mockChats[userId].push(newMessage);
 
     if (sender === 'user' && !silent) {
-        const { data: { user } } = await createClient().auth.getUser();
-
-        // Notify admin of new message
         await addPlatformNotification({
             title: "New Support Message",
-            content: `New message from ${user?.email}: "${text.substring(0, 50)}..."`,
+            content: `New message from ${userId}: "${text.substring(0, 50)}..."`,
             href: '/admin'
         });
 
         // Create an automated reply
-        await supabase.from('messages').insert({
+        const autoReply: Message = {
+            id: `msg-${Date.now() + 1}`,
             user_id: userId,
             text: "Thank you for your message. An admin will be with you shortly. (This is an automated reply)",
             sender: 'admin',
             silent: false,
-        });
+            timestamp: Date.now() + 1,
+        };
+        mockChats[userId].push(autoReply);
     }
 }
 
@@ -109,30 +79,10 @@ export async function sendMessage(
   userId: string,
   text: string,
   fileDataUrl?: string,
-  fileName?: string,
-  fileType?: string,
 ): Promise<void> {
-  const supabase = createAdminClient();
-  let file_url: string | undefined = undefined;
-
-  if (fileDataUrl && fileName && fileType) {
-    const filePath = `${userId}/${Date.now()}_${fileName}`;
-    const base64 = fileDataUrl.split(',')[1];
-    const { data, error } = await supabase.storage
-      .from('chat_files')
-      .upload(filePath, Buffer.from(base64, 'base64'), {
-        contentType: fileType,
-      });
-
-    if (error) {
-      throw new Error(`Failed to upload file: ${error.message}`);
-    }
-    
-    const { data: { publicUrl } } = supabase.storage.from('chat_files').getPublicUrl(data.path);
-    file_url = publicUrl;
-  }
-
-  return createMessage(userId, text, 'user', false, file_url);
+  // In a real app without Supabase storage, you'd upload this to another service (e.g., S3)
+  // For this mock, we will just use the data URL directly if provided.
+  return createMessage(userId, text, 'user', false, fileDataUrl);
 }
 
 // Sends a message from an admin.
