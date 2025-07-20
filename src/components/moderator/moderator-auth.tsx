@@ -11,41 +11,22 @@ import {
 } from '@/components/ui/card';
 import {ModeratorProvider} from '@/contexts/ModeratorContext';
 import {useRouter} from 'next/navigation';
-import {getModeratorStatus} from '@/lib/moderator';
+import { ModeratorLoginForm } from './moderator-login-form';
 
-// Mock implementation after Supabase removal
 export function ModeratorAuth({children}: {children: React.ReactNode}) {
   const router = useRouter();
   const [authStatus, setAuthStatus] = React.useState<
     'loading' | 'authed' | 'unauthed'
-  >('loading');
-  
-  // In a non-Supabase world, you'd check a session/token and then verify moderator status.
-  // For this mock, we'll deny access by default.
-  React.useEffect(() => {
-    async function checkModerator() {
-      // This is where you would call your new backend to verify if the user is a moderator.
-      // const isMod = await checkModeratorStatusOnBackend();
-      const isMod = false; // Mocking no moderator access
+  >('unauthed');
 
-      if (isMod) {
-        // const permissions = await getPermissionsFromBackend();
-        // setAuthStatus('authed');
-        // setPermissions(permissions);
-      } else {
-        setAuthStatus('unauthed');
-        toast({ title: "Access Denied", description: "You do not have moderator permissions.", variant: "destructive" });
-        router.push('/dashboard'); 
-      }
-    }
-    
-    // checkModerator();
-    // For now, let's just show a loading state and then deny.
-    setTimeout(() => {
-        setAuthStatus('unauthed');
-        router.push('/dashboard');
-    }, 1500)
-  }, [router]);
+  React.useEffect(() => {
+    setAuthStatus('unauthed');
+  }, []);
+  
+  const handleLoginSuccess = () => {
+    setAuthStatus('authed');
+    router.refresh();
+  };
 
   if (authStatus === 'loading') {
     return (
@@ -62,19 +43,12 @@ export function ModeratorAuth({children}: {children: React.ReactNode}) {
       </Card>
     );
   }
-
-  // Since we are mocking denial, this part is effectively unused.
-  // In a real scenario, it would render the children.
+  
   if (authStatus === 'authed') {
     return (
       <ModeratorProvider permissions={{ customer_support: true, user_verification: true, deposit_approval: true }}>{children}</ModeratorProvider>
     );
   }
 
-  return null;
-}
-
-// Dummy toast for the component to work
-const toast = (props: { title: string, description: string, variant: string }) => {
-    console.log(`TOAST: ${props.title} - ${props.description}`);
+  return <ModeratorLoginForm onLoginSuccess={handleLoginSuccess} />;
 }
