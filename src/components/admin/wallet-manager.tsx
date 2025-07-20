@@ -54,11 +54,8 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import type { WalletData } from "@/lib/wallet";
-import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
-import { addNotification } from "@/lib/notifications";
 import { Badge } from "../ui/badge";
-import { logModeratorAction } from "@/lib/moderator";
 
 type MappedWallet = WalletData & { user_id: string };
 
@@ -155,42 +152,24 @@ export function WalletManager() {
 
   const handleAddressUpdate = async (values: AddressUpdateFormValues) => {
     if (!selectedWalletData || !selectedUserId) return;
-    const newWalletData: Partial<WalletData> = {
-      addresses: { ...selectedWalletData.addresses, usdt: values.usdtAddress },
-    };
-    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
-    toast({ title: "Address Updated", description: `Successfully updated USDT address for ${selectedUserId}.`});
+    
+    await postAdminUpdate('/api/admin/update-address', { userId: selectedUserId, newAddress: values.usdtAddress });
+
+    toast({ title: "Address Updated", description: `Successfully updated USDT address for ${selectedWalletData.profile.username}.`});
   };
 
   const handleBalanceUpdate = async (values: BalanceUpdateFormValues, action: "add" | "remove") => {
     if (!selectedWalletData || !selectedUserId) return;
     
-    setIsUpdating(true);
-    const { asset } = values;
-    const newBalances = { ...selectedWalletData.balances };
-    const amount = action === "add" ? values.amount : -values.amount;
-    newBalances[asset] = (newBalances[asset] || 0) + amount;
+    await postAdminUpdate('/api/admin/update-balance', { 
+        userId: selectedUserId, 
+        asset: values.asset,
+        amount: action === "add" ? values.amount : -values.amount,
+        username: selectedWalletData.profile.username,
+    });
 
-    if (newBalances[asset] < 0) {
-      toast({ title: "Invalid Operation", description: "Balance cannot be negative.", variant: "destructive" });
-      setIsUpdating(false);
-      return;
-    }
-
-    if (action === "add") {
-      await sendAdminMessage(selectedUserId, `Credit received: ${values.amount.toFixed(8)} ${asset.toUpperCase()} has been added to your account.`);
-      await addNotification(selectedUserId, { title: "AstralCore Deposit", content: `Your balance has been credited with ${values.amount} ${asset.toUpperCase()}.`, href: "/dashboard" });
-      await logModeratorAction(`Credited ${selectedWalletData.profile.username} with ${values.amount} ${asset.toUpperCase()}.`);
-    } else {
-      await logModeratorAction(`Debited ${selectedWalletData.profile.username} by ${values.amount} ${asset.toUpperCase()}.`);
-    }
-
-    const newWalletData: Partial<WalletData> = { balances: newBalances };
-    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
-
-    toast({ title: "Balance Updated", description: `Successfully ${action}ed ${values.amount} ${asset.toUpperCase()} for ${selectedUserId}.` });
+    toast({ title: "Balance Updated", description: `Successfully ${action}ed ${values.amount} ${values.asset.toUpperCase()} for ${selectedWalletData.profile.username}.` });
     balanceForm.reset({ amount: 0 });
-    setIsUpdating(false);
   };
 
   const onSubmitBalanceAdd = (values: BalanceUpdateFormValues) => handleBalanceUpdate(values, "add");
@@ -207,24 +186,23 @@ export function WalletManager() {
         return;
     }
 
-    const newWalletData: Partial<WalletData> = {
-        pending_withdrawals: selectedWalletData.pending_withdrawals.filter(w => w.id !== withdrawalId),
-    };
-
-    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
-    await sendAdminMessage(selectedUserId, `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`);
-    await addNotification(selectedUserId, { title: "AstralCore Withdrawal", content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`, href: "/dashboard/withdraw" });
-    await logModeratorAction(`Completed withdrawal of ${withdrawal.amount.toFixed(2)} USDT for ${selectedWalletData.profile.username}.`);
+    await postAdminUpdate('/api/admin/complete-withdrawal', {
+        userId: selectedUserId,
+        withdrawal,
+        username: selectedWalletData.profile.username
+    });
     
     toast({ title: "Withdrawal Marked as Complete" });
     setIsCompleting(null);
   };
 
   const handleResetAddress = async () => {
-    if (!selectedUserId) return;
-    await postAdminUpdate('/api/admin/reset-address', { userId: selectedUserId });
-    await logModeratorAction(`Reset withdrawal address for ${selectedWalletData?.profile.username}.`);
-    toast({ title: "Withdrawal Address Reset", description: `Successfully reset withdrawal address for ${selectedUserId}.` });
+    if (!selectedUserId || !selectedWalletData) return;
+    await postAdminUpdate('/api/admin/reset-address', { 
+        userId: selectedUserId,
+        username: selectedWalletData.profile.username,
+    });
+    toast({ title: "Withdrawal Address Reset", description: `Successfully reset withdrawal address for ${selectedWalletData.profile.username}.` });
   };
 
 

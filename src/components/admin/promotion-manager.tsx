@@ -11,7 +11,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -59,7 +58,6 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import {type Promotion} from '@/lib/promotions';
-import {createClient} from '@/lib/supabase/client';
 import {Badge} from '@/components/ui/badge';
 
 const promotionSchema = z.object({
@@ -68,7 +66,7 @@ const promotionSchema = z.object({
     .string()
     .min(10, 'Description must be at least 10 characters long.'),
   status: z.enum(['Upcoming', 'Active', 'Expired']),
-  image: z.instanceof(File).optional(),
+  image_url: z.string().url("Please enter a valid URL for the image.").optional(),
 });
 
 type PromotionFormValues = z.infer<typeof promotionSchema>;
@@ -116,6 +114,7 @@ export function PromotionManager() {
       title: promo?.title || '',
       description: promo?.description || '',
       status: promo?.status || 'Upcoming',
+      image_url: promo?.image_url || '',
     });
     setIsDialogOpen(true);
   };
@@ -147,25 +146,6 @@ export function PromotionManager() {
     setIsSubmitting(true);
 
     try {
-      let imageUrl = editingPromotion?.image_url || undefined;
-      const supabase = createClient();
-
-      if (values.image) {
-        const file = values.image;
-        const filePath = `promotions/${Date.now()}_${file.name}`;
-        const {data, error: uploadError} = await supabase.storage
-          .from('verifications') // Reusing verifications bucket for simplicity
-          .upload(filePath, file);
-
-        if (uploadError)
-          throw new Error(`Image upload failed: ${uploadError.message}`);
-
-        const {
-          data: {publicUrl},
-        } = supabase.storage.from('verifications').getPublicUrl(data.path);
-        imageUrl = publicUrl;
-      }
-
       const endpoint = editingPromotion
         ? `/api/admin/promotions?id=${editingPromotion.id}`
         : '/api/admin/promotions';
@@ -178,7 +158,7 @@ export function PromotionManager() {
           title: values.title,
           description: values.description,
           status: values.status,
-          image_url: imageUrl,
+          image_url: values.image_url,
         }),
       });
 
@@ -366,17 +346,12 @@ export function PromotionManager() {
               />
               <FormField
                 control={form.control}
-                name="image"
-                render={({field: {onChange, value, ...rest}}) => (
+                name="image_url"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image (Optional)</FormLabel>
+                    <FormLabel>Image URL (Optional)</FormLabel>
                     <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={e => onChange(e.target.files?.[0])}
-                        {...rest}
-                      />
+                      <Input placeholder="https://placehold.co/600x400.png" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

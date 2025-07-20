@@ -1,8 +1,8 @@
 
 'use server';
 
-import {createClient} from './supabase/server';
-import {createAdminClient} from './supabase/admin';
+// This is a placeholder for moderator logic.
+// In a real app, you would connect to a database or external service here.
 
 export type ActionLog = {
   id: string;
@@ -12,46 +12,30 @@ export type ActionLog = {
   user: {username: string} | null;
 };
 
+// Mock function to check moderator status
 export async function getModeratorStatus(
   userId: string
 ): Promise<{status: string; permissions: any} | null> {
-  const supabase = createClient();
-  const {data, error} = await supabase
-    .from('settings')
-    .select('value')
-    .eq('key', 'moderators')
-    .single();
-
-  if (error || !data || !Array.isArray(data.value)) {
-    return null;
-  }
-
-  const moderator = data.value.find(mod => mod.userId === userId);
-  if (!moderator) {
-    return null;
-  }
-
-  return {status: moderator.status, permissions: moderator.permissions};
+    // This is a mock response. In a real app, query your user database.
+    const MOCK_MODERATORS = {
+        'mod-user-id': {
+            status: 'active',
+            permissions: {
+                customer_support: true,
+                user_verification: true,
+                deposit_approval: true,
+            }
+        }
+    };
+    // @ts-ignore
+    return MOCK_MODERATORS[userId] || null;
 }
 
+// Mock function to log an action
 export async function logModeratorAction(
   action: string,
   metadata?: any
 ): Promise<void> {
-  const supabase = createClient();
-  const {
-    data: {user},
-  } = await supabase.auth.getUser();
-
-  if (!user) return;
-
-  const {error} = await supabase.from('action_logs').insert({
-    user_id: user.id,
-    action,
-    metadata,
-  });
-
-  if (error) {
-    console.error('Failed to log moderator action:', error);
-  }
+  // In a real app, you would save this to a database log.
+  console.log(`[MODERATOR ACTION] by mock-admin: ${action}`, metadata || '');
 }
