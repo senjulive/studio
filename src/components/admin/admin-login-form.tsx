@@ -33,6 +33,9 @@ const adminLoginSchema = z.object({
 
 type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
 
+// A mock admin email for display purposes
+const MOCK_ADMIN_EMAIL = "admin@astralcore.io";
+
 export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -40,36 +43,32 @@ export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void 
   const form = useForm<AdminLoginFormValues>({
     resolver: zodResolver(adminLoginSchema),
     defaultValues: {
-      email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
+      email: MOCK_ADMIN_EMAIL,
       password: "",
     },
   });
 
   const onSubmit = async (values: AdminLoginFormValues) => {
     setIsLoading(true);
+    
+    // Simulate login
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    try {
-      const { error } = await login({ email: values.email, password: values.password });
-
-      if (error) {
-        throw new Error(error);
-      }
-      
+    if (values.email === MOCK_ADMIN_EMAIL && values.password === "admin") {
       toast({
         title: "Admin Login Successful",
         description: "Welcome to the AstralCore AI panel.",
       });
-
       onLoginSuccess();
-    } catch (error: any) {
+    } else {
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials. Please try again.",
+        description: "Invalid credentials. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   return (

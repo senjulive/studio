@@ -11,7 +11,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -53,13 +52,12 @@ import {
   Loader2,
   PlusCircle,
   Gift,
-  Image as ImageIcon,
+  ImageIcon,
   Trash2,
   Edit,
 } from 'lucide-react';
 import Image from 'next/image';
-import {type Promotion} from '@/lib/promotions';
-import {createClient} from '@/lib/supabase/client';
+import {type Promotion, getPromotions} from '@/lib/promotions';
 import {Badge} from '@/components/ui/badge';
 
 const promotionSchema = z.object({
@@ -68,7 +66,7 @@ const promotionSchema = z.object({
     .string()
     .min(10, 'Description must be at least 10 characters long.'),
   status: z.enum(['Upcoming', 'Active', 'Expired']),
-  image: z.instanceof(File).optional(),
+  image_url: z.string().url().optional(),
 });
 
 type PromotionFormValues = z.infer<typeof promotionSchema>;
@@ -88,23 +86,10 @@ export function PromotionManager() {
 
   const fetchPromotions = React.useCallback(async () => {
     setIsLoading(true);
-    try {
-      const response = await fetch('/api/promotions/all');
-      if (!response.ok) throw new Error('Failed to fetch promotions.');
-      const data = await response.json();
-      setPromotions(
-        data.sort(
-          (a: Promotion, b: Promotion) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-      );
-    } catch (error: any) {
-      toast({title: 'Error', description: error.message, variant: 'destructive'});
-      setPromotions([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
+    const data = await getPromotions();
+    setPromotions(data);
+    setIsLoading(false);
+  }, []);
 
   React.useEffect(() => {
     fetchPromotions();
@@ -116,87 +101,29 @@ export function PromotionManager() {
       title: promo?.title || '',
       description: promo?.description || '',
       status: promo?.status || 'Upcoming',
+      image_url: promo?.image_url || '',
     });
     setIsDialogOpen(true);
   };
 
   const handleDelete = async (promotionId: string) => {
-    if (!confirm('Are you sure you want to delete this promotion?')) return;
-
-    try {
-      const response = await fetch(`/api/admin/promotions`, {
-        method: 'DELETE',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ promotionId }),
-      });
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || 'Failed to delete promotion');
-      }
-      toast({
-        title: 'Promotion Deleted',
-        description: 'The promotion has been successfully removed.',
-      });
-      await fetchPromotions();
-    } catch (error: any) {
-      toast({title: 'Error', description: error.message, variant: 'destructive'});
-    }
+    toast({
+        title: 'Action Disabled',
+        description: 'Deleting promotions is disabled in this mock environment.',
+        variant: 'destructive'
+    });
   };
 
   const onSubmit = async (values: PromotionFormValues) => {
     setIsSubmitting(true);
-
-    try {
-      let imageUrl = editingPromotion?.image_url || undefined;
-      const supabase = createClient();
-
-      if (values.image) {
-        const file = values.image;
-        const filePath = `promotions/${Date.now()}_${file.name}`;
-        const {data, error: uploadError} = await supabase.storage
-          .from('verifications') // Reusing verifications bucket for simplicity
-          .upload(filePath, file);
-
-        if (uploadError)
-          throw new Error(`Image upload failed: ${uploadError.message}`);
-
-        const {
-          data: {publicUrl},
-        } = supabase.storage.from('verifications').getPublicUrl(data.path);
-        imageUrl = publicUrl;
-      }
-
-      const endpoint = editingPromotion
-        ? `/api/admin/promotions?id=${editingPromotion.id}`
-        : '/api/admin/promotions';
-      const method = editingPromotion ? 'PUT' : 'POST';
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          title: values.title,
-          description: values.description,
-          status: values.status,
-          image_url: imageUrl,
-        }),
-      });
-
-      const result = await response.json();
-      if (!response.ok)
-        throw new Error(result.error || 'Failed to save promotion.');
-
-      toast({
-        title: `Promotion ${editingPromotion ? 'Updated' : 'Created'}`,
-        description: 'The promotion has been saved.',
-      });
-      setIsDialogOpen(false);
-      await fetchPromotions();
-    } catch (error: any) {
-      toast({title: 'Error', description: error.message, variant: 'destructive'});
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    toast({
+        title: 'Action Disabled',
+        description: 'Creating or editing promotions is disabled in this mock environment.',
+    });
+    setIsSubmitting(false);
+    setIsDialogOpen(false);
   };
 
   return (
@@ -366,16 +293,15 @@ export function PromotionManager() {
               />
               <FormField
                 control={form.control}
-                name="image"
-                render={({field: {onChange, value, ...rest}}) => (
+                name="image_url"
+                render={({field}) => (
                   <FormItem>
-                    <FormLabel>Image (Optional)</FormLabel>
+                    <FormLabel>Image URL (Optional)</FormLabel>
                     <FormControl>
                       <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={e => onChange(e.target.files?.[0])}
-                        {...rest}
+                        type="text"
+                        placeholder="https://placehold.co/600x400.png"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />

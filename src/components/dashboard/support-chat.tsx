@@ -21,7 +21,6 @@ import { getChatHistoryForUser, sendMessage, type Message } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useUser } from "@/contexts/UserContext";
-import { createClient } from "@/lib/supabase/client";
 
 export function SupportChat() {
   const { toast } = useToast();
@@ -53,25 +52,12 @@ export function SupportChat() {
   }, [user, fetchHistory]);
 
   React.useEffect(() => {
-    if (!user) return;
-    const supabase = createClient();
-    const channel = supabase
-      .channel('messages')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'messages', 
-        filter: `user_id=eq.${user.id}` 
-      },
-      (payload) => {
-        fetchHistory();
-      })
-      .subscribe();
-    
-    return () => {
-      supabase.removeChannel(channel);
-    }
-  }, [user, fetchHistory]);
+    // Polling for new messages in a mock environment
+    const interval = setInterval(() => {
+      fetchHistory();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [fetchHistory]);
 
 
   React.useEffect(() => {
@@ -102,8 +88,6 @@ export function SupportChat() {
     setIsSending(true);
     
     let fileDataUrl: string | undefined = undefined;
-    let fileName: string | undefined = undefined;
-    let fileType: string | undefined = undefined;
     
     if (selectedFile) {
       try {
@@ -113,8 +97,6 @@ export function SupportChat() {
           reader.onerror = (error) => reject(error);
           reader.readAsDataURL(selectedFile);
         });
-        fileName = selectedFile.name;
-        fileType = selectedFile.type;
       } catch (error) {
         toast({ title: "Error reading file", description: "Could not process the selected file.", variant: "destructive" });
         setIsSending(false);
@@ -123,13 +105,13 @@ export function SupportChat() {
     }
     
     try {
-      await sendMessage(user.id, newMessage, fileDataUrl, fileName, fileType);
-      // No need to manually add to state, realtime subscription will handle it
+      await sendMessage(user.id, newMessage, fileDataUrl);
       setNewMessage("");
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+      await fetchHistory();
     } catch (error: any) {
       toast({
         title: "Error Sending Message",
