@@ -10,54 +10,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AdminProvider } from "@/contexts/AdminContext";
-import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { AdminLoginForm } from "./admin-login-form";
+
+// Mock auth state since Supabase is removed
+let mockIsAdminLoggedIn = false;
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
 
   React.useEffect(() => {
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-
-    if (!adminEmail) {
-        console.error("CRITICAL: NEXT_PUBLIC_ADMIN_EMAIL is not set in the environment.");
-        setAuthStatus("unauthed");
-        return;
-    }
-
-    const checkAdmin = async () => {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (user && user.email === adminEmail) {
-        setAuthStatus("authed");
-      } else {
-        setAuthStatus("unauthed");
-      }
-    };
-    
-    checkAdmin();
-
-    const supabase = createClient();
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-        (_event, session) => {
-            if (session?.user && session.user.email === adminEmail) {
-                setAuthStatus("authed");
-            } else {
-                setAuthStatus("unauthed");
-            }
-        }
-    );
-
-    return () => {
-        authListener.subscription.unsubscribe();
-    };
-
+    // Simulate checking auth status
+    setTimeout(() => {
+        setAuthStatus(mockIsAdminLoggedIn ? "authed" : "unauthed");
+    }, 500);
   }, []);
 
   const handleLoginSuccess = () => {
+    mockIsAdminLoggedIn = true;
     setAuthStatus("authed");
     router.refresh();
   };

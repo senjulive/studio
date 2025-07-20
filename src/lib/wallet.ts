@@ -4,15 +4,11 @@
 // This is a mock implementation of the wallet logic since Supabase has been removed.
 // It uses a simple JSON file to simulate a database.
 
-import { defaultTierSettings, getBotTierSettings } from './settings';
+import { getBotTierSettings } from './settings';
 import initialWallets from '../../data/wallets.json';
-import initialNotifications from '../../data/notifications.json';
-import initialChats from '../../data/chats.json';
 
 // Define the structure of our mock data
 let mockWallets: Record<string, any> = initialWallets;
-let mockNotifications: Record<string, any[]> = initialNotifications;
-let mockChats: Record<string, any[]> = initialChats;
 
 export type WalletData = any; // Simplified type
 export type ProfileData = any;

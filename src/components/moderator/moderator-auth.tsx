@@ -5,19 +5,18 @@ import * as React from 'react';
 import {Loader2} from 'lucide-react';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import {ModeratorProvider} from '@/contexts/ModeratorContext';
-import {createClient} from '@/lib/supabase/client';
 import {useRouter} from 'next/navigation';
-import {AdminLoginForm} from '../admin/admin-login-form';
 import {getModeratorStatus} from '@/lib/moderator';
+import { useUser } from '@/contexts/UserContext';
 
 export function ModeratorAuth({children}: {children: React.ReactNode}) {
   const router = useRouter();
+  const { user } = useUser();
   const [authStatus, setAuthStatus] = React.useState<
     'loading' | 'authed' | 'unauthed'
   >('loading');
@@ -25,12 +24,10 @@ export function ModeratorAuth({children}: {children: React.ReactNode}) {
 
   React.useEffect(() => {
     const checkModerator = async () => {
-      const supabase = createClient();
-      const {
-        data: {user},
-      } = await supabase.auth.getUser();
-
       if (user) {
+        // Since Supabase auth is gone, we can't get a real user object from server
+        // This is a placeholder for where you would check moderator status
+        // For now, let's assume the mock user is NOT a moderator
         const modStatus = await getModeratorStatus(user.id);
         if (modStatus && modStatus.status === 'active') {
           setAuthStatus('authed');
@@ -40,13 +37,14 @@ export function ModeratorAuth({children}: {children: React.ReactNode}) {
           router.push('/dashboard'); // Not a mod, or not active
         }
       } else {
+        // If no user, definitely unauthed.
         setAuthStatus('unauthed');
-        router.push('/'); // Not logged in
+        router.push('/');
       }
     };
 
     checkModerator();
-  }, [router]);
+  }, [router, user]);
 
   if (authStatus === 'loading') {
     return (
