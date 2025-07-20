@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,6 +40,14 @@
     --sidebar-accent-foreground: 272 100% 25%;
     --sidebar-border: 246 30% 92%;
     --sidebar-ring: 272 100% 25%;
+
+    /* Chart Colors for Ranks */
+    --color-recruit: 240 3.8% 46.1%;
+    --color-bronze: 24 9.8% 30%;
+    --color-silver: 240 4.8% 95.9%;
+    --color-gold: 47.9 95.8% 53.1%;
+    --color-platinum: 197.8 91.1% 47.6%;
+    --color-diamond: 270 95.2% 60.2%;
   }
 }
 

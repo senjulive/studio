@@ -21,6 +21,10 @@ export type WithdrawalAddresses = any;
 // A mock user ID to use throughout the app since there's no real login
 const MOCK_USER_ID = 'mock-user-123';
 
+export async function getAllWallets(): Promise<Record<string, WalletData>> {
+    return mockWallets;
+}
+
 export async function getOrCreateWallet(): Promise<WalletData> {
     const user = { id: MOCK_USER_ID }; // Simulate a logged-in user
 
