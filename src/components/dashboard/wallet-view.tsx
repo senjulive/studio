@@ -37,7 +37,6 @@ import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
 import { getBotTierSettings, getCurrentTier, type TierSetting } from "@/lib/settings";
-import { createClient } from "@/lib/supabase/client";
 
 type Transaction = {
   id: string;
@@ -170,27 +169,6 @@ export function WalletView() {
     fetchWalletData();
   }, [fetchWalletData]);
   
-  React.useEffect(() => {
-    if (!user) return;
-    const client = createClient();
-    const channel = client
-      .channel('wallet-changes')
-      .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'wallets',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          fetchWalletData();
-        }
-      )
-      .subscribe();
-    return () => {
-      client.removeChannel(channel);
-    }
-  }, [user, fetchWalletData]);
-
 
   React.useEffect(() => {
     setAllAssetsData(initialCryptoData);
@@ -258,7 +236,7 @@ export function WalletView() {
     }
 
     if(walletData.squad.members) {
-      walletData.squad.members.forEach((member, index) => {
+      walletData.squad.members.forEach((member: any, index: number) => {
         history.push({
           id: `squad-bonus-${index}-${member.id}`,
           type: "Team Earnings",
