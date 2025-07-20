@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 
 interface NewsArticlePageProps {
   params: { articleId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export default function NewsArticlePage({ params }: NewsArticlePageProps) {
