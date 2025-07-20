@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     description: "Read the latest news from the financial world.",
 };
 
-interface NewsArticlePageProps {
+type NewsArticlePageProps = {
   params: { articleId: string };
 };
 
