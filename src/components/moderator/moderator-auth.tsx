@@ -5,47 +5,46 @@ import * as React from 'react';
 import {Loader2} from 'lucide-react';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import {ModeratorProvider} from '@/contexts/ModeratorContext';
-import {createClient} from '@/lib/supabase/client';
 import {useRouter} from 'next/navigation';
-import {AdminLoginForm} from '../admin/admin-login-form';
 import {getModeratorStatus} from '@/lib/moderator';
 
+// Mock implementation after Supabase removal
 export function ModeratorAuth({children}: {children: React.ReactNode}) {
   const router = useRouter();
   const [authStatus, setAuthStatus] = React.useState<
     'loading' | 'authed' | 'unauthed'
   >('loading');
-  const [permissions, setPermissions] = React.useState(null);
-
+  
+  // In a non-Supabase world, you'd check a session/token and then verify moderator status.
+  // For this mock, we'll deny access by default.
   React.useEffect(() => {
-    const checkModerator = async () => {
-      const supabase = createClient();
-      const {
-        data: {user},
-      } = await supabase.auth.getUser();
+    async function checkModerator() {
+      // This is where you would call your new backend to verify if the user is a moderator.
+      // const isMod = await checkModeratorStatusOnBackend();
+      const isMod = false; // Mocking no moderator access
 
-      if (user) {
-        const modStatus = await getModeratorStatus(user.id);
-        if (modStatus && modStatus.status === 'active') {
-          setAuthStatus('authed');
-          setPermissions(modStatus.permissions);
-        } else {
-          setAuthStatus('unauthed');
-          router.push('/dashboard'); // Not a mod, or not active
-        }
+      if (isMod) {
+        // const permissions = await getPermissionsFromBackend();
+        // setAuthStatus('authed');
+        // setPermissions(permissions);
       } else {
         setAuthStatus('unauthed');
-        router.push('/'); // Not logged in
+        toast({ title: "Access Denied", description: "You do not have moderator permissions.", variant: "destructive" });
+        router.push('/dashboard'); 
       }
-    };
-
-    checkModerator();
+    }
+    
+    // checkModerator();
+    // For now, let's just show a loading state and then deny.
+    setTimeout(() => {
+        setAuthStatus('unauthed');
+        router.push('/dashboard');
+    }, 1500)
   }, [router]);
 
   if (authStatus === 'loading') {
@@ -64,12 +63,18 @@ export function ModeratorAuth({children}: {children: React.ReactNode}) {
     );
   }
 
+  // Since we are mocking denial, this part is effectively unused.
+  // In a real scenario, it would render the children.
   if (authStatus === 'authed') {
     return (
-      <ModeratorProvider permissions={permissions}>{children}</ModeratorProvider>
+      <ModeratorProvider permissions={{ customer_support: true, user_verification: true, deposit_approval: true }}>{children}</ModeratorProvider>
     );
   }
 
-  // Fallback, should be redirected
   return null;
+}
+
+// Dummy toast for the component to work
+const toast = (props: { title: string, description: string, variant: string }) => {
+    console.log(`TOAST: ${props.title} - ${props.description}`);
 }

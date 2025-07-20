@@ -21,7 +21,6 @@ import {
 } from "@/lib/notifications";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
-import { createClient } from "@/lib/supabase/client";
 
 function NotificationItem({ notification }: { notification: Notification }) {
     const content = (
@@ -30,7 +29,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
             <div className="flex-1 space-y-1">
                 <p className="font-medium text-sm">{notification.title}</p>
                 <p className="text-xs text-muted-foreground">{notification.content}</p>
-                <p className="text-xs text-muted-foreground/80">{formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}</p>
+                <p className="text-xs text-muted-foreground/80">{formatDistanceToNow(new Date(notification.date), { addSuffix: true })}</p>
             </div>
         </div>
     );
@@ -70,22 +69,16 @@ export function NotificationBell() {
     
     fetchNotifications();
 
-    const supabase = createClient();
-    const channel = supabase
-        .channel('notifications')
-        .on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${user.id}`
-        }, (payload) => {
-            console.log('New notification received:', payload);
+    // With Supabase removed, real-time updates are disabled.
+    // We can poll for new notifications as a fallback.
+    const interval = setInterval(() => {
+        if(document.visibilityState === 'visible') {
             fetchNotifications();
-        })
-        .subscribe();
-    
+        }
+    }, 30000); // Poll every 30 seconds
+
     return () => {
-        supabase.removeChannel(channel);
+        clearInterval(interval);
     }
   }, [user, fetchNotifications]);
   

@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -13,15 +14,12 @@ import {useToast} from '@/hooks/use-toast';
 import {Skeleton} from '@/components/ui/skeleton';
 import {
   Loader2,
-  PlusCircle,
-  Trash2,
   Users,
   UserCog,
-  ShieldQuestion,
   Power,
   PowerOff,
+  Trash2,
 } from 'lucide-react';
-import type {User} from '@supabase/supabase-js';
 import {
   Select,
   SelectContent,
@@ -44,6 +42,15 @@ type Moderator = {
   };
 };
 
+// Mock User type, simplified
+type User = {
+    id: string;
+    email: string;
+    user_metadata: {
+        username?: string;
+    }
+}
+
 export function ModeratorManager() {
   const {toast} = useToast();
   const [moderators, setModerators] = React.useState<Moderator[]>([]);
@@ -51,53 +58,29 @@ export function ModeratorManager() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
 
-  const fetchInitialData = React.useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [modRes, usersRes] = await Promise.all([
-        fetch('/api/admin/moderators'),
-        fetch('/api/admin/users', {method: 'POST'}),
-      ]);
-      if (!modRes.ok || !usersRes.ok)
-        throw new Error('Failed to fetch initial data.');
-
-      const modData = await modRes.json();
-      const usersData = await usersRes.json();
-
-      setModerators(modData);
-      setAllUsers(usersData);
-    } catch (error: any) {
-      toast({title: 'Error', description: error.message, variant: 'destructive'});
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
+  // Since Supabase is removed, we'll use mock data.
   React.useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
+    setIsLoading(true);
+    // Simulate fetching data
+    setTimeout(() => {
+        setModerators([]); // No moderators by default
+        setAllUsers([
+            { id: 'mock-user-123', email: 'user@example.com', user_metadata: { username: 'DefaultUser'}},
+            { id: 'mock-user-456', email: 'another@example.com', user_metadata: { username: 'AnotherUser'}},
+        ]);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   const handleSave = async () => {
     setIsSaving(true);
-    try {
-      const response = await fetch('/api/admin/moderators', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({moderators}),
-      });
-      const result = await response.json();
-      if (!response.ok)
-        throw new Error(result.error || 'Failed to save moderators.');
-      toast({
-        title: 'Moderators Updated',
-        description: 'The moderator settings have been saved.',
-      });
-      setModerators(result.data);
-    } catch (error: any) {
-      toast({title: 'Error', description: error.message, variant: 'destructive'});
-    } finally {
-      setIsSaving(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    toast({
+      title: 'Action Disabled',
+      description: 'Managing moderators is disabled in this mock environment.',
+    });
+    setIsSaving(false);
   };
 
   const handleAddModerator = (userId: string) => {
