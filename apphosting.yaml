@@ -1,6 +1,29 @@
 # Settings to manage and configure a Firebase App Hosting backend.
 # https://firebase.google.com/docs/app-hosting/configure
 
+# Specifies the node version to use when building and running your app.
+# If you don't need a specific version, you can remove this field.
+runtime: nodejs20
+
+# Settings that affect your build and deployment.
+build:
+  # The command that builds your app.
+  run: npm run build
+  # Where your app's build artifacts are located.
+  # This should be the directory that contains your .next folder.
+  outputDir: .
+
+# Settings that affect how your app is run.
+run:
+  # The command that starts your app.
+  command: npm run start
+  # The port your app listens on.
+  # App Hosting sets the PORT environment variable, and you should use it in your start command.
+  port: 3000
+
+# Settings to manage and configure a Firebase App Hosting backend.
+# https://firebase.google.com/docs/app-hosting/configure
+
 runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
