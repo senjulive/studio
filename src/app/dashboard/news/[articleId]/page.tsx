@@ -7,9 +7,8 @@ export const metadata: Metadata = {
 };
 
 type NewsArticlePageProps = {
-  params: {
-    articleId: string;
-  };
+  params: { articleId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export default function NewsArticlePage({ params }: NewsArticlePageProps) {
