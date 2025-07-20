@@ -78,7 +78,7 @@ export function VirtualCard({ walletData, userEmail, className }: VirtualCardPro
       <div className="z-10 mt-auto">
         <Cpu className="w-10 h-10 mb-2 text-yellow-300/80" />
         <p className="font-mono text-xl md:text-2xl tracking-widest">
-          {cardDetails?.cardNumber || '**** **** **** ****'}
+          {cardDetails?.cardNumber || '4000 1234 5678 ....'}
         </p>
       </div>
       

@@ -174,7 +174,7 @@ export default function DashboardLayout({
           <SidebarContent>
             <SidebarMenu>
               {menuItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
+                <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
                     isActive={
