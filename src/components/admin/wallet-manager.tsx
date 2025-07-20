@@ -58,7 +58,6 @@ import { sendAdminMessage } from "@/lib/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
 import { Badge } from "../ui/badge";
-import { logModeratorAction } from "@/lib/moderator";
 
 type MappedWallet = WalletData & { user_id: string };
 
@@ -180,9 +179,6 @@ export function WalletManager() {
     if (action === "add") {
       await sendAdminMessage(selectedUserId, `Credit received: ${values.amount.toFixed(8)} ${asset.toUpperCase()} has been added to your account.`);
       await addNotification(selectedUserId, { title: "AstralCore Deposit", content: `Your balance has been credited with ${values.amount} ${asset.toUpperCase()}.`, href: "/dashboard" });
-      await logModeratorAction(`Credited ${selectedWalletData.profile.username} with ${values.amount} ${asset.toUpperCase()}.`);
-    } else {
-      await logModeratorAction(`Debited ${selectedWalletData.profile.username} by ${values.amount} ${asset.toUpperCase()}.`);
     }
 
     const newWalletData: Partial<WalletData> = { balances: newBalances };
@@ -214,7 +210,6 @@ export function WalletManager() {
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedUserId, newWalletData });
     await sendAdminMessage(selectedUserId, `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`);
     await addNotification(selectedUserId, { title: "AstralCore Withdrawal", content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`, href: "/dashboard/withdraw" });
-    await logModeratorAction(`Completed withdrawal of ${withdrawal.amount.toFixed(2)} USDT for ${selectedWalletData.profile.username}.`);
     
     toast({ title: "Withdrawal Marked as Complete" });
     setIsCompleting(null);
@@ -223,7 +218,6 @@ export function WalletManager() {
   const handleResetAddress = async () => {
     if (!selectedUserId) return;
     await postAdminUpdate('/api/admin/reset-address', { userId: selectedUserId });
-    await logModeratorAction(`Reset withdrawal address for ${selectedWalletData?.profile.username}.`);
     toast({ title: "Withdrawal Address Reset", description: `Successfully reset withdrawal address for ${selectedUserId}.` });
   };
 
