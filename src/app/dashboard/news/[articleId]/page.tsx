@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     description: "Read the latest news from the financial world.",
 };
 
-type NewsArticlePageProps = {
+interface NewsArticlePageProps {
   params: { articleId: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
