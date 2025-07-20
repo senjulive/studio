@@ -6,7 +6,13 @@ export const metadata: Metadata = {
     description: "Read the latest news from the financial world.",
 };
 
-export default function NewsArticlePage({ params }: { params: { articleId: string } }) {
+type NewsArticlePageProps = {
+  params: {
+    articleId: string;
+  };
+};
+
+export default function NewsArticlePage({ params }: NewsArticlePageProps) {
   return (
     <NewsArticleView articleId={params.articleId} />
   );
