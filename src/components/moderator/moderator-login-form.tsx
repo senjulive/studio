@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { login } from "@/lib/auth";
 
 const moderatorLoginSchema = z.object({
   email: z.string().email(),
@@ -42,27 +42,28 @@ export function ModeratorLoginForm({ onLoginSuccess }: { onLoginSuccess: () => v
     resolver: zodResolver(moderatorLoginSchema),
     defaultValues: {
       email: MOCK_MODERATOR_EMAIL,
-      password: "",
+      password: "moderator", // Pre-fill for demo
     },
   });
 
   const onSubmit = async (values: ModeratorLoginFormValues) => {
     setIsLoading(true);
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { error } = await login(values);
 
-    if (values.email === MOCK_MODERATOR_EMAIL && values.password === "moderator") {
+    if (error) {
+       toast({
+        title: "Login Failed",
+        description: error,
+        variant: "destructive",
+      });
+    } else {
+      sessionStorage.setItem('loggedInEmail', values.email);
       toast({
         title: "Moderator Login Successful",
         description: "Welcome to the AstralCore Moderator panel.",
       });
       onLoginSuccess();
-    } else {
-      toast({
-        title: "Login Failed",
-        description: "Invalid credentials. Please try again.",
-        variant: "destructive",
-      });
     }
 
     setIsLoading(false);
@@ -89,7 +90,7 @@ export function ModeratorLoginForm({ onLoginSuccess }: { onLoginSuccess: () => v
                 <FormItem>
                   <FormLabel>Moderator Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="moderator@example.com" {...field} readOnly />
+                    <Input placeholder="moderator@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

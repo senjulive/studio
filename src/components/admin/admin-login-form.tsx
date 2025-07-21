@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -33,7 +32,6 @@ const adminLoginSchema = z.object({
 
 type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
 
-// A mock admin email for display purposes
 const MOCK_ADMIN_EMAIL = "admin@astralcore.io";
 
 export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void }) {
@@ -44,28 +42,28 @@ export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void 
     resolver: zodResolver(adminLoginSchema),
     defaultValues: {
       email: MOCK_ADMIN_EMAIL,
-      password: "",
+      password: "admin", // Pre-fill for demo purposes
     },
   });
 
   const onSubmit = async (values: AdminLoginFormValues) => {
     setIsLoading(true);
     
-    // Simulate login
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { error } = await login(values);
 
-    if (values.email === MOCK_ADMIN_EMAIL && values.password === "admin") {
+    if (error) {
+       toast({
+        title: "Login Failed",
+        description: error,
+        variant: "destructive",
+      });
+    } else {
+      sessionStorage.setItem('loggedInEmail', values.email);
       toast({
         title: "Admin Login Successful",
         description: "Welcome to the AstralCore AI panel.",
       });
       onLoginSuccess();
-    } else {
-      toast({
-        title: "Login Failed",
-        description: "Invalid credentials. Please try again.",
-        variant: "destructive",
-      });
     }
 
     setIsLoading(false);
@@ -92,7 +90,7 @@ export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void 
                 <FormItem>
                   <FormLabel>Admin Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="admin@example.com" {...field} readOnly />
+                    <Input placeholder="admin@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

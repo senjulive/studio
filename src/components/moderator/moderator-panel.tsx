@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -20,6 +19,7 @@ import {VerificationManager} from '@/components/admin/verification-manager';
 import {DepositManager} from './deposit-manager';
 import {SupportManager} from './support-manager';
 import {useModerator} from '@/contexts/ModeratorContext';
+import { cn } from '@/lib/utils';
 
 export function ModeratorPanel() {
   const {permissions} = useModerator();
@@ -79,7 +79,11 @@ export function ModeratorPanel() {
         <Tabs defaultValue={availableTabs[0].id} className="w-full">
           <TooltipProvider>
             <TabsList
-              className={`grid w-full grid-cols-${availableTabs.length} gap-2`}
+              className={cn("grid w-full gap-2", {
+                "grid-cols-1": availableTabs.length === 1,
+                "grid-cols-2": availableTabs.length === 2,
+                "grid-cols-3": availableTabs.length === 3,
+              })}
             >
               {availableTabs.map(tab => (
                 <Tooltip key={tab.id}>

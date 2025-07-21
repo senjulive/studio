@@ -1,34 +1,33 @@
+"use client";
 
-'use client';
-
-import * as React from 'react';
-import {Loader2} from 'lucide-react';
+import * as React from "react";
+import { Loader2 } from "lucide-react";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import {ModeratorProvider} from '@/contexts/ModeratorContext';
-import {useRouter} from 'next/navigation';
-import { ModeratorLoginForm } from './moderator-login-form';
+} from "@/components/ui/card";
+import { ModeratorProvider } from "@/contexts/ModeratorContext";
+import { ModeratorLoginForm } from "./moderator-login-form";
 
-export function ModeratorAuth({children}: {children: React.ReactNode}) {
-  const router = useRouter();
-  const [authStatus, setAuthStatus] = React.useState<
-    'loading' | 'authed' | 'unauthed'
-  >('unauthed');
+export function ModeratorAuth({ children }: { children: React.ReactNode }) {
+  const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
 
   React.useEffect(() => {
-    setAuthStatus('unauthed');
+    const loggedInEmail = sessionStorage.getItem('loggedInEmail');
+    if (loggedInEmail === 'moderator@astralcore.io') {
+      setAuthStatus("authed");
+    } else {
+      setAuthStatus("unauthed");
+    }
   }, []);
-  
+
   const handleLoginSuccess = () => {
-    setAuthStatus('authed');
-    router.refresh();
+    setAuthStatus("authed");
   };
 
-  if (authStatus === 'loading') {
+  if (authStatus === "loading") {
     return (
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
@@ -43,10 +42,13 @@ export function ModeratorAuth({children}: {children: React.ReactNode}) {
       </Card>
     );
   }
-  
-  if (authStatus === 'authed') {
+
+  if (authStatus === "authed") {
+    // For the mock app, moderators have all permissions
     return (
-      <ModeratorProvider permissions={{ customer_support: true, user_verification: true, deposit_approval: true }}>{children}</ModeratorProvider>
+      <ModeratorProvider permissions={{ customer_support: true, user_verification: true, deposit_approval: true }}>
+        {children}
+      </ModeratorProvider>
     );
   }
 

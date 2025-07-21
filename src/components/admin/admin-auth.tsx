@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -10,23 +9,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AdminProvider } from "@/contexts/AdminContext";
-import { useRouter } from "next/navigation";
 import { AdminLoginForm } from "./admin-login-form";
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  // Simplified auth status for mock environment
-  const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("unauthed");
+  const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
 
-  // In a real app, you would have a session check here.
-  // For now, we'll just show the login form.
   React.useEffect(() => {
-    setAuthStatus("unauthed");
+    // Check session storage to see if admin was logged in
+    const loggedInEmail = sessionStorage.getItem('loggedInEmail');
+    if (loggedInEmail === 'admin@astralcore.io') {
+      setAuthStatus("authed");
+    } else {
+      setAuthStatus("unauthed");
+    }
   }, []);
+
 
   const handleLoginSuccess = () => {
     setAuthStatus("authed");
-    router.refresh();
   };
 
   if (authStatus === "loading") {
@@ -49,6 +49,5 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
     return <AdminProvider>{children}</AdminProvider>;
   }
 
-  // If not authenticated, show the login form.
   return <AdminLoginForm onLoginSuccess={handleLoginSuccess} />;
 }

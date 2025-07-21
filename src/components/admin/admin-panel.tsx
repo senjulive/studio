@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -58,7 +57,7 @@ export function AdminPanel() {
       <CardContent>
         <Tabs defaultValue="analytics" className="w-full">
           <TooltipProvider>
-            <TabsList className="grid w-full grid-cols-11 gap-1">
+            <TabsList className="grid w-full grid-cols-10 gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <TabsTrigger value="analytics" className="text-xs px-2"><LayoutDashboard className="h-4 w-4 mr-1"/>Dashboard</TabsTrigger>

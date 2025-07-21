@@ -1,32 +1,34 @@
-
 'use server';
 
-// This is a mock implementation of the wallet logic since Supabase has been removed.
-// It uses a simple JSON file to simulate a database.
-
-import { defaultTierSettings, getBotTierSettings } from './settings';
+import { getBotTierSettings, getCurrentTier } from './tiers';
 import initialWallets from '../../data/wallets.json';
-import initialNotifications from '../../data/notifications.json';
-import initialChats from '../../data/chats.json';
 
-// Define the structure of our mock data
 let mockWallets: Record<string, any> = initialWallets;
-let mockNotifications: Record<string, any[]> = initialNotifications;
-let mockChats: Record<string, any[]> = initialChats;
+const MOCK_USER_ID = 'mock-user-123';
 
-export type WalletData = any; // Simplified type
+export type WalletData = any;
 export type ProfileData = any;
 export type WithdrawalAddresses = any;
-
-// A mock user ID to use throughout the app since there's no real login
-const MOCK_USER_ID = 'mock-user-123';
 
 export async function getAllWallets(): Promise<Record<string, WalletData>> {
     return mockWallets;
 }
 
+export async function getWalletByUserId(userId: string): Promise<WalletData | null> {
+    return mockWallets[userId] || null;
+}
+
+export async function updateWalletByUserId(userId: string, newData: Partial<WalletData>): Promise<WalletData | null> {
+    if (!mockWallets[userId]) {
+        return null;
+    }
+    const updatedWallet = { ...mockWallets[userId], ...newData };
+    mockWallets[userId] = updatedWallet;
+    return updatedWallet;
+}
+
 export async function getOrCreateWallet(): Promise<WalletData> {
-    const user = { id: MOCK_USER_ID }; // Simulate a logged-in user
+    const user = { id: MOCK_USER_ID };
 
     if (!user) {
         throw new Error("User not authenticated.");
@@ -35,7 +37,6 @@ export async function getOrCreateWallet(): Promise<WalletData> {
     let wallet = mockWallets[user.id];
 
     if (wallet && wallet.profile) {
-        // Daily reset logic for the mock wallet
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000;
         const growthData = wallet.growth as any;
@@ -44,29 +45,25 @@ export async function getOrCreateWallet(): Promise<WalletData> {
         if (now - lastReset > oneDay) {
             const settings = await getBotTierSettings();
             const balance = wallet.balances?.usdt || 0;
-            const currentTier = [...settings].reverse().find(tier => balance >= tier.balanceThreshold) || settings[0];
+            const currentTier = getCurrentTier(balance, settings);
             
-            wallet.growth.clicksLeft = currentTier.clicks;
-            wallet.growth.lastReset = new Date().toISOString();
-            wallet.growth.dailyEarnings = 0;
+            if(currentTier) {
+                wallet.growth.clicksLeft = currentTier.clicks;
+                wallet.growth.lastReset = new Date().toISOString();
+                wallet.growth.dailyEarnings = 0;
+            }
         }
         return wallet;
     }
 
-    // If wallet doesn't exist, return the default mock wallet
     return initialWallets['mock-user-123'];
 }
-
 
 export async function updateWallet(newData: Partial<WalletData>): Promise<WalletData | null> {
     const user = { id: MOCK_USER_ID };
     if (!user) throw new Error("User not authenticated.");
 
-    const currentWallet = mockWallets[user.id] || {};
-    const updatedWallet = { ...currentWallet, ...newData };
-    mockWallets[user.id] = updatedWallet;
-    
-    return updatedWallet;
+    return updateWalletByUserId(user.id, newData);
 }
 
 export async function saveWithdrawalAddress(asset: string, address: string): Promise<void> {
