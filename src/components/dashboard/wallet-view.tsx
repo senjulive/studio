@@ -3,15 +3,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Repeat, Lock } from "lucide-react";
+import { Repeat, Lock, LineChart, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight } from "lucide-react";
 import type { SVGProps } from 'react';
-
-import { DepositIcon } from "@/components/icons/nav/deposit-icon";
-import { MarketIcon } from "@/components/icons/nav/market-icon";
-import { ProfileIcon } from "@/components/icons/nav/profile-icon";
-import { SquadIcon } from "@/components/icons/nav/squad-icon";
-import { SupportIcon } from "@/components/icons/nav/support-icon";
-import { WithdrawIcon } from "@/components/icons/nav/withdraw-icon";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -83,13 +76,13 @@ type CryptoData = {
 };
 
 const quickAccessItems = [
-  { href: "/dashboard/market", label: "Market", icon: MarketIcon },
-  { href: "/dashboard/deposit", label: "Deposit", icon: DepositIcon },
+  { href: "/dashboard/market", label: "Market", icon: LineChart },
+  { href: "/dashboard/deposit", label: "Deposit", icon: WalletIcon },
   { href: "/dashboard/trading", label: "Trade", icon: Repeat },
-  { href: "/dashboard/profile", label: "Profile", icon: ProfileIcon },
-  { href: "/dashboard/support", label: "Support", icon: SupportIcon },
-  { href: "/dashboard/squad", label: "Squad", icon: SquadIcon },
-  { href: "/dashboard/withdraw", label: "Withdraw", icon: WithdrawIcon },
+  { href: "/dashboard/profile", label: "Profile", icon: User },
+  { href: "/dashboard/support", label: "Support", icon: HeartHandshake },
+  { href: "/dashboard/squad", label: "Squad", icon: Users },
+  { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowLeftRight },
 ];
 
 const initialCryptoData: CryptoData[] = [
