@@ -34,7 +34,6 @@ const PerformanceItem = ({ label, value, className }: { label: string; value: st
 
 export function ProTraderView() {
     const [activePair, setActivePair] = React.useState('BTC/USDT');
-    const [activeTimeframe, setActiveTimeframe] = React.useState('1h');
     const [activeChartTab, setActiveChartTab] = React.useState('Candlestick');
 
     return (
@@ -54,13 +53,6 @@ export function ProTraderView() {
                     {['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XRP/USDT'].map(pair => (
                         <button key={pair} onClick={() => setActivePair(pair)} className={cn("pair-btn", activePair === pair && "active")}>
                             {pair}
-                        </button>
-                    ))}
-                </div>
-                <div className="timeframe-selector">
-                    {['1m', '5m', '15m', '1h', '4h'].map(tf => (
-                        <button key={tf} onClick={() => setActiveTimeframe(tf)} className={cn("timeframe-btn", activeTimeframe === tf && "active")}>
-                            {tf}
                         </button>
                     ))}
                 </div>
@@ -84,7 +76,7 @@ export function ProTraderView() {
                     <div className="chart-container">
                         {/* Placeholder for actual chart */}
                         <div className="flex items-center justify-center h-full text-slate-500">
-                             Chart for {activePair} ({activeTimeframe}) - {activeChartTab}
+                             Chart for {activePair} - {activeChartTab}
                         </div>
                     </div>
                      <div className="price-display">
