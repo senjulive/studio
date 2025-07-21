@@ -31,19 +31,24 @@ import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { HomeIcon } from '@/components/icons/nav/home-icon';
-import { MarketIcon } from '@/components/icons/nav/market-icon';
-import { DepositIcon } from '@/components/icons/nav/deposit-icon';
-import { WithdrawIcon } from '@/components/icons/nav/withdraw-icon';
-import { SquadIcon } from '@/components/icons/nav/squad-icon';
-import { ProfileIcon } from '@/components/icons/nav/profile-icon';
-import { SupportIcon } from '@/components/icons/nav/support-icon';
-import { AboutIcon } from '@/components/icons/nav/about-icon';
-import { DownloadIcon } from '@/components/icons/nav/download-icon';
-import { SettingsIcon } from '@/components/icons/nav/settings-icon';
-import { LogoutIcon } from '@/components/icons/nav/logout-icon';
-import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Repeat, Megaphone, Shield, Home, LineChart, Users, User, LayoutGrid } from 'lucide-react';
+import { 
+    UserPlus, 
+    Repeat, 
+    Megaphone, 
+    Shield, 
+    Home, 
+    LineChart, 
+    Users, 
+    User, 
+    Wallet, 
+    ArrowLeftRight, 
+    HeartHandshake, 
+    Info, 
+    Download, 
+    Settings, 
+    LogOut, 
+    Inbox 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -109,18 +114,18 @@ export default function DashboardLayout({
   }, []);
 
   const baseMenuItems = [
-    { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
+    { href: '/dashboard', label: 'Home', icon: Home },
+    { href: '/dashboard/market', label: 'Market', icon: LineChart },
     { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
-    { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
-    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-    { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
+    { href: '/dashboard/deposit', label: 'Deposit', icon: Wallet },
+    { href: '/dashboard/withdraw', label: 'Withdraw', icon: ArrowLeftRight },
+    { href: '/dashboard/squad', label: 'Squad', icon: Users },
     { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
-    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
+    { href: '/dashboard/profile', label: 'Profile', icon: User },
     { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
-    { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/about', label: 'About', icon: AboutIcon },
+    { href: '/dashboard/inbox', label: 'Inbox', icon: Inbox },
+    { href: '/dashboard/support', label: 'Support', icon: HeartHandshake },
+    { href: '/dashboard/about', label: 'About', icon: Info },
   ];
   
   if (isAdmin) {
@@ -136,7 +141,7 @@ export default function DashboardLayout({
       {
         href: downloadHref,
         label: 'Download App',
-        icon: DownloadIcon,
+        icon: Download,
         download: 'AstralCore.url',
       },
   ]
@@ -239,19 +244,19 @@ export default function DashboardLayout({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/profile">
-                    <ProfileIcon className="mr-2 h-4 w-4" />
+                    <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/security">
-                    <SettingsIcon className="mr-2 h-4 w-4" />
+                    <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
-                  <LogoutIcon className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -274,7 +279,7 @@ export default function DashboardLayout({
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
                 <Link href="/dashboard/inbox">
-                  <InboxIcon className="h-5 w-5" />
+                  <Inbox className="h-5 w-5" />
                   <span className="sr-only">Inbox</span>
                 </Link>
               </Button>
