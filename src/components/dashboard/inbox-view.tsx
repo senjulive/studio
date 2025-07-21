@@ -44,7 +44,7 @@ function NotificationCard({ notification }: { notification: Notification }) {
                   {!notification.read && <span className="h-2 w-2 rounded-full bg-primary" />}
                   {notification.title}
                 </CardTitle>
-                <CardDescription>{formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}</CardDescription>
+                <CardDescription>{formatDistanceToNow(new Date(notification.date), { addSuffix: true })}</CardDescription>
             </div>
              {notification.href && <Button asChild size="sm" variant="outline"><Link href={notification.href}>View</Link></Button>}
         </div>
