@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import Image from "next/image";
 import {
   Table,
@@ -29,8 +28,6 @@ import type { MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp, Scale, Landmark, Bitcoin } from 'lucide-react';
-import { allMockNews, type NewsItem } from "@/lib/news";
-
 
 type GenericAsset = {
   id: string;
@@ -114,42 +111,31 @@ export function MarketView() {
   const [selectedAsset, setSelectedAsset] = React.useState<GenericAsset | null>(null);
   const [summary, setSummary] = React.useState<MarketSummaryOutput | null>(null);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  const [news, setNews] = React.useState<NewsItem[]>([]);
   
   React.useEffect(() => {
     setData(initialCryptoData);
     setSelectedAsset(initialCryptoData.find(c => c.ticker === 'BTC') || initialCryptoData[0]);
     setIsLoading(false);
 
-    // Set up news cycling
-    let newsIndex = 0;
-    const cycleNews = () => {
-      setNews(allMockNews.slice(newsIndex, newsIndex + 5));
-      newsIndex = (newsIndex + 1) % (allMockNews.length - 4);
-    };
-    cycleNews(); // Initial set
-    const newsInterval = setInterval(cycleNews, 120000); // every 2 minutes
+    const timer = setTimeout(() => {
+        const allData = {
+            crypto: initialCryptoData,
+            stocks: initialStockData,
+            commodities: initialCommodityData,
+            forex: initialForexData,
+        };
+        
+        setData(allData.crypto);
+        setSelectedAsset(allData.crypto[0]);
+        setIsLoading(false);
+    }, 1500);
+
 
     return () => {
       clearTimeout(timer);
-      clearInterval(newsInterval);
     };
     
   }, []);
-
-
-  const timer = setTimeout(() => {
-      const allData = {
-          crypto: initialCryptoData,
-          stocks: initialStockData,
-          commodities: initialCommodityData,
-          forex: initialForexData,
-      };
-      
-      setData(allData.crypto);
-      setSelectedAsset(allData.crypto[0]);
-      setIsLoading(false);
-  }, 1500);
 
   const handleTabChange = (tab: string) => {
     let newDataSet: GenericAsset[] = [];
@@ -359,33 +345,6 @@ export function MarketView() {
           </Tabs>
       </div>
       <div className="lg:col-span-1 space-y-6">
-        <Card>
-            <CardHeader>
-                <CardTitle>Market News</CardTitle>
-                <CardDescription>Latest headlines from the crypto world.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                {isLoading ? (
-                     <div className="space-y-4">
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {news.map(item => (
-                            <Link key={item.id} href={`/dashboard/news/${item.id}`} className="block p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                                <p className="font-semibold text-sm text-foreground">{item.title}</p>
-                                <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
-                                    <span>{item.source}</span>
-                                    <span>{item.timeAgo}</span>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
-            </CardContent>
-        </Card>
         <Card>
           <CardHeader>
             <CardTitle>AI Market Summary</CardTitle>
