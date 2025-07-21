@@ -27,6 +27,7 @@ import {
 import { logout } from '@/lib/auth';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -51,7 +52,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
-import { NotificationBell } from '@/components/dashboard/notification-bell';
 
 // Mock user object
 const mockUser = {
@@ -182,7 +182,7 @@ export default function DashboardLayout({
   return (
     <UserProvider value={{ user: user as any }}>
       <SidebarProvider>
-        <Sidebar>
+        <Sidebar variant="floating" collapsible="icon">
           <SidebarHeader>
             <div className="flex items-center gap-2">
               <AstralLogo className="h-8 w-8" />
@@ -200,6 +200,7 @@ export default function DashboardLayout({
                     isActive={
                       isClient ? pathname === item.href && !item.download : false
                     }
+                    tooltip={item.label}
                   >
                     <Link href={item.href} download={item.download}>
                       <item.icon />
@@ -265,11 +266,10 @@ export default function DashboardLayout({
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
+          <header className="flex h-14 items-center gap-4 border-b bg-background/60 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
             <SidebarTrigger />
             <div className="w-full flex-1">
               <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                <AstralLogo className="h-6 w-6" />
                 {isClient ? (
                   <span>{getPageTitle()}</span>
                 ) : (
@@ -330,10 +330,10 @@ export default function DashboardLayout({
               </DropdownMenu>
             </div>
           </header>
-          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
+          <main className="flex-1 p-4 md:p-6 pb-20">
             {children}
           </main>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10 md:hidden">
+          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
             {bottomNavItems.map((item, index) => (
               <Link
                 key={item.href}
@@ -347,7 +347,7 @@ export default function DashboardLayout({
               >
                 {item.label === 'Trading' ? (
                   <div className="absolute -top-6 flex items-center justify-center">
-                     <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center">
+                     <div className="h-14 w-14 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
                         <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                            <item.icon className="h-6 w-6" />
                         </div>
