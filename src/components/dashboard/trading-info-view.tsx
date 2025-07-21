@@ -5,46 +5,17 @@ import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Gem, Trophy, TrendingUp, Unlock } from "lucide-react";
-import { getBotTierSettings, type TierSetting as TierSettingData } from "@/lib/settings";
+import { type TierSetting as TierSettingData } from "@/lib/tiers";
 import { ranks } from "@/lib/ranks";
 import { Badge } from "@/components/ui/badge";
 import type { SVGProps } from 'react';
-import { RecruitTierIcon } from '@/components/icons/tiers/recruit-tier-icon';
-import { BronzeTierIcon } from '@/components/icons/tiers/bronze-tier-icon';
-import { SilverTierIcon } from '@/components/icons/tiers/silver-tier-icon';
-import { GoldTierIcon } from '@/components/icons/tiers/gold-tier-icon';
-import { PlatinumTierIcon } from '@/components/icons/tiers/platinum-tier-icon';
-import { DiamondTierIcon } from '@/components/icons/tiers/diamond-tier-icon';
-import { Lock } from 'lucide-react';
-
-// Re-map icons on the client-side
-const tierIcons: { [key: string]: (props: SVGProps<SVGSVGElement>) => JSX.Element } = {
-    'tier-1': RecruitTierIcon,
-    'tier-2': BronzeTierIcon,
-    'tier-3': SilverTierIcon,
-    'tier-4': GoldTierIcon,
-    'tier-5': PlatinumTierIcon,
-    'tier-6': DiamondTierIcon,
-    'tier-7': Lock,
-    'tier-8': Lock,
-};
-
-const tierClassNames: { [key: string]: string } = {
-    'tier-1': 'text-muted-foreground',
-    'tier-2': 'text-orange-600',
-    'tier-3': 'text-slate-400',
-    'tier-4': 'text-amber-500',
-    'tier-5': 'text-sky-400',
-    'tier-6': 'text-purple-400',
-    'tier-7': 'text-muted-foreground',
-    'tier-8': 'text-muted-foreground',
-};
+import { Skeleton } from "@/components/ui/skeleton";
+import { tierIcons, tierClassNames } from '@/lib/settings';
 
 type TierSetting = TierSettingData & {
   Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
   className: string;
 };
-
 
 const Section = ({ title, icon: Icon, children }: { title: string, icon?: React.ElementType, children: React.ReactNode }) => (
     <div className="space-y-4">
@@ -58,16 +29,31 @@ const Section = ({ title, icon: Icon, children }: { title: string, icon?: React.
 
 export function TradingInfoView() {
   const [tierSettings, setTierSettings] = React.useState<TierSetting[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     async function fetchSettings() {
-        const settingsData = await getBotTierSettings();
-        const settingsWithComponents = settingsData.map(tier => ({
-            ...tier,
-            Icon: tierIcons[tier.id] || RecruitTierIcon,
-            className: tierClassNames[tier.id] || 'text-muted-foreground',
-        }));
-        setTierSettings(settingsWithComponents);
+        setIsLoading(true);
+        try {
+            const response = await fetch('/api/public-settings?key=botTierSettings');
+            if (!response.ok) throw new Error('Failed to fetch tier settings');
+            const settingsData = await response.json();
+            
+            if (settingsData) {
+                const settingsWithComponents = settingsData.map((tier: TierSettingData) => ({
+                    ...tier,
+                    Icon: tierIcons[tier.id] || tierIcons['tier-1'],
+                    className: tierClassNames[tier.id] || 'text-muted-foreground',
+                }));
+                setTierSettings(settingsWithComponents);
+            }
+        } catch (error) {
+            console.error(error);
+            // Set empty array on error
+            setTierSettings([]);
+        } finally {
+            setIsLoading(false);
+        }
     }
     fetchSettings();
   }, []);
@@ -104,29 +90,41 @@ export function TradingInfoView() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tierSettings.map((tier) => (
-                                <TableRow key={tier.id}>
-                                    <TableCell className="font-medium">
-                                        <div className="flex items-center gap-2">
-                                            <tier.Icon className="h-5 w-5" />
-                                            <span className={tier.className}>{tier.name}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right font-mono">${tier.balanceThreshold.toLocaleString()}</TableCell>
-                                    <TableCell className="text-right font-mono">{tier.clicks}</TableCell>
-                                    <TableCell className="text-right font-mono text-green-600">~{(tier.dailyProfit * 100).toFixed(1)}%</TableCell>
-                                    <TableCell className="text-right">
-                                        {tier.name.includes('VII') || tier.name.includes('VIII') ? (
-                                            <Badge variant="secondary">Locked</Badge>
-                                        ) : (
-                                            <Badge variant="outline" className="text-green-600 border-green-600/50">
-                                                <Unlock className="mr-1 h-3 w-3" />
-                                                Available
-                                            </Badge>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                            {isLoading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-24 ml-auto" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-16 ml-auto" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-20 ml-auto" /></TableCell>
+                                        <TableCell><Skeleton className="h-6 w-24 ml-auto" /></TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                tierSettings.map((tier) => (
+                                    <TableRow key={tier.id}>
+                                        <TableCell className="font-medium">
+                                            <div className="flex items-center gap-2">
+                                                <tier.Icon className="h-5 w-5" />
+                                                <span className={tier.className}>{tier.name}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right font-mono">${tier.balanceThreshold.toLocaleString()}</TableCell>
+                                        <TableCell className="text-right font-mono">{tier.clicks}</TableCell>
+                                        <TableCell className="text-right font-mono text-green-600">~{(tier.dailyProfit * 100).toFixed(1)}%</TableCell>
+                                        <TableCell className="text-right">
+                                            {tier.name.includes('VII') || tier.name.includes('VIII') ? (
+                                                <Badge variant="secondary">Locked</Badge>
+                                            ) : (
+                                                <Badge variant="outline" className="text-green-600 border-green-600/50">
+                                                    <Unlock className="mr-1 h-3 w-3" />
+                                                    Available
+                                                </Badge>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </Card>
@@ -148,20 +146,32 @@ export function TradingInfoView() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tierSettings.filter(t => t.balanceThreshold > 0).map((tier) => (
-                                <TableRow key={`earnings-${tier.id}`} className={tier.name.includes('VII') || tier.name.includes('VIII') ? 'opacity-50' : ''}>
-                                    <TableCell className="font-medium">
-                                        <div className="flex items-center gap-2">
-                                            <tier.Icon className="h-5 w-5" />
-                                            <span className={tier.className}>{tier.name}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 15).toFixed(2)}</TableCell>
-                                    <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 30).toFixed(2)}</TableCell>
-                                    <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 60).toFixed(2)}</TableCell>
-                                    <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 90).toFixed(2)}</TableCell>
-                                </TableRow>
-                            ))}
+                             {isLoading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-24 ml-auto" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-24 ml-auto" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-24 ml-auto" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-24 ml-auto" /></TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                tierSettings.filter(t => t.balanceThreshold > 0).map((tier) => (
+                                    <TableRow key={`earnings-${tier.id}`} className={tier.name.includes('VII') || tier.name.includes('VIII') ? 'opacity-50' : ''}>
+                                        <TableCell className="font-medium">
+                                            <div className="flex items-center gap-2">
+                                                <tier.Icon className="h-5 w-5" />
+                                                <span className={tier.className}>{tier.name}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 15).toFixed(2)}</TableCell>
+                                        <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 30).toFixed(2)}</TableCell>
+                                        <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 60).toFixed(2)}</TableCell>
+                                        <TableCell className="text-right font-mono text-green-600">${calculateEarnings(tier.balanceThreshold, tier.dailyProfit, 90).toFixed(2)}</TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </Card>
@@ -181,11 +191,13 @@ export function TradingInfoView() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {ranks.map((rank) => (
+                            {ranks.map((rank) => {
+                                const RankIcon = tierIcons[rank.Icon] || tierIcons['tier-1'];
+                                return (
                                 <TableRow key={rank.name}>
                                     <TableCell className="font-medium">
                                         <div className="flex items-center gap-2">
-                                            <rank.Icon className="h-5 w-5" />
+                                            <RankIcon className="h-5 w-5" />
                                             <span className={rank.className}>{rank.name}</span>
                                         </div>
                                     </TableCell>
@@ -201,7 +213,7 @@ export function TradingInfoView() {
                                         )}
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )})}
                         </TableBody>
                     </Table>
                 </Card>
