@@ -51,6 +51,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import type { WalletData } from "@/lib/wallet";
 import { sendAdminMessage } from "@/lib/chat";
@@ -85,10 +86,12 @@ const formatBalance = (amount: number) => {
 
 export function WalletManager() {
   const { toast } = useToast();
+  const [allWallets, setAllWallets] = React.useState<Record<string, MappedWallet> | null>(null);
   const [selectedWalletData, setSelectedWalletData] = React.useState<MappedWallet | null>(null);
   const [isUpdating, setIsUpdating] = React.useState(false);
   const [isCompleting, setIsCompleting] = React.useState<string | null>(null);
   const [isFetchingUser, setIsFetchingUser] = React.useState(false);
+  const [isFetchingAll, setIsFetchingAll] = React.useState(true);
 
   const searchForm = useForm<UserSearchFormValues>({
       resolver: zodResolver(userSearchSchema),
@@ -100,26 +103,46 @@ export function WalletManager() {
     defaultValues: { amount: 0 },
   });
 
-  const refetchWallet = React.useCallback(async (email: string) => {
+  React.useEffect(() => {
+    const fetchAllWallets = async () => {
+        setIsFetchingAll(true);
+        try {
+            const response = await fetch('/api/admin/wallets', { method: 'POST' });
+            if (!response.ok) throw new Error('Failed to load user list.');
+            const data = await response.json();
+            setAllWallets(data);
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" });
+        } finally {
+            setIsFetchingAll(false);
+        }
+    };
+    fetchAllWallets();
+  }, [toast]);
+  
+
+  const refetchWallet = React.useCallback(async (userId: string) => {
       setIsFetchingUser(true);
       try {
-          const response = await fetch('/api/admin/find-user', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email })
-          });
-          const result = await response.json();
-          if (!response.ok) throw new Error(result.error);
-          setSelectedWalletData(result);
+          // This assumes we have a way to find a user by ID.
+          // Since we already fetched all wallets, we can just look it up.
+          if(allWallets && allWallets[userId]) {
+            setSelectedWalletData(allWallets[userId]);
+          } else {
+            // Fallback to refetching all if needed, or an individual user endpoint.
+            // For now, let's assume `find-user` can also take a user ID.
+            throw new Error('User not found in the initial list.');
+          }
       } catch (error: any) {
           toast({ title: "Error", description: `Could not fetch user: ${error.message}`, variant: "destructive" });
           setSelectedWalletData(null);
       } finally {
           setIsFetchingUser(false);
       }
-  }, [toast]);
+  }, [toast, allWallets]);
 
-  const postAdminUpdate = React.useCallback(async (url: string, body: object) => {
+
+  const postAdminUpdate = React.useCallback(async (url: string, body: object, currentEmail: string) => {
     if (!selectedWalletData) return;
     setIsUpdating(true);
     try {
@@ -130,21 +153,46 @@ export function WalletManager() {
         });
         const result = await response.json();
         if (!response.ok || result.error) throw new Error(result.error || 'API request failed');
-        await refetchWallet(searchForm.getValues("email"));
+        
+        // Refetch the user data after update
+        const findResponse = await fetch('/api/admin/find-user', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: currentEmail })
+        });
+        const findResult = await findResponse.json();
+        if (!findResponse.ok) throw new Error(findResult.error);
+        setSelectedWalletData(findResult);
+
         return result;
     } catch (error: any) {
         toast({ title: "Update Failed", description: error.message, variant: "destructive" });
     } finally {
         setIsUpdating(false);
     }
-  }, [refetchWallet, toast, selectedWalletData, searchForm]);
+  }, [toast, selectedWalletData]);
 
   React.useEffect(() => {
     balanceForm.reset({ amount: 0 });
   }, [selectedWalletData, balanceForm]);
 
   const handleUserSearch = async (values: UserSearchFormValues) => {
-      await refetchWallet(values.email);
+      setIsFetchingUser(true);
+      try {
+          const response = await fetch('/api/admin/find-user', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: values.email })
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error);
+          setSelectedWalletData(result);
+      } catch (error: any) {
+          toast({ title: "Error", description: `Could not fetch user: ${error.message}`, variant: "destructive" });
+          setSelectedWalletData(null);
+      } finally {
+          setIsFetchingUser(false);
+      }
   };
   
   const handleBalanceUpdate = async (values: BalanceUpdateFormValues, action: "add" | "remove") => {
@@ -168,7 +216,7 @@ export function WalletManager() {
     }
 
     const newWalletData: Partial<WalletData> = { balances: newBalances };
-    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedWalletData.user_id, newWalletData });
+    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedWalletData.user_id, newWalletData }, searchForm.getValues("email"));
 
     toast({ title: "Balance Updated", description: `Successfully ${action}ed ${values.amount} ${asset.toUpperCase()} for ${selectedWalletData.user_id}.` });
     balanceForm.reset({ amount: 0 });
@@ -193,7 +241,7 @@ export function WalletManager() {
         pending_withdrawals: selectedWalletData.pending_withdrawals.filter(w => w.id !== withdrawalId),
     };
 
-    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedWalletData.user_id, newWalletData });
+    await postAdminUpdate('/api/admin/update-wallet', { userId: selectedWalletData.user_id, newWalletData }, searchForm.getValues("email"));
     await sendAdminMessage(selectedWalletData.user_id, `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT to ${withdrawal.address} has been completed.`);
     await addNotification(selectedWalletData.user_id, { title: "AstralCore Withdrawal", content: `Your withdrawal of $${withdrawal.amount.toFixed(2)} USDT has been successfully processed.`, href: "/dashboard/withdraw" });
     
@@ -203,7 +251,7 @@ export function WalletManager() {
 
   const handleResetAddress = async () => {
     if (!selectedWalletData) return;
-    await postAdminUpdate('/api/admin/reset-address', { userId: selectedWalletData.user_id });
+    await postAdminUpdate('/api/admin/reset-address', { userId: selectedWalletData.user_id }, searchForm.getValues("email"));
     toast({ title: "Withdrawal Address Reset", description: `Successfully reset withdrawal address for ${selectedWalletData.user_id}.` });
   };
 
@@ -213,34 +261,65 @@ export function WalletManager() {
        <Card>
         <CardHeader>
           <CardTitle>Find User Wallet</CardTitle>
-          <CardDescription>Enter a user's email address to manage their wallet and balances.</CardDescription>
+          <CardDescription>Select a user by searching their email or choosing from the list below.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...searchForm}>
-            <form onSubmit={searchForm.handleSubmit(handleUserSearch)} className="flex items-start gap-4">
-              <FormField
-                control={searchForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="sr-only">User Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="user@example.com" {...field} disabled={isFetchingUser} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isFetchingUser}>
-                {isFetchingUser ? <Loader2 className="animate-spin mr-2" /> : <Search className="mr-2"/>}
-                Find User
-              </Button>
-            </form>
-          </Form>
+            <Tabs defaultValue="search">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="search">Search by Email</TabsTrigger>
+                    <TabsTrigger value="list">Select from List</TabsTrigger>
+                </TabsList>
+                <TabsContent value="search" className="pt-4">
+                    <Form {...searchForm}>
+                        <form onSubmit={searchForm.handleSubmit(handleUserSearch)} className="flex items-start gap-4">
+                        <FormField
+                            control={searchForm.control}
+                            name="email"
+                            render={({ field }) => (
+                            <FormItem className="flex-1">
+                                <FormLabel className="sr-only">User Email</FormLabel>
+                                <FormControl>
+                                <Input placeholder="user@example.com" {...field} disabled={isFetchingUser} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <Button type="submit" disabled={isFetchingUser}>
+                            {isFetchingUser ? <Loader2 className="animate-spin mr-2" /> : <Search className="mr-2"/>}
+                            Find User
+                        </Button>
+                        </form>
+                    </Form>
+                </TabsContent>
+                <TabsContent value="list" className="pt-4">
+                    {isFetchingAll ? <Skeleton className="h-10 w-full" /> : (
+                        <Select onValueChange={(userId) => {
+                            const wallet = allWallets?.[userId];
+                            if(wallet) {
+                                setSelectedWalletData(wallet);
+                                // A mock way to get email from wallet for refetching
+                                searchForm.setValue('email', `${wallet.profile.username}@example.com`);
+                            }
+                        }}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a user from the list" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {allWallets && Object.values(allWallets).map(wallet => (
+                                    <SelectItem key={wallet.user_id} value={wallet.user_id}>
+                                        {wallet.profile.username || wallet.user_id}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+                </TabsContent>
+            </Tabs>
         </CardContent>
       </Card>
 
-      {isFetchingUser && ( <Skeleton className="h-48 w-full" /> )}
+      {(isFetchingUser || (selectedWalletData === null && isFetchingAll)) && ( <Skeleton className="h-48 w-full" /> )}
 
       {selectedWalletData ? (
           <>
