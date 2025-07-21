@@ -26,8 +26,26 @@ export function TradingBotCard({
   tierSettings: TierSetting[];
 }) {
   const [isAnimating, setIsAnimating] = React.useState(false);
+  const [minGridBalance, setMinGridBalance] = React.useState(0);
 
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    async function fetchBotSettings() {
+      try {
+        const response = await fetch('/api/public-settings?key=botSettings');
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.minGridBalance !== undefined) {
+            setMinGridBalance(data.minGridBalance);
+          }
+        }
+      } catch (error) {
+        console.error("Could not fetch bot settings, using default.", error);
+      }
+    }
+    fetchBotSettings();
+  }, []);
 
   const currentTier = getCurrentTier(totalBalance, tierSettings);
   
@@ -40,17 +58,17 @@ export function TradingBotCard({
     : 0;
 
   const canStart =
-    totalBalance >= 100 && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
+    totalBalance >= minGridBalance && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
 
 
   const handleStart = async () => {
     if (!canStart || !currentTier) {
       if (isAnimating) {
         toast({ title: "Bot is already running." });
-      } else if (totalBalance < 100) {
+      } else if (totalBalance < minGridBalance) {
         toast({
           title: "Insufficient Balance",
-          description: "You need at least $100 to run the bot.",
+          description: `You need at least $${minGridBalance.toFixed(2)} to run the bot.`,
           variant: "destructive"
         });
       } else if ((walletData?.growth?.clicksLeft ?? 0) <= 0) {
@@ -134,13 +152,13 @@ export function TradingBotCard({
                     <div className="flex flex-col items-center justify-center text-center h-[9.25rem] rounded-lg bg-muted/50 p-4 animate-in fade-in-0 duration-300">
                         {canStart ? (
                         <BotAnimationPreview />
-                        ) : totalBalance < 100 ? (
+                        ) : totalBalance < minGridBalance ? (
                             <Zap className="h-8 w-8 mb-2 text-muted-foreground" />
                         ) : (
                             <AstralLogo className="h-10 w-10 mb-2 text-muted-foreground" />
                         )}
                         <p className="font-semibold text-card-foreground mt-2">
-                        {canStart ? 'START GRID' : totalBalance < 100 ? 'Minimum $100 balance required' : 'No grids remaining'}
+                        {canStart ? 'START GRID' : totalBalance < minGridBalance ? `Minimum $${minGridBalance.toFixed(2)} balance required` : 'No grids remaining'}
                         </p>
                         <p className="text-xs text-muted-foreground">
                             {canStart && currentTier ? `Earn up to ${(currentTier.dailyProfit * 100).toFixed(1)}% daily.` : ''}
