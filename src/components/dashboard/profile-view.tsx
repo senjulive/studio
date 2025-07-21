@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Wand2, Loader2, Save } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Upload, X } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
@@ -128,8 +128,9 @@ export function ProfileView() {
   const [isLoading, setIsLoading] = React.useState(true);
   const { user } = useUser();
   const [showVerificationPopup, setShowVerificationPopup] = React.useState(false);
-  const [isGenerating, setIsGenerating] = React.useState(false);
-  const [prompt, setPrompt] = React.useState("");
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [preview, setPreview] = React.useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchWallet = React.useCallback(async () => {
@@ -162,17 +163,36 @@ export function ProfileView() {
 
   }, [user, fetchWallet, walletData?.profile.verificationStatus]);
 
-  const handleGenerateAvatar = async () => {
-    if (!prompt.trim() || !user?.id || !walletData) return;
-    setIsGenerating(true);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({ title: "File too large", description: "Please select an image smaller than 5MB.", variant: "destructive" });
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        toast({ title: "Invalid File Type", description: "Please select an image file (PNG, JPG, etc.).", variant: "destructive" });
+        return;
+      }
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadAvatar = async () => {
+    if (!selectedFile || !user?.id || !walletData) return;
+    setIsUploading(true);
     try {
-      const response = await fetch('/api/generate-avatar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
+      const avatarDataUri = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(event.target?.result as string);
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(selectedFile);
       });
-      if (!response.ok) throw new Error('Failed to generate avatar.');
-      const { avatarDataUri } = await response.json();
       
       const updatedWallet: WalletData = {
         ...walletData,
@@ -184,12 +204,13 @@ export function ProfileView() {
 
       await updateWallet(updatedWallet);
       setWalletData(updatedWallet);
-      toast({ title: "Avatar Generated!", description: "Your new profile picture has been set." });
+      toast({ title: "Avatar Updated!", description: "Your new profile picture has been saved." });
+      setSelectedFile(null);
+      setPreview(null);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
-      setIsGenerating(false);
-      setPrompt("");
+      setIsUploading(false);
     }
   };
 
@@ -273,39 +294,46 @@ export function ProfileView() {
               <VirtualCard walletData={walletData} userEmail={user?.email || null} />
             </div>
 
-            <Dialog>
+            <Dialog onOpenChange={() => { setPreview(null); setSelectedFile(null); }}>
                 <DialogTrigger asChild>
                     <Button variant="outline" className="w-full mb-6">
-                        <Wand2 className="mr-2 h-4 w-4" />
-                        Generate AI Avatar
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                        Change Avatar
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Create Your Avatar</DialogTitle>
+                        <DialogTitle>Upload a New Avatar</DialogTitle>
                         <DialogDescription>
-                            Describe the avatar you want to generate. Be creative!
+                            Select an image from your device. Recommended size: 400x400 pixels.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
-                        <Input
-                            placeholder="e.g., a crystal astronaut helmet"
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            disabled={isGenerating}
-                        />
-                        {isGenerating && (
-                            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-md">
-                                <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-                                <p className="text-sm font-medium">Generating your masterpiece...</p>
-                                <p className="text-xs text-muted-foreground">This can take a moment.</p>
-                            </div>
-                        )}
+                        <Input id="avatar-upload" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                        <label htmlFor="avatar-upload" className={cn(
+                            "w-full aspect-square rounded-md border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground cursor-pointer hover:border-primary hover:text-primary transition-colors",
+                            preview && "border-solid border-primary"
+                        )}>
+                            {preview ? (
+                                <div className="relative w-full h-full">
+                                    <Image src={preview} alt="Avatar preview" layout="fill" objectFit="cover" className="rounded-md" />
+                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 z-10" onClick={(e) => { e.preventDefault(); setPreview(null); setSelectedFile(null); }}>
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ) : (
+                                <>
+                                    <Upload className="h-8 w-8 mb-2" />
+                                    <span className="text-sm font-medium">Click to upload</span>
+                                    <span className="text-xs">PNG, JPG, or WEBP (max 5MB)</span>
+                                </>
+                            )}
+                        </label>
                     </div>
                     <DialogFooter>
-                        <Button onClick={handleGenerateAvatar} disabled={isGenerating || !prompt.trim()}>
-                            {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                            Generate & Save
+                        <Button onClick={handleUploadAvatar} disabled={isUploading || !selectedFile}>
+                            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                            Save Avatar
                         </Button>
                     </DialogFooter>
                 </DialogContent>
