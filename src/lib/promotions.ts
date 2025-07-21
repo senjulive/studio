@@ -12,18 +12,14 @@ export type Promotion = {
   status: 'Upcoming' | 'Active' | 'Expired';
 };
 
-const mockPromotions: Promotion[] = [
+const mockPromotions: Omit<Promotion, 'id' | 'created_at'>[] = [
     {
-        id: 'promo-1',
-        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         title: "Summer Trading Bonus",
         description: "Get a 10% bonus on all deposits made during the summer season. Don't miss out on this hot offer!",
         image_url: "https://placehold.co/600x400.png",
         status: "Active"
     },
     {
-        id: 'promo-2',
-        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
         title: "New User Welcome Gift",
         description: "All new users who verify their account receive a free $25 trading voucher.",
         image_url: "https://placehold.co/600x400.png",
@@ -33,5 +29,10 @@ const mockPromotions: Promotion[] = [
 
 // Fetches all promotions from the mock data
 export async function getPromotions(): Promise<Promotion[]> {
-    return mockPromotions;
+    // Add dynamic IDs and created_at dates to simulate a real database
+    return mockPromotions.map((p, index) => ({
+        ...p,
+        id: `promo-${index + 1}`,
+        created_at: new Date(Date.now() - (index + 1) * 2 * 24 * 60 * 60 * 1000).toISOString(),
+    }));
 }

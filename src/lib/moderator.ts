@@ -20,9 +20,8 @@ export async function getModeratorStatus(
 }
 
 export async function logModeratorAction(
-  action: string,
-  metadata?: any
+  action: string
 ): Promise<void> {
   // This would send a log to your new backend.
-  console.log(`Moderator Action: ${action}`, metadata);
+  console.log(`Moderator Action: ${action}`);
 }

@@ -32,7 +32,6 @@ import {
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog";
-import { logModeratorAction } from "@/lib/moderator";
 
 type VerificationData = WalletData & {
     profile: ProfileData
@@ -75,7 +74,6 @@ export function VerificationManager() {
         if (!response.ok || result.error) throw new Error(result.error || 'API request failed');
         
         await refetchVerifications();
-        await logModeratorAction(`Verified user ${username}.`);
         toast({ title: "User Manually Verified", description: `Successfully verified ${username}.` });
     } catch (error: any) {
         toast({ title: "Update Failed", description: error.message, variant: "destructive" });

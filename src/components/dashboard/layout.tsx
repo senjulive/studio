@@ -47,7 +47,7 @@ import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 
-// Mock user object since Supabase is removed
+// Mock user object
 const mockUser = {
   id: 'mock-user-123',
   email: 'user@example.com',
@@ -71,8 +71,6 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = React.useState<any | null>(null);
-  const [isAdmin, setIsAdmin] = React.useState(false);
-  const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
@@ -80,9 +78,6 @@ export default function DashboardLayout({
     // Simulate user session check
     setTimeout(() => {
       setUser(mockUser);
-      // You can toggle this to test admin/moderator views
-      setIsAdmin(false); 
-      setIsModerator(false);
       setIsInitializing(false);
     }, 500);
   }, []);
@@ -97,7 +92,7 @@ export default function DashboardLayout({
     }
   }, []);
 
-  const baseMenuItems = [
+  const menuItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
     { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
@@ -110,25 +105,13 @@ export default function DashboardLayout({
     { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
     { href: '/dashboard/about', label: 'About', icon: AboutIcon },
-  ];
-  
-  if (isAdmin) {
-    baseMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
-  }
-  if (isModerator) {
-    baseMenuItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
-  }
-
-
-  const menuItems = [
-      ...baseMenuItems,
-      {
+    {
         href: downloadHref,
         label: 'Download App',
         icon: DownloadIcon,
         download: 'AstralCore.url',
-      },
-  ]
+    },
+  ];
 
   const handleLogout = async () => {
     await logout();
