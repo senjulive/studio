@@ -28,7 +28,7 @@ export async function getBotTierSettings(): Promise<TierSetting[]> {
 }
 
 export const getCurrentTier = (balance: number, tiers: TierSetting[]): TierSetting | null => {
-    if (tiers.length === 0) return null;
+    if (!tiers || tiers.length === 0) return null;
     const applicableTier = [...tiers].reverse().find(
       tier => balance >= tier.balanceThreshold && !tier.name.includes('VII') && !tier.name.includes('VIII')
     );
