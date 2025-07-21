@@ -3,7 +3,6 @@
 
 import * as React from "react";
 import { Info, Loader2, Clock } from "lucide-react";
-import { v4 as uuidv4 } from 'uuid';
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -125,7 +124,7 @@ export function WithdrawView() {
     setIsWithdrawing(true);
 
     const withdrawalRequest = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         amount: withdrawAmount,
         asset: 'usdt' as const,
         address: savedAddresses.usdt,

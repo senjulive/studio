@@ -16,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, PlusCircle, Trash2, Megaphone } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "../ui/scroll-area";
-import { v4 as uuidv4 } from 'uuid';
 
 const announcementSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long."),
@@ -84,7 +83,7 @@ export function AnnouncementManager() {
   const onSubmit = async (values: AnnouncementFormValues) => {
     setIsSubmitting(true);
     const newAnnouncement: Announcement = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         title: values.title,
         content: values.content,
         date: new Date().toISOString().split('T')[0],
