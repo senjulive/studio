@@ -25,7 +25,7 @@ type CryptoData = {
   id: string;
   name: string;
   ticker: string;
-  iconUrl: string;
+  iconUrl?: string;
   price: number;
   change24h: number;
   priceHistory: { value: number }[];
@@ -65,13 +65,15 @@ export function LiveTradingChart({ coin }: LiveTradingChartProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <Image
-            src={coin.iconUrl}
-            alt={`${coin.name} logo`}
-            width={40}
-            height={40}
-            className="rounded-full"
-          />
+          {coin.iconUrl && (
+            <Image
+              src={coin.iconUrl}
+              alt={`${coin.name} logo`}
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+          )}
           <div>
             <CardTitle className="flex items-center gap-2">
               {coin.name}
