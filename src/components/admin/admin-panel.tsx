@@ -1,5 +1,7 @@
+
 'use client';
 
+import * as React from 'react';
 import {
   Card,
   CardContent,
@@ -7,13 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 import {
   Shield,
   WalletCards,
@@ -27,18 +23,51 @@ import {
   Activity,
   LayoutDashboard,
 } from 'lucide-react';
-import {WalletManager} from './wallet-manager';
-import {MessageViewer} from './message-viewer';
-import {BotSettingsManager} from './bot-settings-manager';
-import {AnnouncementManager} from './announcement-manager';
-import {SiteSettingsManager} from './site-settings-manager';
-import {VerificationManager} from './verification-manager';
-import {PromotionManager} from './promotion-manager';
-import {ModeratorManager} from './moderator-manager';
-import {ActionLogViewer} from './action-log-viewer';
+import { WalletManager } from './wallet-manager';
+import { MessageViewer } from './message-viewer';
+import { BotSettingsManager } from './bot-settings-manager';
+import { AnnouncementManager } from './announcement-manager';
+import { SiteSettingsManager } from './site-settings-manager';
+import { VerificationManager } from './verification-manager';
+import { PromotionManager } from './promotion-manager';
+import { ModeratorManager } from './moderator-manager';
+import { ActionLogViewer } from './action-log-viewer';
 import { AnalyticsManager } from './analytics/AnalyticsManager';
+import { cn } from '@/lib/utils';
+
+type AdminView =
+  | 'analytics'
+  | 'wallets'
+  | 'messages'
+  | 'verifications'
+  | 'moderators'
+  | 'action-log'
+  | 'announcements'
+  | 'promotions'
+  | 'bot-settings'
+  | 'site-settings';
+
+const adminTabs = [
+    { id: 'analytics', label: 'Dashboard', icon: LayoutDashboard, component: <AnalyticsManager /> },
+    { id: 'wallets', label: 'Wallets', icon: WalletCards, component: <WalletManager /> },
+    { id: 'messages', label: 'Messages', icon: Mail, component: <MessageViewer /> },
+    { id: 'verifications', label: 'Verifications', icon: UserCheck, component: <VerificationManager /> },
+    { id: 'moderators', label: 'Moderators', icon: Users, component: <ModeratorManager /> },
+    { id: 'action-log', label: 'Action Log', icon: Activity, component: <ActionLogViewer /> },
+    { id: 'announcements', label: 'Alerts', icon: Megaphone, component: <AnnouncementManager /> },
+    { id: 'promotions', label: 'Promotions', icon: Gift, component: <PromotionManager /> },
+    { id: 'bot-settings', label: 'Bot Settings', icon: Bot, component: <BotSettingsManager /> },
+    { id: 'site-settings', label: 'Site Settings', icon: Settings, component: <SiteSettingsManager /> },
+] as const;
 
 export function AdminPanel() {
+    const [activeView, setActiveView] = React.useState<AdminView>('analytics');
+
+    const renderContent = () => {
+        const activeTab = adminTabs.find(tab => tab.id === activeView);
+        return activeTab ? activeTab.component : null;
+    };
+
   return (
     <Card className="w-full max-w-7xl">
       <CardHeader>
@@ -55,102 +84,25 @@ export function AdminPanel() {
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="analytics" className="w-full">
-          <TooltipProvider>
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 h-auto">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="analytics" className="w-full"><LayoutDashboard className="h-4 w-4 mr-1"/>Dashboard</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Analytics Dashboard</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="wallets" className="w-full"><WalletCards className="h-4 w-4 mr-1"/>Wallets</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Manage User Wallets</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="messages" className="w-full"><Mail className="h-4 w-4 mr-1"/>Messages</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>View Messages</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="verifications" className="w-full"><UserCheck className="h-4 w-4 mr-1"/>Verifications</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Manage Verifications</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="moderators" className="w-full"><Users className="h-4 w-4 mr-1"/>Moderators</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Manage Moderators</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="action-log" className="w-full"><Activity className="h-4 w-4 mr-1"/>Logs</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Moderator Action Log</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="announcements" className="w-full"><Megaphone className="h-4 w-4 mr-1"/>Alerts</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Announcements</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="promotions" className="w-full"><Gift className="h-4 w-4 mr-1"/>Promotions</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Promotions</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="bot-settings" className="w-full"><Bot className="h-4 w-4 mr-1"/>Bot</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Bot Settings</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="site-settings" className="w-full"><Settings className="h-4 w-4 mr-1"/>Site</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Site Settings</p></TooltipContent>
-              </Tooltip>
-            </TabsList>
-          </TooltipProvider>
-          <TabsContent value="analytics" className="mt-6">
-            <AnalyticsManager />
-          </TabsContent>
-          <TabsContent value="wallets" className="mt-6">
-            <WalletManager />
-          </TabsContent>
-          <TabsContent value="messages" className="mt-6">
-            <MessageViewer />
-          </TabsContent>
-          <TabsContent value="verifications" className="mt-6">
-            <VerificationManager />
-          </TabsContent>
-          <TabsContent value="moderators" className="mt-6">
-            <ModeratorManager />
-          </TabsContent>
-          <TabsContent value="action-log" className="mt-6">
-            <ActionLogViewer />
-          </TabsContent>
-          <TabsContent value="announcements" className="mt-6">
-            <AnnouncementManager />
-          </TabsContent>
-          <TabsContent value="promotions" className="mt-6">
-            <PromotionManager />
-          </TabsContent>
-          <TabsContent value="bot-settings" className="mt-6">
-            <BotSettingsManager />
-          </TabsContent>
-          <TabsContent value="site-settings" className="mt-6">
-            <SiteSettingsManager />
-          </TabsContent>
-        </Tabs>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {adminTabs.map(tab => {
+                const Icon = tab.icon;
+                return (
+                    <Button
+                        key={tab.id}
+                        variant={activeView === tab.id ? 'default' : 'outline'}
+                        onClick={() => setActiveView(tab.id)}
+                        className="h-auto py-4 flex flex-col gap-2 items-center justify-center text-center"
+                    >
+                        <Icon className="h-6 w-6" />
+                        <span className="text-sm font-medium">{tab.label}</span>
+                    </Button>
+                );
+            })}
+        </div>
+        <div>
+            {renderContent()}
+        </div>
       </CardContent>
     </Card>
   );
