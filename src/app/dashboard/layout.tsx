@@ -46,6 +46,7 @@ import { InboxIcon } from '@/components/icons/nav/inbox-icon';
 import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
+import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
 
 // Mock user object
 const mockUser = {
@@ -71,23 +72,30 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = React.useState<any | null>(null);
+  const [wallet, setWallet] = React.useState<WalletData | null>(null);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
   React.useEffect(() => {
-    // Simulate user session check
-    setTimeout(() => {
-        // Use sessionStorage to get role based on login
-        const loggedInEmail = sessionStorage.getItem('loggedInEmail');
-        const userEmail = loggedInEmail || mockUser.email;
+    const initializeUser = async () => {
+        const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
+        const currentUser = { ...mockUser, email: loggedInEmail };
         
-        setUser({ ...mockUser, email: userEmail });
-        setIsAdmin(userEmail === 'admin@astralcore.io');
-        setIsModerator(userEmail === 'moderator@astralcore.io');
+        setUser(currentUser);
+        setIsAdmin(loggedInEmail === 'admin@astralcore.io');
+        setIsModerator(loggedInEmail === 'moderator@astralcore.io');
+
+        if (currentUser.id) {
+          const walletData = await getOrCreateWallet(currentUser.id);
+          setWallet(walletData);
+        }
+        
         setIsInitializing(false);
-    }, 500);
+    };
+    
+    initializeUser();
   }, []);
 
   React.useEffect(() => {
@@ -144,8 +152,9 @@ export default function DashboardLayout({
 
   const bottomNavItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
+    { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
+    { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
+    { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
   ];
 
@@ -162,6 +171,7 @@ export default function DashboardLayout({
   };
 
   const isClient = typeof window !== 'undefined';
+  const avatarUrl = wallet?.profile?.avatarUrl;
 
   return (
     <UserProvider value={{ user: user as any }}>
@@ -200,8 +210,7 @@ export default function DashboardLayout({
                 <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent/50">
                   <Avatar className="h-8 w-8">
                     <AvatarImage
-                      src={`https://placehold.co/100x100.png`}
-                      data-ai-hint="abstract user"
+                      src={avatarUrl}
                       alt="@user"
                     />
                     <AvatarFallback>{userInitial}</AvatarFallback>
@@ -276,19 +285,30 @@ export default function DashboardLayout({
             {children}
           </main>
           <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10 md:hidden">
-            {bottomNavItems.map((item) => (
+            {bottomNavItems.map((item, index) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors',
+                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
                   isClient && pathname === item.href
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                <item.icon className="h-6 w-6" />
-                <span>{item.label}</span>
+                {item.label === 'Trading' ? (
+                  <div className="absolute -top-6 flex items-center justify-center">
+                     <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center">
+                        <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                           <item.icon className="h-6 w-6" />
+                        </div>
+                     </div>
+                  </div>
+                ) : (
+                  <item.icon className="h-6 w-6" />
+                )}
+                
+                <span className={cn(item.label === 'Trading' && 'mt-10')}>{item.label}</span>
               </Link>
             ))}
           </nav>
