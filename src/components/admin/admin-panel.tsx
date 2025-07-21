@@ -57,64 +57,64 @@ export function AdminPanel() {
       <CardContent>
         <Tabs defaultValue="analytics" className="w-full">
           <TooltipProvider>
-            <TabsList className="grid w-full grid-cols-10 gap-1">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 h-auto">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="analytics" className="text-xs px-2"><LayoutDashboard className="h-4 w-4 mr-1"/>Dashboard</TabsTrigger>
+                  <TabsTrigger value="analytics" className="w-full"><LayoutDashboard className="h-4 w-4 mr-1"/>Dashboard</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Analytics Dashboard</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="wallets" className="text-xs px-2"><WalletCards className="h-4 w-4 mr-1"/>Wallets</TabsTrigger>
+                  <TabsTrigger value="wallets" className="w-full"><WalletCards className="h-4 w-4 mr-1"/>Wallets</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Manage User Wallets</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="messages" className="text-xs px-2"><Mail className="h-4 w-4 mr-1"/>Messages</TabsTrigger>
+                  <TabsTrigger value="messages" className="w-full"><Mail className="h-4 w-4 mr-1"/>Messages</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>View Messages</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="verifications" className="text-xs px-2"><UserCheck className="h-4 w-4 mr-1"/>Verifications</TabsTrigger>
+                  <TabsTrigger value="verifications" className="w-full"><UserCheck className="h-4 w-4 mr-1"/>Verifications</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Manage Verifications</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="moderators" className="text-xs px-2"><Users className="h-4 w-4 mr-1"/>Moderators</TabsTrigger>
+                  <TabsTrigger value="moderators" className="w-full"><Users className="h-4 w-4 mr-1"/>Moderators</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Manage Moderators</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="action-log" className="text-xs px-2"><Activity className="h-4 w-4 mr-1"/>Logs</TabsTrigger>
+                  <TabsTrigger value="action-log" className="w-full"><Activity className="h-4 w-4 mr-1"/>Logs</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Moderator Action Log</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="announcements" className="text-xs px-2"><Megaphone className="h-4 w-4 mr-1"/>Alerts</TabsTrigger>
+                  <TabsTrigger value="announcements" className="w-full"><Megaphone className="h-4 w-4 mr-1"/>Alerts</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Announcements</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="promotions" className="text-xs px-2"><Gift className="h-4 w-4 mr-1"/>Promotions</TabsTrigger>
+                  <TabsTrigger value="promotions" className="w-full"><Gift className="h-4 w-4 mr-1"/>Promotions</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Promotions</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="bot-settings" className="text-xs px-2"><Bot className="h-4 w-4 mr-1"/>Bot</TabsTrigger>
+                  <TabsTrigger value="bot-settings" className="w-full"><Bot className="h-4 w-4 mr-1"/>Bot</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Bot Settings</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="site-settings" className="text-xs px-2"><Settings className="h-4 w-4 mr-1"/>Site</TabsTrigger>
+                  <TabsTrigger value="site-settings" className="w-full"><Settings className="h-4 w-4 mr-1"/>Site</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Site Settings</p></TooltipContent>
               </Tooltip>
