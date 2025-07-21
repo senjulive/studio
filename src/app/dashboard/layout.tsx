@@ -23,7 +23,6 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
-  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { logout } from '@/lib/auth';
 import * as React from 'react';
@@ -45,11 +44,9 @@ import {
     HeartHandshake,
     Info,
     Download,
-    Star,
-    Send,
-    FileText,
-    Archive,
-    Trash2
+    Megaphone,
+    UserPlus,
+    Repeat
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
@@ -116,28 +113,38 @@ export default function DashboardLayout({
     }
   }, []);
 
-  const primaryMenuItems = [
-    { href: '/dashboard/inbox', label: 'Inbox', icon: Inbox },
-    { href: '/dashboard/favorites', label: 'Favourite', icon: Star },
-    { href: '/dashboard/sent', label: 'Sent', icon: Send },
-    { href: '/dashboard/drafts', label: 'Draft', icon: FileText },
-    { href: '/dashboard/archive', label: 'Archive', icon: Archive },
-    { href: '/dashboard/trash', label: 'Trash', icon: Trash2 },
-  ];
-
-  const secondaryMenuItems = [
+  const baseMenuItems = [
+    { href: '/dashboard', label: 'Home', icon: Home },
+    { href: '/dashboard/market', label: 'Market', icon: LineChart },
+    { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
+    { href: '/dashboard/deposit', label: 'Deposit', icon: Wallet },
+    { href: '/dashboard/withdraw', label: 'Withdraw', icon: ArrowLeftRight },
+    { href: '/dashboard/squad', label: 'Squad', icon: Users },
+    { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
     { href: '/dashboard/profile', label: 'Profile', icon: User },
-    { href: '/dashboard/settings', label: 'Settings', icon: Settings },
-    // Logout is handled separately in the footer
+    { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
+    { href: '/dashboard/inbox', label: 'Inbox', icon: Inbox },
+    { href: '/dashboard/support', label: 'Support', icon: HeartHandshake },
+    { href: '/dashboard/about', label: 'About', icon: Info },
   ];
-
-  const adminMenuItems = [];
+  
   if (isAdmin) {
-    adminMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
+    baseMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
   }
   if (isModerator) {
-    adminMenuItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
+    baseMenuItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
   }
+
+
+  const menuItems = [
+      ...baseMenuItems,
+      {
+        href: downloadHref,
+        label: 'Download App',
+        icon: Download,
+        download: 'AstralCore.url',
+      },
+  ]
 
   const handleLogout = async () => {
     sessionStorage.removeItem('loggedInEmail');
@@ -162,8 +169,8 @@ export default function DashboardLayout({
 
   const getPageTitle = () => {
     if (pathname === '/dashboard') return 'Home';
-    const allItems = [...primaryMenuItems, ...secondaryMenuItems, ...adminMenuItems];
-    const currentItem = allItems.find((item) => item.href === pathname);
+    if (pathname === '/dashboard/trading') return 'Astral Core Trading';
+    const currentItem = menuItems.find((item) => item.href === pathname);
     return currentItem
       ? currentItem.label
       : pathname.split('/').pop()?.replace('-', ' ') || 'Dashboard';
@@ -186,42 +193,15 @@ export default function DashboardLayout({
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-              {primaryMenuItems.map((item) => (
+              {menuItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
-                    isActive={ isClient ? pathname === item.href : false }
+                    isActive={
+                      isClient ? pathname === item.href && !item.download : false
+                    }
                   >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-            <SidebarSeparator />
-            <SidebarMenu>
-              {secondaryMenuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={ isClient ? pathname === item.href : false }
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-               {adminMenuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={ isClient ? pathname === item.href : false }
-                  >
-                    <Link href={item.href}>
+                    <Link href={item.href} download={item.download}>
                       <item.icon />
                       <span>{item.label}</span>
                     </Link>
@@ -270,7 +250,7 @@ export default function DashboardLayout({
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/settings">
+                  <Link href="/dashboard/security">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
@@ -336,7 +316,7 @@ export default function DashboardLayout({
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard/settings">
+                    <Link href="/dashboard/security">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </Link>
