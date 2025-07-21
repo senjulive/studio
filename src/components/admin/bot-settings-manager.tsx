@@ -1,49 +1,25 @@
+
 "use client";
 
 import * as React from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { defaultTierSettings } from "@/lib/tiers";
+import { defaultSiteSettings } from "@/lib/site-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Trash2, PlusCircle } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const tierSchema = z.object({
-  id: z.string(),
-  name: z.string().min(1, "Name is required."),
-  balanceThreshold: z.coerce.number().min(0, "Threshold must be non-negative."),
-  dailyProfit: z.coerce.number().min(0, "Profit rate must be non-negative."),
-  clicks: z.coerce.number().int().min(1, "Clicks must be at least 1."),
-});
-
 const settingsSchema = z.object({
-  tiers: z.array(tierSchema),
+  minGridBalance: z.coerce.number().min(0, "Minimum balance must be a positive number."),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
-const BOT_TIERS_KEY = 'botTierSettings';
-
-const toRoman = (num: number): string => {
-    if (num < 1 || num > 3999) return num.toString();
-    const romanMap: [number, string][] = [
-        [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'],
-        [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
-    ];
-    let result = '';
-    for (const [value, symbol] of romanMap) {
-        while (num >= value) {
-            result += symbol;
-            num -= value;
-        }
-    }
-    return result;
-};
-
+const BOT_SETTINGS_KEY = 'botSettings';
 
 export function BotSettingsManager() {
   const { toast } = useToast();
@@ -53,86 +29,64 @@ export function BotSettingsManager() {
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
-      tiers: [],
+      minGridBalance: 100, // Default value
     },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "tiers",
   });
 
   React.useEffect(() => {
     async function fetchSettings() {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/public-settings?key=${BOT_TIERS_KEY}`);
-        if (!response.ok) throw new Error('Failed to fetch settings');
+        const response = await fetch(`/api/public-settings?key=${BOT_SETTINGS_KEY}`);
+        if (!response.ok) throw new Error('Failed to fetch bot settings');
         const data = await response.json();
-        const settings = data || defaultTierSettings;
-        form.reset({ tiers: settings.sort((a,b) => a.balanceThreshold - b.balanceThreshold) });
+        if (data && data.minGridBalance) {
+            form.reset({ minGridBalance: data.minGridBalance });
+        }
       } catch (error: any) {
-        toast({ title: 'Error', description: error.message, variant: 'destructive' });
-        form.reset({ tiers: defaultTierSettings });
+        // Silently fail and use default
+        console.error("Could not fetch bot settings:", error.message);
       } finally {
         setIsLoading(false);
       }
     }
     fetchSettings();
-  }, [form, toast]);
+  }, [form]);
 
   const onSubmit = async (values: SettingsFormValues) => {
     setIsSaving(true);
-    const sortedTiers = [...values.tiers].sort((a, b) => a.balanceThreshold - b.balanceThreshold);
-    
     try {
-      const response = await fetch('/api/admin/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: BOT_TIERS_KEY, value: sortedTiers })
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Failed to save settings.');
-      
-      form.reset({ tiers: sortedTiers });
-      toast({
-        title: "Settings Saved",
-        description: "The bot tier settings have been updated.",
-      });
+        const response = await fetch('/api/admin/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: BOT_SETTINGS_KEY, value: values })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Failed to save settings.');
+        toast({
+            title: "Settings Saved",
+            description: "The bot settings have been updated.",
+        });
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
-      setIsSaving(false);
+        setIsSaving(false);
     }
   };
-  
-  const handleAddNewTier = () => {
-    const nextTierNumber = fields.length + 1;
-    const romanNumeral = toRoman(nextTierNumber);
-    const newTierName = `VIP CORE ${romanNumeral}`;
-    
-    append({ 
-      id: `new-tier-${Date.now()}`, 
-      name: newTierName, 
-      balanceThreshold: 20000, 
-      dailyProfit: 0.1, 
-      clicks: 12 
-    });
-  };
+
 
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Growth Bot Tier Settings</CardTitle>
-          <CardDescription>
-            Configure the profit tiers for the automated trading bot based on user balance.
-          </CardDescription>
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-full" />
         </CardHeader>
         <CardContent className="space-y-4">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-full" />
+            <div className="flex justify-end">
+                <Skeleton className="h-10 w-32" />
+            </div>
         </CardContent>
       </Card>
     );
@@ -141,85 +95,28 @@ export function BotSettingsManager() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Growth Bot Tier Settings</CardTitle>
+        <CardTitle>Trading Bot Settings</CardTitle>
         <CardDescription>
-          Configure the profit tiers for the automated trading bot. Sorts automatically by balance on save.
+          Configure the operational parameters for the grid trading bot.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="space-y-6">
-              {fields.map((field, index) => (
-                <Card key={field.id} className="p-4 relative bg-muted/30 shadow-inner">
-                   <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute -top-3 -right-3 h-7 w-7"
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Remove Tier</span>
-                    </Button>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
-                     <FormField
-                        control={form.control}
-                        name={`tiers.${index}.name`}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Tier Name</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={form.control}
-                        name={`tiers.${index}.balanceThreshold`}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Min. Balance ($)</FormLabel>
-                                <FormControl><Input type="number" step="1" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name={`tiers.${index}.dailyProfit`}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Profit Rate (0.02=2%)</FormLabel>
-                                <FormControl><Input type="number" step="0.001" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name={`tiers.${index}.clicks`}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Daily Grids</FormLabel>
-                                <FormControl><Input type="number" step="1" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                  </div>
-                </Card>
-              ))}
-            </div>
-             <Button
-                type="button"
-                variant="outline"
-                onClick={handleAddNewTier}
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Tier
-              </Button>
-            <div className="flex justify-end">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="minGridBalance"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Minimum Balance to Start Grid ($)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="100" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <div className="flex justify-end">
               <Button type="submit" disabled={isSaving}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Save Settings

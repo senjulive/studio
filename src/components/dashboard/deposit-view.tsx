@@ -20,7 +20,6 @@ import { useToast } from "@/hooks/use-toast";
 import { getSiteSettings } from "@/lib/site-settings";
 import { Skeleton } from "../ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { addAdminNotification, addNotification } from "@/lib/notifications";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import Image from "next/image";
@@ -109,7 +108,7 @@ const PersonalDepositRequest = () => {
 
   React.useEffect(() => {
     if (user?.id) {
-      getOrCreateWallet(user.id).then(setWallet);
+      getOrCreateWallet().then(setWallet);
     }
   }, [user]);
 
@@ -127,21 +126,21 @@ const PersonalDepositRequest = () => {
     setIsSubmitting(true);
 
     try {
-      const username = wallet?.profile.username || user.email;
-      const content = `User '${username}' (${user.email}) has initiated a deposit request for ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()}. Please verify payment and credit their account manually.`;
-      
-      await addAdminNotification({
-        title: "New Deposit Request",
-        content,
-        href: "/admin"
+      const response = await fetch('/api/deposit/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            userId: user.id,
+            amount: parseFloat(amount),
+            asset: selectedAsset,
+        }),
       });
+      
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit request.");
+      }
 
-      await addNotification(user.id, {
-        title: "AstralCore Deposit",
-        content: `Your request to deposit ${parseFloat(amount).toFixed(2)} ${selectedAsset.toUpperCase()} has been received and is pending approval.`,
-        href: "/dashboard/deposit",
-      });
-      
       toast({
         title: "Deposit Request Sent",
         description: "Your balance will be updated upon confirmation."
@@ -149,10 +148,10 @@ const PersonalDepositRequest = () => {
 
       setAmount("");
 
-    } catch (error) {
+    } catch (error: any) {
         toast({
             title: "Request Failed",
-            description: "Could not submit your deposit request. Please try again later.",
+            description: error.message || "Could not submit your deposit request. Please try again later.",
             variant: "destructive",
         });
     } finally {
