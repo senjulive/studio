@@ -1,1 +1,5 @@
-{}
+{
+  "botSettings": {
+    "minGridBalance": 0
+  }
+}
