@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { getUserRank } from '@/lib/ranks';
 import { getCurrentTier } from '@/lib/tiers';
 import { getBotTierSettings } from '@/lib/tiers';
-import { tierIcons, tierClassNames } from '@/lib/settings';
 
 const MOCK_USER_ID = 'mock-user-123';
 
@@ -35,17 +34,17 @@ export async function GET(request: Request) {
                 ...member,
                 rank: {
                     name: rank.name,
-                    Icon: rank.Icon, // Note: This will be a function, can't be serialized directly but NextJS handles it.
+                    Icon: rank.Icon,
                     className: rank.className,
                 },
                 tier: tier ? {
                     name: tier.name,
-                    Icon: tierIcons[tier.id],
-                    className: tierClassNames[tier.id],
+                    Icon: tier.id,
+                    className: '', // className will be applied on client
                 } : {
                     name: 'N/A',
-                    Icon: tierIcons['tier-1'],
-                    className: tierClassNames['tier-1'],
+                    Icon: 'tier-1',
+                    className: '',
                 },
             };
         });

@@ -2,12 +2,36 @@
 'use client';
 
 import * as React from 'react';
+import type { SVGProps } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { AnalyticsData } from './AnalyticsManager';
 import { Badge } from '@/components/ui/badge';
 import { getUserRank } from '@/lib/ranks';
 import { cn } from '@/lib/utils';
+import { Lock } from 'lucide-react';
+
+// Import rank icons
+import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
+import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
+import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
+import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
+import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
+import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
+
+
+type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+const rankIcons: Record<string, IconComponent> = {
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
+};
+
 
 export function UserLeaderboard({ data }: { data: AnalyticsData }) {
     const { leaderboard } = data;
@@ -36,6 +60,7 @@ export function UserLeaderboard({ data }: { data: AnalyticsData }) {
                     <TableBody>
                         {leaderboard.map((user, index) => {
                              const rankInfo = getUserRank(user.balance);
+                             const RankIcon = rankIcons[rankInfo.Icon] || RecruitRankIcon;
                              return (
                                 <TableRow key={user.userId}>
                                     <TableCell className="font-bold">#{index + 1}</TableCell>
@@ -46,7 +71,7 @@ export function UserLeaderboard({ data }: { data: AnalyticsData }) {
                                     <TableCell className="text-right font-mono text-blue-600">{formatCurrency(user.gridEarnings)}</TableCell>
                                     <TableCell>
                                         <Badge variant="outline" className={cn("text-base py-1 px-2 flex items-center gap-1.5 w-fit", rankInfo.className)}>
-                                            <rankInfo.Icon className="h-4 w-4" />
+                                            <RankIcon className="h-4 w-4" />
                                             <span>{rankInfo.name}</span>
                                         </Badge>
                                     </TableCell>

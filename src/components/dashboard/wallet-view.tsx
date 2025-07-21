@@ -3,7 +3,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Repeat } from "lucide-react";
+import { Repeat, Lock } from "lucide-react";
+import type { SVGProps } from 'react';
 
 import { DepositIcon } from "@/components/icons/nav/deposit-icon";
 import { MarketIcon } from "@/components/icons/nav/market-icon";
@@ -37,7 +38,27 @@ import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
 import { type TierSetting as TierData, getCurrentTier } from "@/lib/tiers";
-import { type TierSetting } from "@/lib/settings";
+import { tierIcons, tierClassNames } from '@/lib/settings';
+
+// Import rank icons
+import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
+import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
+import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
+import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
+import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
+import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
+
+type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+const rankIcons: Record<string, IconComponent> = {
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
+};
 
 
 type Transaction = {
@@ -154,7 +175,8 @@ async function fetchTierSettings(): Promise<TierData[]> {
     try {
         const response = await fetch('/api/public-settings?key=botTierSettings');
         if (!response.ok) return [];
-        return await response.json();
+        const data = await response.json();
+        return data || [];
     } catch {
         return [];
     }
@@ -165,7 +187,7 @@ export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const { user } = useUser();
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
-  const [tierSettings, setTierSettings] = React.useState<TierSetting[]>([]);
+  const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
 
   const fetchWalletData = React.useCallback(async () => {
     if (user?.id) {
@@ -298,7 +320,11 @@ export function WalletView() {
   const dailyEarnings = (walletData?.growth as any)?.daily_earnings ?? 0;
   
   const rank = getUserRank(totalBalance);
+  const RankIcon = rankIcons[rank.Icon] || RecruitRankIcon;
+
   const tier = getCurrentTier(totalBalance, tierSettings);
+  const TierIcon = tier ? tierIcons[tier.id] : null;
+  const tierClassName = tier ? tierClassNames[tier.id] : null;
 
   const handleWalletUpdate = async (newData: WalletData) => {
     if (user?.id) {
@@ -337,12 +363,12 @@ export function WalletView() {
             {walletData && (
               <div className="flex items-center gap-3">
                 <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                  <rank.Icon className="h-5 w-5" />
+                  <RankIcon className="h-5 w-5" />
                   <span>{rank.name}</span>
                 </Badge>
-                {tier && (
-                  <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", tier.className)}>
-                    <tier.Icon className="h-5 w-5" />
+                {tier && TierIcon && tierClassName && (
+                  <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", tierClassName)}>
+                    <TierIcon className="h-5 w-5" />
                     <span>{tier.name}</span>
                   </Badge>
                 )}

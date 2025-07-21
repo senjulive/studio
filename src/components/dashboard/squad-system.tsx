@@ -2,7 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { Users, UserCheck } from "lucide-react";
+import { Users, UserCheck, Lock } from "lucide-react";
+import type { SVGProps } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -26,8 +27,40 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { useUser } from "@/contexts/UserContext";
-import type { SquadMember } from "@/app/api/squad/route";
 import { cn } from "@/lib/utils";
+
+// Import rank icons
+import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
+import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
+import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
+import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
+import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
+import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
+
+// Import tier icons
+import { tierIcons, tierClassNames } from '@/lib/settings';
+
+
+type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+const rankIcons: Record<string, IconComponent> = {
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
+};
+
+type SquadMember = {
+    id: string;
+    username: string;
+    rank: { name: string; Icon: string; className: string }; // Icon is a string name
+    tier: { name: string; Icon: string; className: string }; // Icon is a string name
+    team: SquadMember[];
+};
+
 
 const flattenSquad = (members: SquadMember[]): Omit<SquadMember, 'team'>[] => {
     let flatList: Omit<SquadMember, 'team'>[] = [];
@@ -142,23 +175,28 @@ export function SquadSystem() {
                           </TableRow>
                       </TableHeader>
                       <TableBody>
-                          {squadList.map(member => (
-                              <TableRow key={member.id}>
-                                  <TableCell className="font-medium">{member.username}</TableCell>
-                                  <TableCell>
-                                      <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5 w-fit", member.rank.className)}>
-                                          <member.rank.Icon className="h-5 w-5" />
-                                          <span>{member.rank.name}</span>
-                                      </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                      <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5 w-fit", member.tier.className)}>
-                                          <member.tier.Icon className="h-5 w-5" />
-                                          <span>{member.tier.name}</span>
-                                      </Badge>
-                                  </TableCell>
-                              </TableRow>
-                          ))}
+                          {squadList.map(member => {
+                              const RankIcon = rankIcons[member.rank.Icon] || RecruitRankIcon;
+                              const TierIcon = tierIcons[member.tier.Icon] || tierIcons['tier-1'];
+                              const tierClassName = tierClassNames[member.tier.Icon] || tierClassNames['tier-1'];
+                              return (
+                                <TableRow key={member.id}>
+                                    <TableCell className="font-medium">{member.username}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5 w-fit", member.rank.className)}>
+                                            <RankIcon className="h-5 w-5" />
+                                            <span>{member.rank.name}</span>
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5 w-fit", tierClassName)}>
+                                            <TierIcon className="h-5 w-5" />
+                                            <span>{member.tier.name}</span>
+                                        </Badge>
+                                    </TableCell>
+                                </TableRow>
+                              )
+                          })}
                       </TableBody>
                   </Table>
               ) : (

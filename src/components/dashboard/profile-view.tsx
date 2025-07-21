@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
@@ -25,6 +25,28 @@ import { useUser } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from 'date-fns';
+import type { SVGProps } from 'react';
+
+// Import rank icons
+import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
+import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
+import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
+import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
+import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
+import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
+
+type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+const rankIcons: Record<string, IconComponent> = {
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
+};
+
 
 const ProfileDetailItem = ({
   icon,
@@ -140,6 +162,7 @@ export function ProfileView() {
   const squadSize = walletData?.squad?.members?.length ?? 0;
   const usdtBalance = walletData?.balances?.usdt ?? 0;
   const rank = getUserRank(usdtBalance);
+  const RankIcon = rankIcons[rank.Icon] || RecruitRankIcon;
   
   const isVerified = profile?.verificationStatus === 'verified';
 
@@ -172,7 +195,7 @@ export function ProfileView() {
                     ) : (
                     <>
                         <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                        <rank.Icon className="h-5 w-5" />
+                        <RankIcon className="h-5 w-5" />
                         <span>{rank.name}</span>
                         </Badge>
                         <VerificationStatusBadge status={profile?.verificationStatus} />
