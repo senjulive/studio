@@ -43,7 +43,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
+import { UserPlus, Repeat, Megaphone, Shield, Home, LineChart, Users, User, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -151,11 +151,11 @@ export default function DashboardLayout({
   const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
 
   const bottomNavItems = [
-    { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
+    { href: '/dashboard', label: 'Home', icon: Home },
+    { href: '/dashboard/market', label: 'Market', icon: LineChart },
     { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
-    { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
-    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
+    { href: '/dashboard/squad', label: 'Squad', icon: Users },
+    { href: '/dashboard/profile', label: 'Profile', icon: User },
   ];
 
   if (isInitializing) {
