@@ -47,7 +47,8 @@ import {
     Download,
     Megaphone,
     UserPlus,
-    Repeat
+    Repeat,
+    SlidersHorizontal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
@@ -117,6 +118,7 @@ export default function DashboardLayout({
     { href: '/dashboard', label: 'Home', icon: Home },
     { href: '/dashboard/market', label: 'Market', icon: LineChart },
     { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
+    { href: '/pro-trader', label: 'Pro Trader', icon: SlidersHorizontal },
     { href: '/dashboard/deposit', label: 'Deposit', icon: Wallet },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: ArrowLeftRight },
     { href: '/dashboard/squad', label: 'Squad', icon: Users },
