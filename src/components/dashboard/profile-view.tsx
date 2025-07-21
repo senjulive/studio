@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Upload, X } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
@@ -28,6 +28,9 @@ import { format } from 'date-fns';
 import type { SVGProps } from 'react';
 import { Input } from "../ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { FacebookIcon } from "../icons/social/facebook-icon";
+import { InstagramIcon } from "../icons/social/instagram-icon";
+import { UsdtLogoIcon } from "../icons/usdt-logo"; // Assuming a tiktok icon might be named this for consistency
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -128,9 +131,8 @@ export function ProfileView() {
   const [isLoading, setIsLoading] = React.useState(true);
   const { user } = useUser();
   const [showVerificationPopup, setShowVerificationPopup] = React.useState(false);
-  const [isUploading, setIsUploading] = React.useState(false);
-  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-  const [preview, setPreview] = React.useState<string | null>(null);
+  const [isUpdatingAvatar, setIsUpdatingAvatar] = React.useState(false);
+  const [avatarUrl, setAvatarUrl] = React.useState("");
   const { toast } = useToast();
 
   const fetchWallet = React.useCallback(async () => {
@@ -138,6 +140,7 @@ export function ProfileView() {
         setIsLoading(true);
         const data = await getOrCreateWallet(user.id);
         setWalletData(data);
+        setAvatarUrl(data?.profile?.avatarUrl || "");
        
         if (data.profile.verificationStatus !== 'verified' && data.profile.verificationStatus !== 'verifying') {
           setTimeout(() => setShowVerificationPopup(true), 1000);
@@ -163,54 +166,34 @@ export function ProfileView() {
 
   }, [user, fetchWallet, walletData?.profile.verificationStatus]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({ title: "File too large", description: "Please select an image smaller than 5MB.", variant: "destructive" });
-        return;
-      }
-      if (!file.type.startsWith("image/")) {
-        toast({ title: "Invalid File Type", description: "Please select an image file (PNG, JPG, etc.).", variant: "destructive" });
-        return;
-      }
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleUploadAvatar = async () => {
-    if (!selectedFile || !user?.id || !walletData) return;
-    setIsUploading(true);
+  const handleUpdateAvatar = async () => {
+    if (!avatarUrl || !user?.id || !walletData) return;
+    
+    // Basic URL validation
     try {
-      const avatarDataUri = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => resolve(event.target?.result as string);
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(selectedFile);
-      });
-      
+        new URL(avatarUrl);
+    } catch (_) {
+        toast({ title: "Invalid URL", description: "Please enter a valid image URL.", variant: "destructive" });
+        return;
+    }
+
+    setIsUpdatingAvatar(true);
+    try {
       const updatedWallet: WalletData = {
         ...walletData,
         profile: {
           ...walletData.profile,
-          avatarUrl: avatarDataUri,
+          avatarUrl: avatarUrl,
         },
       };
 
       await updateWallet(updatedWallet);
       setWalletData(updatedWallet);
       toast({ title: "Avatar Updated!", description: "Your new profile picture has been saved." });
-      setSelectedFile(null);
-      setPreview(null);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
-      setIsUploading(false);
+      setIsUpdatingAvatar(false);
     }
   };
 
@@ -294,45 +277,40 @@ export function ProfileView() {
               <VirtualCard walletData={walletData} userEmail={user?.email || null} />
             </div>
 
-            <Dialog onOpenChange={() => { setPreview(null); setSelectedFile(null); }}>
+            <Dialog>
                 <DialogTrigger asChild>
                     <Button variant="outline" className="w-full mb-6">
                         <ImageIcon className="mr-2 h-4 w-4" />
-                        Change Avatar
+                        Update Avatar
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Upload a New Avatar</DialogTitle>
+                        <DialogTitle>Update Your Avatar</DialogTitle>
                         <DialogDescription>
-                            Select an image from your device. Recommended size: 400x400 pixels.
+                            Paste the URL of an image from the web (e.g., from your social media profile).
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
-                        <Input id="avatar-upload" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                        <label htmlFor="avatar-upload" className={cn(
-                            "w-full aspect-square rounded-md border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground cursor-pointer hover:border-primary hover:text-primary transition-colors",
-                            preview && "border-solid border-primary"
-                        )}>
-                            {preview ? (
-                                <div className="relative w-full h-full">
-                                    <Image src={preview} alt="Avatar preview" layout="fill" objectFit="cover" className="rounded-md" />
-                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 z-10" onClick={(e) => { e.preventDefault(); setPreview(null); setSelectedFile(null); }}>
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ) : (
-                                <>
-                                    <Upload className="h-8 w-8 mb-2" />
-                                    <span className="text-sm font-medium">Click to upload</span>
-                                    <span className="text-xs">PNG, JPG, or WEBP (max 5MB)</span>
-                                </>
-                            )}
-                        </label>
+                         <div className="flex justify-center items-center gap-4 text-muted-foreground">
+                            <FacebookIcon className="h-6 w-6"/>
+                            <InstagramIcon className="h-6 w-6"/>
+                            <UsdtLogoIcon className="h-6 w-6"/>
+                        </div>
+                        <div className="relative">
+                            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                id="avatar-url"
+                                placeholder="https://example.com/image.png"
+                                value={avatarUrl}
+                                onChange={(e) => setAvatarUrl(e.target.value)}
+                                className="pl-9"
+                            />
+                        </div>
                     </div>
                     <DialogFooter>
-                        <Button onClick={handleUploadAvatar} disabled={isUploading || !selectedFile}>
-                            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        <Button onClick={handleUpdateAvatar} disabled={isUpdatingAvatar || !avatarUrl}>
+                            {isUpdatingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                             Save Avatar
                         </Button>
                     </DialogFooter>
@@ -373,3 +351,5 @@ export function ProfileView() {
     </>
   );
 }
+
+    
