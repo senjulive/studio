@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
+import { getOrCreateWallet, type WalletData, updateWallet } from "@/lib/wallet";
 import {
   Card,
   CardContent,
@@ -11,11 +11,11 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Wand2, Loader2, Save } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from 'date-fns';
 import type { SVGProps } from 'react';
+import { Input } from "../ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -126,6 +128,9 @@ export function ProfileView() {
   const [isLoading, setIsLoading] = React.useState(true);
   const { user } = useUser();
   const [showVerificationPopup, setShowVerificationPopup] = React.useState(false);
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [prompt, setPrompt] = React.useState("");
+  const { toast } = useToast();
 
   const fetchWallet = React.useCallback(async () => {
     if (user?.id) {
@@ -156,6 +161,38 @@ export function ProfileView() {
     return () => clearInterval(interval);
 
   }, [user, fetchWallet, walletData?.profile.verificationStatus]);
+
+  const handleGenerateAvatar = async () => {
+    if (!prompt.trim() || !user?.id || !walletData) return;
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!response.ok) throw new Error('Failed to generate avatar.');
+      const { avatarDataUri } = await response.json();
+      
+      const updatedWallet: WalletData = {
+        ...walletData,
+        profile: {
+          ...walletData.profile,
+          avatarUrl: avatarDataUri,
+        },
+      };
+
+      await updateWallet(updatedWallet);
+      setWalletData(updatedWallet);
+      toast({ title: "Avatar Generated!", description: "Your new profile picture has been set." });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+      setPrompt("");
+    }
+  };
+
 
   const profile = walletData?.profile;
   const profileDisplayName = profile?.fullName || profile?.username || "User Profile";
@@ -235,6 +272,44 @@ export function ProfileView() {
             <div className="mb-6 p-4">
               <VirtualCard walletData={walletData} userEmail={user?.email || null} />
             </div>
+
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full mb-6">
+                        <Wand2 className="mr-2 h-4 w-4" />
+                        Generate AI Avatar
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Create Your Avatar</DialogTitle>
+                        <DialogDescription>
+                            Describe the avatar you want to generate. Be creative!
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <Input
+                            placeholder="e.g., a crystal astronaut helmet"
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            disabled={isGenerating}
+                        />
+                        {isGenerating && (
+                            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-md">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+                                <p className="text-sm font-medium">Generating your masterpiece...</p>
+                                <p className="text-xs text-muted-foreground">This can take a moment.</p>
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={handleGenerateAvatar} disabled={isGenerating || !prompt.trim()}>
+                            {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                            Generate & Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <Separator className="mb-6"/>
 

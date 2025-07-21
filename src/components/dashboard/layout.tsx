@@ -46,6 +46,7 @@ import { InboxIcon } from '@/components/icons/nav/inbox-icon';
 import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
+import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
 
 // Mock user object
 const mockUser = {
@@ -71,15 +72,30 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = React.useState<any | null>(null);
+  const [wallet, setWallet] = React.useState<WalletData | null>(null);
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
   React.useEffect(() => {
-    // Simulate user session check
-    setTimeout(() => {
-      setUser(mockUser);
-      setIsInitializing(false);
-    }, 500);
+    const initializeUser = async () => {
+        const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
+        const currentUser = { ...mockUser, email: loggedInEmail };
+        
+        setUser(currentUser);
+        setIsAdmin(loggedInEmail === 'admin@astralcore.io');
+        setIsModerator(loggedInEmail === 'moderator@astralcore.io');
+
+        if (currentUser.id) {
+          const walletData = await getOrCreateWallet(currentUser.id);
+          setWallet(walletData);
+        }
+        
+        setIsInitializing(false);
+    };
+    
+    initializeUser();
   }, []);
 
   React.useEffect(() => {
@@ -92,7 +108,7 @@ export default function DashboardLayout({
     }
   }, []);
 
-  const menuItems = [
+  const baseMenuItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
     { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
@@ -105,15 +121,28 @@ export default function DashboardLayout({
     { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
     { href: '/dashboard/about', label: 'About', icon: AboutIcon },
-    {
+  ];
+  
+  if (isAdmin) {
+    baseMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
+  }
+  if (isModerator) {
+    baseMenuItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
+  }
+
+
+  const menuItems = [
+      ...baseMenuItems,
+      {
         href: downloadHref,
         label: 'Download App',
         icon: DownloadIcon,
         download: 'AstralCore.url',
-    },
-  ];
+      },
+  ]
 
   const handleLogout = async () => {
+    sessionStorage.removeItem('loggedInEmail');
     await logout();
     router.push('/');
   };
@@ -141,6 +170,7 @@ export default function DashboardLayout({
   };
 
   const isClient = typeof window !== 'undefined';
+  const avatarUrl = wallet?.profile?.avatarUrl;
 
   return (
     <UserProvider value={{ user: user as any }}>
@@ -157,7 +187,7 @@ export default function DashboardLayout({
           <SidebarContent>
             <SidebarMenu>
               {menuItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
+                <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
                     isActive={
@@ -179,8 +209,7 @@ export default function DashboardLayout({
                 <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent/50">
                   <Avatar className="h-8 w-8">
                     <AvatarImage
-                      src={`https://placehold.co/100x100.png`}
-                      data-ai-hint="abstract user"
+                      src={avatarUrl}
                       alt="@user"
                     />
                     <AvatarFallback>{userInitial}</AvatarFallback>
