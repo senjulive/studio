@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -84,8 +85,8 @@ export function ModeratorPanel() {
                 <Tooltip key={tab.id}>
                   <TooltipTrigger asChild>
                     <TabsTrigger value={tab.id}>
-                      <tab.icon />
-                      <span className="sr-only">{tab.label}</span>
+                      <tab.icon className="h-4 w-4 mr-2" />
+                      <span>{tab.label}</span>
                     </TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent>

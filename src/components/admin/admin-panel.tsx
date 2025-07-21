@@ -22,7 +22,6 @@ import {
   Bot,
   Megaphone,
   Settings,
-  Bell,
   UserCheck,
   Gift,
   Users,
@@ -35,7 +34,6 @@ import {BotSettingsManager} from './bot-settings-manager';
 import {AnnouncementManager} from './announcement-manager';
 import {SiteSettingsManager} from './site-settings-manager';
 import {VerificationManager} from './verification-manager';
-import {NotificationViewer} from './notification-viewer';
 import {PromotionManager} from './promotion-manager';
 import {ModeratorManager} from './moderator-manager';
 import {ActionLogViewer} from './action-log-viewer';
@@ -60,7 +58,7 @@ export function AdminPanel() {
       <CardContent>
         <Tabs defaultValue="analytics" className="w-full">
           <TooltipProvider>
-            <TabsList className="grid w-full grid-cols-12 gap-1">
+            <TabsList className="grid w-full grid-cols-11 gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <TabsTrigger value="analytics" className="text-xs px-2"><LayoutDashboard className="h-4 w-4 mr-1"/>Dashboard</TabsTrigger>
@@ -96,12 +94,6 @@ export function AdminPanel() {
                   <TabsTrigger value="action-log" className="text-xs px-2"><Activity className="h-4 w-4 mr-1"/>Logs</TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent><p>Moderator Action Log</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="notifications" className="text-xs px-2"><Bell className="h-4 w-4 mr-1"/>Notifications</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent><p>Admin Notifications</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -146,9 +138,6 @@ export function AdminPanel() {
           </TabsContent>
           <TabsContent value="action-log" className="mt-6">
             <ActionLogViewer />
-          </TabsContent>
-          <TabsContent value="notifications" className="mt-6">
-            <NotificationViewer />
           </TabsContent>
           <TabsContent value="announcements" className="mt-6">
             <AnnouncementManager />

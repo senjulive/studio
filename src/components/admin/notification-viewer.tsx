@@ -16,46 +16,28 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Bell, RefreshCw, User} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 
-type AdminNotification = Notification & {
-  user: {
-    username: string | null;
-    full_name: string | null;
-  } | null;
-};
+// Mock data, as we removed the dedicated API endpoint
+const mockAdminNotifications = [
+    { id: '1', title: 'New User Registered', content: 'user@example.com has created an account.', created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() },
+    { id: '2', title: 'New Deposit Request', content: 'User \'DefaultUser\' (user@example.com) has initiated a deposit request for 500.00 USDT.', created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() },
+    { id: '3', title: 'New Support Message', content: 'New message from mock-user-123: "Hello, I need help with..."', created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString() },
+];
 
 export function NotificationViewer() {
   const {toast} = useToast();
-  const [notifications, setNotifications] = React.useState<AdminNotification[]>(
+  const [notifications, setNotifications] = React.useState<any[]>(
     []
   );
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const fetchNotifications = React.useCallback(async () => {
+  const fetchNotifications = React.useCallback(() => {
     setIsLoading(true);
-    try {
-      const response = await fetch('/api/admin/notifications', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({}), // Empty body as password is no longer needed
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || 'Failed to fetch admin notifications.'
-        );
-      }
-      const data = await response.json();
-      setNotifications(data);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: `Could not fetch notifications: ${error.message}`,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
+    // Simulate API call
+    setTimeout(() => {
+        setNotifications(mockAdminNotifications);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
 
   React.useEffect(() => {
     fetchNotifications();
@@ -65,7 +47,7 @@ export function NotificationViewer() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Admin Notifications</CardTitle>
+          <CardTitle>Platform Notifications</CardTitle>
           <CardDescription>
             A log of important events from across the platform.
           </CardDescription>
@@ -81,7 +63,7 @@ export function NotificationViewer() {
       </CardHeader>
       <CardContent className="space-y-4">
         {isLoading ? (
-          Array.from({length: 5}).map((_, i) => (
+          Array.from({length: 3}).map((_, i) => (
             <Skeleton key={i} className="h-16 w-full" />
           ))
         ) : notifications.length > 0 ? (

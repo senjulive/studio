@@ -47,7 +47,7 @@ import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 
-// Mock user object since Supabase is removed
+// Mock user object
 const mockUser = {
   id: 'mock-user-123',
   email: 'user@example.com',
@@ -79,11 +79,14 @@ export default function DashboardLayout({
   React.useEffect(() => {
     // Simulate user session check
     setTimeout(() => {
-      setUser(mockUser);
-      // You can toggle this to test admin/moderator views
-      setIsAdmin(false); 
-      setIsModerator(false);
-      setIsInitializing(false);
+        // Use sessionStorage to get role based on login
+        const loggedInEmail = sessionStorage.getItem('loggedInEmail');
+        const userEmail = loggedInEmail || mockUser.email;
+        
+        setUser({ ...mockUser, email: userEmail });
+        setIsAdmin(userEmail === 'admin@astralcore.io');
+        setIsModerator(userEmail === 'moderator@astralcore.io');
+        setIsInitializing(false);
     }, 500);
   }, []);
 
@@ -131,6 +134,7 @@ export default function DashboardLayout({
   ]
 
   const handleLogout = async () => {
+    sessionStorage.removeItem('loggedInEmail');
     await logout();
     router.push('/');
   };

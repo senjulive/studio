@@ -70,18 +70,26 @@ export function LoginForm() {
         } else {
             localStorage.removeItem(REMEMBERED_EMAIL_KEY);
         }
+        // Store email in session storage to determine role in dashboard layout
+        sessionStorage.setItem('loggedInEmail', values.email);
     }
     
-    // Since Supabase is removed, this will just simulate a login
-    // and redirect.
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Login Successful",
-      description: "Welcome to AstralCore! (Demo Mode)",
-    });
+    const { error } = await login(values);
 
-    router.push('/dashboard');
+    if (error) {
+        toast({
+            title: "Login Failed",
+            description: error,
+            variant: "destructive",
+        });
+    } else {
+        toast({
+          title: "Login Successful",
+          description: "Welcome to AstralCore!",
+        });
+        router.push('/dashboard');
+    }
+    
     setIsLoading(false);
   };
 
