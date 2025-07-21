@@ -49,13 +49,22 @@ export function TradingBotCard({
 
   const currentTier = getCurrentTier(totalBalance, tierSettings);
   
-  const profitPerTrade = currentTier && totalBalance > 0 
-    ? (totalBalance * currentTier.dailyProfit) / currentTier.clicks 
-    : 0;
+  const profitPerTrade = React.useMemo(() => {
+    if (!currentTier) return 0;
+    if (totalBalance > 0) {
+      return (totalBalance * currentTier.dailyProfit) / currentTier.clicks;
+    }
+    // Provide a small base earning for $0 balance users to see it work
+    return 0.05; 
+  }, [totalBalance, currentTier]);
   
-  const profitPercentagePerTrade = currentTier && totalBalance > 0 
-    ? (currentTier.dailyProfit / currentTier.clicks) * 100
-    : 0;
+  const profitPercentagePerTrade = React.useMemo(() => {
+    if (!currentTier) return 0;
+    if (totalBalance > 0) {
+        return (currentTier.dailyProfit / currentTier.clicks) * 100
+    }
+    return 0; // Percentage is irrelevant for the base amount
+  }, [totalBalance, currentTier]);
 
   const canStart =
     totalBalance >= minGridBalance && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
