@@ -9,7 +9,7 @@ import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BotAnimationPreview } from "./bot-animation-preview";
 import { AstralLogo } from "../icons/astral-logo";
-import { type TierSetting, getCurrentTier } from "@/lib/settings";
+import { type TierSetting, getCurrentTier } from "@/lib/tiers";
 import { GridTradingAnimation } from "./grid-trading-animation";
 
 export function TradingBotCard({

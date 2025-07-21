@@ -36,7 +36,9 @@ import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
-import { getBotTierSettings, getCurrentTier, type TierSetting } from "@/lib/settings";
+import { type TierSetting as TierData, getCurrentTier } from "@/lib/tiers";
+import { type TierSetting } from "@/lib/settings";
+
 
 type Transaction = {
   id: string;
@@ -148,6 +150,17 @@ const assetConfig = [
     },
 ] as const;
 
+async function fetchTierSettings(): Promise<TierData[]> {
+    try {
+        const response = await fetch('/api/public-settings?key=botTierSettings');
+        if (!response.ok) return [];
+        return await response.json();
+    } catch {
+        return [];
+    }
+}
+
+
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const { user } = useUser();
@@ -158,7 +171,7 @@ export function WalletView() {
     if (user?.id) {
         const [wallet, tiers] = await Promise.all([
           getOrCreateWallet(),
-          getBotTierSettings()
+          fetchTierSettings(),
         ]);
         setWalletData(wallet);
         setTierSettings(tiers);
