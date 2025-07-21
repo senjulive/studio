@@ -10,20 +10,24 @@ import {
 } from "@/components/ui/card";
 import { ModeratorProvider } from "@/contexts/ModeratorContext";
 import { ModeratorLoginForm } from "./moderator-login-form";
+import { UserProvider } from "@/contexts/UserContext";
 
 export function ModeratorAuth({ children }: { children: React.ReactNode }) {
   const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
+  const [user, setUser] = React.useState<any>(null);
 
   React.useEffect(() => {
     const loggedInEmail = sessionStorage.getItem('loggedInEmail');
     if (loggedInEmail === 'moderator@astralcore.io') {
       setAuthStatus("authed");
+      setUser({ id: 'mock-moderator-id', email: loggedInEmail });
     } else {
       setAuthStatus("unauthed");
     }
   }, []);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (email: string) => {
+    setUser({ id: 'mock-moderator-id', email });
     setAuthStatus("authed");
   };
 
@@ -46,9 +50,11 @@ export function ModeratorAuth({ children }: { children: React.ReactNode }) {
   if (authStatus === "authed") {
     // For the mock app, moderators have all permissions
     return (
-      <ModeratorProvider permissions={{ customer_support: true, user_verification: true, deposit_approval: true }}>
-        {children}
-      </ModeratorProvider>
+      <UserProvider value={{ user }}>
+        <ModeratorProvider permissions={{ customer_support: true, user_verification: true, deposit_approval: true }}>
+          {children}
+        </ModeratorProvider>
+      </UserProvider>
     );
   }
 

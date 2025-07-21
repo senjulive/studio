@@ -34,7 +34,7 @@ type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
 
 const MOCK_ADMIN_EMAIL = "admin@astralcore.io";
 
-export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void }) {
+export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (email: string) => void }) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -63,7 +63,7 @@ export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void 
         title: "Admin Login Successful",
         description: "Welcome to the AstralCore AI panel.",
       });
-      onLoginSuccess();
+      onLoginSuccess(values.email);
     }
 
     setIsLoading(false);

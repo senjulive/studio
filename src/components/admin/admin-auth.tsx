@@ -10,22 +10,26 @@ import {
 } from "@/components/ui/card";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { AdminLoginForm } from "./admin-login-form";
+import { UserProvider } from "@/contexts/UserContext";
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
   const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
+  const [user, setUser] = React.useState<any>(null);
 
   React.useEffect(() => {
     // Check session storage to see if admin was logged in
     const loggedInEmail = sessionStorage.getItem('loggedInEmail');
     if (loggedInEmail === 'admin@astralcore.io') {
       setAuthStatus("authed");
+      setUser({ id: 'mock-admin-id', email: loggedInEmail });
     } else {
       setAuthStatus("unauthed");
     }
   }, []);
 
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (email: string) => {
+    setUser({ id: 'mock-admin-id', email });
     setAuthStatus("authed");
   };
 
@@ -46,7 +50,11 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
   }
 
   if (authStatus === "authed") {
-    return <AdminProvider>{children}</AdminProvider>;
+    return (
+      <UserProvider value={{ user }}>
+        <AdminProvider>{children}</AdminProvider>
+      </UserProvider>
+    );
   }
 
   return <AdminLoginForm onLoginSuccess={handleLoginSuccess} />;

@@ -34,7 +34,7 @@ type ModeratorLoginFormValues = z.infer<typeof moderatorLoginSchema>;
 
 const MOCK_MODERATOR_EMAIL = "moderator@astralcore.io";
 
-export function ModeratorLoginForm({ onLoginSuccess }: { onLoginSuccess: () => void }) {
+export function ModeratorLoginForm({ onLoginSuccess }: { onLoginSuccess: (email: string) => void }) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -63,7 +63,7 @@ export function ModeratorLoginForm({ onLoginSuccess }: { onLoginSuccess: () => v
         title: "Moderator Login Successful",
         description: "Welcome to the AstralCore Moderator panel.",
       });
-      onLoginSuccess();
+      onLoginSuccess(values.email);
     }
 
     setIsLoading(false);
