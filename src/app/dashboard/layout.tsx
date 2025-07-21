@@ -27,7 +27,6 @@ import {
 import { logout } from '@/lib/auth';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -268,7 +267,6 @@ export default function DashboardLayout({
             <SidebarTrigger />
             <div className="w-full flex-1">
               <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                <AstralLogo className="h-6 w-6" />
                 {isClient ? (
                   <span>{getPageTitle()}</span>
                 ) : (
@@ -277,13 +275,55 @@ export default function DashboardLayout({
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                <Link href="/dashboard/inbox">
-                  <Inbox className="h-5 w-5" />
-                  <span className="sr-only">Inbox</span>
-                </Link>
-              </Button>
-              <NotificationBell />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={avatarUrl}
+                        alt="@user"
+                      />
+                      <AvatarFallback>{userInitial}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none text-foreground">
+                        User
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {userEmail || '...'}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/profile">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/inbox">
+                      <Inbox className="mr-2 h-4 w-4" />
+                      <span>Inbox</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/security">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
