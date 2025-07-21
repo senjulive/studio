@@ -5,7 +5,7 @@ import * as React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, LayoutDashboard, Trophy } from 'lucide-react';
+import { AlertCircle, LayoutDashboard } from 'lucide-react';
 import { AnalyticsOverview } from './AnalyticsOverview';
 import { UserLeaderboard } from './UserLeaderboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -73,7 +73,7 @@ export function AnalyticsManager() {
     <Tabs defaultValue="overview">
         <TabsList>
             <TabsTrigger value="overview"><LayoutDashboard className="mr-2"/>Overview</TabsTrigger>
-            <TabsTrigger value="leaderboard"><Trophy className="mr-2"/>Leaderboard</TabsTrigger>
+            <TabsTrigger value="leaderboard"><LayoutDashboard className="mr-2"/>Leaderboard</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-4">
             <AnalyticsOverview data={data} />

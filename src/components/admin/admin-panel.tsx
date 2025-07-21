@@ -28,7 +28,6 @@ import {
   Users,
   Activity,
   LayoutDashboard,
-  Trophy,
 } from 'lucide-react';
 import {WalletManager} from './wallet-manager';
 import {MessageViewer} from './message-viewer';
