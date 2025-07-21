@@ -1,6 +1,4 @@
 
-'use server';
-
 import type { SVGProps } from 'react';
 
 export type Rank = {
