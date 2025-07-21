@@ -33,7 +33,7 @@
 
     /* Custom Sidebar Vars */
     --sidebar-background: 0 0% 100% / 0.5;
-    --sidebar-foreground: 247 38% 15%;
+    --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 272 100% 25%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 246 80% 96% / 0.7;
