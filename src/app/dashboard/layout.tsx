@@ -51,6 +51,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
+import { NotificationBell } from '@/components/dashboard/notification-bell';
 
 // Mock user object
 const mockUser = {
@@ -267,6 +268,7 @@ export default function DashboardLayout({
             <SidebarTrigger />
             <div className="w-full flex-1">
               <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
+                <AstralLogo className="h-6 w-6" />
                 {isClient ? (
                   <span>{getPageTitle()}</span>
                 ) : (
@@ -275,6 +277,7 @@ export default function DashboardLayout({
               </h1>
             </div>
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
