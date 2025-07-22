@@ -165,7 +165,6 @@ export default function DashboardLayout({
   ];
 
   const getPageTitle = () => {
-    // Remove locale from pathname for matching
     const currentPath = pathname;
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
