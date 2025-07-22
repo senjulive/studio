@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -48,24 +49,40 @@ type ChatMessage = {
     isAdmin?: boolean;
 };
 
-const LeaderboardItem = ({ displayName, squadSize, color }: { displayName: string, squadSize: number, color: string }) => (
+type Leader = {
+    id: string;
+    displayName: string;
+    squadSize: number;
+    color: string;
+};
+
+const LeaderboardItem = ({ displayName, squadSize, color }: Leader) => (
     <div className="flex items-center justify-between text-sm p-2 rounded-md hover:bg-muted/50">
         <span className="flex items-center gap-2 font-medium">
             <Crown className={cn("h-4 w-4", color)} />
             {displayName}
         </span>
-        <span className="text-xs text-muted-foreground">{squadSize} members</span>
+        <span className="text-xs text-muted-foreground">{squadSize.toLocaleString()} members</span>
     </div>
 );
 
+const initialLeaders: Omit<Leader, 'squadSize' | 'id'>[] = [
+    { displayName: "CryptoKing", color: "text-amber-400" },
+    { displayName: "SatoshiN", color: "text-amber-400" },
+    { displayName: "EtherEve", color: "text-slate-400" },
+    { displayName: "TheWhale", color: "text-slate-400" },
+    { displayName: "NewbieTrader", color: "text-sky-400" },
+];
+
 export function PublicChatView({ isFloating = false }: { isFloating?: boolean }) {
   const { toast } = useToast();
-  const { user, wallet, rank, tier, tierSettings } = useUser();
+  const { user, wallet } = useUser();
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSending, setIsSending] = React.useState(false);
   const [onlineUsers, setOnlineUsers] = React.useState(0);
+  const [leaders, setLeaders] = React.useState<Leader[]>([]);
   
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
 
@@ -77,7 +94,6 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
             const history = await response.json();
             setMessages(history);
         } catch (error: any) {
-            // Silently fail on floating view to avoid spamming toasts
             if(!isFloating) toast({ title: "Error", description: error.message, variant: "destructive" });
         }
         setIsLoading(false);
@@ -88,7 +104,6 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
     setIsLoading(true);
     fetchHistory();
     
-    // Simulate online users
     setOnlineUsers(Math.floor(Math.random() * (10000 - 3000 + 1)) + 3000);
     const onlineInterval = setInterval(() => {
         setOnlineUsers(prev => Math.max(3000, Math.min(10000, prev + Math.floor(Math.random() * 201) - 100)));
@@ -98,9 +113,25 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
         fetchHistory();
     }, 5000);
 
+    // Initialize leaders
+    setLeaders(initialLeaders.map((l, i) => ({
+        ...l,
+        id: `leader-${i}`,
+        squadSize: Math.floor(Math.random() * (200 - 30 + 1)) + 30
+    })));
+
+    const leaderInterval = setInterval(() => {
+        setLeaders(prevLeaders => prevLeaders.map(l => ({
+            ...l,
+            squadSize: l.squadSize + Math.floor(Math.random() * 3)
+        })).sort((a,b) => b.squadSize - a.squadSize));
+    }, 3000);
+
+
     return () => {
         clearInterval(onlineInterval);
         clearInterval(messageInterval);
+        clearInterval(leaderInterval);
     };
   }, [fetchHistory]);
 
@@ -147,8 +178,21 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
   const CardComponent = isFloating ? 'div' : Card;
 
   return (
-    <div className={cn("grid gap-6", !isFloating && "lg:grid-cols-3")}>
-        <CardComponent className={cn("h-full flex flex-col", !isFloating && "lg:col-span-2")}>
+    <div className={cn("grid gap-6", !isFloating && "lg:grid-cols-1")}>
+        {!isFloating && (
+             <Card>
+                <CardHeader>
+                    <CardTitle>Community Leaders</CardTitle>
+                    <CardDescription>Top squad builders in the community.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    {leaders.map(leader => (
+                        <LeaderboardItem key={leader.id} {...leader} />
+                    ))}
+                </CardContent>
+            </Card>
+        )}
+        <CardComponent className={cn("h-full flex flex-col", !isFloating && "lg:col-span-1")}>
             <CardHeader className="flex-row items-center justify-between">
                 <div>
                     <CardTitle>Public Chat</CardTitle>
@@ -215,21 +259,6 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
                 </form>
             </CardFooter>
         </CardComponent>
-        {!isFloating && (
-             <Card>
-                <CardHeader>
-                    <CardTitle>Community Leaders</CardTitle>
-                    <CardDescription>Top squad builders in the community.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                    <LeaderboardItem displayName="CryptoKing" squadSize={15} color="text-amber-400" />
-                    <LeaderboardItem displayName="SatoshiN" squadSize={11} color="text-amber-400" />
-                    <LeaderboardItem displayName="EtherEve" squadSize={8} color="text-slate-400" />
-                    <LeaderboardItem displayName="TheWhale" squadSize={6} color="text-slate-400" />
-                    <LeaderboardItem displayName="NewbieTrader" squadSize={0} color="text-sky-400" />
-                </CardContent>
-            </Card>
-        )}
     </div>
   );
 }
