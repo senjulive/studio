@@ -106,7 +106,7 @@ export function TradingInfoView() {
                                         <TableCell className="font-medium">
                                             <div className="flex items-center gap-2">
                                                 <tier.Icon className="h-5 w-5" />
-                                                <span className={tier.className}>{tier.name}</span>
+                                                <span className={tier.className}>{tier.name} ({tier.clicks} Grids)</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right font-mono">${tier.balanceThreshold.toLocaleString()}</TableCell>
