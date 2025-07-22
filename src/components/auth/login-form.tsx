@@ -8,7 +8,6 @@ import * as z from "zod";
 import Link from "next/link";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,7 +38,6 @@ const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const t = useTranslations('LoginForm');
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -81,14 +79,14 @@ export function LoginForm() {
 
     if (error) {
         toast({
-            title: t('loginFailedToast.title'),
+            title: "Login Failed",
             description: error,
             variant: "destructive",
         });
     } else {
         toast({
-          title: t('loginSuccessToast.title'),
-          description: t('loginSuccessToast.description'),
+          title: "Login Successful",
+          description: "Welcome to AstralCore!",
         });
         router.push('/dashboard');
     }
@@ -102,7 +100,7 @@ export function LoginForm() {
         <AstralLogo className="mx-auto" />
         <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
         <CardDescription>
-          {t('description')}
+          Enter your credentials to access your account.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -113,7 +111,7 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('emailLabel')}</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input placeholder="name@example.com" {...field} />
                   </FormControl>
@@ -127,13 +125,13 @@ export function LoginForm() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>{t('passwordLabel')}</FormLabel>
+                    <FormLabel>Password</FormLabel>
                     <Button variant="link" asChild className="p-0 h-auto text-sm">
                       <Link
                         href="/forgot-password"
                         className="font-medium text-primary/80 hover:text-primary"
                       >
-                        {t('forgotPasswordLink')}
+                        Forgot password?
                       </Link>
                     </Button>
                   </div>
@@ -168,7 +166,7 @@ export function LoginForm() {
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel>
-                      {t('rememberMeLabel')}
+                      Remember me
                     </FormLabel>
                   </div>
                 </FormItem>
@@ -180,20 +178,20 @@ export function LoginForm() {
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? t('loginButtonLoading') : t('loginButton')}
+              {isLoading ? "Authorizing..." : "Login"}
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="text-center text-sm">
         <p className="w-full text-muted-foreground">
-          {t('registerPrompt')}{" "}
+          Don't have an account?{" "}
           <Button variant="link" asChild className="p-0 h-auto">
             <Link
                 href="/register"
                 className="font-semibold text-primary hover:text-primary/90"
             >
-                {t('registerLink')}
+                Register
             </Link>
           </Button>
         </p>

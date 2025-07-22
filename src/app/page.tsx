@@ -1,7 +1,11 @@
-import { redirect } from 'next/navigation';
-import { defaultLocale } from '@/i18n-config';
- 
-// This page only renders for the root `/` URL
-export default function RootPage() {
-  redirect(`/${defaultLocale}`);
+import { LoginForm } from "@/components/auth/login-form";
+
+export default function LoginPage() {
+  return (
+    <main
+      className="flex min-h-dvh items-center justify-center p-4 bg-background"
+    >
+      <LoginForm />
+    </main>
+  );
 }
