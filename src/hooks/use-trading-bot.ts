@@ -32,6 +32,7 @@ type BotState = {
     orderHistory: Trade[];
     lastTrade: Trade | null;
     candlestickData: CandlestickData[];
+    botLog: { message: string, time: Date }[];
     // Simplified fields, real data comes from wallet
     winRate: number;
     avgTrade: number;
@@ -58,11 +59,19 @@ export function useTradingBot(config: BotConfig) {
         orderHistory: [],
         lastTrade: null,
         candlestickData: [],
+        botLog: [], // Initialize botLog as an empty array
         winRate: 84.2,
         avgTrade: 8.74,
         maxDrawdown: -1.8,
         totalTrades: 1247,
     });
+    
+    const setBotLog = useCallback((logUpdater: React.SetStateAction<{ message: string; time: Date; }[]>) => {
+        setState(prevState => ({
+            ...prevState,
+            botLog: typeof logUpdater === 'function' ? logUpdater(prevState.botLog) : logUpdater
+        }));
+    }, []);
 
     const createGrid = useCallback((price: number) => {
         const orders: Order[] = [];
@@ -170,5 +179,5 @@ export function useTradingBot(config: BotConfig) {
         return () => clearInterval(interval);
     }, [config.initialPrice, createGrid]);
 
-    return { state };
+    return { state, setBotLog };
 }
