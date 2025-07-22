@@ -22,6 +22,7 @@ import {
   Activity,
   LayoutDashboard,
   Banknote,
+  Gem,
 } from 'lucide-react';
 import { WalletManager } from './wallet-manager';
 import { MessageViewer } from './message-viewer';
@@ -34,6 +35,7 @@ import { ModeratorManager } from './moderator-manager';
 import { ActionLogViewer } from './action-log-viewer';
 import { AnalyticsManager } from './analytics/AnalyticsManager';
 import { DepositApprovalManager } from './deposit-approval-manager';
+import { BotTierSettingsManager } from './bot-tier-settings-manager';
 
 type AdminView =
   | 'analytics'
@@ -46,6 +48,7 @@ type AdminView =
   | 'announcements'
   | 'promotions'
   | 'bot-settings'
+  | 'bot-tier-settings'
   | 'site-settings';
 
 const VerificationIcon = () => <span className="text-2xl">🪪</span>;
@@ -61,6 +64,7 @@ const adminTabs = [
     { id: 'announcements', label: 'Alerts', icon: Megaphone, component: <AnnouncementManager /> },
     { id: 'promotions', label: 'Promotions', icon: Gift, component: <PromotionManager /> },
     { id: 'bot-settings', label: 'Bot Settings', icon: Bot, component: <BotSettingsManager /> },
+    { id: 'bot-tier-settings', label: 'Tier Settings', icon: Gem, component: <BotTierSettingsManager /> },
     { id: 'site-settings', label: 'Site Settings', icon: Settings, component: <SiteSettingsManager /> },
 ] as const;
 
