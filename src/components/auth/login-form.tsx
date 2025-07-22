@@ -100,7 +100,7 @@ export function LoginForm() {
         <AstralLogo className="mx-auto h-28 w-28" />
         <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
         <CardDescription>
-          Enter your credentials to access your account.
+          Access the highly intelligent CORE Nexus Quantum v3.76 trading bot.
         </CardDescription>
       </CardHeader>
       <CardContent>
