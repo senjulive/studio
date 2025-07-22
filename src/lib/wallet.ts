@@ -63,7 +63,10 @@ export async function updateWallet(newData: Partial<WalletData>): Promise<Wallet
     const user = { id: MOCK_USER_ID };
     if (!user) throw new Error("User not authenticated.");
 
-    return updateWalletByUserId(user.id, newData);
+    const currentWallet = await getOrCreateWallet(user.id);
+    const updatedWallet = { ...currentWallet, ...newData };
+    mockWallets[user.id] = updatedWallet;
+    return updatedWallet;
 }
 
 export async function saveWithdrawalAddress(asset: string, address: string): Promise<void> {

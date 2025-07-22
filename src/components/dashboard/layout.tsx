@@ -283,20 +283,31 @@ export default function DashboardLayout({
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
           </main>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10 md:hidden">
+          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden holographic-nav">
             {bottomNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors',
-                  isClient && pathname === item.href
+                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
+                  isClient && pathname.endsWith(item.href)
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                <item.icon className="h-6 w-6" />
-                <span>{item.label}</span>
+                {item.label === 'CORE' ? (
+                  <div className="absolute -top-8 flex items-center justify-center">
+                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center holographic-border">
+                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                           <item.icon className="h-8 w-8" />
+                        </div>
+                     </div>
+                  </div>
+                ) : (
+                  <item.icon className="h-6 w-6" />
+                )}
+                
+                <span className={cn(item.label === 'CORE' && 'mt-8')}>{item.label}</span>
               </Link>
             ))}
           </nav>
