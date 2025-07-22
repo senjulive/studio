@@ -40,13 +40,17 @@ const rankIcons: Record<string, IconComponent> = {
 };
 
 const useAnimatedCounter = (endValue: number, duration = 1000) => {
-    const [count, setCount] = React.useState(endValue);
+    const [count, setCount] = React.useState(0);
     const frameRate = 1000 / 60;
     const totalFrames = Math.round(duration / frameRate);
 
     React.useEffect(() => {
+        setCount(endValue);
+    }, [endValue]);
+
+    React.useEffect(() => {
         let frame = 0;
-        const startValue = parseFloat(count.toFixed(2));
+        const startValue = count;
         const increment = (endValue - startValue) / totalFrames;
 
         const counter = setInterval(() => {
@@ -61,7 +65,8 @@ const useAnimatedCounter = (endValue: number, duration = 1000) => {
         }, frameRate);
 
         return () => clearInterval(counter);
-    }, [endValue, duration, frameRate, totalFrames, count]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [endValue, duration, frameRate, totalFrames]);
 
     return count;
 };
@@ -122,10 +127,12 @@ export function ProTraderView() {
         if (user) {
             const [wallet, tiers] = await Promise.all([getOrCreateWallet(), getBotTierSettings()]);
             setWalletData(wallet);
-            setDisplayBalance(wallet.balances?.usdt ?? 0);
+            if (!isAnimating) {
+                setDisplayBalance(wallet.balances?.usdt ?? 0);
+            }
             setTierSettings(tiers);
         }
-    }, [user]);
+    }, [user, isAnimating]);
 
     React.useEffect(() => {
         fetchAndSetData();
@@ -298,7 +305,7 @@ export function ProTraderView() {
                         </Button>
                     </div>
                     <div className="chart-container">
-                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} />
+                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} progress={progress} />
                     </div>
                      <div className="price-display">
                         <div className="price-info">
@@ -319,7 +326,7 @@ export function ProTraderView() {
                         <StatCard label="Profit per Grid" value={`~${profitPercentagePerTrade.toFixed(4)}%`} />
                     </div>
                     <div className="performance-section">
-                        <h3 className="section-header">Performance Analytics</h3>
+                        <h3 className="section-header">Quantum Operation V3.76</h3>
                         <div className="performance-grid">
                             <PerformanceItem label="Win Rate" value={`${simState.winRate.toFixed(1)}%`} className="text-green-400"/>
                             <PerformanceItem label="Total Trades" value={totalTrades.toString()} />
@@ -339,7 +346,7 @@ export function ProTraderView() {
                                 <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
                             ))
                          ) : (
-                             walletData.growth.earningsHistory.slice(-10).reverse().map(trade => (
+                             walletData.growth.earningsHistory.slice(-10).reverse().map((trade, index) => (
                                  <HistoryItem key={trade.timestamp} log={`Grid Profit`} time={format(new Date(trade.timestamp), 'HH:mm:ss')} amount={trade.amount}/>
                              ))
                          )}
