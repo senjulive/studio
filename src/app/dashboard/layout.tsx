@@ -44,7 +44,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Megaphone, Shield, Lock, Trophy } from 'lucide-react';
+import { UserPlus, Shield, Lock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -53,6 +53,7 @@ import { type TierSetting as TierData, getCurrentTier, getBotTierSettings } from
 import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
+import { PromotionIcon } from '@/components/icons/nav/promotion-icon';
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -175,7 +176,7 @@ export default function DashboardLayout({
       {
         title: 'Platform',
         items: [
-          { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
+          { href: '/dashboard/promotions', label: 'Promotions', icon: PromotionIcon },
           { href: '/dashboard/trading-info', label: 'Tiers & Ranks', icon: Trophy },
           { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
           { href: '/dashboard/about', label: 'About', icon: AboutIcon },
@@ -444,7 +445,3 @@ export default function DashboardLayout({
     </UserProvider>
   );
 }
-
-    
-
-    

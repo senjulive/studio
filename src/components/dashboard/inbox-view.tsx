@@ -23,7 +23,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog";
-import { Inbox, Trash2, Loader2, Bell, Megaphone, Gift, AlertCircle, Calendar } from "lucide-react";
+import { Inbox, Trash2, Loader2, AlertCircle, Calendar } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { useUser } from "@/contexts/UserContext";
 import { Button } from "../ui/button";
@@ -33,6 +33,9 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import { NotificationIcon } from "../icons/nav/notification-icon";
+import { AnnouncementIcon } from "../icons/nav/announcement-icon";
+import { PromotionIcon } from "../icons/nav/promotion-icon";
 
 function NotificationCard({ notification }: { notification: Notification }) {
   return (
@@ -152,15 +155,15 @@ export function InboxView() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <TabsList>
                 <TabsTrigger value="notifications">
-                  <Bell className="mr-2 h-4 w-4" />
+                  <NotificationIcon className="mr-2 h-4 w-4" />
                   Notifications {unreadCount > 0 && <Badge className="ml-2">{unreadCount}</Badge>}
                 </TabsTrigger>
                 <TabsTrigger value="announcements">
-                  <Megaphone className="mr-2 h-4 w-4" />
+                  <AnnouncementIcon className="mr-2 h-4 w-4" />
                   Announcements
                 </TabsTrigger>
                 <TabsTrigger value="promotions">
-                   <Gift className="mr-2 h-4 w-4" />
+                   <PromotionIcon className="mr-2 h-4 w-4" />
                    Promotions
                 </TabsTrigger>
               </TabsList>
@@ -196,7 +199,7 @@ export function InboxView() {
                       notifications.map((item) => <NotificationCard key={item.id} notification={item} />)
                   ) : (
                   <div className="flex h-48 flex-col items-center justify-center rounded-md border border-dashed text-center">
-                      <Bell className="h-12 w-12 text-muted-foreground" />
+                      <NotificationIcon className="h-12 w-12 text-muted-foreground" />
                       <p className="mt-4 font-medium text-muted-foreground">No notifications.</p>
                       <p className="text-sm text-muted-foreground">Important account updates will appear here.</p>
                   </div>
@@ -212,7 +215,7 @@ export function InboxView() {
                     announcements.map((item) => <AnnouncementCard key={item.id} announcement={item} />)
                 ) : (
                 <div className="flex h-48 flex-col items-center justify-center rounded-md border border-dashed text-center">
-                    <Megaphone className="h-12 w-12 text-muted-foreground" />
+                    <AnnouncementIcon className="h-12 w-12 text-muted-foreground" />
                     <p className="mt-4 font-medium text-muted-foreground">No announcements yet.</p>
                 </div>
               )}
@@ -227,7 +230,7 @@ export function InboxView() {
                     promotions.map((item) => <PromotionCard key={item.id} promotion={item} />)
                 ) : (
                 <div className="md:col-span-2 flex h-48 flex-col items-center justify-center rounded-md border border-dashed text-center">
-                    <Gift className="h-12 w-12 text-muted-foreground" />
+                    <PromotionIcon className="h-12 w-12 text-muted-foreground" />
                     <p className="mt-4 font-medium text-muted-foreground">No active promotions.</p>
                     <p className="text-sm text-muted-foreground">Check back soon for special offers!</p>
                 </div>

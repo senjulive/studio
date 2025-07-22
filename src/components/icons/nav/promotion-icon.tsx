@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 
-export const SquadIcon = (props: React.SVGProps<SVGSVGElement>) => (
+export const PromotionIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 24 24"
     fill="currentColor"
@@ -18,7 +18,7 @@ export const SquadIcon = (props: React.SVGProps<SVGSVGElement>) => (
           color: 'currentColor',
         }}
       >
-        👥
+        🎁
       </div>
     </foreignObject>
   </svg>

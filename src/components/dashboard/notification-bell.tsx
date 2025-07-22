@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { Bell, CheckCheck } from "lucide-react";
+import { CheckCheck } from "lucide-react";
 
 import {
   Popover,
@@ -21,6 +21,7 @@ import {
 } from "@/lib/notifications";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
+import { NotificationIcon } from "../icons/nav/notification-icon";
 
 function NotificationItem({ notification }: { notification: Notification }) {
     const content = (
@@ -92,7 +93,7 @@ export function NotificationBell() {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative h-7 w-7">
-          <Bell className="h-5 w-5" />
+          <NotificationIcon className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px]">
               {unreadCount}
@@ -129,7 +130,7 @@ export function NotificationBell() {
             </div>
           ) : (
             <div className="flex h-full flex-col items-center justify-center p-6 text-center">
-              <Bell className="h-10 w-10 text-muted-foreground/50" />
+              <NotificationIcon className="h-10 w-10 text-muted-foreground/50" />
               <p className="mt-4 font-medium">No new notifications</p>
               <p className="text-sm text-muted-foreground">We'll let you know when something new happens.</p>
             </div>
