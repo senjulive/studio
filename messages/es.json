@@ -1,0 +1,20 @@
+{
+  "LoginForm": {
+    "description": "Ingrese sus credenciales para acceder a su cuenta.",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contraseña",
+    "forgotPasswordLink": "¿Olvidaste tu contraseña?",
+    "rememberMeLabel": "Recuérdame",
+    "loginButton": "Iniciar sesión",
+    "loginButtonLoading": "Autorizando...",
+    "registerPrompt": "¿No tienes una cuenta?",
+    "registerLink": "Registrarse",
+    "loginSuccessToast": {
+      "title": "Inicio de sesión exitoso",
+      "description": "¡Bienvenido a AstralCore!"
+    },
+    "loginFailedToast": {
+      "title": "Error de inicio de sesión"
+    }
+  }
+}
