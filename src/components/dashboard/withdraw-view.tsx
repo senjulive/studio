@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Info, Loader2, Clock } from "lucide-react";
+import { Info, Loader2, Clock, KeyRound } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,7 @@ export function WithdrawView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [currentAddress, setCurrentAddress] = React.useState("");
   const [amount, setAmount] = React.useState("");
+  const [passcode, setPasscode] = React.useState("");
   const { user } = useUser();
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -121,7 +122,19 @@ export function WithdrawView() {
       return;
     }
 
+    if (!passcode || passcode.length < 4) {
+      toast({
+        title: "Passcode Required",
+        description: `Please enter a valid passcode to authorize this transaction.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsWithdrawing(true);
+
+    // Mock passcode check
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const withdrawalRequest = {
         id: crypto.randomUUID(),
@@ -156,6 +169,7 @@ export function WithdrawView() {
     });
 
     setAmount("");
+    setPasscode("");
     toast({
       title: "Withdrawal Initiated",
       description: `Your withdrawal of ${withdrawAmount.toFixed(2)} ${asset.toUpperCase()} is being processed.`,
@@ -218,18 +232,31 @@ export function WithdrawView() {
                 className="font-mono text-sm"
             />
             </div>
-            <div className="space-y-2">
-            <Label htmlFor="amount">Amount to Withdraw (Available: ${walletData?.balances.usdt.toFixed(2)})</Label>
-            <Input
-                id="amount"
-                type="number"
-                placeholder="Minimum $10.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                disabled={isWithdrawing}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="amount">Amount to Withdraw (Available: ${walletData?.balances.usdt.toFixed(2)})</Label>
+                <Input
+                    id="amount"
+                    type="number"
+                    placeholder="Minimum $10.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    disabled={isWithdrawing}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="passcode">Security Passcode</Label>
+                <Input
+                    id="passcode"
+                    type="password"
+                    placeholder="••••••"
+                    value={passcode}
+                    onChange={(e) => setPasscode(e.target.value)}
+                    disabled={isWithdrawing}
+                />
+              </div>
             </div>
-            <Button type="submit" disabled={isWithdrawing || !amount} className="w-full">
+            <Button type="submit" disabled={isWithdrawing || !amount || !passcode} className="w-full">
             {isWithdrawing && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
