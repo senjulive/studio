@@ -151,7 +151,7 @@ export function TradingBotCard({
                         "p-2 rounded-lg bg-muted transition-all",
                         isAnimating && "bg-primary/20 animate-bot-pulse"
                     )}>
-                        <Bot className={cn(
+                        <AstralLogo className={cn(
                             "h-6 w-6 text-foreground/80 transition-colors",
                             isAnimating && "text-primary"
                         )} />
