@@ -346,7 +346,7 @@ export function ProTraderView() {
                      </div>
                  </div>
                  <div className="order-history">
-                     <h3 className="section-header">Market Value</h3>
+                     <h3 className="section-header">🤖 Quantum Operation V3.76</h3>
                      <div className="order-list">
                         {[...Array(totalGrids)].map((_, i) => (
                            <div className="order-item" key={i}>
@@ -367,4 +367,3 @@ export function ProTraderView() {
         </div>
     );
 }
-
