@@ -12,6 +12,8 @@ import { useUser } from '@/contexts/UserContext';
 import { type TierSetting as TierData, getCurrentTier, getBotTierSettings } from '@/lib/tiers';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '../ui/skeleton';
+import { UsdtLogoIcon } from '../icons/usdt-logo';
+import { format } from 'date-fns';
 
 const StatCard = ({ label, value, className, change }: { label: string; value: string; className?: string; change?: string }) => (
     <div className="stat-card">
@@ -23,14 +25,13 @@ const StatCard = ({ label, value, className, change }: { label: string; value: s
     </div>
 );
 
-const OrderItem = ({ type, price, amount, time }: { type: 'buy' | 'sell'; price: string; amount: string; time: string }) => (
+const HistoryItem = ({ log, time }: { log: string; time: string }) => (
     <div className="order-item">
-        <div className={cn("font-bold", type === 'buy' ? "order-buy" : "order-sell")}>{type.toUpperCase()}</div>
-        <div>{price}</div>
-        <div>{amount}</div>
+        <div className="flex-1">{log}</div>
         <div className="order-time">{time}</div>
     </div>
 );
+
 
 const PerformanceItem = ({ label, value, className }: { label: string; value: string; className?: string }) => (
     <div className="performance-item">
@@ -104,9 +105,8 @@ const formatCurrency = (value: number) => {
 
 
 export function ProTraderView() {
-    const [activePair, setActivePair] = React.useState('BTC/USDT');
     const [activeChartTab, setActiveChartTab] = React.useState('Candlestick');
-    const { state: simState } = useTradingBot({ initialPrice: 68000 });
+    const { state: simState, setBotLog } = useTradingBot({ initialPrice: 68000 });
     const [walletData, setWalletData] = React.useState<WalletData | null>(null);
     const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
     const [isAnimating, setIsAnimating] = React.useState(false);
@@ -115,6 +115,7 @@ export function ProTraderView() {
     
     const [floaters, setFloaters] = React.useState<{ id: number; x: number; y: number; text: string; type: 'profit' | 'loss' }[]>([]);
     const chartContainerRef = React.useRef<HTMLDivElement>(null);
+    const botLogIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
     React.useEffect(() => {
         async function fetchData() {
@@ -175,9 +176,27 @@ export function ProTraderView() {
         }
     
         setIsAnimating(true);
+        setBotLog([]);
+
+        const logMessages = [
+            "Connecting to Exchange...", "Authenticating API Keys...", "Fetching Market Data...", "Analyzing Market Volatility...",
+            "Calculating Grid Levels...", "Placing Upper Grid Sell Orders...", "Placing Lower Grid Buy Orders...",
+            "Monitoring Price Action...", "Executing Grid Trade...", "Finalizing Trade and Calculating Profit...", "Updating Portfolio..."
+        ];
+
+        let logIndex = 0;
+        botLogIntervalRef.current = setInterval(() => {
+            if (logIndex < logMessages.length) {
+                setBotLog(prev => [...prev, { message: logMessages[logIndex], time: new Date() }]);
+                logIndex++;
+            } else {
+                if(botLogIntervalRef.current) clearInterval(botLogIntervalRef.current);
+            }
+        }, 5000); // 5 seconds per log message for a ~60s total run
         
-        // Simulate animation time before processing profit
         setTimeout(() => {
+            if (botLogIntervalRef.current) clearInterval(botLogIntervalRef.current);
+            
             const usdtEarnings = profitPerTrade;
             
             const newEarning = { amount: usdtEarnings, timestamp: Date.now() };
@@ -203,7 +222,6 @@ export function ProTraderView() {
               description: `You've earned ${formatCurrency(usdtEarnings)}.`,
             });
             
-            // Trigger floating text animation
             const chartRect = chartContainerRef.current?.getBoundingClientRect();
             if (chartRect) {
                 const newFloater = {
@@ -220,7 +238,7 @@ export function ProTraderView() {
             }
 
             setIsAnimating(false);
-        }, 8000); // Animation duration of 8 seconds
+        }, 60000); // Animation duration of 60 seconds
     };
     
     if (!walletData) {
@@ -230,6 +248,9 @@ export function ProTraderView() {
              </div>
         )
     }
+
+    const totalGrids = currentTier?.clicks ?? 0;
+    const executedGrids = totalGrids - gridsRemaining;
 
     return (
         <div className="trading-card">
@@ -251,16 +272,6 @@ export function ProTraderView() {
                     )}
                 </Button>
             </header>
-
-            <section className="controls">
-                <div className="pair-selector">
-                    {['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XRP/USDT'].map(pair => (
-                        <button key={pair} onClick={() => setActivePair(pair)} className={cn("pair-btn", activePair === pair && "active")}>
-                            {pair}
-                        </button>
-                    ))}
-                </div>
-            </section>
 
             <section className="content-grid">
                 <div className="chart-section">
@@ -287,10 +298,8 @@ export function ProTraderView() {
                     </div>
                      <div className="price-display">
                         <div className="price-info">
-                            <div className="price-value">{formatCurrency(simState.currentPrice)}</div>
-                            <div className={cn("price-change", simState.change24h >= 0 ? 'positive' : 'negative')}>
-                                {simState.change24h >= 0 ? '+' : ''}{simState.change24h.toFixed(2)}%
-                            </div>
+                             <UsdtLogoIcon className="h-8 w-8" />
+                            <div className="price-value">{formatCurrency(totalBalance)}</div>
                         </div>
                         <div className="volume-info">
                             Vol: {simState.volume24h.toLocaleString()}M
@@ -302,7 +311,7 @@ export function ProTraderView() {
                     <div className="stats-grid">
                         <StatCard label="Portfolio Balance" value={formatCurrency(totalBalance)} />
                         <StatCard label="Today's P&L" value={`${dailyEarnings >= 0 ? '+' : ''}${formatCurrency(dailyEarnings)}`} className={dailyEarnings >= 0 ? "profit" : "loss"} />
-                        <StatCard label="Grids Remaining" value={`${gridsRemaining}/${currentTier?.clicks || 0}`} />
+                        <StatCard label="Grids Remaining" value={`${gridsRemaining}/${totalGrids}`} />
                         <StatCard label="Profit per Grid" value={`~${profitPercentagePerTrade.toFixed(4)}%`} />
                     </div>
                     <div className="performance-section">
@@ -319,18 +328,34 @@ export function ProTraderView() {
 
             <div className="bottom-stats">
                  <div className="order-history">
-                    <h3 className="section-header">Simulated Order History</h3>
+                    <h3 className="section-header">History</h3>
                      <div className="order-list">
-                        {simState.orderHistory.map(order => (
-                             <OrderItem key={order.id} type={order.type} price={order.price.toFixed(2)} amount={order.amount.toFixed(2)} time={order.time} />
-                        ))}
+                        {isAnimating ? (
+                            simState.botLog.map((log, index) => (
+                                <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
+                            ))
+                        ) : (
+                             walletData.growth.earningsHistory.slice(-10).reverse().map(trade => (
+                                <HistoryItem key={trade.timestamp} log={`Grid Profit Executed`} time={format(new Date(trade.timestamp), 'PPpp')} />
+                            ))
+                        )}
                      </div>
                  </div>
                  <div className="order-history">
-                     <h3 className="section-header">Simulated Open Orders</h3>
+                     <h3 className="section-header">Open Orders</h3>
                      <div className="order-list">
-                        {simState.openOrders.map(order => (
-                            <OrderItem key={order.id} type={order.type} price={order.price.toFixed(2)} amount={order.amount.toFixed(2)} time="pending" />
+                        {[...Array(totalGrids)].map((_, i) => (
+                           <div className="order-item" key={i}>
+                                <div className={cn("font-bold", i < executedGrids ? "text-slate-500" : "text-amber-400")}>
+                                    Grid #{i + 1}
+                                </div>
+                                <div className={cn(i < executedGrids ? "text-slate-500" : "text-slate-300")}>
+                                     {i < executedGrids ? 'Executed' : 'Pending'}
+                                </div>
+                                <div className="order-time">
+                                    { i < executedGrids && walletData.growth.earningsHistory[i] ? format(new Date(walletData.growth.earningsHistory[i].timestamp), 'HH:mm:ss') : '--:--:--'}
+                                </div>
+                           </div>
                         ))}
                      </div>
                  </div>
