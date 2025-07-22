@@ -5,6 +5,7 @@ import { MessageSquare, X, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PublicChatView } from "./public-chat-view"
 import { AnimatePresence, motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 export function FloatingChat() {
   const [isOpen, setIsOpen] = React.useState(false)
@@ -66,13 +67,21 @@ export function FloatingChat() {
       </AnimatePresence>
       
       {!isOpen && (
-        <Button
-            onClick={handleToggle}
-            className="fixed bottom-4 right-4 z-50 rounded-full h-14 w-14 shadow-lg"
+        <motion.div
+          drag
+          dragConstraints={{ left: 8, right: window.innerWidth - 64, top: 8, bottom: window.innerHeight - 64 }}
+          dragMomentum={false}
+          className="fixed bottom-4 right-4 z-50 cursor-grab active:cursor-grabbing"
+          initial={{ bottom: 16, right: 16 }}
         >
+          <Button
+            onClick={handleToggle}
+            className="rounded-full h-14 w-14 shadow-lg"
+          >
             <MessageSquare className="h-6 w-6" />
             <span className="sr-only">Open Chat</span>
-        </Button>
+          </Button>
+        </motion.div>
       )}
     </>
   )
