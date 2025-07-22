@@ -68,6 +68,20 @@ export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPerce
   }, [profitPerTrade, totalBalance, isAnimating]);
   
   const chartHeight = chartAreaRef.current?.offsetHeight || 380;
+
+  // FIX: Added a check to ensure candlestickData is not undefined
+  if (!candlestickData || candlestickData.length === 0) {
+    return (
+      <div className="trading-container" ref={chartAreaRef}>
+        <div className="grid-levels">
+            {[20, 40, 60, 80].map((top, i) => (
+                <div key={i} className="grid-line" style={{ top: `${top}%` }}></div>
+            ))}
+        </div>
+      </div>
+    );
+  }
+
   const priceData = candlestickData.map(d => [d.high, d.low]).flat();
   const minPrice = Math.min(...priceData, currentPrice);
   const maxPrice = Math.max(...priceData, currentPrice);
