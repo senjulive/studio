@@ -1,8 +1,6 @@
-
 'use server';
 
-import { getBotTierSettings } from './tiers';
-import { getCurrentTier } from './settings';
+import { getBotTierSettings, getCurrentTier } from './tiers';
 import initialWallets from '../../data/wallets.json';
 
 let mockWallets: Record<string, any> = initialWallets;

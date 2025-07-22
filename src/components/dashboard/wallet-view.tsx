@@ -1,5 +1,4 @@
-
-"use client";
+'use client';
 
 import * as React from "react";
 import Link from "next/link";
@@ -29,8 +28,8 @@ import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
-import { type TierSetting as TierData } from "@/lib/tiers";
-import { tierIcons, tierClassNames, getCurrentTier } from '@/lib/settings';
+import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from "@/lib/tiers";
+import { tierIcons, tierClassNames } from '@/lib/settings';
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -185,7 +184,7 @@ export function WalletView() {
     if (user?.id) {
         const [wallet, tiers] = await Promise.all([
           getOrCreateWallet(),
-          fetchTierSettings(),
+          getBotTierSettings(),
         ]);
         setWalletData(wallet);
         setTierSettings(tiers);
