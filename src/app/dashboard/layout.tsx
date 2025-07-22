@@ -62,6 +62,7 @@ import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
 import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -370,6 +371,33 @@ export default function DashboardLayout({
               </h1>
             </div>
             <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                     <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
+                        <RankIcon className="h-4 w-4" />
+                        <span>{rank.name}</span>
+                     </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Account Rank</p>
+                  </TooltipContent>
+                </Tooltip>
+                 {tier && TierIcon && tierClassName && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
+                          <TierIcon className="h-4 w-4" />
+                          <span>{tier.name}</span>
+                        </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>VIP CORE Tier</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </TooltipProvider>
+
               <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
                 <Link href="/dashboard/inbox">
                   <InboxIcon className="h-5 w-5" />
@@ -415,3 +443,5 @@ export default function DashboardLayout({
     </UserProvider>
   );
 }
+
+    
