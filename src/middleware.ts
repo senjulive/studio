@@ -10,5 +10,16 @@ export default createMiddleware({
  
 export const config = {
   // Match only internationalized pathnames
-  matcher: ['/', '/(en|es|fr|zh|ru)/:path*']
+  matcher: [
+    // Enable a redirect to a matching locale at the root
+    '/',
+
+    // Set a cookie to remember the previous locale for
+    // all requests that have a locale prefix
+    '/(en|es|fr|zh|ru)/:path*',
+
+    // Enable redirects that add a locale prefix
+    // (e.g. `/pathnames` -> `/en/pathnames`)
+    '/((?!_next|.*\\..*|api).*)'
+  ]
 };
