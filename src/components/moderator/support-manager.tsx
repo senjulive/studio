@@ -4,7 +4,6 @@
 import * as React from 'react';
 import {format} from 'date-fns';
 import {
-  getAllChats,
   sendAdminMessage,
   type ChatHistory,
   type Message,
@@ -82,9 +81,19 @@ export function SupportManager() {
         return {};
       }
     };
+    
+    const fetchAllChats = async (): Promise<ChatHistory> => {
+        try {
+            const response = await fetch('/api/support/chat', { method: 'PATCH' });
+            if (!response.ok) return {};
+            return await response.json();
+        } catch {
+            return {};
+        }
+    };
 
     const [chatData, walletData, claimData] = await Promise.all([
-      getAllChats(),
+      fetchAllChats(),
       fetchWallets(),
       fetchClaims(),
     ]);
@@ -105,11 +114,15 @@ export function SupportManager() {
 
     setIsSending(prev => ({...prev, [userId]: true}));
 
-    await sendAdminMessage(userId, text);
+    await fetch('/api/support/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, text, sender: 'admin' }),
+    });
+
     await logModeratorAction(`Replied to support thread for user ${username}.`);
 
-    const data = await getAllChats();
-    setChats(data);
+    await fetchData(); // Refetch all data
 
     setReplyMessages(prev => ({...prev, [userId]: ''}));
     setIsSending(prev => ({...prev, [userId]: false}));
@@ -153,6 +166,8 @@ export function SupportManager() {
 
   const sortedChats = chats
     ? Object.entries(chats).sort(([, a], [, b]) => {
+        if (a.length === 0) return 1;
+        if (b.length === 0) return -1;
         const lastMsgA = new Date(a[a.length - 1]?.timestamp ?? 0).getTime();
         const lastMsgB = new Date(b[b.length - 1]?.timestamp ?? 0).getTime();
         return lastMsgB - lastMsgA;
@@ -174,6 +189,7 @@ export function SupportManager() {
   return (
     <Accordion type="single" collapsible className="w-full">
       {sortedChats.map(([userId, messages]) => {
+        if (messages.length === 0) return null;
         const wallet = wallets?.[userId];
         const displayName = wallet?.profile?.username || userId;
         const currentClaim = claimStatus[userId];

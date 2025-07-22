@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { getChatHistoryForUser, sendMessage, type Message } from "@/lib/chat";
+import { type Message } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useUser } from "@/contexts/UserContext";
@@ -36,13 +36,19 @@ export function SupportChat() {
 
   const fetchHistory = React.useCallback(async () => {
     if (user?.id) {
-        const history = await getChatHistoryForUser(user.id);
-        setMessages(history.filter(m => !m.silent));
+        try {
+            const response = await fetch(`/api/support/chat?userId=${user.id}`);
+            if (!response.ok) throw new Error("Failed to fetch chat history.");
+            const history = await response.json();
+            setMessages(history.filter((m: Message) => !m.silent));
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" });
+        }
         setIsLoading(false);
     } else {
         setIsLoading(false);
     }
-  }, [user]);
+  }, [user, toast]);
 
   React.useEffect(() => {
     if (user?.id) {
@@ -105,7 +111,17 @@ export function SupportChat() {
     }
     
     try {
-      await sendMessage(user.id, newMessage, fileDataUrl);
+      await fetch('/api/support/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            userId: user.id,
+            text: newMessage,
+            fileDataUrl,
+            sender: 'user',
+        })
+      });
+
       setNewMessage("");
       setSelectedFile(null);
       if (fileInputRef.current) {
@@ -130,7 +146,7 @@ export function SupportChat() {
       <CardHeader>
         <CardTitle>Customer Support</CardTitle>
         <CardDescription>
-          Have a question or issue? Send us a message below.
+          Have a question or issue? Send us a message below. Messages are deleted after 24 hours.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
