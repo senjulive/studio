@@ -298,7 +298,7 @@ export function ProTraderView() {
                         </Button>
                     </div>
                     <div className="chart-container">
-                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} />
+                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} progress={progress} />
                     </div>
                      <div className="price-display">
                         <div className="price-info">
@@ -351,7 +351,7 @@ export function ProTraderView() {
                         {[...Array(totalGrids)].map((_, i) => (
                            <div className="order-item" key={i}>
                                 <div className={cn("font-bold text-white")}>
-                                    Grid Cycle #{i + 1}
+                                    Operation status 🤖 {i + 1}
                                 </div>
                                 <Badge variant={i < executedGrids ? "default" : "secondary"} className={cn(i < executedGrids ? "bg-green-600/80" : "bg-slate-600/80")}>
                                     {i < executedGrids ? 'Executed' : 'Pending'}
