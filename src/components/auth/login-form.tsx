@@ -97,7 +97,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <AstralLogo className="mx-auto" />
+        <AstralLogo className="mx-auto h-28 w-28" />
         <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
         <CardDescription>
           Enter your credentials to access your account.
