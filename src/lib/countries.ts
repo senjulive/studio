@@ -6,7 +6,7 @@ export type Country = {
   flag: string;
 };
 
-export const countries: Country[] = [
+export const countries: Country[] & { find: (predicate: (value: Country, index: number, obj: Country[]) => unknown) => Country | undefined } = [
   { name: 'Afghanistan', dial_code: '+93', code: 'AF', flag: '🇦🇫' },
   { name: 'Albania', dial_code: '+355', code: 'AL', flag: '🇦🇱' },
   { name: 'Algeria', dial_code: '+213', code: 'DZ', flag: '🇩🇿' },
@@ -67,4 +67,4 @@ export const countries: Country[] = [
   { name: 'United Kingdom', dial_code: '+44', code: 'GB', flag: '🇬🇧' },
   { name: 'United States', dial_code: '+1', code: 'US', flag: '🇺🇸' },
   { name: 'Vietnam', dial_code: '+84', code: 'VN', flag: '🇻🇳' },
-];
+] as any;

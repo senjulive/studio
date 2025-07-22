@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/sidebar';
 import { logout } from '@/lib/auth';
 import * as React from 'react';
+import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
@@ -42,10 +43,36 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Megaphone, Shield } from 'lucide-react';
+import { UserPlus, Megaphone, Shield, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
+import { getUserRank } from '@/lib/ranks';
+import { type TierSetting as TierData, getCurrentTier, getBotTierSettings } from '@/lib/tiers';
+import { Badge } from '@/components/ui/badge';
+import { countries } from '@/lib/countries';
+import { tierIcons, tierClassNames } from '@/lib/settings';
+
+// Import rank icons
+import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
+import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
+import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
+import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
+import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
+import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
+import { Separator } from '@/components/ui/separator';
+
+type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+const rankIcons: Record<string, IconComponent> = {
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
+};
 
 // Mock user object
 const mockUser = {
@@ -72,6 +99,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [user, setUser] = React.useState<any | null>(null);
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
+  const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
@@ -88,10 +116,14 @@ export default function DashboardLayout({
 
       if (currentUser.id) {
         try {
-            const walletData = await getOrCreateWallet(currentUser.id);
+            const [walletData, tiers] = await Promise.all([
+                getOrCreateWallet(currentUser.id),
+                getBotTierSettings()
+            ]);
             setWallet(walletData);
+            setTierSettings(tiers);
         } catch (error) {
-            console.error("Failed to fetch wallet data:", error);
+            console.error("Failed to fetch initial data:", error);
             // Handle error appropriately, maybe show an error message
         }
       }
@@ -177,8 +209,15 @@ export default function DashboardLayout({
   };
 
   const isClient = typeof window !== 'undefined';
-  const avatarUrl = wallet?.profile?.avatarUrl;
   
+  const totalBalance = wallet?.balances?.usdt ?? 0;
+  const rank = getUserRank(totalBalance);
+  const RankIcon = rankIcons[rank.Icon] || Lock;
+  const tier = getCurrentTier(totalBalance, tierSettings);
+  const TierIcon = tier ? tierIcons[tier.id] : null;
+  const tierClassName = tier ? tierClassNames[tier.id] : null;
+  const userCountry = countries.find(c => c.name === wallet?.profile?.country);
+
   if (isInitializing) {
     return <DashboardLoading />;
   }
@@ -189,12 +228,45 @@ export default function DashboardLayout({
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center gap-2">
-              <AstralLogo className="h-24 w-24" />
+              <AstralLogo className="h-10 w-10" />
               <span className="text-lg font-semibold text-sidebar-foreground">
                 AstralCore
               </span>
             </div>
           </SidebarHeader>
+
+          <div className="mt-12 mb-4 px-4 space-y-4">
+             <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={wallet?.profile?.avatarUrl}
+                      alt={wallet?.profile?.username || 'User'}
+                    />
+                    <AvatarFallback>{userInitial}</AvatarFallback>
+                  </Avatar>
+                  <div className="overflow-hidden">
+                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
+                        {wallet?.profile?.username || 'User'}
+                        {userCountry && <span className="text-lg">{userCountry.flag}</span>}
+                     </p>
+                     <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
+                  </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
+                    <RankIcon className="h-4 w-4" />
+                    <span>{rank.name}</span>
+                 </Badge>
+                 {tier && TierIcon && tierClassName && (
+                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
+                    <TierIcon className="h-4 w-4" />
+                    <span>{tier.name}</span>
+                  </Badge>
+                )}
+              </div>
+          </div>
+          <Separator className="bg-sidebar-border" />
+
           <SidebarContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -217,29 +289,16 @@ export default function DashboardLayout({
           <SidebarFooter>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent/50">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={avatarUrl}
-                      alt="@user"
-                    />
-                    <AvatarFallback>{userInitial}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col overflow-hidden text-left">
-                    <p className="truncate text-sm font-medium text-sidebar-foreground">
-                      User
-                    </p>
-                    <p className="truncate text-xs text-sidebar-foreground/70">
-                      {userEmail || '...'}
-                    </p>
-                  </div>
-                </div>
+                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-2">
+                   <SettingsIcon className="mr-2 h-4 w-4" />
+                   Settings & Logout
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none text-foreground">
-                      User
+                      {wallet?.profile?.username || 'User'}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {userEmail || '...'}
