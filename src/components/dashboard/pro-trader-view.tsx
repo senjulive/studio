@@ -9,14 +9,14 @@ import { Button } from '../ui/button';
 import { useTradingBot } from '@/hooks/use-trading-bot';
 import { getOrCreateWallet, updateWallet, type WalletData } from '@/lib/wallet';
 import { useUser } from '@/contexts/UserContext';
-import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
+import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '../ui/skeleton';
 import { UsdtLogoIcon } from '../icons/usdt-logo';
 import { format } from 'date-fns';
 import { Badge } from '../ui/badge';
 import { getUserRank } from '@/lib/ranks';
-import { tierIcons, tierClassNames, getCurrentTier } from '@/lib/settings';
+import { tierIcons, tierClassNames } from '@/lib/settings';
 import { GridTradingAnimation } from './grid-trading-animation';
 import Link from 'next/link';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
@@ -115,7 +115,7 @@ const formatCurrency = (value: number) => {
 
 export function ProTraderView() {
     const [walletData, setWalletData] = React.useState<WalletData | null>(null);
-    const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
+    const [currentTier, setCurrentTier] = React.useState<TierData | null>(null);
     const [isAnimating, setIsAnimating] = React.useState(false);
     const [progress, setProgress] = React.useState(0);
     const [displayBalance, setDisplayBalance] = React.useState(0);
@@ -153,7 +153,8 @@ export function ProTraderView() {
             if (!isAnimating) {
                 setDisplayBalance(wallet.balances?.usdt ?? 0);
             }
-            setTierSettings(tiers);
+            const tier = await getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
+            setCurrentTier(tier);
         }
     }, [user, isAnimating]);
 
@@ -175,7 +176,6 @@ export function ProTraderView() {
     const totalBalance = walletData?.balances?.usdt ?? 0;
     const totalTrades = walletData?.growth?.earningsHistory?.length ?? 0;
     
-    const currentTier = getCurrentTier(totalBalance, tierSettings);
     const rank = getUserRank(totalBalance);
     const RankIcon = rankIcons[rank.Icon] || Lock;
     const TierIcon = currentTier ? tierIcons[currentTier.id] : null;

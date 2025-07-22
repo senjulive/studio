@@ -162,23 +162,11 @@ const assetConfig = [
     },
 ] as const;
 
-async function fetchTierSettings(): Promise<TierData[]> {
-    try {
-        const response = await fetch('/api/public-settings?key=botTierSettings');
-        if (!response.ok) return [];
-        const data = await response.json();
-        return data || [];
-    } catch {
-        return [];
-    }
-}
-
-
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const { user } = useUser();
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
-  const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
+  const [tier, setTier] = React.useState<TierData | null>(null);
 
   const fetchWalletData = React.useCallback(async () => {
     if (user?.id) {
@@ -187,7 +175,8 @@ export function WalletView() {
           getBotTierSettings(),
         ]);
         setWalletData(wallet);
-        setTierSettings(tiers);
+        const currentTier = await getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
+        setTier(currentTier);
       }
   }, [user]);
 
@@ -313,7 +302,6 @@ export function WalletView() {
   const rank = getUserRank(totalBalance);
   const RankIcon = rankIcons[rank.Icon] || RecruitRankIcon;
 
-  const tier = getCurrentTier(totalBalance, tierSettings);
   const TierIcon = tier ? tierIcons[tier.id] : null;
   const tierClassName = tier ? tierClassNames[tier.id] : null;
 

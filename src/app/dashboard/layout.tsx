@@ -101,7 +101,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [user, setUser] = React.useState<any | null>(null);
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
-  const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
+  const [tier, setTier] = React.useState<TierData | null>(null);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
@@ -123,7 +123,8 @@ export default function DashboardLayout({
                 getBotTierSettings()
             ]);
             setWallet(walletData);
-            setTierSettings(tiers);
+            const currentTier = await getCurrentTier(walletData.balances?.usdt ?? 0, tiers);
+            setTier(currentTier);
         } catch (error) {
             console.error("Failed to fetch initial data:", error);
             // Handle error appropriately, maybe show an error message
@@ -238,7 +239,6 @@ export default function DashboardLayout({
   const totalBalance = wallet?.balances?.usdt ?? 0;
   const rank = getUserRank(totalBalance);
   const RankIcon = rankIcons[rank.Icon] || Lock;
-  const tier = getCurrentTier(totalBalance, tierSettings);
   const TierIcon = tier ? tierIcons[tier.id] : null;
   const tierClassName = tier ? tierClassNames[tier.id] : null;
   const userCountry = countries.find(c => c.name === wallet?.profile?.country);

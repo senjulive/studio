@@ -45,7 +45,7 @@ export async function getOrCreateWallet(userId?: string): Promise<WalletData> {
         if (now - lastReset > oneDay) {
             const settings = await getBotTierSettings();
             const balance = wallet.balances?.usdt || 0;
-            const currentTier = getCurrentTier(balance, settings);
+            const currentTier = await getCurrentTier(balance, settings);
             
             if(currentTier) {
                 wallet.growth.clicksLeft = currentTier.clicks;

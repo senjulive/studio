@@ -49,7 +49,7 @@ export async function getBotTierSettings(): Promise<TierSetting[]> {
     return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
-export function getCurrentTier(balance: number, tiers: TierSetting[]): TierSetting | null {
+export async function getCurrentTier(balance: number, tiers: TierSetting[]): Promise<TierSetting | null> {
     if (!tiers || tiers.length === 0) return null;
     const applicableTier = [...tiers].reverse().find(
       tier => balance >= tier.balanceThreshold && !tier.locked
