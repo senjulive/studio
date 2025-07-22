@@ -4,7 +4,7 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Gem, Trophy, TrendingUp, Unlock } from "lucide-react";
+import { Gem, Trophy, TrendingUp, Unlock, Lock } from "lucide-react";
 import { type TierSetting as TierSettingData } from "@/lib/tiers";
 import { ranks } from "@/lib/ranks";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +49,6 @@ export function TradingInfoView() {
             }
         } catch (error) {
             console.error(error);
-            // Set empty array on error
             setTierSettings([]);
         } finally {
             setIsLoading(false);
@@ -59,7 +58,6 @@ export function TradingInfoView() {
   }, []);
   
   const calculateEarnings = (balance: number, dailyProfit: number, days: number) => {
-    // Note: This is a simple projection and doesn't account for compounding.
     const dailyEarning = balance * dailyProfit;
     return dailyEarning * days;
   };
@@ -113,8 +111,8 @@ export function TradingInfoView() {
                                         <TableCell className="text-right font-mono">{tier.clicks}</TableCell>
                                         <TableCell className="text-right font-mono text-green-600">~{(tier.dailyProfit * 100).toFixed(1)}%</TableCell>
                                         <TableCell className="text-right">
-                                            {tier.name.includes('VII') || tier.name.includes('VIII') ? (
-                                                <Badge variant="secondary">Locked</Badge>
+                                            {tier.locked ? (
+                                                <Badge variant="secondary"><Lock className="mr-1 h-3 w-3"/>Locked</Badge>
                                             ) : (
                                                 <Badge variant="outline" className="text-green-600 border-green-600/50">
                                                     <Unlock className="mr-1 h-3 w-3" />
@@ -158,7 +156,7 @@ export function TradingInfoView() {
                                 ))
                             ) : (
                                 tierSettings.filter(t => t.balanceThreshold > 0).map((tier) => (
-                                    <TableRow key={`earnings-${tier.id}`} className={tier.name.includes('VII') || tier.name.includes('VIII') ? 'opacity-50' : ''}>
+                                    <TableRow key={`earnings-${tier.id}`} className={tier.locked ? 'opacity-50' : ''}>
                                         <TableCell className="font-medium">
                                             <div className="flex items-center gap-2">
                                                 <tier.Icon className="h-5 w-5" />
@@ -204,7 +202,7 @@ export function TradingInfoView() {
                                     <TableCell className="text-right font-mono">${rank.minBalance.toLocaleString()}</TableCell>
                                     <TableCell className="text-right">
                                          {rank.name === 'Astral' || rank.name === 'Cosmic' ? (
-                                            <Badge variant="secondary">Locked</Badge>
+                                            <Badge variant="secondary"><Lock className="mr-1 h-3 w-3"/>Locked</Badge>
                                         ) : (
                                             <Badge variant="outline" className="text-green-600 border-green-600/50">
                                                 <Unlock className="mr-1 h-3 w-3" />

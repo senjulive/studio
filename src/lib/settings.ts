@@ -36,3 +36,11 @@ export type TierSetting = TierSettingData & {
   Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
   className: string;
 };
+
+export const getCurrentTier = (balance: number, tiers: TierSettingData[]): TierSettingData | null => {
+    if (!tiers || tiers.length === 0) return null;
+    const applicableTier = [...tiers].reverse().find(
+      tier => balance >= tier.balanceThreshold && !tier.locked
+    );
+    return applicableTier || tiers.find(t => !t.locked) || null;
+};

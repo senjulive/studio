@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/sidebar';
 import { logout } from '@/lib/auth';
 import * as React from 'react';
+import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
@@ -43,10 +44,38 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
+import { UserPlus, Shield, Lock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
+import { getUserRank } from '@/lib/ranks';
+import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
+import { Badge } from '@/components/ui/badge';
+import { countries } from '@/lib/countries';
+import { tierIcons, tierClassNames, getCurrentTier } from '@/lib/settings';
+import { PromotionIcon } from '@/components/icons/nav/promotion-icon';
+
+// Import rank icons
+import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
+import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
+import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
+import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
+import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
+import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+const rankIcons: Record<string, IconComponent> = {
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
+};
 
 // Mock user object
 const mockUser = {
@@ -57,7 +86,7 @@ const mockUser = {
 function DashboardLoading() {
   return (
     <div className="flex flex-col items-center justify-center min-h-dvh bg-background text-foreground animate-in fade-in-50">
-      <AstralLogo className="h-20 w-20 animate-pulse" />
+      <AstralLogo className="h-40 w-40 animate-pulse" />
       <p className="mt-4 text-lg font-semibold">Loading Your Dashboard</p>
       <p className="text-muted-foreground">Please wait a moment...</p>
     </div>
@@ -73,6 +102,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [user, setUser] = React.useState<any | null>(null);
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
+  const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
@@ -80,23 +110,31 @@ export default function DashboardLayout({
 
   React.useEffect(() => {
     const initializeUser = async () => {
-        const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
-        const currentUser = { ...mockUser, email: loggedInEmail };
-        
-        setUser(currentUser);
-        setIsAdmin(loggedInEmail === 'admin@astralcore.io');
-        setIsModerator(loggedInEmail === 'moderator@astralcore.io');
+      const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
+      const currentUser = { ...mockUser, email: loggedInEmail };
 
-        if (currentUser.id) {
-          const walletData = await getOrCreateWallet(currentUser.id);
-          setWallet(walletData);
+      setUser(currentUser);
+      setIsAdmin(loggedInEmail === 'admin@astralcore.io');
+      setIsModerator(loggedInEmail === 'moderator@astralcore.io');
+
+      if (currentUser.id) {
+        try {
+            const [walletData, tiers] = await Promise.all([
+                getOrCreateWallet(currentUser.id),
+                getBotTierSettings()
+            ]);
+            setWallet(walletData);
+            setTierSettings(tiers);
+        } catch (error) {
+            console.error("Failed to fetch initial data:", error);
+            // Handle error appropriately, maybe show an error message
         }
-        
-        setIsInitializing(false);
+      }
+      setIsInitializing(false);
     };
-    
     initializeUser();
   }, []);
+
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -108,38 +146,62 @@ export default function DashboardLayout({
     }
   }, []);
 
-  const baseMenuItems = [
-    { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
-    { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
-    { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
-    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-    { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
-    { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
-    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
-    { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
-    { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/about', label: 'About', icon: AboutIcon },
-  ];
-  
-  if (isAdmin) {
-    baseMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
-  }
-  if (isModerator) {
-    baseMenuItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
-  }
-
-
-  const menuItems = [
-      ...baseMenuItems,
+  const menuConfig = React.useMemo(() => {
+    const baseConfig = [
       {
-        href: downloadHref,
-        label: 'Download App',
-        icon: DownloadIcon,
-        download: 'AstralCore.url',
+        title: 'Overview',
+        items: [
+          { href: '/dashboard', label: 'Home', icon: HomeIcon },
+          { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
+          { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+        ],
       },
-  ]
+      {
+        title: 'Manage',
+        items: [
+          { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
+          { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
+          { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
+          { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
+        ],
+      },
+      {
+        title: 'Account',
+        items: [
+          { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
+          { href: '/dashboard/security', label: 'Security', icon: SettingsIcon },
+          { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
+        ],
+      },
+      {
+        title: 'Platform',
+        items: [
+          { href: '/dashboard/promotions', label: 'Promotions', icon: PromotionIcon },
+          { href: '/dashboard/trading-info', label: 'Tiers & Ranks', icon: Trophy },
+          { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+          { href: '/dashboard/about', label: 'About', icon: AboutIcon },
+          { href: downloadHref, label: 'Download App', icon: DownloadIcon, download: 'AstralCore.url'},
+        ],
+      },
+    ];
+
+    if (isAdmin || isModerator) {
+      const adminItems = [];
+      if (isAdmin) {
+        adminItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
+      }
+      if (isModerator) {
+        adminItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
+      }
+      baseConfig.push({
+        title: 'Admin Tools',
+        items: adminItems,
+      });
+    }
+
+    return baseConfig;
+  }, [isAdmin, isModerator, downloadHref]);
+
 
   const handleLogout = async () => {
     sessionStorage.removeItem('loggedInEmail');
@@ -153,82 +215,122 @@ export default function DashboardLayout({
   const bottomNavItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
   ];
 
-  if (isInitializing) {
-    return <DashboardLoading />;
-  }
-
   const getPageTitle = () => {
-    if (pathname === '/dashboard/trading') return 'Astral Core Trading';
-    const currentItem = menuItems.find((item) => item.href === pathname);
+    const currentPath = pathname;
+    const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
+
+    if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
+    const currentItem = menuConfig.flatMap(g => g.items).find((item) => {
+        return simplePath.startsWith(item.href) && item.href !== '/dashboard' || simplePath === item.href;
+    });
+     if (simplePath === '/dashboard') return 'Home';
     return currentItem
       ? currentItem.label
-      : pathname.split('/').pop()?.replace('-', ' ') || 'Home';
+      : simplePath.split('/').pop()?.replace('-', ' ') || 'Home';
   };
 
   const isClient = typeof window !== 'undefined';
-  const avatarUrl = wallet?.profile?.avatarUrl;
+  
+  const totalBalance = wallet?.balances?.usdt ?? 0;
+  const rank = getUserRank(totalBalance);
+  const RankIcon = rankIcons[rank.Icon] || Lock;
+  const tier = getCurrentTier(totalBalance, tierSettings);
+  const TierIcon = tier ? tierIcons[tier.id] : null;
+  const tierClassName = tier ? tierClassNames[tier.id] : null;
+  const userCountry = countries.find(c => c.name === wallet?.profile?.country);
 
+  if (isInitializing) {
+    return <DashboardLoading />;
+  }
+  
   return (
     <UserProvider value={{ user: user as any }}>
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center gap-2">
-              <AstralLogo className="h-8 w-8" />
+              <AstralLogo className="h-10 w-10" />
               <span className="text-lg font-semibold text-sidebar-foreground">
                 AstralCore
               </span>
             </div>
           </SidebarHeader>
+
+          <div className="mt-12 mb-4 px-4 space-y-4">
+             <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={wallet?.profile?.avatarUrl}
+                      alt={wallet?.profile?.username || 'User'}
+                    />
+                    <AvatarFallback>{userInitial}</AvatarFallback>
+                  </Avatar>
+                  <div className="overflow-hidden">
+                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
+                        {wallet?.profile?.username || 'User'}
+                        {userCountry && <span className="text-lg">{userCountry.flag}</span>}
+                     </p>
+                     <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
+                  </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
+                    <RankIcon className="h-4 w-4" />
+                    <span>{rank.name}</span>
+                 </Badge>
+                 {tier && TierIcon && tierClassName && (
+                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
+                    <TierIcon className="h-4 w-4" />
+                    <span>{tier.name}</span>
+                  </Badge>
+                )}
+              </div>
+          </div>
+          <Separator className="bg-sidebar-border" />
+
           <SidebarContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={
-                      isClient ? pathname === item.href && !item.download : false
-                    }
-                  >
-                    <Link href={item.href} download={item.download}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuConfig.map((group, index) => (
+                  <React.Fragment key={group.title}>
+                    {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
+                    <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
+                    {group.items.map((item) => (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={
+                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
+                          }
+                        >
+                          <Link href={item.href} download={item.download}>
+                            <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </React.Fragment>
+                ))}
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent/50">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={avatarUrl}
-                      alt="@user"
-                    />
-                    <AvatarFallback>{userInitial}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col overflow-hidden text-left">
-                    <p className="truncate text-sm font-medium text-sidebar-foreground">
-                      User
-                    </p>
-                    <p className="truncate text-xs text-sidebar-foreground/70">
-                      {userEmail || '...'}
-                    </p>
-                  </div>
-                </div>
+                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-2">
+                   <SettingsIcon className="mr-2 h-4 w-4" />
+                   Settings & Logout
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none text-foreground">
-                      User
+                      {wallet?.profile?.username || 'User'}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {userEmail || '...'}
@@ -271,6 +373,33 @@ export default function DashboardLayout({
               </h1>
             </div>
             <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                     <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
+                        <RankIcon className="h-4 w-4" />
+                        <span>{rank.name}</span>
+                     </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Account Rank</p>
+                  </TooltipContent>
+                </Tooltip>
+                 {tier && TierIcon && tierClassName && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
+                          <TierIcon className="h-4 w-4" />
+                          <span>{tier.name}</span>
+                        </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>VIP CORE Tier</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </TooltipProvider>
+
               <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
                 <Link href="/dashboard/inbox">
                   <InboxIcon className="h-5 w-5" />
@@ -296,7 +425,7 @@ export default function DashboardLayout({
                 )}
               >
                 {item.label === 'CORE' ? (
-                  <div className="absolute -top-8 flex items-center justify-center">
+                  <div className="absolute -top-7 flex items-center justify-center">
                      <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center holographic-border">
                         <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                            <item.icon className="h-8 w-8" />

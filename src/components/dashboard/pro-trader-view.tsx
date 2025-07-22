@@ -4,21 +4,22 @@
 import * as React from 'react';
 import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
-import { SlidersHorizontal, PlayCircle, Bot, Lock, Trophy } from 'lucide-react';
+import { SlidersHorizontal, PlayCircle, Bot, Lock, Trophy, Wallet } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTradingBot } from '@/hooks/use-trading-bot';
 import { getOrCreateWallet, updateWallet, type WalletData } from '@/lib/wallet';
 import { useUser } from '@/contexts/UserContext';
-import { type TierSetting as TierData, getCurrentTier, getBotTierSettings } from '@/lib/tiers';
+import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '../ui/skeleton';
 import { UsdtLogoIcon } from '../icons/usdt-logo';
 import { format } from 'date-fns';
 import { Badge } from '../ui/badge';
 import { getUserRank } from '@/lib/ranks';
-import { tierIcons, tierClassNames } from '@/lib/settings';
+import { tierIcons, tierClassNames, getCurrentTier } from '@/lib/settings';
 import { GridTradingAnimation } from './grid-trading-animation';
 import Link from 'next/link';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -121,11 +122,29 @@ export function ProTraderView() {
     const { user } = useUser();
     const { toast } = useToast();
     const { state: simState, setBotLog } = useTradingBot({ initialPrice: 68000 });
+    const [minGridBalance, setMinGridBalance] = React.useState(0);
     
     const progressIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const animatedBalance = useAnimatedCounter(displayBalance);
     const animatedDailyEarnings = useAnimatedCounter(walletData?.growth?.dailyEarnings ?? 0);
+    
+    React.useEffect(() => {
+        async function fetchBotSettings() {
+          try {
+            const response = await fetch('/api/public-settings?key=botSettings');
+            if (response.ok) {
+              const data = await response.json();
+              if (data && data.minGridBalance !== undefined) {
+                setMinGridBalance(data.minGridBalance);
+              }
+            }
+          } catch (error) {
+            console.error("Could not fetch bot settings, using default.", error);
+          }
+        }
+        fetchBotSettings();
+    }, []);
 
     const fetchAndSetData = React.useCallback(async () => {
         if (user) {
@@ -179,16 +198,32 @@ export function ProTraderView() {
     }, [totalBalance, currentTier]);
     
     const gridsRemaining = walletData?.growth?.clicksLeft ?? 0;
-    const canStart = gridsRemaining > 0 && !isAnimating;
+    const canStart = gridsRemaining > 0 && !isAnimating && totalBalance >= minGridBalance;
 
     const handleStartBot = async () => {
-        if (!canStart || !currentTier || !walletData) {
+        if (!walletData) return;
+
+        if (totalBalance < minGridBalance) {
+            // This case will be handled by the alert, but as a safeguard.
+            return;
+        }
+    
+        if (gridsRemaining <= 0 || isAnimating) {
           toast({
-            title: canStart ? "Cannot Start Bot" : "Limit Reached",
-            description: gridsRemaining <= 0 ? "You have no grids remaining for today." : "Bot cannot be started at this time.",
+            title: isAnimating ? "Bot is already running" : "Limit Reached",
+            description: gridsRemaining <= 0 ? "You have no grids remaining for today." : "Please wait for the current session to complete.",
             variant: "destructive"
           });
           return;
+        }
+
+        if (!currentTier) {
+            toast({
+                title: "Tier Not Found",
+                description: "Could not determine your trading tier.",
+                variant: "destructive"
+            });
+            return;
         }
     
         setIsAnimating(true);
@@ -293,6 +328,21 @@ export function ProTraderView() {
                     )}
                 </Button>
             </header>
+
+            {totalBalance < minGridBalance && (
+                <Alert className="mb-6">
+                    <Wallet className="h-4 w-4" />
+                    <AlertTitle>Insufficient Balance</AlertTitle>
+                    <AlertDescription className="flex items-center justify-between">
+                        <div>
+                           You need at least {formatCurrency(minGridBalance)} to start the bot.
+                        </div>
+                        <Button asChild size="sm">
+                            <Link href="/dashboard/deposit">Deposit Funds</Link>
+                        </Button>
+                    </AlertDescription>
+                </Alert>
+            )}
 
             <section className="content-grid">
                 <div className="chart-section">
