@@ -33,6 +33,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { KeyRound, EyeOff, Languages, DollarSign, Loader2, Save } from "lucide-react";
 import { Separator } from "../ui/separator";
+import { Label } from "@/components/ui/label";
 
 const passwordSchema = z.object({
     currentPassword: z.string().min(1, "Current password is required."),
