@@ -40,19 +40,26 @@ const rankIcons: Record<string, IconComponent> = {
     Lock,
 };
 
-const StatCard = ({ label, value, className, change }: { label: string; value: string; className?: string; change?: string }) => (
+const StatCard = ({ label, value, valueIcon: ValueIcon, className, change }: { label: string; value: string; valueIcon?: React.ElementType, className?: string; change?: string }) => (
     <div className="stat-card">
         <div className="stat-label">{label}</div>
-        <div className={cn("stat-value", className)}>
-            {value}
+        <div className={cn("stat-value flex items-center gap-2", className)}>
+            {ValueIcon && <ValueIcon className="h-5 w-5" />}
+            <span>{value}</span>
             {change && <span className={cn("text-xs ml-2", change.startsWith('+') ? 'text-green-400' : 'text-red-400')}>{change}</span>}
         </div>
     </div>
 );
 
-const HistoryItem = ({ log, time }: { log: string; time: string }) => (
+const HistoryItem = ({ log, time, amount }: { log: string; time: string, amount?: number }) => (
     <div className="order-item">
         <div className="flex-1 text-white flex items-center gap-2">{log}</div>
+        {amount && (
+             <div className="flex items-center gap-1.5 text-emerald-400 font-bold [text-shadow:0_0_8px_rgba(16,185,129,0.3)]">
+                <UsdtLogoIcon className="h-4 w-4" />
+                <span>+${amount.toFixed(2)}</span>
+            </div>
+        )}
         <div className="order-time">{time}</div>
     </div>
 );
@@ -183,7 +190,7 @@ export function ProTraderView() {
               description: `You've earned ${formatCurrency(usdtEarnings)}.`,
             });
             
-            setBotLog(prev => [...prev, { message: `Profit: +${formatCurrency(usdtEarnings)}`, time: new Date() }]);
+            setBotLog(prev => [...prev, { message: `Profit`, time: new Date() }]);
             if(updatedWallet) {
                 setDisplayBalance(updatedWallet.balances.usdt);
             }
@@ -245,13 +252,13 @@ export function ProTraderView() {
                 <div className="chart-section">
                     <div className="flex justify-between items-center mb-4">
                          {isAnimating ? (
-                            <div className="bot-status !bg-emerald-500/20">
+                            <div className="bot-status !bg-transparent !border-none !p-0">
                                 <div className="status-indicator"></div>
                                 ONLINE
-                                <span className="text-xs tabular-nums">({progress.toFixed(0)}%)</span>
+                                <span className="text-xs tabular-nums text-emerald-400">({progress.toFixed(0)}%)</span>
                             </div>
                         ) : (
-                             <div className={cn("bot-status", gridsRemaining > 0 ? "!bg-slate-500/20" : "!bg-red-500/20")}>
+                             <div className={cn("bot-status !text-sm", gridsRemaining > 0 ? "!bg-transparent !border-none !p-0" : "!bg-red-500/20 text-red-400")}>
                                 <div className={cn("status-indicator", gridsRemaining > 0 ? "!bg-slate-400" : "!bg-red-400")}></div>
                                 OFFLINE
                             </div>
@@ -262,12 +269,7 @@ export function ProTraderView() {
                         </Button>
                     </div>
                     <div className="chart-container">
-                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} />
-                        {isAnimating && (
-                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
-                                <Progress value={progress} className="w-1/2 h-2 bg-slate-700" />
-                            </div>
-                        )}
+                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} />
                     </div>
                      <div className="price-display">
                         <div className="price-info">
@@ -282,7 +284,7 @@ export function ProTraderView() {
 
                 <div className="stats-section">
                     <div className="stats-grid">
-                        <StatCard label="Portfolio Balance" value={formatCurrency(displayBalance)} />
+                        <StatCard label="Balance" value={formatCurrency(displayBalance)} valueIcon={UsdtLogoIcon}/>
                         <StatCard label="Today's Earnings" value={`${dailyEarnings >= 0 ? '+' : ''}${formatCurrency(dailyEarnings)}`} className={dailyEarnings >= 0 ? "profit" : "loss"} />
                         <StatCard label="Grids Remaining" value={`${gridsRemaining}/${totalGrids}`} />
                         <StatCard label="Profit per Grid" value={`~${profitPercentagePerTrade.toFixed(4)}%`} />
@@ -309,7 +311,7 @@ export function ProTraderView() {
                             ))
                          ) : (
                              walletData.growth.earningsHistory.slice(-10).reverse().map(trade => (
-                                 <HistoryItem key={trade.timestamp} log={`Grid Profit: +${formatCurrency(trade.amount)}`} time={format(new Date(trade.timestamp), 'HH:mm:ss')} />
+                                 <HistoryItem key={trade.timestamp} log={`Grid Profit`} time={format(new Date(trade.timestamp), 'HH:mm:ss')} amount={trade.amount}/>
                              ))
                          )}
                      </div>
@@ -322,9 +324,9 @@ export function ProTraderView() {
                                 <div className={cn("font-bold text-white")}>
                                     Grid #{i + 1}
                                 </div>
-                                <div className={cn(i < executedGrids ? "text-slate-500" : "text-white")}>
-                                     {i < executedGrids ? 'Executed' : 'Pending'}
-                                </div>
+                                <Badge variant={i < executedGrids ? "default" : "secondary"} className={cn(i < executedGrids ? "bg-green-600/80" : "bg-slate-600/80")}>
+                                    {i < executedGrids ? 'Executed' : 'Pending'}
+                                </Badge>
                                 <div className="order-time">
                                     { i < executedGrids && walletData.growth.earningsHistory[i] ? format(new Date(walletData.growth.earningsHistory[i].timestamp), 'HH:mm:ss') : '--:--:--'}
                                 </div>
