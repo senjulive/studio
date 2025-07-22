@@ -45,19 +45,22 @@ const useAnimatedCounter = (endValue: number, duration = 1000) => {
     const totalFrames = Math.round(duration / frameRate);
 
     React.useEffect(() => {
-        setCount(endValue);
-    }, [endValue]);
-
-    React.useEffect(() => {
         let frame = 0;
         const startValue = count;
-        const increment = (endValue - startValue) / totalFrames;
+        // Check if endValue is a valid number, otherwise default to startValue
+        const validEndValue = isNaN(endValue) ? startValue : endValue;
+        const increment = (validEndValue - startValue) / totalFrames;
+
+        if (isNaN(increment)) {
+            setCount(validEndValue);
+            return;
+        }
 
         const counter = setInterval(() => {
             frame++;
             const newCount = startValue + increment * frame;
             if (frame === totalFrames) {
-                setCount(endValue);
+                setCount(validEndValue);
                 clearInterval(counter);
             } else {
                 setCount(newCount);
@@ -65,8 +68,8 @@ const useAnimatedCounter = (endValue: number, duration = 1000) => {
         }, frameRate);
 
         return () => clearInterval(counter);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [endValue, duration, frameRate, totalFrames]);
+    }, [endValue, duration, frameRate, totalFrames, count]);
+
 
     return count;
 };
@@ -250,7 +253,7 @@ export function ProTraderView() {
         <div className="trading-card">
             <header className="header">
                 <div className="logo flex-col !items-start">
-                    Grid Trading Bot
+                    CORE Nexus Quantum v3.76
                     <div className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className={cn("text-base py-1 px-2 flex items-center gap-1.5", rank.className)}>
                           <RankIcon className="h-5 w-5" />
@@ -288,13 +291,13 @@ export function ProTraderView() {
                 <div className="chart-section">
                     <div className="flex justify-between items-center mb-4">
                          {isAnimating ? (
-                            <div className="bot-status !bg-transparent !border-none !p-0 text-emerald-400">
+                            <div className="flex items-center gap-2 text-emerald-400">
                                 <div className="status-indicator bg-green-400 animate-pulse"></div>
                                 🤖 ONLINE
                                 <span className="text-xs tabular-nums">({progress.toFixed(0)}%)</span>
                             </div>
                         ) : (
-                             <div className={cn("bot-status text-sm !bg-transparent !border-none !p-0", gridsRemaining > 0 ? "text-slate-400" : "text-red-400")}>
+                             <div className={cn("flex items-center gap-2 text-sm", gridsRemaining > 0 ? "text-slate-400" : "text-red-400")}>
                                 <div className={cn("status-indicator", gridsRemaining > 0 ? "bg-slate-400" : "bg-red-400 animate-pulse")}></div>
                                 🤖 OFFLINE
                             </div>
@@ -305,7 +308,7 @@ export function ProTraderView() {
                         </Button>
                     </div>
                     <div className="chart-container">
-                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} />
+                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} progress={progress} />
                     </div>
                      <div className="price-display">
                         <div className="price-info">
@@ -326,7 +329,7 @@ export function ProTraderView() {
                         <StatCard label="Profit per Grid" value={`~${profitPercentagePerTrade.toFixed(4)}%`} />
                     </div>
                     <div className="performance-section">
-                        <h3 className="section-header">Quantum Operation V3.76</h3>
+                        <h3 className="section-header">🤖 Quantum Operation v3.76</h3>
                         <div className="performance-grid">
                             <PerformanceItem label="Win Rate" value={`${simState.winRate.toFixed(1)}%`} className="text-green-400"/>
                             <PerformanceItem label="Total Trades" value={totalTrades.toString()} />
@@ -353,7 +356,7 @@ export function ProTraderView() {
                      </div>
                  </div>
                  <div className="order-history">
-                     <h3 className="section-header">🤖 Quantum Operation V3.76</h3>
+                     <h3 className="section-header">Operation Status</h3>
                      <div className="order-list">
                         {[...Array(totalGrids)].map((_, i) => (
                            <div className="order-item" key={i}>
