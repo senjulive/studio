@@ -26,64 +26,54 @@ export type CandlestickData = {
 
 type BotState = {
     currentPrice: number;
-    portfolioBalance: number;
-    pnl: number;
-    openPositions: number;
-    totalPositions: number;
-    gridRange: number;
-    winRate: number;
-    avgTrade: number;
-    maxDrawdown: number;
-    totalTrades: number;
     change24h: number;
     volume24h: number;
     openOrders: Order[];
     orderHistory: Trade[];
     lastTrade: Trade | null;
-    lastPnl: number;
     candlestickData: CandlestickData[];
+    // Simplified fields, real data comes from wallet
+    winRate: number;
+    avgTrade: number;
+    maxDrawdown: number;
+    totalTrades: number;
 };
 
 type BotConfig = {
     initialPrice: number;
-    gridLevels: number;
-    gridSpread: number; // e.g., 0.001 for 0.1%
-    tradeAmount: number;
 };
 
-const MOCK_INITIAL_BALANCE = 12847.92;
+const SIMULATION_CONFIG = {
+    gridLevels: 5,
+    gridSpread: 0.001,
+    tradeAmount: 0.05
+};
 
 export function useTradingBot(config: BotConfig) {
     const [state, setState] = useState<BotState>({
         currentPrice: config.initialPrice,
-        portfolioBalance: MOCK_INITIAL_BALANCE,
-        pnl: 0,
-        openPositions: 0,
-        totalPositions: config.gridLevels * 2,
-        gridRange: config.gridSpread * config.gridLevels * 100,
-        winRate: 0,
-        avgTrade: 0,
-        maxDrawdown: 0,
-        totalTrades: 0,
         change24h: 0,
         volume24h: 847.23,
         openOrders: [],
         orderHistory: [],
         lastTrade: null,
-        lastPnl: 0,
         candlestickData: [],
+        winRate: 84.2,
+        avgTrade: 8.74,
+        maxDrawdown: -1.8,
+        totalTrades: 1247,
     });
 
     const createGrid = useCallback((price: number) => {
         const orders: Order[] = [];
-        for (let i = 1; i <= config.gridLevels; i++) {
-            const buyPrice = price * (1 - config.gridSpread * i);
-            const sellPrice = price * (1 + config.gridSpread * i);
-            orders.push({ id: `buy-${i}`, type: 'buy', price: buyPrice, amount: config.tradeAmount });
-            orders.push({ id: `sell-${i}`, type: 'sell', price: sellPrice, amount: config.tradeAmount });
+        for (let i = 1; i <= SIMULATION_CONFIG.gridLevels; i++) {
+            const buyPrice = price * (1 - SIMULATION_CONFIG.gridSpread * i);
+            const sellPrice = price * (1 + SIMULATION_CONFIG.gridSpread * i);
+            orders.push({ id: `buy-${i}`, type: 'buy', price: buyPrice, amount: SIMULATION_CONFIG.tradeAmount });
+            orders.push({ id: `sell-${i}`, type: 'sell', price: sellPrice, amount: SIMULATION_CONFIG.tradeAmount });
         }
         return orders;
-    }, [config.gridLevels, config.gridSpread, config.tradeAmount]);
+    }, []);
     
     useEffect(() => {
         const initialCandle: CandlestickData = {
@@ -117,8 +107,9 @@ export function useTradingBot(config: BotConfig) {
                 
                 let newCandlestickData = [...prevState.candlestickData];
                 
-                // Create a new candle every 15 ticks (22.5s)
-                if (prevState.totalTrades % 15 === 0 && prevState.totalTrades > 0) {
+                const ticksSinceLastCandle = (prevState.totalTrades + 1) % 15;
+
+                if (ticksSinceLastCandle === 0) {
                      newCandle = {
                         open: newPrice,
                         high: newPrice,
@@ -128,21 +119,16 @@ export function useTradingBot(config: BotConfig) {
                     };
                     newCandlestickData.push(newCandle);
                     if (newCandlestickData.length > 50) {
-                        newCandlestickData.shift(); // Keep chart to 50 candles
+                        newCandlestickData.shift();
                     }
                 } else {
                     newCandlestickData[newCandlestickData.length - 1] = newCandle;
                 }
 
-                let newPnl = prevState.pnl;
-                let newBalance = prevState.portfolioBalance;
                 let newHistory = [...prevState.orderHistory];
                 let newOpenOrders = [...prevState.openOrders];
                 let lastTrade: Trade | null = null;
-                let lastPnl = 0;
-                let executedTradesCount = prevState.totalTrades + 1;
-                let profitableTrades = prevState.winRate * prevState.totalTrades / 100;
-
+                
                 const buysToExecute = newOpenOrders.filter(order => order.type === 'buy' && newPrice <= order.price);
                 const sellsToExecute = newOpenOrders.filter(order => order.type === 'sell' && newPrice >= order.price);
 
@@ -150,7 +136,7 @@ export function useTradingBot(config: BotConfig) {
                     const order = buysToExecute[0];
                     newOpenOrders = newOpenOrders.filter(o => o.id !== order.id);
                     
-                    const newSellPrice = order.price * (1 + config.gridSpread * 2); 
+                    const newSellPrice = order.price * (1 + SIMULATION_CONFIG.gridSpread * 2); 
                     newOpenOrders.push({ id: `sell-filled-${Date.now()}`, type: 'sell', price: newSellPrice, amount: order.amount });
                     
                     const trade: Trade = { ...order, time: formatDistanceToNowStrict(new Date(), { addSuffix: true }) };
@@ -160,37 +146,21 @@ export function useTradingBot(config: BotConfig) {
                     const order = sellsToExecute[0];
                     newOpenOrders = newOpenOrders.filter(o => o.id !== order.id);
 
-                    const newBuyPrice = order.price * (1 - config.gridSpread * 2);
+                    const newBuyPrice = order.price * (1 - SIMULATION_CONFIG.gridSpread * 2);
                     newOpenOrders.push({ id: `buy-filled-${Date.now()}`, type: 'buy', price: newBuyPrice, amount: order.amount });
-
-                    const profit = (order.price - (order.price / (1 + config.gridSpread * 2))) * order.amount;
-                    newPnl += profit;
-                    newBalance += profit;
-                    lastPnl = profit;
                     
-                    profitableTrades++;
-
                     const trade: Trade = { ...order, time: formatDistanceToNowStrict(new Date(), { addSuffix: true }) };
                     newHistory.unshift(trade);
                     lastTrade = trade;
                 }
                 
-                const winRate = executedTradesCount > 0 ? (profitableTrades / executedTradesCount) * 100 : 0;
-                const avgTrade = executedTradesCount > 0 ? newPnl / executedTradesCount : 0;
-
                 return {
                     ...prevState,
                     currentPrice: newPrice,
-                    pnl: newPnl,
-                    portfolioBalance: newBalance,
                     openOrders: newOpenOrders.sort((a,b) => b.price - a.price),
                     orderHistory: newHistory.slice(0, 10),
                     lastTrade,
-                    lastPnl,
-                    totalTrades: executedTradesCount,
-                    winRate,
-                    avgTrade,
-                    openPositions: newOpenOrders.length / 2,
+                    totalTrades: prevState.totalTrades + 1,
                     change24h: (newPrice / config.initialPrice - 1) * 100,
                     candlestickData: newCandlestickData,
                 };
@@ -198,7 +168,7 @@ export function useTradingBot(config: BotConfig) {
         }, 1500);
 
         return () => clearInterval(interval);
-    }, [config.initialPrice, config.tradeAmount, createGrid, config.gridSpread]);
+    }, [config.initialPrice, createGrid]);
 
     return { state };
 }

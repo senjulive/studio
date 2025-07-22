@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/table";
 import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TradingBotCard } from "./trading-bot-card";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
@@ -319,16 +318,6 @@ export function WalletView() {
   const TierIcon = tier ? tierIcons[tier.id] : null;
   const tierClassName = tier ? tierClassNames[tier.id] : null;
 
-  const handleWalletUpdate = async (newData: WalletData) => {
-    if (user?.id) {
-      const updatedWallet = await updateWallet(newData);
-      if (updatedWallet) {
-        // Force a re-fetch of all wallet data to ensure consistency
-        await fetchWalletData();
-      }
-    }
-  };
-
   if (!walletData) {
     return (
       <div className="space-y-6">
@@ -426,13 +415,6 @@ export function WalletView() {
           )}
         </CardContent>
       </Card>
-
-      <TradingBotCard
-        walletData={walletData}
-        onUpdate={handleWalletUpdate}
-        totalBalance={totalBalance}
-        tierSettings={tierSettings}
-      />
 
       <Card>
         <CardHeader>
