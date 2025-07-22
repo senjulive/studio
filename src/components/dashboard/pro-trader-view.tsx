@@ -39,6 +39,34 @@ const rankIcons: Record<string, IconComponent> = {
     Lock,
 };
 
+const useAnimatedCounter = (endValue: number, duration = 1000) => {
+    const [count, setCount] = React.useState(endValue);
+    const frameRate = 1000 / 60;
+    const totalFrames = Math.round(duration / frameRate);
+
+    React.useEffect(() => {
+        let frame = 0;
+        const startValue = parseFloat(count.toFixed(2));
+        const increment = (endValue - startValue) / totalFrames;
+
+        const counter = setInterval(() => {
+            frame++;
+            const newCount = startValue + increment * frame;
+            if (frame === totalFrames) {
+                setCount(endValue);
+                clearInterval(counter);
+            } else {
+                setCount(newCount);
+            }
+        }, frameRate);
+
+        return () => clearInterval(counter);
+    }, [endValue, duration, frameRate, totalFrames, count]);
+
+    return count;
+};
+
+
 const StatCard = ({ label, value, valueIcon: ValueIcon, className, change }: { label: string; value: string; valueIcon?: React.ElementType, className?: string; change?: string }) => (
     <div className="stat-card">
         <div className="stat-label">{label}</div>
@@ -54,7 +82,7 @@ const HistoryItem = ({ log, time, amount }: { log: string; time: string, amount?
     <div className="order-item">
         <div className="flex-1 text-white flex items-center gap-2">{log}</div>
         {amount && (
-             <div className="flex items-center gap-1.5 text-emerald-400 font-bold [text-shadow:0_0_8px_rgba(16,185,129,0.3)]">
+             <div className="flex items-center gap-1.5 font-bold [text-shadow:0_0_8px_rgba(16,185,129,0.3)] text-emerald-400">
                 <UsdtLogoIcon className="h-4 w-4" />
                 <span>+${amount.toFixed(2)}</span>
             </div>
@@ -87,6 +115,9 @@ export function ProTraderView() {
     
     const progressIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
+    const animatedBalance = useAnimatedCounter(displayBalance);
+    const animatedDailyEarnings = useAnimatedCounter(walletData?.growth?.dailyEarnings ?? 0);
+
     const fetchAndSetData = React.useCallback(async () => {
         if (user) {
             const [wallet, tiers] = await Promise.all([getOrCreateWallet(), getBotTierSettings()]);
@@ -112,8 +143,6 @@ export function ProTraderView() {
     };
     
     const totalBalance = walletData?.balances?.usdt ?? 0;
-    const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
-    const gridsRemaining = walletData?.growth?.clicksLeft ?? 0;
     const totalTrades = walletData?.growth?.earningsHistory?.length ?? 0;
     
     const currentTier = getCurrentTier(totalBalance, tierSettings);
@@ -138,6 +167,7 @@ export function ProTraderView() {
         return 0;
     }, [totalBalance, currentTier]);
     
+    const gridsRemaining = walletData?.growth?.clicksLeft ?? 0;
     const canStart = gridsRemaining > 0 && !isAnimating;
 
     const handleStartBot = async () => {
@@ -177,7 +207,7 @@ export function ProTraderView() {
               growth: {
                 ...walletData.growth,
                 clicksLeft: gridsRemaining - 1,
-                dailyEarnings: dailyEarnings + usdtEarnings,
+                dailyEarnings: (walletData.growth.dailyEarnings || 0) + usdtEarnings,
                 earningsHistory: [...(walletData.growth.earningsHistory || []), newEarning],
               },
             };
@@ -252,12 +282,12 @@ export function ProTraderView() {
                     <div className="flex justify-between items-center mb-4">
                          {isAnimating ? (
                             <div className="bot-status !bg-transparent !border-none !p-0">
-                                <div className="status-indicator"></div>
+                                <div className="status-indicator bg-green-400"></div>
                                 ONLINE
                                 <span className="text-xs tabular-nums text-emerald-400">({progress.toFixed(0)}%)</span>
                             </div>
                         ) : (
-                             <div className={cn("bot-status !text-sm", gridsRemaining > 0 ? "!bg-transparent !border-none !p-0" : "!bg-red-500/20 !text-red-400")}>
+                             <div className={cn("bot-status !text-sm !bg-transparent !border-none !p-0", gridsRemaining > 0 ? "" : "!text-red-400")}>
                                 <div className={cn("status-indicator", gridsRemaining > 0 ? "!bg-slate-400" : "!bg-red-400")}></div>
                                 OFFLINE
                             </div>
@@ -268,12 +298,12 @@ export function ProTraderView() {
                         </Button>
                     </div>
                     <div className="chart-container">
-                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} />
+                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} />
                     </div>
                      <div className="price-display">
                         <div className="price-info">
                              <UsdtLogoIcon className="h-8 w-8" />
-                            <div className="price-value">{formatCurrency(displayBalance)}</div>
+                            <div className="price-value">{formatCurrency(animatedBalance)}</div>
                         </div>
                         <div className="volume-info">
                             Vol: {simState.volume24h.toLocaleString()}M
@@ -283,8 +313,8 @@ export function ProTraderView() {
 
                 <div className="stats-section">
                     <div className="stats-grid">
-                        <StatCard label="Balance" value={formatCurrency(displayBalance)} valueIcon={UsdtLogoIcon}/>
-                        <StatCard label="Today's Earnings" value={`${dailyEarnings >= 0 ? '+' : ''}${formatCurrency(dailyEarnings)}`} className={dailyEarnings >= 0 ? "profit" : "loss"} />
+                        <StatCard label="Balance" value={formatCurrency(animatedBalance)} valueIcon={UsdtLogoIcon}/>
+                        <StatCard label="Today's Earnings" value={`${animatedDailyEarnings >= 0 ? '+' : ''}${formatCurrency(animatedDailyEarnings)}`} className={animatedDailyEarnings >= 0 ? "profit" : "loss"} />
                         <StatCard label="Grids Remaining" value={`${gridsRemaining}/${totalGrids}`} />
                         <StatCard label="Profit per Grid" value={`~${profitPercentagePerTrade.toFixed(4)}%`} />
                     </div>
@@ -292,8 +322,8 @@ export function ProTraderView() {
                         <h3 className="section-header">Performance Analytics</h3>
                         <div className="performance-grid">
                             <PerformanceItem label="Win Rate" value={`${simState.winRate.toFixed(1)}%`} className="text-green-400"/>
-                            <PerformanceItem label="Avg Trade" value={formatCurrency(profitPerTrade)} />
                             <PerformanceItem label="Total Trades" value={totalTrades.toString()} />
+                            <PerformanceItem label="Avg Trade" value={formatCurrency(profitPerTrade)} />
                             <PerformanceItem label="Max Drawdown" value={`${simState.maxDrawdown.toFixed(2)}%`} className="text-red-400"/>
                         </div>
                     </div>
@@ -337,3 +367,4 @@ export function ProTraderView() {
         </div>
     );
 }
+
