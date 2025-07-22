@@ -31,9 +31,7 @@ import {
   type WithdrawalAddresses,
   getOrCreateWallet,
   type WalletData,
-  updateWallet,
 } from "@/lib/wallet";
-import { addAdminNotification, addNotification } from "@/lib/notifications";
 import Image from "next/image";
 import { format } from "date-fns";
 import { useUser } from "@/contexts/UserContext";
@@ -96,85 +94,61 @@ export function WithdrawView() {
     if (!walletData || !user?.id || !savedAddresses?.usdt) return;
 
     if (!amount || withdrawAmount <= 0) {
-      toast({
-        title: "Invalid Amount",
-        description: "Please enter a valid amount to withdraw.",
-        variant: "destructive",
-      });
+      toast({ title: "Invalid Amount", description: "Please enter a valid amount.", variant: "destructive" });
       return;
     }
 
     if (withdrawAmount < 10) {
-      toast({
-        title: "Minimum Withdrawal",
-        description: `The minimum withdrawal amount is $10.00 USDT.`,
-        variant: "destructive",
-      });
+      toast({ title: "Minimum Withdrawal", description: `The minimum withdrawal amount is $10.00 USDT.`, variant: "destructive" });
       return;
     }
     
     if (withdrawAmount > walletData.balances.usdt) {
-      toast({
-        title: "Insufficient Balance",
-        description: `Your USDT balance is too low to withdraw $${withdrawAmount.toFixed(2)}.`,
-        variant: "destructive",
-      });
+      toast({ title: "Insufficient Balance", description: `Your USDT balance is too low.`, variant: "destructive" });
       return;
     }
 
     if (!passcode || passcode.length < 4) {
-      toast({
-        title: "Passcode Required",
-        description: `Please enter a valid passcode to authorize this transaction.`,
-        variant: "destructive",
-      });
+      toast({ title: "Passcode Required", description: `Please enter a valid passcode.`, variant: "destructive" });
       return;
     }
 
     setIsWithdrawing(true);
-
+    
     // Mock passcode check
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const withdrawalRequest = {
-        id: crypto.randomUUID(),
-        amount: withdrawAmount,
-        asset: 'usdt' as const,
-        address: savedAddresses.usdt,
-        timestamp: Date.now()
-    };
+    try {
+        const response = await fetch('/api/withdraw/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: user.id,
+                amount: withdrawAmount,
+                asset: 'usdt',
+                address: savedAddresses.usdt,
+            }),
+        });
+        const result = await response.json();
 
-    const newWalletData: WalletData = {
-        ...walletData,
-        balances: {
-            ...walletData.balances,
-            usdt: walletData.balances.usdt - withdrawAmount,
-        },
-        pending_withdrawals: [...(walletData.pending_withdrawals || []), withdrawalRequest]
-    };
+        if (!response.ok) {
+            throw new Error(result.error || "Failed to submit withdrawal request.");
+        }
 
-    await updateWallet(newWalletData);
-    setWalletData(newWalletData);
+        await fetchWalletData(); // Refetch data to show new pending request and updated balance
 
-    await addAdminNotification({
-        title: "New Withdrawal Request",
-        content: `User '${user.email}' initiated a withdrawal of ${amount} ${asset.toUpperCase()} to address ${savedAddresses.usdt}.`,
-        href: "/admin"
-    });
+        setAmount("");
+        setPasscode("");
+        toast({
+            title: "Withdrawal Initiated",
+            description: `Your request for ${withdrawAmount.toFixed(2)} USDT is being processed.`,
+        });
 
-    await addNotification(user.id, {
-      title: "AstralCore Withdrawal",
-      content: `Your request to withdraw $${amount} USDT is now pending review.`,
-      href: "/dashboard/withdraw"
-    });
-
-    setAmount("");
-    setPasscode("");
-    toast({
-      title: "Withdrawal Initiated",
-      description: `Your withdrawal of ${withdrawAmount.toFixed(2)} ${asset.toUpperCase()} is being processed.`,
-    });
-    setIsWithdrawing(false);
+    } catch (error: any) {
+        toast({ title: "Withdrawal Failed", description: error.message, variant: "destructive" });
+    } finally {
+        setIsWithdrawing(false);
+    }
   };
 
   const hasSavedAddress = savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
@@ -260,8 +234,7 @@ export function WithdrawView() {
             {isWithdrawing && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Withdraw {amount || ""}{" "}
-            {amount ? asset.toUpperCase() : ""}
+            Request Withdrawal
             </Button>
         </form>
     );

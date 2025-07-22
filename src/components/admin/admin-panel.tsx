@@ -23,6 +23,7 @@ import {
   LayoutDashboard,
   Banknote,
   Gem,
+  ArrowUpFromLine,
 } from 'lucide-react';
 import { WalletManager } from './wallet-manager';
 import { MessageViewer } from './message-viewer';
@@ -36,12 +37,14 @@ import { ActionLogViewer } from './action-log-viewer';
 import { AnalyticsManager } from './analytics/AnalyticsManager';
 import { DepositApprovalManager } from './deposit-approval-manager';
 import { BotTierSettingsManager } from './bot-tier-settings-manager';
+import { WithdrawalManager } from './withdrawal-manager';
 
 type AdminView =
   | 'analytics'
   | 'wallets'
   | 'messages'
   | 'deposits'
+  | 'withdrawals'
   | 'verifications'
   | 'moderators'
   | 'action-log'
@@ -58,6 +61,7 @@ const adminTabs = [
     { id: 'wallets', label: 'Wallets', icon: WalletCards, component: <WalletManager /> },
     { id: 'messages', label: 'Messages', icon: Mail, component: <MessageViewer /> },
     { id: 'deposits', label: 'Deposits', icon: Banknote, component: <DepositApprovalManager /> },
+    { id: 'withdrawals', label: 'Withdrawals', icon: ArrowUpFromLine, component: <WithdrawalManager /> },
     { id: 'verifications', label: 'Verifications', icon: VerificationIcon, component: <VerificationManager /> },
     { id: 'moderators', label: 'Moderators', icon: Users, component: <ModeratorManager /> },
     { id: 'action-log', label: 'Action Log', icon: Activity, component: <ActionLogViewer /> },
@@ -92,7 +96,7 @@ export function AdminPanel() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
             {adminTabs.map(tab => {
                 const Icon = tab.icon;
                 return (
