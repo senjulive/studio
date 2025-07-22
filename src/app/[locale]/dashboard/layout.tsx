@@ -305,10 +305,10 @@ export default function DashboardLayout({
                 )}
               >
                 {item.label === 'CORE' ? (
-                  <div className="absolute -top-6 flex items-center justify-center">
-                     <div className="h-14 w-14 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
-                        <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                           <item.icon className="h-8 w-8" />
+                  <div className="absolute -top-8 flex items-center justify-center">
+                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                           <item.icon className="h-10 w-10" />
                         </div>
                      </div>
                   </div>
