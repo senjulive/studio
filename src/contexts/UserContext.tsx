@@ -2,6 +2,9 @@
 'use client';
 
 import * as React from 'react';
+import type { WalletData } from '@/lib/wallet';
+import type { Rank } from '@/lib/ranks';
+import type { TierSetting as TierData } from '@/lib/tiers';
 
 // A generic user type for when Supabase is removed.
 type User = {
@@ -12,6 +15,10 @@ type User = {
 
 type UserContextType = {
     user: User | null;
+    wallet: WalletData | null;
+    rank: Rank | null;
+    tier: TierData | null;
+    tierSettings: TierData[];
 };
 
 const UserContext = React.createContext<UserContextType | undefined>(undefined);

@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
@@ -30,7 +30,7 @@ import { Input } from "../ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { FacebookIcon } from "../icons/social/facebook-icon";
 import { InstagramIcon } from "../icons/social/instagram-icon";
-import { UsdtLogoIcon } from "../icons/usdt-logo"; // Assuming a tiktok icon might be named this for consistency
+import { UsdtLogoIcon } from "../icons/usdt-logo"; 
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -132,7 +132,9 @@ export function ProfileView() {
   const { user } = useUser();
   const [showVerificationPopup, setShowVerificationPopup] = React.useState(false);
   const [isUpdatingAvatar, setIsUpdatingAvatar] = React.useState(false);
+  const [isUpdatingDisplayName, setIsUpdatingDisplayName] = React.useState(false);
   const [avatarUrl, setAvatarUrl] = React.useState("");
+  const [displayName, setDisplayName] = React.useState("");
   const { toast } = useToast();
 
   const fetchWallet = React.useCallback(async () => {
@@ -141,6 +143,7 @@ export function ProfileView() {
         const data = await getOrCreateWallet(user.id);
         setWalletData(data);
         setAvatarUrl(data?.profile?.avatarUrl || "");
+        setDisplayName(data?.profile?.displayName || data?.profile?.username || "");
        
         if (data.profile.verificationStatus !== 'verified' && data.profile.verificationStatus !== 'verifying') {
           setTimeout(() => setShowVerificationPopup(true), 1000);
@@ -169,7 +172,6 @@ export function ProfileView() {
   const handleUpdateAvatar = async () => {
     if (!avatarUrl || !user?.id || !walletData) return;
     
-    // Basic URL validation
     try {
         new URL(avatarUrl);
     } catch (_) {
@@ -196,10 +198,37 @@ export function ProfileView() {
       setIsUpdatingAvatar(false);
     }
   };
+  
+  const handleUpdateDisplayName = async () => {
+    if (!displayName || !user?.id || !walletData) return;
+    if (displayName.length < 3) {
+        toast({ title: "Display Name Too Short", description: "Must be at least 3 characters.", variant: "destructive"});
+        return;
+    }
+
+    setIsUpdatingDisplayName(true);
+    try {
+      const updatedWallet: WalletData = {
+        ...walletData,
+        profile: {
+          ...walletData.profile,
+          displayName: displayName,
+        },
+      };
+
+      await updateWallet(updatedWallet);
+      setWalletData(updatedWallet);
+      toast({ title: "Display Name Updated!", description: "Your new display name has been saved." });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setIsUpdatingDisplayName(false);
+    }
+  };
 
 
   const profile = walletData?.profile;
-  const profileDisplayName = profile?.fullName || profile?.username || "User Profile";
+  const profileDisplayName = profile?.displayName || profile?.fullName || profile?.username || "User Profile";
   const squadSize = walletData?.squad?.members?.length ?? 0;
   const usdtBalance = walletData?.balances?.usdt ?? 0;
   const rank = getUserRank(usdtBalance);
@@ -277,45 +306,20 @@ export function ProfileView() {
               <VirtualCard walletData={walletData} userEmail={user?.email || null} />
             </div>
 
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full mb-6">
-                        <ImageIcon className="mr-2 h-4 w-4" />
-                        Update Avatar
-                    </Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Update Your Avatar</DialogTitle>
-                        <DialogDescription>
-                            Paste the URL of an image from the web (e.g., from your social media profile).
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                         <div className="flex justify-center items-center gap-4 text-muted-foreground">
-                            <FacebookIcon className="h-6 w-6"/>
-                            <InstagramIcon className="h-6 w-6"/>
-                            <UsdtLogoIcon className="h-6 w-6"/>
-                        </div>
-                        <div className="relative">
-                            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input 
-                                id="avatar-url"
-                                placeholder="https://example.com/image.png"
-                                value={avatarUrl}
-                                onChange={(e) => setAvatarUrl(e.target.value)}
-                                className="pl-9"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button onClick={handleUpdateAvatar} disabled={isUpdatingAvatar || !avatarUrl}>
-                            {isUpdatingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                            Save Avatar
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline"><ImageIcon className="mr-2 h-4 w-4" /> Avatar</Button>
+                    </DialogTrigger>
+                    <DialogContent><DialogHeader><DialogTitle>Update Your Avatar</DialogTitle><DialogDescription>Paste the URL of an image from the web.</DialogDescription></DialogHeader><div className="space-y-4"><div className="relative"><LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input id="avatar-url" placeholder="https://example.com/image.png" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} className="pl-9"/></div></div><DialogFooter><Button onClick={handleUpdateAvatar} disabled={isUpdatingAvatar || !avatarUrl}>{isUpdatingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Save Avatar</Button></DialogFooter></DialogContent>
+                </Dialog>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Display Name</Button>
+                    </DialogTrigger>
+                    <DialogContent><DialogHeader><DialogTitle>Set Display Name</DialogTitle><DialogDescription>This name will be visible in the public chat.</DialogDescription></DialogHeader><div className="space-y-4"><div className="relative"><User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input id="display-name" placeholder="Your public name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="pl-9"/></div></div><DialogFooter><Button onClick={handleUpdateDisplayName} disabled={isUpdatingDisplayName || !displayName}>{isUpdatingDisplayName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Save Name</Button></DialogFooter></DialogContent>
+                </Dialog>
+            </div>
 
             <Separator className="mb-6"/>
 
@@ -351,5 +355,3 @@ export function ProfileView() {
     </>
   );
 }
-
-    

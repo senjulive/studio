@@ -43,15 +43,16 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Shield, Lock, Trophy } from 'lucide-react';
+import { MessageSquare, UserPlus, Shield, Lock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
 import { getUserRank } from '@/lib/ranks';
-import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
 import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
+import { getCurrentTier } from '@/lib/tiers';
 import { PromotionIcon } from '@/components/icons/nav/promotion-icon';
 
 // Import rank icons
@@ -63,6 +64,7 @@ import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { FloatingChat } from '@/components/dashboard/floating-chat';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -101,6 +103,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [user, setUser] = React.useState<any | null>(null);
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
+  const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
   const [tier, setTier] = React.useState<TierData | null>(null);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isModerator, setIsModerator] = React.useState(false);
@@ -123,6 +126,7 @@ export default function DashboardLayout({
                 getBotTierSettings()
             ]);
             setWallet(walletData);
+            setTierSettings(tiers);
             const currentTier = await getCurrentTier(walletData.balances?.usdt ?? 0, tiers);
             setTier(currentTier);
         } catch (error) {
@@ -157,12 +161,18 @@ export default function DashboardLayout({
         ],
       },
       {
+        title: 'Community',
+        items: [
+          { href: '/dashboard/chat', label: 'Chat', icon: MessageSquare },
+          { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
+          { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
+        ],
+      },
+      {
         title: 'Manage',
         items: [
           { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
           { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-          { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
-          { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
         ],
       },
       {
@@ -248,7 +258,7 @@ export default function DashboardLayout({
   }
   
   return (
-    <UserProvider value={{ user: user as any }}>
+    <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
@@ -410,6 +420,7 @@ export default function DashboardLayout({
           </header>
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
+            {!isAdmin && !isModerator && <FloatingChat />}
           </main>
           <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden holographic-nav">
             {bottomNavItems.map((item) => (
