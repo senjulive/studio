@@ -2,11 +2,11 @@
 'use client';
 
 import * as React from 'react';
+import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
-import { SlidersHorizontal, PlayCircle, Bot } from 'lucide-react';
+import { SlidersHorizontal, PlayCircle, Bot, Lock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTradingBot } from '@/hooks/use-trading-bot';
-import type { CandlestickData } from '@/hooks/use-trading-bot';
 import { getOrCreateWallet, updateWallet, type WalletData } from '@/lib/wallet';
 import { useUser } from '@/contexts/UserContext';
 import { type TierSetting as TierData, getCurrentTier, getBotTierSettings } from '@/lib/tiers';
@@ -14,6 +14,30 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '../ui/skeleton';
 import { UsdtLogoIcon } from '../icons/usdt-logo';
 import { format } from 'date-fns';
+import { Progress } from '../ui/progress';
+import { Badge } from '../ui/badge';
+import { getUserRank } from '@/lib/ranks';
+import { tierIcons, tierClassNames } from '@/lib/settings';
+
+// Import rank icons
+import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
+import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
+import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
+import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
+import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
+import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
+
+type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+const rankIcons: Record<string, IconComponent> = {
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
+};
 
 const StatCard = ({ label, value, className, change }: { label: string; value: string; className?: string; change?: string }) => (
     <div className="stat-card">
@@ -27,11 +51,10 @@ const StatCard = ({ label, value, className, change }: { label: string; value: s
 
 const HistoryItem = ({ log, time }: { log: string; time: string }) => (
     <div className="order-item">
-        <div className="flex-1">{log}</div>
+        <div className="flex-1 text-white">{log}</div>
         <div className="order-time">{time}</div>
     </div>
 );
-
 
 const PerformanceItem = ({ label, value, className }: { label: string; value: string; className?: string }) => (
     <div className="performance-item">
@@ -40,64 +63,20 @@ const PerformanceItem = ({ label, value, className }: { label: string; value: st
     </div>
 )
 
-const CandlestickChart = ({ data, currentPrice }: { data: CandlestickData[], currentPrice: number }) => {
-    const chartRef = React.useRef<HTMLDivElement>(null);
-    const [minPrice, setMinPrice] = React.useState(0);
-    const [maxPrice, setMaxPrice] = React.useState(0);
-    const [chartHeight, setChartHeight] = React.useState(0);
-
-    React.useEffect(() => {
-        if (data.length > 0) {
-            const prices = data.flatMap(d => [d.high, d.low]);
-            setMinPrice(Math.min(...prices) * 0.999);
-            setMaxPrice(Math.max(...prices) * 1.001);
-        }
-        if (chartRef.current) {
-            setChartHeight(chartRef.current.clientHeight);
-        }
-    }, [data]);
-
-    const getPriceY = (price: number) => {
-        if (maxPrice === minPrice) return chartHeight / 2;
-        return chartHeight * (1 - (price - minPrice) / (maxPrice - minPrice));
-    };
-
-    if (data.length === 0 || chartHeight === 0) {
-        return <div className="flex items-center justify-center h-full text-slate-500">Generating chart data...</div>;
-    }
-    
-    const candleWidth = 8;
-    const candleMargin = 4;
-    const totalCandleWidth = candleWidth + candleMargin;
-
-    return (
-        <div ref={chartRef} className="w-full h-full relative">
-            {/* Grid Lines */}
-            {[...Array(5)].map((_, i) => (
-                <div key={i} className="grid-line" style={{ top: `${(i + 1) * 20}%` }} />
-            ))}
-            
-            {/* Candlesticks */}
-            {data.map((candle, index) => {
-                const isBullish = candle.close >= candle.open;
-                const bodyTop = getPriceY(isBullish ? candle.close : candle.open);
-                const bodyHeight = Math.abs(getPriceY(candle.close) - getPriceY(candle.open));
-                const wickTop = getPriceY(candle.high);
-                const wickHeight = Math.abs(getPriceY(candle.high) - getPriceY(candle.low));
-                
-                return (
-                    <div key={index} className="candle" style={{ left: `${index * totalCandleWidth}px`, width: `${candleWidth}px` }}>
-                        <div className="candle-wick" style={{ top: `${wickTop}px`, height: `${wickHeight}px` }} />
-                        <div className={cn("candle-body", isBullish ? 'bullish' : 'bearish')} style={{ top: `${bodyTop}px`, height: `${Math.max(bodyHeight, 2)}px` }} />
-                    </div>
-                );
-            })}
-
-            {/* Current Price Line */}
-            <div className="price-line" style={{ top: `${getPriceY(currentPrice)}px` }} data-price={formatCurrency(currentPrice)} />
-        </div>
-    );
+const GridAnimation = () => {
+  return (
+    <div className="w-full h-full relative overflow-hidden">
+        {/* Grid Lines */}
+        {[...Array(8)].map((_, i) => (
+            <div key={`h-line-${i}`} className="grid-line" style={{ top: `${(i + 1) * 11}%`, animationDelay: `${i * 0.1}s` }} />
+        ))}
+        {[...Array(12)].map((_, i) => (
+            <div key={`v-line-${i}`} className="grid-line-vertical" style={{ left: `${(i + 1) * 8}%`, animationDelay: `${i * 0.1}s` }} />
+        ))}
+    </div>
+  );
 };
+
 
 const formatCurrency = (value: number) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -105,17 +84,15 @@ const formatCurrency = (value: number) => {
 
 
 export function ProTraderView() {
-    const [activeChartTab, setActiveChartTab] = React.useState('Candlestick');
-    const { state: simState, setBotLog } = useTradingBot({ initialPrice: 68000 });
     const [walletData, setWalletData] = React.useState<WalletData | null>(null);
     const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
     const [isAnimating, setIsAnimating] = React.useState(false);
+    const [progress, setProgress] = React.useState(0);
     const { user } = useUser();
     const { toast } = useToast();
+    const { state: simState, setBotLog } = useTradingBot({ initialPrice: 68000 });
     
-    const [floaters, setFloaters] = React.useState<{ id: number; x: number; y: number; text: string; type: 'profit' | 'loss' }[]>([]);
-    const chartContainerRef = React.useRef<HTMLDivElement>(null);
-    const botLogIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
+    const progressIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
     React.useEffect(() => {
         async function fetchData() {
@@ -142,6 +119,10 @@ export function ProTraderView() {
     const gridsRemaining = walletData?.growth?.clicksLeft ?? 0;
     
     const currentTier = getCurrentTier(totalBalance, tierSettings);
+    const rank = getUserRank(totalBalance);
+    const RankIcon = rankIcons[rank.Icon] || Lock;
+    const TierIcon = currentTier ? tierIcons[currentTier.id] : null;
+    const tierClassName = currentTier ? tierClassNames[currentTier.id] : null;
 
     const profitPerTrade = React.useMemo(() => {
         if (!currentTier) return 0;
@@ -163,42 +144,51 @@ export function ProTraderView() {
 
     const handleStartBot = async () => {
         if (!canStart || !currentTier || !walletData) {
-          if (isAnimating) {
-            toast({ title: "Bot is already running." });
-          } else if (gridsRemaining <= 0) {
-            toast({
-              title: "Limit Reached",
-              description: "You have no grids remaining for today.",
-              variant: "destructive"
-            });
-          }
+          toast({
+            title: canStart ? "Cannot Start Bot" : "Limit Reached",
+            description: gridsRemaining <= 0 ? "You have no grids remaining for today." : "Bot cannot be started at this time.",
+            variant: "destructive"
+          });
           return;
         }
     
         setIsAnimating(true);
         setBotLog([]);
+        setProgress(0);
 
         const logMessages = [
-            "Connecting to Exchange...", "Authenticating API Keys...", "Fetching Market Data...", "Analyzing Market Volatility...",
-            "Calculating Grid Levels...", "Placing Upper Grid Sell Orders...", "Placing Lower Grid Buy Orders...",
-            "Monitoring Price Action...", "Executing Grid Trade...", "Finalizing Trade and Calculating Profit...", "Updating Portfolio..."
+            { prog: 3, msg: "Connecting to Exchange..." },
+            { prog: 15, msg: "Authenticating API Keys..." },
+            { prog: 25, msg: "Fetching Market Data..." },
+            { prog: 40, msg: "Analyzing Market Volatility..." },
+            { prog: 55, msg: "Calculating Grid Levels..." },
+            { prog: 70, msg: "Placing Grid Orders..." },
+            { prog: 85, msg: "Monitoring Price Action..." },
+            { prog: 95, msg: "Executing Grid Trade..." },
+            { prog: 100, msg: "Trade Finalized. Updating Portfolio..." }
         ];
 
-        let logIndex = 0;
-        botLogIntervalRef.current = setInterval(() => {
-            if (logIndex < logMessages.length) {
-                setBotLog(prev => [...prev, { message: logMessages[logIndex], time: new Date() }]);
-                logIndex++;
-            } else {
-                if(botLogIntervalRef.current) clearInterval(botLogIntervalRef.current);
-            }
-        }, 5000); // 5 seconds per log message for a ~60s total run
+        const animationDuration = 60000; // 60 seconds
+        const updateInterval = 100; // Update progress every 100ms
+        const progressIncrement = 100 / (animationDuration / updateInterval);
         
+        progressIntervalRef.current = setInterval(() => {
+            setProgress(prev => {
+                const newProgress = prev + progressIncrement;
+                const nextLog = logMessages.find(log => newProgress >= log.prog && prev < log.prog);
+                if (nextLog) {
+                    setBotLog(prevLogs => [...prevLogs, { message: nextLog.msg, time: new Date() }]);
+                }
+                if (newProgress >= 100) {
+                    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+                    return 100;
+                }
+                return newProgress;
+            });
+        }, updateInterval);
+
         setTimeout(() => {
-            if (botLogIntervalRef.current) clearInterval(botLogIntervalRef.current);
-            
             const usdtEarnings = profitPerTrade;
-            
             const newEarning = { amount: usdtEarnings, timestamp: Date.now() };
     
             const newWalletData: WalletData = {
@@ -222,23 +212,9 @@ export function ProTraderView() {
               description: `You've earned ${formatCurrency(usdtEarnings)}.`,
             });
             
-            const chartRect = chartContainerRef.current?.getBoundingClientRect();
-            if (chartRect) {
-                const newFloater = {
-                    id: Date.now(),
-                    x: Math.random() * chartRect.width * 0.8 + chartRect.width * 0.1,
-                    y: Math.random() * chartRect.height * 0.5 + chartRect.height * 0.2,
-                    text: `+${formatCurrency(usdtEarnings)}`,
-                    type: 'profit' as const
-                };
-                setFloaters(f => [...f, newFloater]);
-                setTimeout(() => {
-                    setFloaters(f => f.filter(fl => fl.id !== newFloater.id));
-                }, 3000);
-            }
-
             setIsAnimating(false);
-        }, 60000); // Animation duration of 60 seconds
+            setProgress(0);
+        }, animationDuration);
     };
     
     if (!walletData) {
@@ -255,20 +231,37 @@ export function ProTraderView() {
     return (
         <div className="trading-card">
             <header className="header">
-                <div className="logo">
+                <div className="logo flex-col !items-start">
                     Grid Trading Bot
+                    <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className={cn("text-base py-1 px-2 flex items-center gap-1.5", rank.className)}>
+                          <RankIcon className="h-5 w-5" />
+                          <span>{rank.name}</span>
+                        </Badge>
+                        {currentTier && TierIcon && tierClassName && (
+                          <Badge variant="outline" className={cn("text-base py-1 px-2 flex items-center gap-1.5", tierClassName)}>
+                            <TierIcon className="h-5 w-5" />
+                            <span>{currentTier.name}</span>
+                          </Badge>
+                        )}
+                    </div>
                 </div>
-                <Button onClick={handleStartBot} disabled={!canStart || isAnimating} size="lg">
+                 <Button onClick={handleStartBot} disabled={!canStart} size="lg" className={cn(!canStart && 'bg-gray-500 hover:bg-gray-500', canStart && 'bg-green-600 hover:bg-green-700')}>
                     {isAnimating ? (
                         <>
                             <Bot className="h-5 w-5 mr-2 animate-pulse"/>
                             <span>Bot is Running...</span>
                         </>
-                    ) : (
+                    ) : canStart ? (
                         <>
                             <PlayCircle className="h-5 w-5 mr-2" />
                             <span>Start Bot</span>
                         </>
+                    ) : (
+                         <>
+                            <Lock className="h-5 w-5 mr-2"/>
+                            <span>Offline</span>
+                         </>
                     )}
                 </Button>
             </header>
@@ -276,25 +269,30 @@ export function ProTraderView() {
             <section className="content-grid">
                 <div className="chart-section">
                     <div className="flex justify-between items-center mb-4">
-                        <div className="chart-tabs">
-                            {['Candlestick'].map(tab => (
-                                <button key={tab} className={cn("chart-tab", activeChartTab === tab && "active")}>
-                                    {tab}
-                                </button>
-                            ))}
-                        </div>
+                         {isAnimating ? (
+                            <div className="bot-status !bg-emerald-500/20">
+                                <div className="status-indicator"></div>
+                                ONLINE
+                            </div>
+                        ) : (
+                             <div className="bot-status !bg-slate-500/20">
+                                <div className="status-indicator !bg-slate-400"></div>
+                                OFFLINE
+                            </div>
+                        )}
                         <Button variant="ghost" size="sm" className="text-slate-400 hover:bg-slate-700 hover:text-white">
                             <SlidersHorizontal className="h-4 w-4 mr-2"/>
                             Indicators
                         </Button>
                     </div>
-                    <div ref={chartContainerRef} className={cn("chart-container", simState.lastTrade?.type === 'buy' ? 'flash-green' : simState.lastTrade?.type === 'sell' ? 'flash-red' : '')}>
-                         <CandlestickChart data={simState.candlestickData} currentPrice={simState.currentPrice} />
-                         {floaters.map(f => (
-                            <div key={f.id} className={cn(f.type === 'profit' ? 'profit-float' : 'loss-float')} style={{ left: `${f.x}px`, top: `${f.y}px` }}>
-                                {f.text}
+                    <div className="chart-container">
+                        <GridAnimation />
+                        {isAnimating && (
+                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
+                                <div className="text-6xl font-bold text-white tabular-nums tracking-tighter mb-2">{progress.toFixed(0)}%</div>
+                                <Progress value={progress} className="w-1/2 h-2 bg-slate-700" />
                             </div>
-                        ))}
+                        )}
                     </div>
                      <div className="price-display">
                         <div className="price-info">
@@ -318,7 +316,7 @@ export function ProTraderView() {
                         <h3 className="section-header">Performance Analytics</h3>
                         <div className="performance-grid">
                             <PerformanceItem label="Win Rate" value={`${simState.winRate.toFixed(1)}%`} className="text-green-400"/>
-                            <PerformanceItem label="Avg Trade" value={formatCurrency(simState.avgTrade)} />
+                            <PerformanceItem label="Avg Trade" value={formatCurrency(profitPerTrade)} />
                             <PerformanceItem label="Max Drawdown" value={`${simState.maxDrawdown.toFixed(2)}%`} className="text-red-400"/>
                             <PerformanceItem label="Total Trades" value={simState.totalTrades.toString()} />
                         </div>
@@ -330,26 +328,20 @@ export function ProTraderView() {
                  <div className="order-history">
                     <h3 className="section-header">History</h3>
                      <div className="order-list">
-                        {isAnimating ? (
-                            simState.botLog.map((log, index) => (
-                                <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
-                            ))
-                        ) : (
-                             walletData.growth.earningsHistory.slice(-10).reverse().map(trade => (
-                                <HistoryItem key={trade.timestamp} log={`Grid Profit Executed`} time={format(new Date(trade.timestamp), 'PPpp')} />
-                            ))
-                        )}
+                        {simState.botLog.map((log, index) => (
+                           <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
+                        ))}
                      </div>
                  </div>
                  <div className="order-history">
-                     <h3 className="section-header">Open Orders</h3>
+                     <h3 className="section-header">Grid Start Times</h3>
                      <div className="order-list">
                         {[...Array(totalGrids)].map((_, i) => (
                            <div className="order-item" key={i}>
                                 <div className={cn("font-bold", i < executedGrids ? "text-slate-500" : "text-amber-400")}>
                                     Grid #{i + 1}
                                 </div>
-                                <div className={cn(i < executedGrids ? "text-slate-500" : "text-slate-300")}>
+                                <div className={cn(i < executedGrids ? "text-slate-500" : "text-white")}>
                                      {i < executedGrids ? 'Executed' : 'Pending'}
                                 </div>
                                 <div className="order-time">
@@ -360,7 +352,6 @@ export function ProTraderView() {
                      </div>
                  </div>
             </div>
-
         </div>
     );
 }
