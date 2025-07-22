@@ -1,11 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { MessageSquare, X, Minus } from "lucide-react"
+import { X, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PublicChatView } from "./public-chat-view"
 import { AnimatePresence, motion } from "framer-motion"
-import { cn } from "@/lib/utils"
+import { AstralLogo } from "../icons/astral-logo"
 
 export function FloatingChat() {
   const [isOpen, setIsOpen] = React.useState(false)
@@ -76,9 +76,9 @@ export function FloatingChat() {
         >
           <Button
             onClick={handleToggle}
-            className="rounded-full h-14 w-14 shadow-lg"
+            className="rounded-full h-14 w-14 shadow-lg flex items-center justify-center"
           >
-            <MessageSquare className="h-6 w-6" />
+            <AstralLogo className="h-8 w-8" />
             <span className="sr-only">Open Chat</span>
           </Button>
         </motion.div>
