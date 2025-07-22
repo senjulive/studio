@@ -3,6 +3,8 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { UsdtLogoIcon } from '../icons/usdt-logo';
+import { cn } from '@/lib/utils';
+import { CandlestickData } from '@/hooks/use-trading-bot';
 
 const statusMessages = [
     { text: "Connecting to Exchange...", progress: 3 },
@@ -14,9 +16,7 @@ const statusMessages = [
 ];
 
 
-export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPercentage, setBotLog, isAnimating }: { totalBalance: number, profitPerTrade: number, profitPercentage: number, setBotLog: React.Dispatch<React.SetStateAction<{ message: string; time: Date; }[]>>, isAnimating: boolean }) {
-  const [price, setPrice] = useState(totalBalance);
-  const [pnl, setPnl] = useState(0);
+export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPercentage, setBotLog, isAnimating, candlestickData, currentPrice }: { totalBalance: number, profitPerTrade: number, profitPercentage: number, setBotLog: React.Dispatch<React.SetStateAction<{ message: string; time: Date; }[]>>, isAnimating: boolean, candlestickData: CandlestickData[], currentPrice: number }) {
   const [transactions, setTransactions] = useState<{ id: number; type: string; x: number; y: number; }[]>([]);
   const [statusText, setStatusText] = useState("");
   const chartAreaRef = useRef<HTMLDivElement>(null);
@@ -24,27 +24,9 @@ export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPerce
 
   useEffect(() => {
     if (!isAnimating) {
-        setPrice(totalBalance);
-        setPnl(0);
         setStatusText("");
         return;
     };
-
-    const priceInterval = setInterval(() => {
-      setPrice(prevPrice => {
-        const variation = (Math.random() - 0.5) * (totalBalance * 0.001);
-        return totalBalance + variation;
-      });
-    }, 500);
-
-    const pnlInterval = setInterval(() => {
-        setPnl(prevPnl => {
-            if (prevPnl < profitPerTrade) {
-                return Math.min(prevPnl + profitPerTrade / 50, profitPerTrade);
-            }
-            return profitPerTrade;
-        });
-    }, 100);
 
     const transactionInterval = setInterval(() => {
       const type = Math.random() > 0.5 ? 'buy' : 'sell';
@@ -79,207 +61,56 @@ export function GridTradingAnimation({ totalBalance, profitPerTrade, profitPerce
     }, 9000); // Change status every 9 seconds
 
     return () => {
-      clearInterval(priceInterval);
-      clearInterval(pnlInterval);
       clearInterval(transactionInterval);
       clearInterval(statusInterval);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profitPerTrade, totalBalance, isAnimating]);
+  
+  const chartHeight = chartAreaRef.current?.offsetHeight || 380;
+  const priceData = candlestickData.map(d => [d.high, d.low]).flat();
+  const minPrice = Math.min(...priceData, currentPrice);
+  const maxPrice = Math.max(...priceData, currentPrice);
+  const priceRange = maxPrice - minPrice;
+
+  const getYPosition = (price: number) => {
+    if (priceRange === 0) return chartHeight / 2;
+    return chartHeight - ((price - minPrice) / priceRange) * chartHeight;
+  };
+  
 
   return (
     <>
-      <style>{`
-        .trading-container * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        .trading-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            font-family: 'Courier New', monospace;
-            color: #ffffff;
-            overflow: hidden;
-            border-radius: var(--radius);
-        }
-        .main-content {
-            flex: 1;
-            display: flex;
-        }
-        .chart-area {
-            flex: 2;
-            position: relative;
-            border-right: 1px solid #333;
-        }
-        .price-line {
-            position: absolute;
-            width: 100%;
-            height: 1px;
-            background: #3b82f6;
-            animation: priceMove 3s ease-in-out infinite;
-            box-shadow: 0 0 10px #3b82f6;
-        }
-        @keyframes priceMove {
-            0% { top: 60%; }
-            25% { top: 45%; }
-            50% { top: 55%; }
-            75% { top: 40%; }
-            100% { top: 60%; }
-        }
-        .order-book {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            font-size: 10px;
-        }
-        .order-book-header {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        .orders-section {
-            margin-bottom: 10px;
-        }
-        .section-title {
-            font-size: 10px;
-            margin-bottom: 5px;
-            color: #888;
-        }
-        .order-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 2px 0;
-            border-bottom: 1px solid #222;
-            animation: orderFlash 2s ease-in-out infinite;
-        }
-        .order-row.buy {
-            color: #00ff88;
-        }
-        .order-row.sell {
-            color: #ff4444;
-        }
-        @keyframes orderFlash {
-            0%, 90% { opacity: 0.8; }
-            95% { opacity: 1; background: rgba(255, 255, 255, 0.05); }
-            100% { opacity: 0.8; }
-        }
-        .transaction {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            animation: transactionPop 1s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        @keyframes transactionPop {
-            0% { transform: scale(0); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.8; }
-            100% { transform: scale(0); opacity: 0; }
-        }
-        .profit-loss {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
-            border: 1px dashed #64748b;
-            font-size: 10px;
-        }
-        .pnl-value {
-            font-size: 14px;
-            font-weight: bold;
-            animation: pnlFlicker 1s ease-in-out infinite;
-        }
-        .pnl-value.positive {
-            color: #00ff88;
-        }
-        @keyframes pnlFlicker {
-            0%, 50% { opacity: 0.8; }
-            100% { opacity: 1; }
-        }
-        .grid-levels {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        .grid-level {
-            position: absolute;
-            width: 100%;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            animation: gridLevelPulse 3s ease-in-out infinite;
-        }
-        @keyframes gridLevelPulse {
-            0%, 100% { opacity: 0.1; }
-            50% { opacity: 0.4; }
-        }
-        .dynamic-status {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.5);
-            padding: 5px 15px;
-            border-radius: 5px;
-            font-size: 12px;
-            animation: fadeInOut 5s;
-        }
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; }
-            20%, 80% { opacity: 1; }
-        }
-      `}</style>
-      <div className="trading-container">
-        <div className="main-content">
-            <div className="chart-area" ref={chartAreaRef}>
-                <div className="grid-levels">
-                    {[25, 35, 45, 55, 65, 75].map((top, i) => (
-                        <div key={i} className="grid-level" style={{ top: `${top}%`, animationDelay: `${i * 0.5}s` }}></div>
-                    ))}
-                </div>
-                <div className="price-line"></div>
-                <div className="profit-loss">
-                    <div>PROFIT</div>
-                    <div className={`pnl-value positive`}>
-                      +${pnl.toFixed(2)}
-                    </div>
-                    <div className="text-xs text-green-400">({profitPercentage.toFixed(4)}%)</div>
-                </div>
-                {transactions.map(t => (
-                  <div key={t.id} className={`transaction ${t.type}`} style={{ left: `${t.x}%`, top: `${t.y}%` }}>
-                    <UsdtLogoIcon className="h-6 w-6"/>
-                  </div>
-                ))}
-                {statusText && <div className="dynamic-status">{statusText}</div>}
-            </div>
-            <div className="order-book">
-                <div className="order-book-header">ORDER BOOK</div>
-                <div className="orders-section">
-                    <div className="section-title">SELL ORDERS</div>
-                    <div className="order-row sell"><span>{(totalBalance * 1.0005).toFixed(2)}</span><span>0.125</span></div>
-                    <div className="order-row sell"><span>{(totalBalance * 1.0003).toFixed(2)}</span><span>0.234</span></div>
-                    <div className="order-row sell"><span>{(totalBalance * 1.0001).toFixed(2)}</span><span>0.456</span></div>
-                </div>
-                <div className="orders-section">
-                    <div className="section-title">BUY ORDERS</div>
-                    <div className="order-row buy"><span>{(totalBalance * 0.9999).toFixed(2)}</span><span>0.345</span></div>
-                    <div className="order-row buy"><span>{(totalBalance * 0.9997).toFixed(2)}</span><span>0.567</span></div>
-                    <div className="order-row buy"><span>{(totalBalance * 0.9995).toFixed(2)}</span><span>0.789</span></div>
-                </div>
-            </div>
+      <div className="trading-container" ref={chartAreaRef}>
+         <div className="grid-levels">
+            {[20, 40, 60, 80].map((top, i) => (
+                <div key={i} className="grid-line" style={{ top: `${top}%` }}></div>
+            ))}
         </div>
+
+        {candlestickData.map((candle, index) => {
+            const candleTop = getYPosition(candle.high);
+            const candleBottom = getYPosition(candle.low);
+            const bodyTop = getYPosition(Math.max(candle.open, candle.close));
+            const bodyBottom = getYPosition(Math.min(candle.open, candle.close));
+            const isBullish = candle.close >= candle.open;
+
+            return (
+                 <div key={index} className="candle" style={{ left: `${(index / candlestickData.length) * 100}%`, width: `${100 / candlestickData.length}%` }}>
+                    <div className="candle-wick" style={{ top: `${candleTop}px`, height: `${candleBottom - candleTop}px` }}></div>
+                    <div className={cn("candle-body", isBullish ? "bullish" : "bearish")} style={{ top: `${bodyTop}px`, height: `${bodyBottom - bodyTop}px` }}></div>
+                </div>
+            )
+        })}
+
+        <div className="price-line" style={{ top: `${getYPosition(currentPrice)}px` }} data-price={currentPrice.toFixed(2)}></div>
+
+        {transactions.map(t => (
+          <div key={t.id} className={`transaction ${t.type}`} style={{ left: `${t.x}%`, top: `${t.y}%` }}>
+            <UsdtLogoIcon className="h-6 w-6"/>
+          </div>
+        ))}
+        {statusText && <div className="dynamic-status">{statusText}</div>}
     </div>
     </>
   );

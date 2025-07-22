@@ -85,10 +85,10 @@
         @apply text-3xl;
     }
     .bot-status {
-        @apply flex items-center gap-2.5 py-2.5 px-5 bg-emerald-500/10 border border-emerald-500/30 rounded-full cursor-pointer transition-all duration-300 font-semibold hover:bg-emerald-500/25 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(16,185,129,0.2)];
+        @apply flex items-center gap-2.5 py-2.5 px-5 rounded-full cursor-pointer transition-all duration-300 font-semibold;
     }
     .status-indicator {
-        @apply w-2.5 h-2.5 rounded-full bg-gradient-radial from-emerald-500 to-emerald-600 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.6)];
+        @apply w-2.5 h-2.5 rounded-full animate-pulse;
     }
     .controls {
         @apply flex justify-between mb-6 gap-6 items-center;
@@ -226,18 +226,73 @@
         @apply text-slate-500 text-xs;
     }
     .candle { @apply absolute; }
-    .candle-wick { @apply absolute w-px left-[3.5px] bg-slate-500; }
-    .candle-body { @apply absolute w-[7px] left-[0.5px] rounded-sm min-h-[2px] transition-all duration-200; }
+    .candle-wick { @apply absolute w-px left-1/2 -translate-x-1/2 bg-slate-500; }
+    .candle-body { @apply absolute left-1/2 -translate-x-1/2 rounded-sm min-h-[2px] transition-all duration-200; }
     .candle:hover .candle-body { @apply shadow-[0_0_10px_rgba(255,255,255,0.3)] scale-110; }
     .bullish { @apply bg-gradient-to-b from-emerald-500 to-emerald-700 border border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]; }
     .bearish { @apply bg-gradient-to-b from-red-500 to-red-700 border border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]; }
     .grid-line { @apply absolute left-0 right-0 border-t border-dashed border-slate-700/50; }
-    .price-line { @apply absolute left-0 right-0 border-t-2 border-amber-400 z-10 animate-pulse; }
+    .price-line { @apply absolute left-0 right-0 border-t border-blue-500 z-10; }
     .price-line::after {
         content: attr(data-price);
-        @apply absolute right-2 -top-3.5 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 py-1 px-2 rounded text-xs font-bold shadow-[0_4px_12px_rgba(251,191,36,0.4)];
+        @apply absolute right-2 -top-2.5 bg-blue-500 text-white py-0.5 px-2 rounded text-xs font-bold shadow-[0_2px_8px_rgba(59,130,246,0.4)];
     }
     .profit-float { @apply absolute text-emerald-400 font-bold text-sm animate-floatUp pointer-events-none z-30 [text-shadow:0_0_12px_rgba(16,185,129,0.8)]; }
     .loss-float { @apply absolute text-red-400 font-bold text-sm animate-floatUp pointer-events-none z-30 [text-shadow:0_0_12px_rgba(239,68,68,0.8)]; }
 
+    .trading-container * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .trading-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        font-family: 'Courier New', monospace;
+        color: #ffffff;
+        overflow: hidden;
+        border-radius: var(--radius);
+    }
+    .transaction {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        animation: transactionPop 1s ease-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    @keyframes transactionPop {
+        0% { transform: scale(0); opacity: 1; }
+        50% { transform: scale(1.5); opacity: 0.8; }
+        100% { transform: scale(0); opacity: 0; }
+    }
+    
+    .grid-levels {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+   
+    .dynamic-status {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.5);
+        padding: 5px 15px;
+        border-radius: 5px;
+        font-size: 12px;
+        animation: fadeInOut 5s;
+    }
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0; }
+        20%, 80% { opacity: 1; }
+    }
 }
