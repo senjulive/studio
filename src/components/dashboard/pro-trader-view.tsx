@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { BarChart2, TrendingUp, SlidersHorizontal, Layers, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useTradingBot } from '@/hooks/use-trading-bot';
 
 const StatCard = ({ label, value, className, change }: { label: string; value: string; className?: string; change?: string }) => (
     <div className="stat-card">
@@ -35,6 +36,16 @@ const PerformanceItem = ({ label, value, className }: { label: string; value: st
 export function ProTraderView() {
     const [activePair, setActivePair] = React.useState('BTC/USDT');
     const [activeChartTab, setActiveChartTab] = React.useState('Candlestick');
+    const { state } = useTradingBot({
+        initialPrice: 43850,
+        gridLevels: 5,
+        gridSpread: 0.001,
+        tradeAmount: 0.05
+    });
+
+    const formatCurrency = (value: number) => {
+        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
 
     return (
         <div className="trading-card">
@@ -73,37 +84,38 @@ export function ProTraderView() {
                             Indicators
                         </Button>
                     </div>
-                    <div className="chart-container">
-                        {/* Placeholder for actual chart */}
+                    <div className={cn("chart-container", state.lastTrade?.type === 'buy' ? 'flash-green' : state.lastTrade?.type === 'sell' ? 'flash-red' : '')}>
                         <div className="flex items-center justify-center h-full text-slate-500">
                              Chart for {activePair} - {activeChartTab}
                         </div>
                     </div>
                      <div className="price-display">
                         <div className="price-info">
-                            <div className="price-value">$43,847.52</div>
-                            <div className="price-change positive">+2.48%</div>
+                            <div className="price-value">{formatCurrency(state.currentPrice)}</div>
+                            <div className={cn("price-change", state.change24h >= 0 ? 'positive' : 'negative')}>
+                                {state.change24h >= 0 ? '+' : ''}{state.change24h.toFixed(2)}%
+                            </div>
                         </div>
                         <div className="volume-info">
-                            Vol: 847.23M
+                            Vol: {state.volume24h.toLocaleString()}M
                         </div>
                     </div>
                 </div>
 
                 <div className="stats-section">
                     <div className="stats-grid">
-                        <StatCard label="Portfolio Balance" value="$12,847.92" />
-                        <StatCard label="Today's P&L" value="+$347.85" className="profit" />
-                        <StatCard label="Active Positions" value="8/15" />
-                        <StatCard label="Grid Range" value="±3.2%" />
+                        <StatCard label="Portfolio Balance" value={formatCurrency(state.portfolioBalance)} />
+                        <StatCard label="Today's P&L" value={`${state.pnl >= 0 ? '+' : ''}${formatCurrency(state.pnl)}`} className={state.pnl >= 0 ? "profit" : "loss"} />
+                        <StatCard label="Active Positions" value={`${state.openPositions}/${state.totalPositions}`} />
+                        <StatCard label="Grid Range" value={`±${state.gridRange.toFixed(2)}%`} />
                     </div>
                     <div className="performance-section">
                         <h3 className="section-header">Performance Analytics</h3>
                         <div className="performance-grid">
-                            <PerformanceItem label="Win Rate" value="84.2%" className="text-green-400"/>
-                            <PerformanceItem label="Avg Trade" value="$8.74" />
-                            <PerformanceItem label="Max Drawdown" value="-1.8%" className="text-red-400"/>
-                            <PerformanceItem label="Total Trades" value="1,247" />
+                            <PerformanceItem label="Win Rate" value={`${state.winRate.toFixed(1)}%`} className="text-green-400"/>
+                            <PerformanceItem label="Avg Trade" value={formatCurrency(state.avgTrade)} />
+                            <PerformanceItem label="Max Drawdown" value={`${state.maxDrawdown.toFixed(2)}%`} className="text-red-400"/>
+                            <PerformanceItem label="Total Trades" value={state.totalTrades.toString()} />
                         </div>
                     </div>
                 </div>
@@ -113,20 +125,17 @@ export function ProTraderView() {
                  <div className="order-history">
                     <h3 className="section-header">Live Order History</h3>
                      <div className="order-list">
-                        <OrderItem type="buy" price="43850.12" amount="0.05" time="2s ago" />
-                        <OrderItem type="sell" price="43895.60" amount="0.02" time="28s ago" />
-                        <OrderItem type="buy" price="43842.90" amount="0.10" time="1m ago" />
-                        <OrderItem type="sell" price="43901.05" amount="0.08" time="2m ago" />
-                        <OrderItem type="buy" price="43833.45" amount="0.05" time="3m ago" />
+                        {state.orderHistory.map(order => (
+                             <OrderItem key={order.id} type={order.type} price={order.price.toFixed(2)} amount={order.amount.toFixed(2)} time={order.time} />
+                        ))}
                      </div>
                  </div>
                  <div className="order-history">
                      <h3 className="section-header">Open Orders</h3>
                      <div className="order-list">
-                        <OrderItem type="sell" price="44100.00" amount="0.15" time="pending" />
-                        <OrderItem type="sell" price="44050.00" amount="0.15" time="pending" />
-                        <OrderItem type="buy" price="43750.00" amount="0.20" time="pending" />
-                        <OrderItem type="buy" price="43700.00" amount="0.20" time="pending" />
+                        {state.openOrders.map(order => (
+                            <OrderItem key={order.id} type={order.type} price={order.price.toFixed(2)} amount={order.amount.toFixed(2)} time="pending" />
+                        ))}
                      </div>
                  </div>
             </div>

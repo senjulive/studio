@@ -103,7 +103,17 @@ export default {
           '0%': { opacity: '1', transform: 'scale(1)' },
           '50%': { opacity: '0.7', transform: 'scale(1.1)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
-        }
+        },
+        flashGreen: {
+          '0%': { backgroundColor: 'rgba(16, 185, 129, 0)' },
+          '50%': { backgroundColor: 'rgba(16, 185, 129, 0.2)' },
+          '100%': { backgroundColor: 'rgba(16, 185, 129, 0)' },
+        },
+        flashRed: {
+            '0%': { backgroundColor: 'rgba(239, 68, 68, 0)' },
+            '50%': { backgroundColor: 'rgba(239, 68, 68, 0.2)' },
+            '100%': { backgroundColor: 'rgba(239, 68, 68, 0)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -111,6 +121,8 @@ export default {
         'bot-pulse': 'bot-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bar-pulse': 'bar-pulse 2.2s ease-in-out infinite',
         'pulse': 'pulse 2s infinite',
+        'flash-green': 'flashGreen 0.8s ease-in-out',
+        'flash-red': 'flashRed 0.8s ease-in-out',
       },
     },
   },
