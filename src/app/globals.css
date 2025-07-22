@@ -5,26 +5,26 @@
 
 @layer base {
   :root {
-    --background: 240 33% 97% / 0.1;
-    --foreground: 247 38% 15%;
-    --card: 0 0% 100% / 0.1;
-    --card-foreground: 247 38% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 247 38% 15%;
-    --primary: 272 100% 25%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 10% 99% / 0.1;
-    --secondary-foreground: 247 38% 15%;
-    --muted: 246 80% 96% / 0.1;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 274 100% 50% / 0.1;
-    --accent-foreground: 247 38% 15%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 246 30% 92% / 0.2;
-    --input: 246 30% 92% / 0.2;
-    --ring: 274 100% 50%;
-    --chart-1: 272 100% 25%;
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 213 94% 68%;
+    --chart-1: 22 92% 58%;
     --chart-2: 142.1 76.2% 36.3%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
@@ -32,14 +32,14 @@
     --radius: 0.75rem;
 
     /* Custom Sidebar Vars */
-    --sidebar-background: 0 0% 100% / 0.1;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 272 100% 25%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 246 80% 96% / 0.2;
-    --sidebar-accent-foreground: 272 100% 25%;
-    --sidebar-border: 246 30% 92% / 0.2;
-    --sidebar-ring: 272 100% 25%;
+    --sidebar-background: 224 71% 4%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 40% 98%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 213 94% 68%;
 
     /* Chart Colors for Ranks */
     --color-recruit: 240 3.8% 46.1%;
@@ -57,7 +57,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
   }
 }
 
