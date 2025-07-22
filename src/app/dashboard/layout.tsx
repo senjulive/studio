@@ -31,25 +31,19 @@ import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { 
-    User, 
-    Settings, 
-    LogOut, 
-    Inbox,
-    Home,
-    LineChart,
-    Users,
-    Shield,
-    Wallet,
-    ArrowLeftRight,
-    HeartHandshake,
-    Info,
-    Download,
-    Megaphone,
-    UserPlus,
-    Repeat,
-    SlidersHorizontal
-} from 'lucide-react';
+import { HomeIcon } from '@/components/icons/nav/home-icon';
+import { MarketIcon } from '@/components/icons/nav/market-icon';
+import { DepositIcon } from '@/components/icons/nav/deposit-icon';
+import { WithdrawIcon } from '@/components/icons/nav/withdraw-icon';
+import { SquadIcon } from '@/components/icons/nav/squad-icon';
+import { ProfileIcon } from '@/components/icons/nav/profile-icon';
+import { SupportIcon } from '@/components/icons/nav/support-icon';
+import { AboutIcon } from '@/components/icons/nav/about-icon';
+import { DownloadIcon } from '@/components/icons/nav/download-icon';
+import { SettingsIcon } from '@/components/icons/nav/settings-icon';
+import { LogoutIcon } from '@/components/icons/nav/logout-icon';
+import { InboxIcon } from '@/components/icons/nav/inbox-icon';
+import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -115,19 +109,18 @@ export default function DashboardLayout({
   }, []);
 
   const baseMenuItems = [
-    { href: '/dashboard', label: 'Home', icon: Home },
-    { href: '/dashboard/market', label: 'Market', icon: LineChart },
-    { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
-    { href: '/pro-trader', label: 'Pro Trader', icon: SlidersHorizontal },
-    { href: '/dashboard/deposit', label: 'Deposit', icon: Wallet },
-    { href: '/dashboard/withdraw', label: 'Withdraw', icon: ArrowLeftRight },
-    { href: '/dashboard/squad', label: 'Squad', icon: Users },
+    { href: '/dashboard', label: 'Home', icon: HomeIcon },
+    { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
+    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+    { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
+    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
+    { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
     { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
-    { href: '/dashboard/profile', label: 'Profile', icon: User },
+    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
     { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
-    { href: '/dashboard/inbox', label: 'Inbox', icon: Inbox },
-    { href: '/dashboard/support', label: 'Support', icon: HeartHandshake },
-    { href: '/dashboard/about', label: 'About', icon: Info },
+    { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
+    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/about', label: 'About', icon: AboutIcon },
   ];
   
   if (isAdmin) {
@@ -143,7 +136,7 @@ export default function DashboardLayout({
       {
         href: downloadHref,
         label: 'Download App',
-        icon: Download,
+        icon: DownloadIcon,
         download: 'AstralCore.url',
       },
   ]
@@ -158,11 +151,11 @@ export default function DashboardLayout({
   const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
 
   const bottomNavItems = [
-    { href: '/dashboard', label: 'Home', icon: Home },
-    { href: '/dashboard/market', label: 'Market', icon: LineChart },
-    { href: '/dashboard/trading', label: 'Trading', icon: Wallet },
-    { href: '/dashboard/squad', label: 'Squad', icon: Users },
-    { href: '/dashboard/profile', label: 'Profile', icon: User },
+    { href: '/dashboard', label: 'Home', icon: HomeIcon },
+    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
+    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
   ];
 
   if (isInitializing) {
@@ -170,12 +163,11 @@ export default function DashboardLayout({
   }
 
   const getPageTitle = () => {
-    if (pathname === '/dashboard') return 'Home';
     if (pathname === '/dashboard/trading') return 'Astral Core Trading';
     const currentItem = menuItems.find((item) => item.href === pathname);
     return currentItem
       ? currentItem.label
-      : pathname.split('/').pop()?.replace('-', ' ') || 'Dashboard';
+      : pathname.split('/').pop()?.replace('-', ' ') || 'Home';
   };
 
   const isClient = typeof window !== 'undefined';
@@ -184,7 +176,7 @@ export default function DashboardLayout({
   return (
     <UserProvider value={{ user: user as any }}>
       <SidebarProvider>
-        <Sidebar variant="floating" collapsible="icon">
+        <Sidebar>
           <SidebarHeader>
             <div className="flex items-center gap-2">
               <AstralLogo className="h-8 w-8" />
@@ -202,10 +194,9 @@ export default function DashboardLayout({
                     isActive={
                       isClient ? pathname === item.href && !item.download : false
                     }
-                    tooltip={item.label}
                   >
                     <Link href={item.href} download={item.download}>
-                      <item.icon />
+                      <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
                       <span>{item.label}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -248,19 +239,19 @@ export default function DashboardLayout({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/profile">
-                    <User className="mr-2 h-4 w-4" />
+                    <ProfileIcon className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/security">
-                    <Settings className="mr-2 h-4 w-4" />
+                    <SettingsIcon className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogoutIcon className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -268,10 +259,11 @@ export default function DashboardLayout({
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-          <header className="flex h-14 items-center gap-4 border-b bg-background/60 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
+          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
             <SidebarTrigger />
             <div className="w-full flex-1">
               <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
+                <AstralLogo className="h-6 w-6" />
                 {isClient ? (
                   <span>{getPageTitle()}</span>
                 ) : (
@@ -280,78 +272,35 @@ export default function DashboardLayout({
               </h1>
             </div>
             <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                <Link href="/dashboard/inbox">
+                  <InboxIcon className="h-5 w-5" />
+                  <span className="sr-only">Inbox</span>
+                </Link>
+              </Button>
               <NotificationBell />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={avatarUrl}
-                        alt="@user"
-                      />
-                      <AvatarFallback>{userInitial}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none text-foreground">
-                        User
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {userEmail || '...'}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/profile">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/inbox">
-                      <Inbox className="mr-2 h-4 w-4" />
-                      <span>Inbox</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/security">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </header>
-          <main className="flex-1 p-4 md:p-6 pb-20">
+          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
           </main>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
-            {bottomNavItems.map((item, index) => (
+          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10 md:hidden">
+            {bottomNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
+                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors',
                   isClient && pathname === item.href
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                {item.label === 'Trading' ? (
+                {item.label === 'CORE' ? (
                   <div className="absolute -top-6 flex items-center justify-center">
                      <div className="h-14 w-14 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
                         <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                           <item.icon className="h-6 w-6" />
+                           <item.icon className="h-8 w-8" />
                         </div>
                      </div>
                   </div>
@@ -359,7 +308,7 @@ export default function DashboardLayout({
                   <item.icon className="h-6 w-6" />
                 )}
                 
-                <span className={cn(item.label === 'Trading' && 'mt-10')}>{item.label}</span>
+                <span className={cn(item.label === 'CORE' && 'mt-10')}>{item.label}</span>
               </Link>
             ))}
           </nav>
