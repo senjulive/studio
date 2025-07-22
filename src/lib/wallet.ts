@@ -27,14 +27,14 @@ export async function updateWalletByUserId(userId: string, newData: Partial<Wall
     return updatedWallet;
 }
 
-export async function getOrCreateWallet(): Promise<WalletData> {
-    const user = { id: MOCK_USER_ID };
+export async function getOrCreateWallet(userId?: string): Promise<WalletData> {
+    const currentUserId = userId || MOCK_USER_ID;
 
-    if (!user) {
+    if (!currentUserId) {
         throw new Error("User not authenticated.");
     }
     
-    let wallet = mockWallets[user.id];
+    let wallet = mockWallets[currentUserId];
 
     if (wallet && wallet.profile) {
         const now = Date.now();

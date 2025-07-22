@@ -37,9 +37,11 @@ export async function POST(request: Request) {
         totalGridEarnings += gridEarnings;
         totalPendingWithdrawals += pendingWithdrawalAmount;
 
-        const totalBalance = wallet.balances.usdt + wallet.balances.btc * 68000 + wallet.balances.eth * 3500; // Using mock prices
+        const totalBalance = (wallet.balances?.usdt ?? 0) + (wallet.balances?.btc ?? 0) * 68000 + (wallet.balances?.eth ?? 0) * 3500; // Using mock prices
         const userRank = getUserRank(totalBalance);
-        rankDistribution[userRank.name]++;
+        if (rankDistribution.hasOwnProperty(userRank.name)) {
+            rankDistribution[userRank.name]++;
+        }
 
         return {
             userId,
@@ -56,7 +58,8 @@ export async function POST(request: Request) {
 
     const rankChartData = Object.entries(rankDistribution)
       .filter(([, value]) => value > 0)
-      .map(([name, value]) => ({ name, value, fill: `var(--color-${name.toLowerCase()})` }));
+      .map(([name, value]) => ({ name, value, fill: `var(--color-${name.toLowerCase().replace(/\s/g, '-')})` }));
+
 
     return NextResponse.json({
       totals: {

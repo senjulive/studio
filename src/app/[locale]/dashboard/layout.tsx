@@ -44,7 +44,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Megaphone, Shield } from 'lucide-react';
+import { UserPlus, Megaphone, Shield, Repeat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -90,7 +90,7 @@ export default function DashboardLayout({
 
       if (currentUser.id) {
         try {
-            const walletData = await getOrCreateWallet();
+            const walletData = await getOrCreateWallet(currentUser.id);
             setWallet(walletData);
         } catch (error) {
             console.error("Failed to fetch wallet data:", error);
@@ -116,7 +116,7 @@ export default function DashboardLayout({
   const baseMenuItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
-    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+    { href: '/dashboard/trading', label: 'CORE', icon: Repeat },
     { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
@@ -159,7 +159,7 @@ export default function DashboardLayout({
   const bottomNavItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+    { href: '/dashboard/trading', label: 'CORE', icon: Repeat },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
   ];
@@ -303,7 +303,7 @@ export default function DashboardLayout({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors',
+                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
                   isClient && pathname.endsWith(item.href)
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
@@ -313,7 +313,7 @@ export default function DashboardLayout({
                   <div className="absolute -top-8 flex items-center justify-center">
                      <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center holographic-border">
                         <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                           <item.icon className="h-12 w-12" />
+                           <item.icon className="h-8 w-8" />
                         </div>
                      </div>
                   </div>
@@ -321,7 +321,7 @@ export default function DashboardLayout({
                   <item.icon className="h-6 w-6" />
                 )}
                 
-                <span className={cn(item.label === 'CORE' && 'mt-10')}>{item.label}</span>
+                <span className={cn(item.label === 'CORE' && 'mt-8')}>{item.label}</span>
               </Link>
             ))}
           </nav>
