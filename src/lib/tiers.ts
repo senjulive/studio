@@ -1,6 +1,11 @@
 // This is a server-safe module for tier data and logic.
 // It does not contain any client-side code (like React components or hooks).
 
+import * as fs from 'fs/promises';
+import * as path from 'path';
+
+const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
+
 export type TierSetting = {
   id: string; // e.g., 'tier-1'
   name: string;
@@ -20,10 +25,25 @@ export const defaultTierSettings: TierSetting[] = [
   { id: 'tier-8', name: 'VIP CORE VIII', balanceThreshold: 100000, dailyProfit: 0.12, clicks: 15 },
 ];
 
+async function readSettings() {
+  try {
+    const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return {};
+  }
+}
+
 export async function getBotTierSettings(): Promise<TierSetting[]> {
-    // In a real app, this might fetch from a database or a remote JSON file.
-    // For this mock app, we return the default settings.
-    // A fetch from the local API could also be placed here if settings were dynamic.
+    try {
+        const settings = await readSettings();
+        const tierSettings = settings['botTierSettings'];
+        if (tierSettings && Array.isArray(tierSettings) && tierSettings.length > 0) {
+            return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
+        }
+    } catch (error) {
+        console.error("Could not read tier settings from file, using defaults.", error);
+    }
     return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
@@ -32,5 +52,5 @@ export const getCurrentTier = (balance: number, tiers: TierSetting[]): TierSetti
     const applicableTier = [...tiers].reverse().find(
       tier => balance >= tier.balanceThreshold && !tier.name.includes('VII') && !tier.name.includes('VIII')
     );
-    return applicableTier || null;
+    return applicableTier || tiers[0] || null;
 };
