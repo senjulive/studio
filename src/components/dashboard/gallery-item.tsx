@@ -45,9 +45,13 @@ const fragmentShader = `
 
 export function GalleryItem({
   imageUrl,
+  title,
+  description,
   ...props
 }: {
   imageUrl: string;
+  title: string;
+  description: string;
   [key: string]: any;
 }) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -175,6 +179,10 @@ export function GalleryItem({
       {...props}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+      <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
+        <h3 className="text-lg font-bold text-white">{title}</h3>
+        <p className="text-sm text-white/80">{description}</p>
+      </div>
     </div>
   );
 }
