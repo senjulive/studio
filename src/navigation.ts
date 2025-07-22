@@ -1,9 +1,8 @@
 import {
-  createLocalizedPathnamesNavigation,
-  Pathnames
+  createLocalizedPathnamesNavigation
 } from 'next-intl/navigation';
+import {locales} from './i18n-config';
 
-export const locales = ['en', 'es', 'fr', 'zh', 'ru'] as const;
 export const localePrefix = 'always'; // Default
 
 // The `pathnames` object holds pairs of internal
@@ -13,8 +12,7 @@ export const pathnames = {
   // special `/` key.
   '/': '/',
   '/dashboard': '/dashboard',
-
-} satisfies Pathnames<typeof locales>;
+} satisfies Record<string, any>;
 
 export const {Link, redirect, usePathname, useRouter} =
   createLocalizedPathnamesNavigation({locales, localePrefix, pathnames});
