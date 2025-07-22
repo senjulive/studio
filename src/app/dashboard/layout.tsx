@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -143,39 +144,61 @@ export default function DashboardLayout({
     }
   }, []);
 
-  const baseMenuItems = [
-    { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
-    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
-    { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
-    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-    { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
-    { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
-    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
-    { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
-    { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/security', label: 'Security', icon: SettingsIcon },
-    { href: '/dashboard/about', label: 'About', icon: AboutIcon },
-  ];
-  
-  if (isAdmin) {
-    baseMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
-  }
-  if (isModerator) {
-    baseMenuItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
-  }
-
-
-  const menuItems = [
-      ...baseMenuItems,
+  const menuConfig = React.useMemo(() => {
+    const baseConfig = [
       {
-        href: downloadHref,
-        label: 'Download App',
-        icon: DownloadIcon,
-        download: 'AstralCore.url',
+        title: 'Overview',
+        items: [
+          { href: '/dashboard', label: 'Home', icon: HomeIcon },
+          { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
+          { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+        ],
       },
-  ]
+      {
+        title: 'Manage',
+        items: [
+          { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
+          { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
+          { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
+          { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
+        ],
+      },
+      {
+        title: 'Account',
+        items: [
+          { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
+          { href: '/dashboard/security', label: 'Security', icon: SettingsIcon },
+          { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
+        ],
+      },
+      {
+        title: 'Platform',
+        items: [
+          { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
+          { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+          { href: '/dashboard/about', label: 'About', icon: AboutIcon },
+          { href: downloadHref, label: 'Download App', icon: DownloadIcon, download: 'AstralCore.url'},
+        ],
+      },
+    ];
+
+    if (isAdmin || isModerator) {
+      const adminItems = [];
+      if (isAdmin) {
+        adminItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
+      }
+      if (isModerator) {
+        adminItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
+      }
+      baseConfig.push({
+        title: 'Admin Tools',
+        items: adminItems,
+      });
+    }
+
+    return baseConfig;
+  }, [isAdmin, isModerator, downloadHref]);
+
 
   const handleLogout = async () => {
     sessionStorage.removeItem('loggedInEmail');
@@ -199,7 +222,7 @@ export default function DashboardLayout({
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
-    const currentItem = menuItems.find((item) => {
+    const currentItem = menuConfig.flatMap(g => g.items).find((item) => {
         return simplePath.startsWith(item.href) && item.href !== '/dashboard' || simplePath === item.href;
     });
      if (simplePath === '/dashboard') return 'Home';
@@ -269,21 +292,27 @@ export default function DashboardLayout({
 
           <SidebarContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={
-                      isClient ? pathname.endsWith(item.href) && !item.download : false
-                    }
-                  >
-                    <Link href={item.href} download={item.download}>
-                      <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuConfig.map((group, index) => (
+                  <React.Fragment key={group.title}>
+                    {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
+                    <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
+                    {group.items.map((item) => (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={
+                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
+                          }
+                        >
+                          <Link href={item.href} download={item.download}>
+                            <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </React.Fragment>
+                ))}
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
