@@ -9,49 +9,30 @@ export const AstralLogo = ({ className, ...props }: React.SVGProps<SVGSVGElement
         {...props}
     >
         <defs>
-            <linearGradient id="chevronGradient" x1="0.5" y1="0" x2="0.5" y2="1">
-                <stop offset="0%" stopColor="hsl(var(--chart-4))" />
-                <stop offset="100%" stopColor="hsl(var(--chart-5))" />
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{ stopColor: "hsl(180, 80%, 70%)" }} />
+                <stop offset="100%" style={{ stopColor: "hsl(195, 100%, 50%)" }} />
             </linearGradient>
-            <linearGradient id="nodeGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="hsl(var(--chart-5))" />
-                <stop offset="100%" stopColor="hsl(var(--chart-4))" />
-            </linearGradient>
-            <filter id="drop-shadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="1.5" dy="1.5" stdDeviation="1" floodColor="hsl(var(--primary) / 0.4)" />
-            </filter>
         </defs>
-
-        <path
-            d="M50 5 L93.3 27.5 L93.3 72.5 L50 95 L6.7 72.5 L6.7 27.5 Z"
-            fill="hsl(var(--primary) / 0.10)"
-            stroke="hsl(var(--primary))"
-            strokeWidth="4"
-            filter="url(#drop-shadow)"
-        />
-
-        <g stroke="hsl(var(--primary))" strokeWidth="1.5" strokeOpacity="0.5">
-            <line x1="71.65" y1="16.25" x2="62" y2="28" />
-            <line x1="93.3" y1="50" x2="73" y2="50" />
-            <line x1="71.65" y1="83.75" x2="62" y2="72" />
-            <line x1="28.35" y1="83.75" x2="38" y2="72" />
-            <line x1="6.7" y1="50" x2="27" y2="50" />
-            <line x1="28.35" y1="16.25" x2="38" y2="28" />
-        </g>
-        
-        <g fill="url(#nodeGradient)">
-            <circle cx="62" cy="28" r="4" />
-            <circle cx="73" cy="50" r="4" />
-            <circle cx="62" cy="72" r="4" />
-            <circle cx="38" cy="72" r="4" />
-            <circle cx="27" cy="50" r="4" />
-            <circle cx="38" cy="28" r="4" />
-        </g>
-        
-        <g transform="translate(0, -2)">
-            <rect x="47" y="22" width="6" height="18" fill="hsl(var(--chart-2))" rx="2" />
-            <rect x="37" y="26" width="6" height="18" fill="hsl(var(--chart-2) / 0.8)" rx="2" />
-            <rect x="57" y="26" width="6" height="18" fill="hsl(var(--chart-2) / 0.8)" rx="2" />
+        <g fill="url(#logoGradient)">
+            {/* Outer Circle */}
+            <path d="M50,2.5 A47.5,47.5 0 1,1 49.9,2.5 Z M50,10 A40,40 0 1,0 50,90 A40,40 0 1,0 50,10 Z" />
+            
+            {/* Main Star Points (Large) */}
+            <path d="M50 15 L59 41 L50 50 Z" />
+            <path d="M50 15 L41 41 L50 50 Z" />
+            <path d="M85 50 L59 59 L50 50 Z" />
+            <path d="M85 50 L59 41 L50 50 Z" />
+            <path d="M50 85 L41 59 L50 50 Z" />
+            <path d="M50 85 L59 59 L50 50 Z" />
+            <path d="M15 50 L41 41 L50 50 Z" />
+            <path d="M15 50 L41 59 L50 50 Z" />
+            
+            {/* Inner Star Points (Small) */}
+            <path d="M65.5 34.5 L55.7 44.3 L50 50 Z" opacity="0.7" />
+            <path d="M65.5 65.5 L55.7 55.7 L50 50 Z" opacity="0.7" />
+            <path d="M34.5 65.5 L44.3 55.7 L50 50 Z" opacity="0.7" />
+            <path d="M34.5 34.5 L44.3 44.3 L50 50 Z" opacity="0.7" />
         </g>
     </svg>
 );
