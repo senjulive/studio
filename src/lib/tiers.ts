@@ -1,3 +1,5 @@
+'use server';
+
 // This is a server-safe module for tier data and logic.
 // It does not contain any client-side code (like React components or hooks).
 
