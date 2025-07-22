@@ -36,8 +36,9 @@ export async function POST(request: Request) {
         totalWithdrawals += transactions.withdrawals;
         totalGridEarnings += gridEarnings;
         totalPendingWithdrawals += pendingWithdrawalAmount;
-
-        const totalBalance = (wallet.balances?.usdt ?? 0) + (wallet.balances?.btc ?? 0) * 68000 + (wallet.balances?.eth ?? 0) * 3500; // Using mock prices
+        
+        const balances = wallet.balances || { usdt: 0, btc: 0, eth: 0 };
+        const totalBalance = (balances.usdt ?? 0) + (balances.btc ?? 0) * 68000 + (balances.eth ?? 0) * 3500; // Using mock prices
         const userRank = getUserRank(totalBalance);
         if (rankDistribution.hasOwnProperty(userRank.name)) {
             rankDistribution[userRank.name]++;

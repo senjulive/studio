@@ -1,3 +1,4 @@
+
 'use server';
 
 import { getBotTierSettings, getCurrentTier } from './tiers';
@@ -56,7 +57,8 @@ export async function getOrCreateWallet(userId?: string): Promise<WalletData> {
         return wallet;
     }
 
-    return initialWallets['mock-user-123'];
+    // Fallback to default user if no user is found. In a real app, this might create a new wallet.
+    return initialWallets[MOCK_USER_ID];
 }
 
 export async function updateWallet(newData: Partial<WalletData>): Promise<WalletData | null> {
