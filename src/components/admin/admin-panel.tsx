@@ -17,7 +17,6 @@ import {
   Bot,
   Megaphone,
   Settings,
-  UserCheck,
   Gift,
   Users,
   Activity,
@@ -49,12 +48,14 @@ type AdminView =
   | 'bot-settings'
   | 'site-settings';
 
+const VerificationIcon = () => <span className="text-2xl">🪪</span>;
+
 const adminTabs = [
     { id: 'analytics', label: 'Dashboard', icon: LayoutDashboard, component: <AnalyticsManager /> },
     { id: 'wallets', label: 'Wallets', icon: WalletCards, component: <WalletManager /> },
     { id: 'messages', label: 'Messages', icon: Mail, component: <MessageViewer /> },
     { id: 'deposits', label: 'Deposits', icon: Banknote, component: <DepositApprovalManager /> },
-    { id: 'verifications', label: 'Verifications', icon: UserCheck, component: <VerificationManager /> },
+    { id: 'verifications', label: 'Verifications', icon: VerificationIcon, component: <VerificationManager /> },
     { id: 'moderators', label: 'Moderators', icon: Users, component: <ModeratorManager /> },
     { id: 'action-log', label: 'Action Log', icon: Activity, component: <ActionLogViewer /> },
     { id: 'announcements', label: 'Alerts', icon: Megaphone, component: <AnnouncementManager /> },

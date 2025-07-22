@@ -14,12 +14,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {Shield, Mail, UserCheck, Banknote} from 'lucide-react';
+import {Shield, Mail, Banknote} from 'lucide-react';
 import {VerificationManager} from '@/components/admin/verification-manager';
 import {DepositManager} from './deposit-manager';
 import {SupportManager} from './support-manager';
 import {useModerator} from '@/contexts/ModeratorContext';
 import { cn } from '@/lib/utils';
+
+const VerificationIcon = () => <span className="text-xl">🪪</span>;
 
 export function ModeratorPanel() {
   const {permissions} = useModerator();
@@ -35,7 +37,7 @@ export function ModeratorPanel() {
     {
       id: 'verifications',
       label: 'Verifications',
-      icon: UserCheck,
+      icon: VerificationIcon,
       condition: permissions?.user_verification,
       component: <VerificationManager />,
     },

@@ -44,7 +44,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Megaphone, Shield, Lock } from 'lucide-react';
+import { UserPlus, Megaphone, Shield, Lock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -62,7 +62,7 @@ import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
 import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -176,6 +176,7 @@ export default function DashboardLayout({
         title: 'Platform',
         items: [
           { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
+          { href: '/dashboard/trading-info', label: 'Tiers & Ranks', icon: Trophy },
           { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
           { href: '/dashboard/about', label: 'About', icon: AboutIcon },
           { href: downloadHref, label: 'Download App', icon: DownloadIcon, download: 'AstralCore.url'},
@@ -443,5 +444,7 @@ export default function DashboardLayout({
     </UserProvider>
   );
 }
+
+    
 
     
