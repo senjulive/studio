@@ -18,6 +18,7 @@ import { Progress } from '../ui/progress';
 import { Badge } from '../ui/badge';
 import { getUserRank } from '@/lib/ranks';
 import { tierIcons, tierClassNames } from '@/lib/settings';
+import { GridTradingAnimation } from './grid-trading-animation';
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -51,7 +52,7 @@ const StatCard = ({ label, value, className, change }: { label: string; value: s
 
 const HistoryItem = ({ log, time }: { log: string; time: string }) => (
     <div className="order-item">
-        <div className="flex-1 text-white">{log}</div>
+        <div className="flex-1 text-white flex items-center gap-2">{log}</div>
         <div className="order-time">{time}</div>
     </div>
 );
@@ -63,21 +64,6 @@ const PerformanceItem = ({ label, value, className }: { label: string; value: st
     </div>
 )
 
-const GridAnimation = () => {
-  return (
-    <div className="w-full h-full relative overflow-hidden">
-        {/* Grid Lines */}
-        {[...Array(8)].map((_, i) => (
-            <div key={`h-line-${i}`} className="grid-line" style={{ top: `${(i + 1) * 11}%`, animationDelay: `${i * 0.1}s` }} />
-        ))}
-        {[...Array(12)].map((_, i) => (
-            <div key={`v-line-${i}`} className="grid-line-vertical" style={{ left: `${(i + 1) * 8}%`, animationDelay: `${i * 0.1}s` }} />
-        ))}
-    </div>
-  );
-};
-
-
 const formatCurrency = (value: number) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 }
@@ -88,22 +74,25 @@ export function ProTraderView() {
     const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
     const [isAnimating, setIsAnimating] = React.useState(false);
     const [progress, setProgress] = React.useState(0);
+    const [displayBalance, setDisplayBalance] = React.useState(0);
     const { user } = useUser();
     const { toast } = useToast();
     const { state: simState, setBotLog } = useTradingBot({ initialPrice: 68000 });
     
     const progressIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
-    React.useEffect(() => {
-        async function fetchData() {
+    const fetchAndSetData = React.useCallback(async () => {
+        if (user) {
             const [wallet, tiers] = await Promise.all([getOrCreateWallet(), getBotTierSettings()]);
             setWalletData(wallet);
+            setDisplayBalance(wallet.balances?.usdt ?? 0);
             setTierSettings(tiers);
         }
-        if (user) {
-            fetchData();
-        }
     }, [user]);
+
+    React.useEffect(() => {
+        fetchAndSetData();
+    }, [fetchAndSetData]);
     
     const handleWalletUpdate = async (newData: WalletData) => {
         if (user?.id) {
@@ -111,12 +100,15 @@ export function ProTraderView() {
             if (updatedWallet) {
                 setWalletData(updatedWallet);
             }
+            return updatedWallet;
         }
+        return null;
     };
     
     const totalBalance = walletData?.balances?.usdt ?? 0;
     const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
     const gridsRemaining = walletData?.growth?.clicksLeft ?? 0;
+    const totalTrades = walletData?.growth?.earningsHistory?.length ?? 0;
     
     const currentTier = getCurrentTier(totalBalance, tierSettings);
     const rank = getUserRank(totalBalance);
@@ -155,39 +147,18 @@ export function ProTraderView() {
         setIsAnimating(true);
         setBotLog([]);
         setProgress(0);
-
-        const logMessages = [
-            { prog: 3, msg: "Connecting to Exchange..." },
-            { prog: 15, msg: "Authenticating API Keys..." },
-            { prog: 25, msg: "Fetching Market Data..." },
-            { prog: 40, msg: "Analyzing Market Volatility..." },
-            { prog: 55, msg: "Calculating Grid Levels..." },
-            { prog: 70, msg: "Placing Grid Orders..." },
-            { prog: 85, msg: "Monitoring Price Action..." },
-            { prog: 95, msg: "Executing Grid Trade..." },
-            { prog: 100, msg: "Trade Finalized. Updating Portfolio..." }
-        ];
+        setDisplayBalance(0);
 
         const animationDuration = 60000; // 60 seconds
-        const updateInterval = 100; // Update progress every 100ms
+        const updateInterval = 100;
         const progressIncrement = 100 / (animationDuration / updateInterval);
         
         progressIntervalRef.current = setInterval(() => {
-            setProgress(prev => {
-                const newProgress = prev + progressIncrement;
-                const nextLog = logMessages.find(log => newProgress >= log.prog && prev < log.prog);
-                if (nextLog) {
-                    setBotLog(prevLogs => [...prevLogs, { message: nextLog.msg, time: new Date() }]);
-                }
-                if (newProgress >= 100) {
-                    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-                    return 100;
-                }
-                return newProgress;
-            });
+            setProgress(prev => Math.min(prev + progressIncrement, 100));
         }, updateInterval);
 
-        setTimeout(() => {
+        setTimeout(async () => {
+            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
             const usdtEarnings = profitPerTrade;
             const newEarning = { amount: usdtEarnings, timestamp: Date.now() };
     
@@ -195,23 +166,27 @@ export function ProTraderView() {
               ...walletData,
               balances: {
                 ...walletData.balances,
-                usdt: (walletData.balances?.usdt ?? 0) + usdtEarnings,
+                usdt: totalBalance + usdtEarnings,
               },
               growth: {
                 ...walletData.growth,
-                clicksLeft: (walletData.growth?.clicksLeft ?? 1) - 1,
-                dailyEarnings: (walletData.growth?.dailyEarnings ?? 0) + usdtEarnings,
+                clicksLeft: gridsRemaining - 1,
+                dailyEarnings: dailyEarnings + usdtEarnings,
                 earningsHistory: [...(walletData.growth.earningsHistory || []), newEarning],
               },
             };
     
-            handleWalletUpdate(newWalletData);
+            const updatedWallet = await handleWalletUpdate(newWalletData);
     
             toast({
               title: "Trade Successful!",
               description: `You've earned ${formatCurrency(usdtEarnings)}.`,
             });
             
+            setBotLog(prev => [...prev, { message: `Profit: +${formatCurrency(usdtEarnings)}`, time: new Date() }]);
+            if(updatedWallet) {
+                setDisplayBalance(updatedWallet.balances.usdt);
+            }
             setIsAnimating(false);
             setProgress(0);
         }, animationDuration);
@@ -273,10 +248,11 @@ export function ProTraderView() {
                             <div className="bot-status !bg-emerald-500/20">
                                 <div className="status-indicator"></div>
                                 ONLINE
+                                <span className="text-xs tabular-nums">({progress.toFixed(0)}%)</span>
                             </div>
                         ) : (
-                             <div className="bot-status !bg-slate-500/20">
-                                <div className="status-indicator !bg-slate-400"></div>
+                             <div className={cn("bot-status", gridsRemaining > 0 ? "!bg-slate-500/20" : "!bg-red-500/20")}>
+                                <div className={cn("status-indicator", gridsRemaining > 0 ? "!bg-slate-400" : "!bg-red-400")}></div>
                                 OFFLINE
                             </div>
                         )}
@@ -286,10 +262,9 @@ export function ProTraderView() {
                         </Button>
                     </div>
                     <div className="chart-container">
-                        <GridAnimation />
+                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} />
                         {isAnimating && (
                              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
-                                <div className="text-6xl font-bold text-white tabular-nums tracking-tighter mb-2">{progress.toFixed(0)}%</div>
                                 <Progress value={progress} className="w-1/2 h-2 bg-slate-700" />
                             </div>
                         )}
@@ -297,7 +272,7 @@ export function ProTraderView() {
                      <div className="price-display">
                         <div className="price-info">
                              <UsdtLogoIcon className="h-8 w-8" />
-                            <div className="price-value">{formatCurrency(totalBalance)}</div>
+                            <div className="price-value">{formatCurrency(displayBalance)}</div>
                         </div>
                         <div className="volume-info">
                             Vol: {simState.volume24h.toLocaleString()}M
@@ -307,8 +282,8 @@ export function ProTraderView() {
 
                 <div className="stats-section">
                     <div className="stats-grid">
-                        <StatCard label="Portfolio Balance" value={formatCurrency(totalBalance)} />
-                        <StatCard label="Today's P&L" value={`${dailyEarnings >= 0 ? '+' : ''}${formatCurrency(dailyEarnings)}`} className={dailyEarnings >= 0 ? "profit" : "loss"} />
+                        <StatCard label="Portfolio Balance" value={formatCurrency(displayBalance)} />
+                        <StatCard label="Today's Earnings" value={`${dailyEarnings >= 0 ? '+' : ''}${formatCurrency(dailyEarnings)}`} className={dailyEarnings >= 0 ? "profit" : "loss"} />
                         <StatCard label="Grids Remaining" value={`${gridsRemaining}/${totalGrids}`} />
                         <StatCard label="Profit per Grid" value={`~${profitPercentagePerTrade.toFixed(4)}%`} />
                     </div>
@@ -317,8 +292,8 @@ export function ProTraderView() {
                         <div className="performance-grid">
                             <PerformanceItem label="Win Rate" value={`${simState.winRate.toFixed(1)}%`} className="text-green-400"/>
                             <PerformanceItem label="Avg Trade" value={formatCurrency(profitPerTrade)} />
+                            <PerformanceItem label="Total Trades" value={totalTrades.toString()} />
                             <PerformanceItem label="Max Drawdown" value={`${simState.maxDrawdown.toFixed(2)}%`} className="text-red-400"/>
-                            <PerformanceItem label="Total Trades" value={simState.totalTrades.toString()} />
                         </div>
                     </div>
                 </div>
@@ -328,9 +303,15 @@ export function ProTraderView() {
                  <div className="order-history">
                     <h3 className="section-header">History</h3>
                      <div className="order-list">
-                        {simState.botLog.map((log, index) => (
-                           <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
-                        ))}
+                         {isAnimating ? (
+                            simState.botLog.map((log, index) => (
+                                <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
+                            ))
+                         ) : (
+                             walletData.growth.earningsHistory.slice(-10).reverse().map(trade => (
+                                 <HistoryItem key={trade.timestamp} log={`Grid Profit: +${formatCurrency(trade.amount)}`} time={format(new Date(trade.timestamp), 'HH:mm:ss')} />
+                             ))
+                         )}
                      </div>
                  </div>
                  <div className="order-history">
@@ -338,7 +319,7 @@ export function ProTraderView() {
                      <div className="order-list">
                         {[...Array(totalGrids)].map((_, i) => (
                            <div className="order-item" key={i}>
-                                <div className={cn("font-bold", i < executedGrids ? "text-slate-500" : "text-amber-400")}>
+                                <div className={cn("font-bold text-white")}>
                                     Grid #{i + 1}
                                 </div>
                                 <div className={cn(i < executedGrids ? "text-slate-500" : "text-white")}>
