@@ -1,0 +1,20 @@
+{
+  "LoginForm": {
+    "description": "输入您的凭据以访问您的帐户。",
+    "emailLabel": "电子邮件",
+    "passwordLabel": "密码",
+    "forgotPasswordLink": "忘记密码？",
+    "rememberMeLabel": "记住我",
+    "loginButton": "登录",
+    "loginButtonLoading": "授权中...",
+    "registerPrompt": "还没有帐户？",
+    "registerLink": "注册",
+    "loginSuccessToast": {
+      "title": "登录成功",
+      "description": "欢迎来到 AstralCore！"
+    },
+    "loginFailedToast": {
+      "title": "登录失败"
+    }
+  }
+}

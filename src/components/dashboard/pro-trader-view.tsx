@@ -4,7 +4,7 @@
 import * as React from 'react';
 import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
-import { SlidersHorizontal, PlayCircle, Bot, Lock } from 'lucide-react';
+import { SlidersHorizontal, PlayCircle, Bot, Lock, Trophy } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTradingBot } from '@/hooks/use-trading-bot';
 import { getOrCreateWallet, updateWallet, type WalletData } from '@/lib/wallet';
@@ -18,6 +18,7 @@ import { Badge } from '../ui/badge';
 import { getUserRank } from '@/lib/ranks';
 import { tierIcons, tierClassNames } from '@/lib/settings';
 import { GridTradingAnimation } from './grid-trading-animation';
+import Link from 'next/link';
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -265,6 +266,12 @@ export function ProTraderView() {
                             <span>{currentTier.name}</span>
                           </Badge>
                         )}
+                        <Button asChild variant="ghost" size="sm" className="text-slate-400 hover:bg-slate-700 hover:text-white -ml-2">
+                           <Link href="/dashboard/trading-info">
+                              <Trophy className="h-4 w-4 mr-2"/>
+                              Tiers & Ranks
+                           </Link>
+                        </Button>
                     </div>
                 </div>
                  <Button onClick={handleStartBot} disabled={!canStart} size="lg" className={cn(!canStart && 'bg-gray-500 hover:bg-gray-500', canStart && 'bg-green-600 hover:bg-green-700')}>
@@ -308,7 +315,7 @@ export function ProTraderView() {
                         </Button>
                     </div>
                     <div className="chart-container">
-                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} progress={progress} />
+                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} />
                     </div>
                      <div className="price-display">
                         <div className="price-info">

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -43,7 +44,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
+import { UserPlus, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -163,11 +164,18 @@ export default function DashboardLayout({
   }
 
   const getPageTitle = () => {
-    if (pathname === '/dashboard/trading') return 'Astral Core Trading';
-    const currentItem = menuItems.find((item) => item.href === pathname);
+    // Remove locale from pathname for matching
+    const currentPath = pathname.replace(/^\/[a-z]{2}\//, '/');
+    const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
+
+    if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
+    const currentItem = menuItems.find((item) => {
+        return simplePath.startsWith(item.href) && item.href !== '/dashboard' || simplePath === item.href;
+    });
+     if (simplePath === '/dashboard') return 'Home';
     return currentItem
       ? currentItem.label
-      : pathname.split('/').pop()?.replace('-', ' ') || 'Home';
+      : simplePath.split('/').pop()?.replace('-', ' ') || 'Home';
   };
 
   const isClient = typeof window !== 'undefined';
@@ -192,7 +200,7 @@ export default function DashboardLayout({
                   <SidebarMenuButton
                     asChild
                     isActive={
-                      isClient ? pathname === item.href && !item.download : false
+                      isClient ? pathname.endsWith(item.href) && !item.download : false
                     }
                   >
                     <Link href={item.href} download={item.download}>
@@ -291,7 +299,7 @@ export default function DashboardLayout({
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors',
-                  isClient && pathname === item.href
+                  isClient && pathname.endsWith(item.href)
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}

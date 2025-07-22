@@ -1,0 +1,20 @@
+{
+  "LoginForm": {
+    "description": "Введите свои учетные данные для доступа к вашему аккаунту.",
+    "emailLabel": "Электронная почта",
+    "passwordLabel": "Пароль",
+    "forgotPasswordLink": "Забыли пароль?",
+    "rememberMeLabel": "Запомнить меня",
+    "loginButton": "Войти",
+    "loginButtonLoading": "Авторизация...",
+    "registerPrompt": "У вас нет аккаунта?",
+    "registerLink": "Зарегистрироваться",
+    "loginSuccessToast": {
+      "title": "Вход выполнен успешно",
+      "description": "Добро пожаловать в AstralCore!"
+    },
+    "loginFailedToast": {
+      "title": "Ошибка входа"
+    }
+  }
+}
