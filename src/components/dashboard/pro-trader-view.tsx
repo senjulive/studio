@@ -14,7 +14,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '../ui/skeleton';
 import { UsdtLogoIcon } from '../icons/usdt-logo';
 import { format } from 'date-fns';
-import { Progress } from '../ui/progress';
 import { Badge } from '../ui/badge';
 import { getUserRank } from '@/lib/ranks';
 import { tierIcons, tierClassNames } from '@/lib/settings';
@@ -156,7 +155,7 @@ export function ProTraderView() {
         setProgress(0);
         setDisplayBalance(0);
 
-        const animationDuration = 60000; // 60 seconds
+        const animationDuration = 60000;
         const updateInterval = 100;
         const progressIncrement = 100 / (animationDuration / updateInterval);
         
@@ -258,7 +257,7 @@ export function ProTraderView() {
                                 <span className="text-xs tabular-nums text-emerald-400">({progress.toFixed(0)}%)</span>
                             </div>
                         ) : (
-                             <div className={cn("bot-status !text-sm", gridsRemaining > 0 ? "!bg-transparent !border-none !p-0" : "!bg-red-500/20 text-red-400")}>
+                             <div className={cn("bot-status !text-sm", gridsRemaining > 0 ? "!bg-transparent !border-none !p-0" : "!bg-red-500/20 !text-red-400")}>
                                 <div className={cn("status-indicator", gridsRemaining > 0 ? "!bg-slate-400" : "!bg-red-400")}></div>
                                 OFFLINE
                             </div>
@@ -317,12 +316,12 @@ export function ProTraderView() {
                      </div>
                  </div>
                  <div className="order-history">
-                     <h3 className="section-header">Grid Start Times</h3>
+                     <h3 className="section-header">Market Value</h3>
                      <div className="order-list">
                         {[...Array(totalGrids)].map((_, i) => (
                            <div className="order-item" key={i}>
                                 <div className={cn("font-bold text-white")}>
-                                    Grid #{i + 1}
+                                    Grid Cycle #{i + 1}
                                 </div>
                                 <Badge variant={i < executedGrids ? "default" : "secondary"} className={cn(i < executedGrids ? "bg-green-600/80" : "bg-slate-600/80")}>
                                     {i < executedGrids ? 'Executed' : 'Pending'}
