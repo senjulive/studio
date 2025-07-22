@@ -58,7 +58,7 @@ const mockUser = {
 function DashboardLoading() {
   return (
     <div className="flex flex-col items-center justify-center min-h-dvh bg-background text-foreground animate-in fade-in-50">
-      <AstralLogo className="h-20 w-20 animate-pulse" />
+      <AstralLogo className="h-40 w-40 animate-pulse" />
       <p className="mt-4 text-lg font-semibold">Loading Your Dashboard</p>
       <p className="text-muted-foreground">Please wait a moment...</p>
     </div>
@@ -79,25 +79,25 @@ export default function DashboardLayout({
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
+  const fetchUserData = React.useCallback(async (email: string) => {
+    const currentUser = { ...mockUser, email };
+    setUser(currentUser);
+    setIsAdmin(email === 'admin@astralcore.io');
+    setIsModerator(email === 'moderator@astralcore.io');
+    if (currentUser.id) {
+      const walletData = await getOrCreateWallet(currentUser.id);
+      setWallet(walletData);
+    }
+  }, []);
+
   React.useEffect(() => {
     const initializeUser = async () => {
-        const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
-        const currentUser = { ...mockUser, email: loggedInEmail };
-        
-        setUser(currentUser);
-        setIsAdmin(loggedInEmail === 'admin@astralcore.io');
-        setIsModerator(loggedInEmail === 'moderator@astralcore.io');
-
-        if (currentUser.id) {
-          const walletData = await getOrCreateWallet(currentUser.id);
-          setWallet(walletData);
-        }
-        
-        setIsInitializing(false);
+      const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
+      await fetchUserData(loggedInEmail);
+      setIsInitializing(false);
     };
-    
     initializeUser();
-  }, []);
+  }, [fetchUserData]);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -121,6 +121,7 @@ export default function DashboardLayout({
     { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
     { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/security', label: 'Security', icon: SettingsIcon },
     { href: '/dashboard/about', label: 'About', icon: AboutIcon },
   ];
   
@@ -159,9 +160,12 @@ export default function DashboardLayout({
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
   ];
 
-  if (isInitializing) {
-    return <DashboardLoading />;
-  }
+  const userDataPromise = React.useMemo(() => {
+    const loggedInEmail = typeof sessionStorage !== 'undefined'
+      ? sessionStorage.getItem('loggedInEmail') || mockUser.email
+      : mockUser.email;
+    return fetchUserData(loggedInEmail);
+  }, [fetchUserData]);
 
   const getPageTitle = () => {
     // Remove locale from pathname for matching
@@ -180,14 +184,18 @@ export default function DashboardLayout({
 
   const isClient = typeof window !== 'undefined';
   const avatarUrl = wallet?.profile?.avatarUrl;
-
+  
+  if (isInitializing) {
+    return <DashboardLoading />;
+  }
+  
   return (
     <UserProvider value={{ user: user as any }}>
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center gap-2">
-              <AstralLogo className="h-8 w-8" />
+              <AstralLogo className="h-24 w-24" />
               <span className="text-lg font-semibold text-sidebar-foreground">
                 AstralCore
               </span>
@@ -292,7 +300,7 @@ export default function DashboardLayout({
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
           </main>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10 md:hidden">
+          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden holographic-nav">
             {bottomNavItems.map((item) => (
               <Link
                 key={item.href}
@@ -306,9 +314,9 @@ export default function DashboardLayout({
               >
                 {item.label === 'CORE' ? (
                   <div className="absolute -top-8 flex items-center justify-center">
-                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center holographic-border">
                         <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                           <item.icon className="h-10 w-10" />
+                           <item.icon className="h-12 w-12" />
                         </div>
                      </div>
                   </div>
