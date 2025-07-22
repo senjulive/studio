@@ -42,7 +42,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Megaphone, Shield, Repeat } from 'lucide-react';
+import { UserPlus, Megaphone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -114,7 +114,7 @@ export default function DashboardLayout({
   const baseMenuItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
-    { href: '/dashboard/trading', label: 'CORE', icon: Repeat },
+    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
     { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
@@ -157,7 +157,7 @@ export default function DashboardLayout({
   const bottomNavItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/trading', label: 'CORE', icon: Repeat },
+    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
   ];
