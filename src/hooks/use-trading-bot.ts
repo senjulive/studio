@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -13,6 +14,15 @@ type Order = {
 type Trade = Order & {
     time: string;
 };
+
+export type CandlestickData = {
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    timestamp: number;
+};
+
 
 type BotState = {
     currentPrice: number;
@@ -30,6 +40,8 @@ type BotState = {
     openOrders: Order[];
     orderHistory: Trade[];
     lastTrade: Trade | null;
+    lastPnl: number;
+    candlestickData: CandlestickData[];
 };
 
 type BotConfig = {
@@ -58,6 +70,8 @@ export function useTradingBot(config: BotConfig) {
         openOrders: [],
         orderHistory: [],
         lastTrade: null,
+        lastPnl: 0,
+        candlestickData: [],
     });
 
     const createGrid = useCallback((price: number) => {
@@ -72,24 +86,61 @@ export function useTradingBot(config: BotConfig) {
     }, [config.gridLevels, config.gridSpread, config.tradeAmount]);
     
     useEffect(() => {
+        const initialCandle: CandlestickData = {
+            open: config.initialPrice,
+            high: config.initialPrice,
+            low: config.initialPrice,
+            close: config.initialPrice,
+            timestamp: Date.now(),
+        };
+
         setState(prevState => ({
             ...prevState,
             openOrders: createGrid(config.initialPrice),
+            candlestickData: [initialCandle],
         }));
     }, [config.initialPrice, createGrid]);
 
     useEffect(() => {
         const interval = setInterval(() => {
             setState(prevState => {
-                const priceChange = (Math.random() - 0.5) * (prevState.currentPrice * 0.0005);
+                const lastCandle = prevState.candlestickData[prevState.candlestickData.length - 1];
+                const priceChange = (Math.random() - 0.49) * (prevState.currentPrice * 0.0005); // slightly bullish bias
                 const newPrice = prevState.currentPrice + priceChange;
+
+                let newCandle: CandlestickData = {
+                    ...lastCandle,
+                    close: newPrice,
+                    high: Math.max(lastCandle.high, newPrice),
+                    low: Math.min(lastCandle.low, newPrice),
+                };
+                
+                let newCandlestickData = [...prevState.candlestickData];
+                
+                // Create a new candle every 15 ticks (22.5s)
+                if (prevState.totalTrades % 15 === 0 && prevState.totalTrades > 0) {
+                     newCandle = {
+                        open: newPrice,
+                        high: newPrice,
+                        low: newPrice,
+                        close: newPrice,
+                        timestamp: Date.now(),
+                    };
+                    newCandlestickData.push(newCandle);
+                    if (newCandlestickData.length > 50) {
+                        newCandlestickData.shift(); // Keep chart to 50 candles
+                    }
+                } else {
+                    newCandlestickData[newCandlestickData.length - 1] = newCandle;
+                }
 
                 let newPnl = prevState.pnl;
                 let newBalance = prevState.portfolioBalance;
                 let newHistory = [...prevState.orderHistory];
                 let newOpenOrders = [...prevState.openOrders];
                 let lastTrade: Trade | null = null;
-                let executedTradesCount = prevState.totalTrades;
+                let lastPnl = 0;
+                let executedTradesCount = prevState.totalTrades + 1;
                 let profitableTrades = prevState.winRate * prevState.totalTrades / 100;
 
                 const buysToExecute = newOpenOrders.filter(order => order.type === 'buy' && newPrice <= order.price);
@@ -99,7 +150,6 @@ export function useTradingBot(config: BotConfig) {
                     const order = buysToExecute[0];
                     newOpenOrders = newOpenOrders.filter(o => o.id !== order.id);
                     
-                    // Add corresponding sell order
                     const newSellPrice = order.price * (1 + config.gridSpread * 2); 
                     newOpenOrders.push({ id: `sell-filled-${Date.now()}`, type: 'sell', price: newSellPrice, amount: order.amount });
                     
@@ -110,15 +160,14 @@ export function useTradingBot(config: BotConfig) {
                     const order = sellsToExecute[0];
                     newOpenOrders = newOpenOrders.filter(o => o.id !== order.id);
 
-                    // Add corresponding buy order
                     const newBuyPrice = order.price * (1 - config.gridSpread * 2);
                     newOpenOrders.push({ id: `buy-filled-${Date.now()}`, type: 'buy', price: newBuyPrice, amount: order.amount });
 
                     const profit = (order.price - (order.price / (1 + config.gridSpread * 2))) * order.amount;
                     newPnl += profit;
                     newBalance += profit;
+                    lastPnl = profit;
                     
-                    executedTradesCount++;
                     profitableTrades++;
 
                     const trade: Trade = { ...order, time: formatDistanceToNowStrict(new Date(), { addSuffix: true }) };
@@ -137,14 +186,16 @@ export function useTradingBot(config: BotConfig) {
                     openOrders: newOpenOrders.sort((a,b) => b.price - a.price),
                     orderHistory: newHistory.slice(0, 10),
                     lastTrade,
+                    lastPnl,
                     totalTrades: executedTradesCount,
                     winRate,
                     avgTrade,
-                    openPositions: newOpenOrders.length / 2, // Approximation
+                    openPositions: newOpenOrders.length / 2,
                     change24h: (newPrice / config.initialPrice - 1) * 100,
+                    candlestickData: newCandlestickData,
                 };
             });
-        }, 1500); // Update price every 1.5 seconds
+        }, 1500);
 
         return () => clearInterval(interval);
     }, [config.initialPrice, config.tradeAmount, createGrid, config.gridSpread]);

@@ -225,4 +225,19 @@
     .order-time {
         @apply text-slate-500 text-xs;
     }
+    .candle { @apply absolute; }
+    .candle-wick { @apply absolute w-px left-[3.5px] bg-slate-500; }
+    .candle-body { @apply absolute w-[7px] left-[0.5px] rounded-sm min-h-[2px] transition-all duration-200; }
+    .candle:hover .candle-body { @apply shadow-[0_0_10px_rgba(255,255,255,0.3)] scale-110; }
+    .bullish { @apply bg-gradient-to-b from-emerald-500 to-emerald-700 border border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]; }
+    .bearish { @apply bg-gradient-to-b from-red-500 to-red-700 border border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]; }
+    .grid-line { @apply absolute left-0 right-0 border-t border-dashed border-slate-700/50; }
+    .price-line { @apply absolute left-0 right-0 border-t-2 border-amber-400 z-10 animate-pulse; }
+    .price-line::after {
+        content: attr(data-price);
+        @apply absolute right-2 -top-3.5 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 py-1 px-2 rounded text-xs font-bold shadow-[0_4px_12px_rgba(251,191,36,0.4)];
+    }
+    .profit-float { @apply absolute text-emerald-400 font-bold text-sm animate-floatUp pointer-events-none z-30 [text-shadow:0_0_12px_rgba(16,185,129,0.8)]; }
+    .loss-float { @apply absolute text-red-400 font-bold text-sm animate-floatUp pointer-events-none z-30 [text-shadow:0_0_12px_rgba(239,68,68,0.8)]; }
+
 }

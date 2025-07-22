@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -5,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { SlidersHorizontal } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTradingBot } from '@/hooks/use-trading-bot';
+import type { CandlestickData } from '@/hooks/use-trading-bot';
 
 const StatCard = ({ label, value, className, change }: { label: string; value: string; className?: string; change?: string }) => (
     <div className="stat-card">
@@ -32,6 +34,69 @@ const PerformanceItem = ({ label, value, className }: { label: string; value: st
     </div>
 )
 
+const CandlestickChart = ({ data, currentPrice }: { data: CandlestickData[], currentPrice: number }) => {
+    const chartRef = React.useRef<HTMLDivElement>(null);
+    const [minPrice, setMinPrice] = React.useState(0);
+    const [maxPrice, setMaxPrice] = React.useState(0);
+    const [chartHeight, setChartHeight] = React.useState(0);
+
+    React.useEffect(() => {
+        if (data.length > 0) {
+            const prices = data.flatMap(d => [d.high, d.low]);
+            setMinPrice(Math.min(...prices) * 0.999);
+            setMaxPrice(Math.max(...prices) * 1.001);
+        }
+        if (chartRef.current) {
+            setChartHeight(chartRef.current.clientHeight);
+        }
+    }, [data]);
+
+    const getPriceY = (price: number) => {
+        if (maxPrice === minPrice) return chartHeight / 2;
+        return chartHeight * (1 - (price - minPrice) / (maxPrice - minPrice));
+    };
+
+    if (data.length === 0 || chartHeight === 0) {
+        return <div className="flex items-center justify-center h-full text-slate-500">Generating chart data...</div>;
+    }
+    
+    const candleWidth = 8;
+    const candleMargin = 4;
+    const totalCandleWidth = candleWidth + candleMargin;
+
+    return (
+        <div ref={chartRef} className="w-full h-full relative">
+            {/* Grid Lines */}
+            {[...Array(5)].map((_, i) => (
+                <div key={i} className="grid-line" style={{ top: `${(i + 1) * 20}%` }} />
+            ))}
+            
+            {/* Candlesticks */}
+            {data.map((candle, index) => {
+                const isBullish = candle.close >= candle.open;
+                const bodyTop = getPriceY(isBullish ? candle.close : candle.open);
+                const bodyHeight = Math.abs(getPriceY(candle.close) - getPriceY(candle.open));
+                const wickTop = getPriceY(candle.high);
+                const wickHeight = Math.abs(getPriceY(candle.high) - getPriceY(candle.low));
+                
+                return (
+                    <div key={index} className="candle" style={{ left: `${index * totalCandleWidth}px`, width: `${candleWidth}px` }}>
+                        <div className="candle-wick" style={{ top: `${wickTop}px`, height: `${wickHeight}px` }} />
+                        <div className={cn("candle-body", isBullish ? 'bullish' : 'bearish')} style={{ top: `${bodyTop}px`, height: `${Math.max(bodyHeight, 2)}px` }} />
+                    </div>
+                );
+            })}
+
+            {/* Current Price Line */}
+            <div className="price-line" style={{ top: `${getPriceY(currentPrice)}px` }} data-price={formatCurrency(currentPrice)} />
+        </div>
+    );
+};
+
+const formatCurrency = (value: number) => {
+    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+}
+
 
 export function ProTraderView() {
     const [activePair, setActivePair] = React.useState('BTC/USDT');
@@ -42,10 +107,37 @@ export function ProTraderView() {
         gridSpread: 0.001,
         tradeAmount: 0.05
     });
+    const [floaters, setFloaters] = React.useState<{ id: number; x: number; y: number; text: string; type: 'profit' | 'loss' }[]>([]);
+    const chartContainerRef = React.useRef<HTMLDivElement>(null);
 
-    const formatCurrency = (value: number) => {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
+
+    React.useEffect(() => {
+        if (state.lastTrade) {
+            const chartRect = chartContainerRef.current?.getBoundingClientRect();
+            if (chartRect) {
+                const isBuy = state.lastTrade.type === 'buy';
+                if (!isBuy) { // Only show floaters on sell (profit/loss)
+                    const profit = state.lastPnl;
+                    const type = profit >= 0 ? 'profit' : 'loss';
+                    const text = `${type === 'profit' ? '+' : ''}${formatCurrency(profit)}`;
+
+                    const newFloater = {
+                        id: Date.now(),
+                        x: Math.random() * chartRect.width * 0.8 + chartRect.width * 0.1,
+                        y: Math.random() * chartRect.height * 0.5 + chartRect.height * 0.2,
+                        text,
+                        type
+                    };
+                    setFloaters(f => [...f, newFloater]);
+                    setTimeout(() => {
+                        setFloaters(f => f.filter(fl => fl.id !== newFloater.id));
+                    }, 3000);
+                }
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state.lastTrade, state.lastPnl]);
+
 
     return (
         <div className="trading-card">
@@ -84,10 +176,18 @@ export function ProTraderView() {
                             Indicators
                         </Button>
                     </div>
-                    <div className={cn("chart-container", state.lastTrade?.type === 'buy' ? 'flash-green' : state.lastTrade?.type === 'sell' ? 'flash-red' : '')}>
-                        <div className="flex items-center justify-center h-full text-slate-500">
-                             Chart for {activePair} - {activeChartTab}
-                        </div>
+                    <div ref={chartContainerRef} className={cn("chart-container", state.lastTrade?.type === 'buy' ? 'flash-green' : state.lastTrade?.type === 'sell' ? 'flash-red' : '')}>
+                         {activeChartTab === 'Candlestick' && <CandlestickChart data={state.candlestickData} currentPrice={state.currentPrice} />}
+                         {(activeChartTab === 'Line Chart' || activeChartTab === 'Volume') && (
+                            <div className="flex items-center justify-center h-full text-slate-500">
+                                Chart for {activePair} - {activeChartTab}
+                            </div>
+                         )}
+                         {floaters.map(f => (
+                            <div key={f.id} className={cn(f.type === 'profit' ? 'profit-float' : 'loss-float')} style={{ left: `${f.x}px`, top: `${f.y}px` }}>
+                                {f.text}
+                            </div>
+                        ))}
                     </div>
                      <div className="price-display">
                         <div className="price-info">
