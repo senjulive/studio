@@ -79,25 +79,29 @@ export default function DashboardLayout({
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
-  const fetchUserData = React.useCallback(async (email: string) => {
-    const currentUser = { ...mockUser, email };
-    setUser(currentUser);
-    setIsAdmin(email === 'admin@astralcore.io');
-    setIsModerator(email === 'moderator@astralcore.io');
-    if (currentUser.id) {
-      const walletData = await getOrCreateWallet(currentUser.id);
-      setWallet(walletData);
-    }
-  }, []);
-
   React.useEffect(() => {
     const initializeUser = async () => {
       const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
-      await fetchUserData(loggedInEmail);
+      const currentUser = { ...mockUser, email: loggedInEmail };
+
+      setUser(currentUser);
+      setIsAdmin(loggedInEmail === 'admin@astralcore.io');
+      setIsModerator(loggedInEmail === 'moderator@astralcore.io');
+
+      if (currentUser.id) {
+        try {
+            const walletData = await getOrCreateWallet();
+            setWallet(walletData);
+        } catch (error) {
+            console.error("Failed to fetch wallet data:", error);
+            // Handle error appropriately, maybe show an error message
+        }
+      }
       setIsInitializing(false);
     };
     initializeUser();
-  }, [fetchUserData]);
+  }, []);
+
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -159,13 +163,6 @@ export default function DashboardLayout({
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
   ];
-
-  const userDataPromise = React.useMemo(() => {
-    const loggedInEmail = typeof sessionStorage !== 'undefined'
-      ? sessionStorage.getItem('loggedInEmail') || mockUser.email
-      : mockUser.email;
-    return fetchUserData(loggedInEmail);
-  }, [fetchUserData]);
 
   const getPageTitle = () => {
     // Remove locale from pathname for matching
