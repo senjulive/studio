@@ -1,4 +1,3 @@
-
 import { PromotionsView } from '@/components/dashboard/promotions-view';
 import type { Metadata } from 'next';
 
