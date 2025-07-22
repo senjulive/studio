@@ -281,15 +281,15 @@ export function ProTraderView() {
                 <div className="chart-section">
                     <div className="flex justify-between items-center mb-4">
                          {isAnimating ? (
-                            <div className="bot-status !bg-transparent !border-none !p-0">
-                                <div className="status-indicator bg-green-400"></div>
-                                ONLINE
-                                <span className="text-xs tabular-nums text-emerald-400">({progress.toFixed(0)}%)</span>
+                            <div className="bot-status !bg-transparent !border-none !p-0 text-emerald-400">
+                                <div className="status-indicator bg-green-400 animate-pulse"></div>
+                                🤖 online
+                                <span className="text-xs tabular-nums">({progress.toFixed(0)}%)</span>
                             </div>
                         ) : (
-                             <div className={cn("bot-status !text-sm !bg-transparent !border-none !p-0", gridsRemaining > 0 ? "" : "!text-red-400")}>
-                                <div className={cn("status-indicator", gridsRemaining > 0 ? "!bg-slate-400" : "!bg-red-400")}></div>
-                                OFFLINE
+                             <div className={cn("bot-status text-sm !bg-transparent !border-none !p-0", gridsRemaining > 0 ? "text-slate-400" : "text-red-400")}>
+                                <div className={cn("status-indicator", gridsRemaining > 0 ? "bg-slate-400" : "bg-red-400 animate-pulse")}></div>
+                                🤖 offline
                             </div>
                         )}
                         <Button variant="ghost" size="sm" className="text-slate-400 hover:bg-slate-700 hover:text-white">
@@ -298,7 +298,7 @@ export function ProTraderView() {
                         </Button>
                     </div>
                     <div className="chart-container">
-                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} progress={progress} />
+                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} />
                     </div>
                      <div className="price-display">
                         <div className="price-info">
