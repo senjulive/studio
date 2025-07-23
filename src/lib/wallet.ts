@@ -1,6 +1,8 @@
+
 'use server';
 
-import { getBotTierSettings, getCurrentTier } from './tiers';
+import { getBotTierSettings } from './tiers';
+import { getCurrentTier } from './ranks';
 import initialWallets from '../../data/wallets.json';
 
 let mockWallets: Record<string, any> = initialWallets;
@@ -45,7 +47,7 @@ export async function getOrCreateWallet(userId?: string): Promise<WalletData> {
         if (now - lastReset > oneDay) {
             const settings = await getBotTierSettings();
             const balance = wallet.balances?.usdt || 0;
-            const currentTier = await getCurrentTier(balance, settings);
+            const currentTier = getCurrentTier(balance, settings);
             
             if(currentTier) {
                 wallet.growth.clicksLeft = currentTier.clicks;
