@@ -23,7 +23,7 @@ type UserContextType = {
 
 const UserContext = React.createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children, value }: { children: React.ReactNode, value: UserContextType }) => {
+export const UserProvider = ({ children, value }: { children: React.ReactNode; value: UserContextType }) => {
     return (
         <UserContext.Provider value={value}>
             {children}

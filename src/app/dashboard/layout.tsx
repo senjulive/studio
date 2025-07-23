@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -48,11 +49,10 @@ import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
 import { getUserRank } from '@/lib/ranks';
-import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
+import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
-import { getCurrentTier } from '@/lib/tiers';
 import { PromotionIcon } from '@/components/icons/nav/promotion-icon';
 
 // Import rank icons
