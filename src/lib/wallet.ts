@@ -1,3 +1,4 @@
+
 'use server';
 
 import { getBotTierSettings, getCurrentTier } from './tiers';
@@ -11,11 +12,25 @@ export type ProfileData = any;
 export type WithdrawalAddresses = any;
 
 export async function getAllWallets(): Promise<Record<string, WalletData>> {
+    // Ensure all wallets have the new reward fields for safety
+    Object.keys(mockWallets).forEach(userId => {
+        if (!mockWallets[userId].claimed_achievements) {
+            mockWallets[userId].claimed_achievements = { ranks: [], tiers: [] };
+        }
+        if (!mockWallets[userId].claimed_referrals) {
+            mockWallets[userId].claimed_referrals = [];
+        }
+    });
     return mockWallets;
 }
 
 export async function getWalletByUserId(userId: string): Promise<WalletData | null> {
-    return mockWallets[userId] || null;
+    const wallet = mockWallets[userId] || null;
+    if (wallet) {
+        if (!wallet.claimed_achievements) wallet.claimed_achievements = { ranks: [], tiers: [] };
+        if (!wallet.claimed_referrals) wallet.claimed_referrals = [];
+    }
+    return wallet;
 }
 
 export async function updateWalletByUserId(userId: string, newData: Partial<WalletData>): Promise<WalletData | null> {
@@ -37,6 +52,10 @@ export async function getOrCreateWallet(userId?: string): Promise<WalletData> {
     let wallet = mockWallets[currentUserId];
 
     if (wallet && wallet.profile) {
+        // Ensure reward fields exist
+        if (!wallet.claimed_achievements) wallet.claimed_achievements = { ranks: [], tiers: [] };
+        if (!wallet.claimed_referrals) wallet.claimed_referrals = [];
+        
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000;
         const growthData = wallet.growth as any;

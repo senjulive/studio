@@ -5,7 +5,6 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { defaultSiteSettings } from "@/lib/site-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,11 +12,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "../ui/separator";
 
 const settingsSchema = z.object({
   minGridBalance: z.coerce.number().min(0, "Minimum balance must be a positive number."),
-  minClanCreateBalance: z.coerce.number().min(0, "Minimum balance must be a positive number."),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -32,7 +29,6 @@ export function BotSettingsManager() {
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       minGridBalance: 100, // Default value
-      minClanCreateBalance: 100,
     },
   });
 
@@ -46,7 +42,6 @@ export function BotSettingsManager() {
         if (data) {
             form.reset({ 
                 minGridBalance: data.minGridBalance || 100,
-                minClanCreateBalance: data.minClanCreateBalance || 100,
             });
         }
       } catch (error: any) {
@@ -101,15 +96,14 @@ export function BotSettingsManager() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Trading Bot & Clan Settings</CardTitle>
+        <CardTitle>Trading Bot Settings</CardTitle>
         <CardDescription>
-          Configure operational parameters for the grid trading bot and squad clans.
+          Configure operational parameters for the grid trading bot.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <h3 className="text-lg font-medium">Bot Settings</h3>
             <FormField
               control={form.control}
               name="minGridBalance"
@@ -123,26 +117,11 @@ export function BotSettingsManager() {
                 </FormItem>
               )}
             />
-            <Separator />
-            <h3 className="text-lg font-medium">Squad Clan Settings</h3>
-             <FormField
-              control={form.control}
-              name="minClanCreateBalance"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Minimum Member Balance for Clan Creation ($)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="100" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
              <div className="flex justify-end pt-4">
               <Button type="submit" disabled={isSaving}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                Save All Settings
+                Save Settings
               </Button>
             </div>
           </form>

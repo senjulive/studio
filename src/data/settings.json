@@ -1,3 +1,4 @@
+
 {
   "botSettings": {
     "minGridBalance": 100
@@ -67,5 +68,13 @@
       "clicks": 15,
       "locked": true
     }
-  ]
+  ],
+  "rewardSettings": {
+    "minClanCreateBalance": 100,
+    "rankAchievementBonus": 10,
+    "tierAchievementBonus": 5,
+    "referralBonusTier1": 5,
+    "referralBonusTier2": 1,
+    "newUserBonus": 5
+  }
 }

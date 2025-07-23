@@ -166,6 +166,7 @@ export default function DashboardLayout({
           { href: '/dashboard/chat', label: 'Chat', icon: MessageSquare },
           { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
           { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
+          { href: '/dashboard/rewards', label: 'Rewards', icon: Trophy },
         ],
       },
       {
@@ -442,7 +443,7 @@ export default function DashboardLayout({
               >
                 {item.label === 'CORE' ? (
                   <div className="absolute -top-7 flex items-center justify-center">
-                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                     <div className="h-16 w-16 rounded-full bg-transparent flex items-center justify-center">
                         <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center p-1">
                            <item.icon className="h-full w-full" />
                         </div>

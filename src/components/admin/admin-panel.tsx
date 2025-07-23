@@ -24,9 +24,10 @@ import {
   Banknote,
   Gem,
   ArrowUpFromLine,
+  GitBranch,
 } from 'lucide-react';
 import { WalletManager } from './wallet-manager';
-import { MessageViewer } from './message-viewer';
+import { SupportChatManager } from './support-chat-manager';
 import { BotSettingsManager } from './bot-settings-manager';
 import { AnnouncementManager } from './announcement-manager';
 import { SiteSettingsManager } from './site-settings-manager';
@@ -38,84 +39,123 @@ import { AnalyticsManager } from './analytics/AnalyticsManager';
 import { DepositApprovalManager } from './deposit-approval-manager';
 import { BotTierSettingsManager } from './bot-tier-settings-manager';
 import { WithdrawalManager } from './withdrawal-manager';
+import { PublicChatManager } from './public-chat-manager';
+import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
+import { cn } from '@/lib/utils';
 
-type AdminView =
-  | 'analytics'
-  | 'wallets'
-  | 'messages'
-  | 'deposits'
-  | 'withdrawals'
-  | 'verifications'
-  | 'moderators'
-  | 'action-log'
-  | 'announcements'
-  | 'promotions'
-  | 'bot-settings'
-  | 'bot-tier-settings'
-  | 'site-settings';
 
-const VerificationIcon = () => <span className="text-2xl">🪪</span>;
+const adminSections = {
+    'Dashboard': { component: <AnalyticsManager />, icon: LayoutDashboard },
+    'User Management': {
+        'Wallets': { component: <WalletManager />, icon: WalletCards },
+        'Verifications': { component: <VerificationManager />, icon: () => <span className="text-xl">🪪</span> },
+        'Moderators': { component: <ModeratorManager />, icon: Users },
+    },
+    'Platform Activity': {
+        'Deposits': { component: <DepositApprovalManager />, icon: Banknote },
+        'Withdrawals': { component: <WithdrawalManager />, icon: ArrowUpFromLine },
+        'Support Messages': { component: <SupportChatManager />, icon: Mail },
+        'Public Chat': { component: <PublicChatManager />, icon: Users },
+        'Action Log': { component: <ActionLogViewer />, icon: Activity },
+    },
+    'Content & Engagement': {
+        'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
+        'Promotions': { component: <PromotionManager />, icon: Gift },
+    },
+    'Platform Settings': {
+        'General Settings': { component: <SiteSettingsManager />, icon: Settings },
+        'Bot & Tier Settings': { component: <BotTierSettingsManager />, icon: Bot },
+        'Squad & Rewards': { component: <SquadRewardSettingsManager />, icon: GitBranch },
+    }
+} as const;
 
-const adminTabs = [
-    { id: 'analytics', label: 'Dashboard', icon: LayoutDashboard, component: <AnalyticsManager /> },
-    { id: 'wallets', label: 'Wallets', icon: WalletCards, component: <WalletManager /> },
-    { id: 'messages', label: 'Messages', icon: Mail, component: <MessageViewer /> },
-    { id: 'deposits', label: 'Deposits', icon: Banknote, component: <DepositApprovalManager /> },
-    { id: 'withdrawals', label: 'Withdrawals', icon: ArrowUpFromLine, component: <WithdrawalManager /> },
-    { id: 'verifications', label: 'Verifications', icon: VerificationIcon, component: <VerificationManager /> },
-    { id: 'moderators', label: 'Moderators', icon: Users, component: <ModeratorManager /> },
-    { id: 'action-log', label: 'Action Log', icon: Activity, component: <ActionLogViewer /> },
-    { id: 'announcements', label: 'Alerts', icon: Megaphone, component: <AnnouncementManager /> },
-    { id: 'promotions', label: 'Promotions', icon: Gift, component: <PromotionManager /> },
-    { id: 'bot-settings', label: 'Bot Settings', icon: Bot, component: <BotSettingsManager /> },
-    { id: 'bot-tier-settings', label: 'Tier Settings', icon: Gem, component: <BotTierSettingsManager /> },
-    { id: 'site-settings', label: 'Site Settings', icon: Settings, component: <SiteSettingsManager /> },
-] as const;
+
+type AdminView = keyof (typeof adminSections)['User Management'] | 
+                 keyof (typeof adminSections)['Platform Activity'] |
+                 keyof (typeof adminSections)['Content & Engagement'] |
+                 keyof (typeof adminSections)['Platform Settings'] |
+                 'Dashboard';
+
 
 export function AdminPanel() {
-    const [activeView, setActiveView] = React.useState<AdminView>('analytics');
+    const [activeView, setActiveView] = React.useState<AdminView>('Dashboard');
 
     const renderContent = () => {
-        const activeTab = adminTabs.find(tab => tab.id === activeView);
-        return activeTab ? activeTab.component : null;
+        if (activeView === 'Dashboard') {
+            return adminSections.Dashboard.component;
+        }
+        for (const section of Object.values(adminSections)) {
+            if (typeof section === 'object' && activeView in section) {
+                 // @ts-ignore
+                return section[activeView].component;
+            }
+        }
+        return null;
     };
 
-  return (
-    <Card className="w-full max-w-7xl">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/10 p-2 rounded-lg">
-            <Shield className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <CardTitle>AstralCore AI</CardTitle>
-            <CardDescription>
-              Platform management and user oversight system.
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
-            {adminTabs.map(tab => {
-                const Icon = tab.icon;
-                return (
-                    <Button
-                        key={tab.id}
-                        variant={activeView === tab.id ? 'default' : 'outline'}
-                        onClick={() => setActiveView(tab.id)}
-                        className="h-auto py-4 flex flex-col gap-2 items-center justify-center text-center"
-                    >
-                        <Icon className="h-6 w-6" />
-                        <span className="text-sm font-medium">{tab.label}</span>
-                    </Button>
-                );
-            })}
-        </div>
-        <div>
-            {renderContent()}
-        </div>
-      </CardContent>
-    </Card>
-  );
+    return (
+        <Card className="w-full max-w-7xl">
+            <CardHeader>
+                <div className="flex items-center gap-3">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                        <Shield className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                        <CardTitle>AstralCore AI</CardTitle>
+                        <CardDescription>Platform management and user oversight system.</CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-12 gap-6">
+                    <div className="col-span-12 md:col-span-3 lg:col-span-2 space-y-4">
+                        {Object.entries(adminSections).map(([sectionName, items]) => {
+                             if(sectionName === 'Dashboard') {
+                                const Icon = items.icon;
+                                return (
+                                    <Button
+                                        key={sectionName}
+                                        variant={activeView === sectionName ? 'default' : 'outline'}
+                                        onClick={() => setActiveView(sectionName as AdminView)}
+                                        className="w-full justify-start gap-2"
+                                    >
+                                        <Icon className="h-4 w-4" />
+                                        {sectionName}
+                                    </Button>
+                                )
+                             }
+                             return (
+                                <div key={sectionName}>
+                                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">{sectionName}</h3>
+                                    <div className="space-y-1">
+                                    {Object.entries(items).map(([itemName, itemDetails]) => {
+                                        const Icon = itemDetails.icon;
+                                        return (
+                                            <Button
+                                                key={itemName}
+                                                variant={activeView === itemName ? 'secondary' : 'ghost'}
+                                                onClick={() => setActiveView(itemName as AdminView)}
+                                                className="w-full justify-start gap-2"
+                                            >
+                                                <Icon className="h-4 w-4" />
+                                                {itemName}
+                                            </Button>
+                                        )
+                                    })}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <div className="col-span-12 md:col-span-9 lg:col-span-10">
+                        <Card className="min-h-[70vh]">
+                            <CardContent className="p-6">
+                                {renderContent()}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
 }

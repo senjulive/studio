@@ -26,6 +26,7 @@ export async function POST(request: Request) {
     }
 
     const settings = await readSettings();
+    // This allows nested key updates, e.g., key = "botSettings"
     settings[key] = value;
     await writeSettings(settings);
 
