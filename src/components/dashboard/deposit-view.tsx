@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Copy, Info, QrCode, Wallet, User, Loader2 } from "lucide-react";
+import { Copy, Info, QrCode, Wallet, User, Loader2, ShieldCheck } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -24,6 +24,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import Image from "next/image";
 import { useUser } from "@/contexts/UserContext";
+import Link from "next/link";
 
 const DepositAddressDisplay = ({
   address,
@@ -202,6 +203,7 @@ const PersonalDepositRequest = () => {
 }
 
 export function DepositView() {
+  const { wallet } = useUser();
   const [addresses, setAddresses] = React.useState({ usdt: '', eth: '', btc: ''});
   const [isLoading, setIsLoading] = React.useState(true);
   
@@ -218,6 +220,36 @@ export function DepositView() {
     }
     fetchAddresses();
   }, []);
+  
+  const isVerified = wallet?.profile?.verificationStatus === 'verified';
+
+  if (!isVerified) {
+    return (
+        <Card className="w-full max-w-2xl mx-auto">
+             <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                <Wallet className="h-6 w-6" />
+                <span>Deposit</span>
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Alert variant="destructive">
+                    <ShieldCheck className="h-4 w-4" />
+                    <AlertTitle>Verification Required</AlertTitle>
+                    <AlertDescription>
+                        You must verify your identity before you can deposit funds. This is a security measure to protect your account.
+                    </AlertDescription>
+                    <div className="mt-4">
+                        <Button asChild>
+                            <Link href="/dashboard/profile/verify">Start Verification</Link>
+                        </Button>
+                    </div>
+                </Alert>
+            </CardContent>
+        </Card>
+    );
+  }
+
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

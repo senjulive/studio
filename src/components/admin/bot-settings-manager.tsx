@@ -13,9 +13,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "../ui/separator";
 
 const settingsSchema = z.object({
   minGridBalance: z.coerce.number().min(0, "Minimum balance must be a positive number."),
+  minClanCreateBalance: z.coerce.number().min(0, "Minimum balance must be a positive number."),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -30,6 +32,7 @@ export function BotSettingsManager() {
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       minGridBalance: 100, // Default value
+      minClanCreateBalance: 100,
     },
   });
 
@@ -40,8 +43,11 @@ export function BotSettingsManager() {
         const response = await fetch(`/api/public-settings?key=${BOT_SETTINGS_KEY}`);
         if (!response.ok) throw new Error('Failed to fetch bot settings');
         const data = await response.json();
-        if (data && data.minGridBalance) {
-            form.reset({ minGridBalance: data.minGridBalance });
+        if (data) {
+            form.reset({ 
+                minGridBalance: data.minGridBalance || 100,
+                minClanCreateBalance: data.minClanCreateBalance || 100,
+            });
         }
       } catch (error: any) {
         // Silently fail and use default
@@ -95,14 +101,15 @@ export function BotSettingsManager() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Trading Bot Settings</CardTitle>
+        <CardTitle>Trading Bot & Clan Settings</CardTitle>
         <CardDescription>
-          Configure the operational parameters for the grid trading bot.
+          Configure operational parameters for the grid trading bot and squad clans.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <h3 className="text-lg font-medium">Bot Settings</h3>
             <FormField
               control={form.control}
               name="minGridBalance"
@@ -116,10 +123,26 @@ export function BotSettingsManager() {
                 </FormItem>
               )}
             />
-             <div className="flex justify-end">
+            <Separator />
+            <h3 className="text-lg font-medium">Squad Clan Settings</h3>
+             <FormField
+              control={form.control}
+              name="minClanCreateBalance"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Minimum Member Balance for Clan Creation ($)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="100" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+             <div className="flex justify-end pt-4">
               <Button type="submit" disabled={isSaving}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                Save Settings
+                Save All Settings
               </Button>
             </div>
           </form>
