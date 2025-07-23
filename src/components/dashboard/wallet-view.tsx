@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from "react";
@@ -21,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
+import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
@@ -30,6 +31,8 @@ import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
 import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from "@/lib/tiers";
 import { tierIcons, tierClassNames } from '@/lib/settings';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SquadSystem } from "./squad-system";
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -79,7 +82,7 @@ const quickAccessItems = [
   { href: "/dashboard/trading", label: "Trade", icon: Repeat },
   { href: "/dashboard/profile", label: "Profile", icon: User },
   { href: "/dashboard/support", label: "Support", icon: HeartHandshake },
-  { href: "/dashboard/squad", label: "Squad", icon: Users },
+  { href: "/dashboard/invite", label: "Invite", icon: Users },
   { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowLeftRight },
 ];
 
@@ -163,27 +166,8 @@ const assetConfig = [
 ] as const;
 
 export function WalletView() {
-  const [walletData, setWalletData] = React.useState<WalletData | null>(null);
-  const { user } = useUser();
+  const { user, wallet: walletData, tier, rank } = useUser();
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
-  const [tier, setTier] = React.useState<TierData | null>(null);
-
-  const fetchWalletData = React.useCallback(async () => {
-    if (user?.id) {
-        const [wallet, tiers] = await Promise.all([
-          getOrCreateWallet(),
-          getBotTierSettings(),
-        ]);
-        setWalletData(wallet);
-        const currentTier = await getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
-        setTier(currentTier);
-      }
-  }, [user]);
-
-  React.useEffect(() => {
-    fetchWalletData();
-  }, [fetchWalletData]);
-  
 
   React.useEffect(() => {
     setAllAssetsData(initialCryptoData);
@@ -237,8 +221,8 @@ export function WalletView() {
     }
 
     const growth = walletData.growth as any;
-    if (growth.earnings_history) {
-        growth.earnings_history.forEach((earning: any, index: number) => {
+    if (growth.earningsHistory) {
+        growth.earningsHistory.forEach((earning: any, index: number) => {
         history.push({
           id: `grid-profit-${earning.timestamp}-${index}`,
           type: "Grid Profit",
@@ -297,15 +281,13 @@ export function WalletView() {
     );
   }, [walletData, allAssetsData]);
 
-  const dailyEarnings = (walletData?.growth as any)?.daily_earnings ?? 0;
+  const dailyEarnings = (walletData?.growth as any)?.dailyEarnings ?? 0;
   
-  const rank = getUserRank(totalBalance);
-  const RankIcon = rankIcons[rank.Icon] || RecruitRankIcon;
-
+  const RankIcon = rank ? rankIcons[rank.Icon] : RecruitRankIcon;
   const TierIcon = tier ? tierIcons[tier.id] : null;
   const tierClassName = tier ? tierClassNames[tier.id] : null;
 
-  if (!walletData) {
+  if (!walletData || !rank) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-64 w-full rounded-lg" />
@@ -320,189 +302,121 @@ export function WalletView() {
 
   return (
     <div className="space-y-6">
-      <Card
-        className="relative overflow-hidden"
-      >
-        <div 
-          className="absolute inset-0 bg-primary/5 -z-10"
-        />
-        <CardHeader>
-           <CardTitle className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            Available Assets
-            {walletData && (
-              <div className="flex items-center gap-3">
-                <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                  <RankIcon className="h-5 w-5" />
-                  <span>{rank.name}</span>
-                </Badge>
-                {tier && TierIcon && tierClassName && (
-                  <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", tierClassName)}>
-                    <TierIcon className="h-5 w-5" />
-                    <span>{tier.name}</span>
-                  </Badge>
-                )}
-              </div>
-            )}
-          </CardTitle>
-          <CardDescription>
-            Your total asset value and individual balances.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <div className="flex items-baseline justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Total Value (USD)
-                </p>
-                <p className="text-4xl font-bold tracking-tighter">
-                  $
-                  {totalBalance.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">
-                  Today's Earnings
-                </p>
-                <p className="text-lg font-semibold text-green-600">
-                  +$
-                  {dailyEarnings.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-            </div>
-          </div>
-          {assetsWithFunds.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              {assetsWithFunds.map(asset => (
-                  <div key={asset.ticker} className="rounded-lg border bg-background/50 p-4">
-                      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                          <Image src={asset.iconUrl} alt={asset.ticker} width={20} height={20} className="rounded-full" />
-                          <span>{asset.name}</span>
-                      </div>
-                      <p className="text-2xl font-bold mt-1">
-                          {asset.balanceKey === 'usdt' && '$'}
-                          {balances[asset.balanceKey].toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: asset.balanceKey === 'usdt' ? 2 : 6,
-                          }) ?? '0.00'}
-                      </p>
-                  </div>
-              ))}
-            </div>
-          ) : (
-             <div className="text-center text-muted-foreground p-4 border border-dashed rounded-lg">
-                You currently have no funds. Make a deposit to get started.
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Access</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 text-center">
-            {quickAccessItems.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                className="flex flex-col items-center justify-center space-y-1 rounded-lg p-1 transition-colors hover:bg-muted"
-              >
-                <div className="rounded-full bg-primary/10 p-2">
-                  <item.icon className="h-7 w-7 text-primary" />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground">
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <AllAssetsChart coins={allAssetsData} />
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Transaction History</CardTitle>
-          <CardDescription>
-            A record of all your deposits, withdrawals, and earnings.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Asset</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    No transactions yet.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                transactions.map((txn) => (
-                  <TableRow key={txn.id}>
-                    <TableCell>
-                      <div className="font-medium">{txn.type}</div>
-                    </TableCell>
-                    <TableCell>{txn.asset}</TableCell>
-                    <TableCell
-                      className={cn(
-                        "font-mono",
-                        txn.amount >= 0 ? "text-green-600" : "text-red-600"
-                      )}
-                    >
-                      {txn.asset === 'USDT' ? (
-                        `${txn.amount >= 0 ? "+" : "-"}$${Math.abs(txn.amount).toFixed(2)}`
-                      ) : (
-                        `${txn.amount >= 0 ? "+" : ""}${Math.abs(txn.amount).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 8,
-                        })} ${txn.asset}`
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(txn.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Badge
-                        variant={
-                          txn.status === "Completed"
-                            ? "default"
-                            : txn.status === "Pending"
-                            ? "secondary"
-                            : "destructive"
-                        }
-                        className="capitalize"
-                      >
-                        {txn.status}
+      <Tabs defaultValue="wallet">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="wallet"><WalletIcon className="mr-2 h-4 w-4"/>Wallet</TabsTrigger>
+          <TabsTrigger value="squad"><Users className="mr-2 h-4 w-4"/>My Squad</TabsTrigger>
+        </TabsList>
+        <TabsContent value="wallet">
+          <div className="space-y-6">
+            <Card className="relative overflow-hidden">
+              <div className="absolute inset-0 bg-primary/5 -z-10"/>
+              <CardHeader>
+                <CardTitle className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                  Available Assets
+                  <div className="flex items-center gap-3">
+                    <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
+                      <RankIcon className="h-5 w-5" />
+                      <span>{rank.name}</span>
+                    </Badge>
+                    {tier && TierIcon && tierClassName && (
+                      <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", tierClassName)}>
+                        <TierIcon className="h-5 w-5" />
+                        <span>{tier.name}</span>
                       </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                    )}
+                  </div>
+                </CardTitle>
+                <CardDescription>Your total asset value and individual balances.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <div className="flex items-baseline justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total Value (USD)</p>
+                      <p className="text-4xl font-bold tracking-tighter">${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Today's Earnings</p>
+                      <p className="text-lg font-semibold text-green-600">
+                        +${dailyEarnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {assetsWithFunds.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    {assetsWithFunds.map(asset => (
+                        <div key={asset.ticker} className="rounded-lg border bg-background/50 p-4">
+                            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                <Image src={asset.iconUrl} alt={asset.ticker} width={20} height={20} className="rounded-full" />
+                                <span>{asset.name}</span>
+                            </div>
+                            <p className="text-2xl font-bold mt-1">
+                                {asset.balanceKey === 'usdt' && '$'}
+                                {balances[asset.balanceKey].toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: asset.balanceKey === 'usdt' ? 2 : 6,
+                                }) ?? '0.00'}
+                            </p>
+                        </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-muted-foreground p-4 border border-dashed rounded-lg">
+                      You currently have no funds. Make a deposit to get started.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle>Quick Access</CardTitle></CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 text-center">
+                  {quickAccessItems.map((item, index) => (
+                    <Link key={index} href={item.href} className="flex flex-col items-center justify-center space-y-1 rounded-lg p-1 transition-colors hover:bg-muted">
+                      <div className="rounded-full bg-primary/10 p-2"><item.icon className="h-7 w-7 text-primary" /></div>
+                      <span className="text-xs font-medium text-muted-foreground">{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <AllAssetsChart coins={allAssetsData} />
+
+            <Card>
+              <CardHeader><CardTitle>Transaction History</CardTitle><CardDescription>A record of all your deposits, withdrawals, and earnings.</CardDescription></CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader><TableRow><TableHead>Type</TableHead><TableHead>Asset</TableHead><TableHead>Amount</TableHead><TableHead>Date</TableHead><TableHead className="text-right">Status</TableHead></TableRow></TableHeader>
+                  <TableBody>
+                    {transactions.length === 0 ? (
+                      <TableRow><TableCell colSpan={5} className="h-24 text-center text-muted-foreground">No transactions yet.</TableCell></TableRow>
+                    ) : (
+                      transactions.map((txn) => (
+                        <TableRow key={txn.id}>
+                          <TableCell><div className="font-medium">{txn.type}</div></TableCell>
+                          <TableCell>{txn.asset}</TableCell>
+                          <TableCell className={cn("font-mono", txn.amount >= 0 ? "text-green-600" : "text-red-600")}>
+                            {txn.asset === 'USDT' ? (`${txn.amount >= 0 ? "+" : "-"}$${Math.abs(txn.amount).toFixed(2)}`) : (`${txn.amount >= 0 ? "+" : ""}${Math.abs(txn.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })} ${txn.asset}`)}
+                          </TableCell>
+                          <TableCell>{new Date(txn.date).toLocaleDateString()}</TableCell>
+                          <TableCell className="text-right"><Badge variant={txn.status === "Completed" ? "default" : txn.status === "Pending" ? "secondary" : "destructive"} className="capitalize">{txn.status}</Badge></TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        <TabsContent value="squad">
+          <SquadSystem />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

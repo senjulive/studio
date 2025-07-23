@@ -28,9 +28,6 @@ import { format } from 'date-fns';
 import type { SVGProps } from 'react';
 import { Input } from "../ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { FacebookIcon } from "../icons/social/facebook-icon";
-import { InstagramIcon } from "../icons/social/instagram-icon";
-import { UsdtLogoIcon } from "../icons/usdt-logo"; 
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -108,7 +105,7 @@ export function AvatarUploadDialog({ children, wallet, onUploadSuccess }: { chil
             <DialogTrigger asChild>
                 <div className="relative group">
                     {children}
-                    <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-red-600 rounded-full flex items-center justify-center border-2 border-sidebar-background cursor-pointer group-hover:bg-red-500 transition-colors">
+                    <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-red-600 rounded-full flex items-center justify-center border-2 border-card cursor-pointer group-hover:bg-red-500 transition-colors">
                         <Plus className="h-4 w-4 text-white" />
                     </div>
                 </div>
@@ -153,7 +150,7 @@ const ProfileDetailItem = ({
       {isLoading ? (
         <Skeleton className="h-6 w-3/4" />
       ) : (
-        <p className="text-base font-medium text-foreground break-words">{value || "Not set"}</p>
+        <p className="text-base font-medium text-foreground break-words">{value || <span className="text-sm text-muted-foreground italic">Not set</span>}</p>
       )}
     </div>
   </div>
@@ -387,7 +384,7 @@ export function ProfileView() {
                 <Button asChild className="w-full">
                     <Link href="/dashboard/profile/verify">
                         <ShieldCheck className="mr-2 h-4 w-4" />
-                        Start Verification
+                        Edit Profile & Verify
                     </Link>
                 </Button>
             </CardFooter>

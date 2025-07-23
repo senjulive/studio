@@ -109,7 +109,7 @@ export function WithdrawView() {
     }
 
     if (!passcode || passcode.length < 4) {
-      toast({ title: "Passcode Required", description: `Please enter a valid passcode.`, variant: "destructive" });
+      toast({ title: "Passcode Required", description: `Please enter your 4-6 digit withdrawal passcode.`, variant: "destructive" });
       return;
     }
 
@@ -219,10 +219,11 @@ export function WithdrawView() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="passcode">Security Passcode</Label>
+                <Label htmlFor="passcode">Withdrawal Passcode</Label>
                 <Input
                     id="passcode"
                     type="password"
+                    maxLength={6}
                     placeholder="••••••"
                     value={passcode}
                     onChange={(e) => setPasscode(e.target.value)}
@@ -271,8 +272,7 @@ export function WithdrawView() {
                   Withdrawals typically take <strong>24-72 hours</strong> to be fully processed for security reasons.
                 </li>
                 <li>
-                  For security, once an address is saved, you must contact
-                  support to change it.
+                  You must set a withdrawal passcode on the Security page before you can withdraw funds.
                 </li>
               </ul>
             </AlertDescription>
