@@ -44,15 +44,15 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Shield, Lock, Trophy } from 'lucide-react';
+import { MessageSquare, UserPlus, Shield, Lock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
 import { getUserRank } from '@/lib/ranks';
-import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
+import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
-import { tierIcons, tierClassNames, getCurrentTier } from '@/lib/settings';
+import { tierIcons, tierClassNames } from '@/lib/settings';
 import { PromotionIcon } from '@/components/icons/nav/promotion-icon';
 
 // Import rank icons
@@ -64,6 +64,7 @@ import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { AvatarUploadDialog } from './profile-view';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -108,6 +109,19 @@ export default function DashboardLayout({
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
+  const fetchWalletAndTiers = React.useCallback(async (userId: string) => {
+    try {
+        const [walletData, tiers] = await Promise.all([
+            getOrCreateWallet(userId),
+            getBotTierSettings()
+        ]);
+        setWallet(walletData);
+        setTierSettings(tiers);
+    } catch (error) {
+        console.error("Failed to fetch initial data:", error);
+    }
+  }, []);
+
   React.useEffect(() => {
     const initializeUser = async () => {
       const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
@@ -118,22 +132,12 @@ export default function DashboardLayout({
       setIsModerator(loggedInEmail === 'moderator@astralcore.io');
 
       if (currentUser.id) {
-        try {
-            const [walletData, tiers] = await Promise.all([
-                getOrCreateWallet(currentUser.id),
-                getBotTierSettings()
-            ]);
-            setWallet(walletData);
-            setTierSettings(tiers);
-        } catch (error) {
-            console.error("Failed to fetch initial data:", error);
-            // Handle error appropriately, maybe show an error message
-        }
+        await fetchWalletAndTiers(currentUser.id);
       }
       setIsInitializing(false);
     };
     initializeUser();
-  }, []);
+  }, [fetchWalletAndTiers]);
 
 
   React.useEffect(() => {
@@ -157,12 +161,18 @@ export default function DashboardLayout({
         ],
       },
       {
+        title: 'Community',
+        items: [
+          { href: '/dashboard/chat', label: 'Chat', icon: MessageSquare },
+          { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
+          { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
+        ],
+      },
+      {
         title: 'Manage',
         items: [
           { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
           { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-          { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
-          { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
         ],
       },
       {
@@ -249,7 +259,7 @@ export default function DashboardLayout({
   }
   
   return (
-    <UserProvider value={{ user: user as any }}>
+    <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
@@ -263,13 +273,19 @@ export default function DashboardLayout({
 
           <div className="mt-12 mb-4 px-4 space-y-4">
              <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage
-                      src={wallet?.profile?.avatarUrl}
-                      alt={wallet?.profile?.username || 'User'}
-                    />
-                    <AvatarFallback>{userInitial}</AvatarFallback>
-                  </Avatar>
+                  <AvatarUploadDialog 
+                    onUploadSuccess={() => fetchWalletAndTiers(user.id)}
+                    wallet={wallet}
+                  >
+                    <Avatar className="h-12 w-12 cursor-pointer">
+                      <AvatarImage
+                        src={wallet?.profile?.avatarUrl}
+                        alt={wallet?.profile?.username || 'User'}
+                      />
+                      <AvatarFallback>{userInitial}</AvatarFallback>
+                    </Avatar>
+                  </AvatarUploadDialog>
+
                   <div className="overflow-hidden">
                      <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
                         {wallet?.profile?.username || 'User'}
@@ -412,7 +428,7 @@ export default function DashboardLayout({
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
           </main>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden holographic-nav">
+          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
             {bottomNavItems.map((item) => (
               <Link
                 key={item.href}
@@ -426,9 +442,9 @@ export default function DashboardLayout({
               >
                 {item.label === 'CORE' ? (
                   <div className="absolute -top-7 flex items-center justify-center">
-                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center holographic-border">
-                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                           <item.icon className="h-8 w-8" />
+                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center p-1">
+                           <item.icon className="h-full w-full" />
                         </div>
                      </div>
                   </div>

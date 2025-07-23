@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit, Plus } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
 import { VirtualCard } from "./virtual-card";
@@ -51,6 +51,86 @@ const rankIcons: Record<string, IconComponent> = {
     DiamondRankIcon,
     Lock,
 };
+
+
+export function AvatarUploadDialog({ children, wallet, onUploadSuccess }: { children: React.ReactNode, wallet: WalletData | null, onUploadSuccess: () => void }) {
+    const { toast } = useToast();
+    const { user } = useUser();
+    const [isUpdatingAvatar, setIsUpdatingAvatar] = React.useState(false);
+    const [avatarUrl, setAvatarUrl] = React.useState(wallet?.profile?.avatarUrl || "");
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                toast({ title: "File too large", description: "Please select a file smaller than 2MB.", variant: "destructive" });
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                toast({ title: "Invalid file type", description: "Only image files are supported.", variant: "destructive" });
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    const handleUpdateAvatar = async () => {
+        if (!avatarUrl || !user?.id || !wallet) return;
+        
+        setIsUpdatingAvatar(true);
+        try {
+          const updatedWallet: WalletData = {
+            ...wallet,
+            profile: {
+              ...wallet.profile,
+              avatarUrl: avatarUrl,
+            },
+          };
+    
+          await updateWallet(updatedWallet);
+          toast({ title: "Avatar Updated!", description: "Your new profile picture has been saved." });
+          onUploadSuccess();
+        } catch (error: any) {
+          toast({ title: "Error", description: error.message, variant: "destructive" });
+        } finally {
+          setIsUpdatingAvatar(false);
+        }
+    };
+    
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <div className="relative group">
+                    {children}
+                    <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-red-600 rounded-full flex items-center justify-center border-2 border-sidebar-background cursor-pointer group-hover:bg-red-500 transition-colors">
+                        <Plus className="h-4 w-4 text-white" />
+                    </div>
+                </div>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader><DialogTitle>Update Your Avatar</DialogTitle><DialogDescription>Select an image file from your device.</DialogDescription></DialogHeader>
+                <div className="space-y-4">
+                    <div className="flex justify-center">
+                        <Image src={avatarUrl || "https://placehold.co/128x128.png"} alt="Avatar preview" width={128} height={128} className="rounded-full" />
+                    </div>
+                    <Input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef}/>
+                </div>
+                <DialogFooter>
+                    <Button onClick={handleUpdateAvatar} disabled={isUpdatingAvatar || !avatarUrl}>
+                        {isUpdatingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save Avatar
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 
 const ProfileDetailItem = ({
@@ -131,9 +211,7 @@ export function ProfileView() {
   const [isLoading, setIsLoading] = React.useState(true);
   const { user } = useUser();
   const [showVerificationPopup, setShowVerificationPopup] = React.useState(false);
-  const [isUpdatingAvatar, setIsUpdatingAvatar] = React.useState(false);
   const [isUpdatingDisplayName, setIsUpdatingDisplayName] = React.useState(false);
-  const [avatarUrl, setAvatarUrl] = React.useState("");
   const [displayName, setDisplayName] = React.useState("");
   const { toast } = useToast();
 
@@ -142,7 +220,6 @@ export function ProfileView() {
         setIsLoading(true);
         const data = await getOrCreateWallet(user.id);
         setWalletData(data);
-        setAvatarUrl(data?.profile?.avatarUrl || "");
         setDisplayName(data?.profile?.displayName || data?.profile?.username || "");
        
         if (data.profile.verificationStatus !== 'verified' && data.profile.verificationStatus !== 'verifying') {
@@ -168,36 +245,6 @@ export function ProfileView() {
     return () => clearInterval(interval);
 
   }, [user, fetchWallet, walletData?.profile.verificationStatus]);
-
-  const handleUpdateAvatar = async () => {
-    if (!avatarUrl || !user?.id || !walletData) return;
-    
-    try {
-        new URL(avatarUrl);
-    } catch (_) {
-        toast({ title: "Invalid URL", description: "Please enter a valid image URL.", variant: "destructive" });
-        return;
-    }
-
-    setIsUpdatingAvatar(true);
-    try {
-      const updatedWallet: WalletData = {
-        ...walletData,
-        profile: {
-          ...walletData.profile,
-          avatarUrl: avatarUrl,
-        },
-      };
-
-      await updateWallet(updatedWallet);
-      setWalletData(updatedWallet);
-      toast({ title: "Avatar Updated!", description: "Your new profile picture has been saved." });
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } finally {
-      setIsUpdatingAvatar(false);
-    }
-  };
   
   const handleUpdateDisplayName = async () => {
     if (!displayName || !user?.id || !walletData) return;
@@ -306,16 +353,10 @@ export function ProfileView() {
               <VirtualCard walletData={walletData} userEmail={user?.email || null} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 gap-4 mb-6">
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant="outline"><ImageIcon className="mr-2 h-4 w-4" /> Avatar</Button>
-                    </DialogTrigger>
-                    <DialogContent><DialogHeader><DialogTitle>Update Your Avatar</DialogTitle><DialogDescription>Paste the URL of an image from the web.</DialogDescription></DialogHeader><div className="space-y-4"><div className="relative"><LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input id="avatar-url" placeholder="https://example.com/image.png" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} className="pl-9"/></div></div><DialogFooter><Button onClick={handleUpdateAvatar} disabled={isUpdatingAvatar || !avatarUrl}>{isUpdatingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Save Avatar</Button></DialogFooter></DialogContent>
-                </Dialog>
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Display Name</Button>
+                        <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit Display Name</Button>
                     </DialogTrigger>
                     <DialogContent><DialogHeader><DialogTitle>Set Display Name</DialogTitle><DialogDescription>This name will be visible in the public chat.</DialogDescription></DialogHeader><div className="space-y-4"><div className="relative"><User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input id="display-name" placeholder="Your public name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="pl-9"/></div></div><DialogFooter><Button onClick={handleUpdateDisplayName} disabled={isUpdatingDisplayName || !displayName}>{isUpdatingDisplayName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Save Name</Button></DialogFooter></DialogContent>
                 </Dialog>
