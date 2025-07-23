@@ -64,7 +64,6 @@ import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { FloatingChat } from '@/components/dashboard/floating-chat';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -420,7 +419,6 @@ export default function DashboardLayout({
           </header>
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
             {children}
-            {!isAdmin && !isModerator && <FloatingChat />}
           </main>
           <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden holographic-nav">
             {bottomNavItems.map((item) => (
