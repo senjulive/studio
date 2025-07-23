@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -153,7 +154,7 @@ export function ProTraderView() {
             if (!isAnimating) {
                 setDisplayBalance(wallet.balances?.usdt ?? 0);
             }
-            const tier = await getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
+            const tier = getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
             setCurrentTier(tier);
         }
     }, [user, isAnimating]);

@@ -1,4 +1,5 @@
 
+
 import { NextResponse } from 'next/server';
 import { getUserRank, getCurrentTier } from '@/lib/ranks';
 import { getBotTierSettings } from '@/lib/tiers';
