@@ -5,6 +5,61 @@
 
 @layer base {
   :root {
+    --background: 240 10% 96%; /* Very light grayish-indigo (#F0F0F8) */
+    --foreground: 271 100% 25%; /* Deep Indigo for text */
+    
+    --card: 0 0% 100%;
+    --card-foreground: 271 100% 25%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 271 100% 25%;
+    
+    --primary: 271 100% 25%; /* Deep Indigo (#4B0082) */
+    --primary-foreground: 240 10% 98%;
+    
+    --secondary: 240 10% 90%;
+    --secondary-foreground: 271 100% 25%;
+    
+    --muted: 240 10% 90%;
+    --muted-foreground: 271 100% 25%;
+    
+    --accent: 276 100% 50%; /* Electric Violet (#8F00FF) */
+    --accent-foreground: 240 10% 98%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 240 10% 85%;
+    --input: 240 10% 90%;
+    --ring: 276 100% 50%;
+    
+    --chart-1: 22 92% 58%;
+    --chart-2: 142.1 76.2% 36.3%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.75rem;
+
+    /* Custom Sidebar Vars - adapted for light theme */
+    --sidebar-background: 271 100% 25%; /* Deep Indigo */
+    --sidebar-foreground: 240 10% 98%;
+    --sidebar-primary: 240 10% 98%;
+    --sidebar-primary-foreground: 271 100% 25%;
+    --sidebar-accent: 276 100% 50%;
+    --sidebar-accent-foreground: 240 10% 98%;
+    --sidebar-border: 271 100% 35%;
+    --sidebar-ring: 240 10% 98%;
+
+    /* Chart Colors for Ranks */
+    --color-recruit: 240 3.8% 46.1%;
+    --color-bronze: 24 9.8% 30%;
+    --color-silver: 240 4.8% 95.9%;
+    --color-gold: 47.9 95.8% 53.1%;
+    --color-platinum: 197.8 91.1% 47.6%;
+    --color-diamond: 270 95.2% 60.2%;
+  }
+
+  .dark {
     --background: 224 71% 4%;
     --foreground: 210 40% 98%;
     
@@ -14,8 +69,8 @@
     --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
     
-    --primary: 213 94% 68%; /* A vibrant blue */
-    --primary-foreground: 222 47% 11%;
+    --primary: 271 100% 25%; /* Deep Indigo */
+    --primary-foreground: 210 40% 98%;
     
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -23,22 +78,15 @@
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
     
-    --accent: 217 33% 17%;
+    --accent: 276 100% 50%; /* Electric Violet */
     --accent-foreground: 210 40% 98%;
     
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 217 33% 25%; /* Slightly lighter border for glass effect */
+    --border: 217 33% 25%;
     --input: 217 33% 17%;
-    --ring: 213 94% 68%;
-    
-    --chart-1: 22 92% 58%;
-    --chart-2: 142.1 76.2% 36.3%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.75rem;
+    --ring: 276 100% 50%;
 
     /* Custom Sidebar Vars */
     --sidebar-background: 224 71% 4%;
@@ -49,14 +97,6 @@
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217 33% 17%;
     --sidebar-ring: 213 94% 68%;
-
-    /* Chart Colors for Ranks */
-    --color-recruit: 240 3.8% 46.1%;
-    --color-bronze: 24 9.8% 30%;
-    --color-silver: 240 4.8% 95.9%;
-    --color-gold: 47.9 95.8% 53.1%;
-    --color-platinum: 197.8 91.1% 47.6%;
-    --color-diamond: 270 95.2% 60.2%;
   }
 }
 
@@ -66,6 +106,8 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .dark body {
     background-image: radial-gradient(circle at 1px 1px, hsl(var(--border)) 1px, transparent 0);
     background-size: 2rem 2rem;
   }

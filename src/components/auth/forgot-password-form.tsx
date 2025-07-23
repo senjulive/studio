@@ -105,7 +105,7 @@ export function ForgotPasswordForm() {
         </CardContent>
         <CardFooter className="flex justify-center text-sm">
             <Button variant="link" asChild>
-                <Link href="/" className="text-muted-foreground hover:text-primary">
+                <Link href="/login" className="text-muted-foreground hover:text-primary">
                     <ArrowLeft className="mr-2 h-4 w-4"/>
                     Back to Login
                 </Link>
