@@ -18,9 +18,8 @@ export const PlatinumTierIcon = ({ className, ...props }: React.SVGProps<SVGSVGE
             </filter>
         </defs>
         <g filter="url(#platinum-tier-glow)">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z" fill="url(#platinum-tier-gradient)" />
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z" stroke="#0369A1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 6l1.41 2.59L16 10l-2.59 1.41L12 14l-1.41-2.59L8 10l2.59-1.41L12 6z" fill="white" />
+            <path d="M12 2.5L21.5 8.5L12 21.5L2.5 8.5L12 2.5Z" fill="url(#platinum-tier-gradient)" />
+            <path d="M12 2.5L21.5 8.5L12 21.5L2.5 8.5L12 2.5Z" stroke="#0369A1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </g>
     </svg>
 );
