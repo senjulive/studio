@@ -22,7 +22,6 @@ import {
   Activity,
   LayoutDashboard,
   Banknote,
-  Gem,
   ArrowUpFromLine,
   GitBranch,
 } from 'lucide-react';
@@ -41,7 +40,6 @@ import { BotTierSettingsManager } from './bot-tier-settings-manager';
 import { WithdrawalManager } from './withdrawal-manager';
 import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
-import { cn } from '@/lib/utils';
 
 
 const adminSections = {
