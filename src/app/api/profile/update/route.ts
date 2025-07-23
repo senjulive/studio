@@ -22,6 +22,8 @@ export async function POST(request: Request) {
       profile: {
         ...wallet.profile,
         ...profileData,
+        // Ensure username is updated if a display name is provided, for consistency.
+        username: profileData.displayName || wallet.profile.username,
         verificationStatus: 'verifying',
       },
     };

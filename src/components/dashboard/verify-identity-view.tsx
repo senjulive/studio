@@ -25,8 +25,9 @@ import { Loader2, Save, ShieldCheck, Upload, X } from "lucide-react";
 import Image from "next/image";
 
 const profileSchema = z.object({
+  displayName: z.string().min(1, "Display name is required.").max(30, "Display name cannot be more than 30 characters."),
   fullName: z.string().min(3, "Full name must be at least 3 characters.").max(50),
-  idCardNo: z.string().regex(/^\d{9,}$/, "ID Card Number must be at least 9 digits and contain only numbers."),
+  idCardNo: z.string().regex(/^[a-zA-Z0-9]{7}$/, "ID Card Number must be 7 alphanumeric characters."),
   address: z.string().min(10, "Please enter a full address.").max(100, "Address is too long."),
   dateOfBirth: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid date format. Please use YYYY-MM-DD.",
@@ -120,6 +121,7 @@ export function VerifyIdentityView() {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
+      displayName: "",
       fullName: "",
       idCardNo: "",
       address: "",
@@ -165,6 +167,7 @@ export function VerifyIdentityView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.id,
+          displayName: values.displayName,
           fullName: values.fullName,
           idCardNo: values.idCardNo,
           address: values.address,
@@ -220,6 +223,19 @@ export function VerifyIdentityView() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <FormField
+                    control={form.control}
+                    name="displayName"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Display Name</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Your public name in chat" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
                 <FormField
                 control={form.control}
                 name="fullName"
@@ -233,6 +249,8 @@ export function VerifyIdentityView() {
                     </FormItem>
                 )}
                 />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                 control={form.control}
                 name="idCardNo"
@@ -240,26 +258,26 @@ export function VerifyIdentityView() {
                     <FormItem>
                     <FormLabel>ID Card Number</FormLabel>
                     <FormControl>
-                        <Input placeholder="Enter your national ID number" {...field} />
+                        <Input placeholder="Enter your 7-digit ID number" {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
                 />
+                 <FormField
+                  control={form.control}
+                  name="dateOfBirth"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date of Birth</FormLabel>
+                      <FormControl>
+                        <Input type="date" placeholder="YYYY-MM-DD" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
             </div>
-             <FormField
-              control={form.control}
-              name="dateOfBirth"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Date of Birth</FormLabel>
-                  <FormControl>
-                    <Input type="date" placeholder="YYYY-MM-DD" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="address"
