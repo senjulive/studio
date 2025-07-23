@@ -5,7 +5,6 @@ import * as React from "react";
 import { format } from "date-fns";
 import {
   getAllChats,
-  sendAdminMessage,
   type ChatHistory,
   type Message,
 } from "@/lib/chat";
@@ -23,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BrainCircuit, Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { addNotification } from "@/lib/notifications";
 import { useToast } from "@/hooks/use-toast";
 import { type SupportAgentOutput } from "@/ai/flows/support-agent-flow";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,43 +39,60 @@ export function SupportChatManager() {
   const [isAnalyzing, setIsAnalyzing] = React.useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
-  React.useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
+  const fetchData = React.useCallback(async () => {
+    setIsLoading(true);
 
-      const fetchWallets = async (): Promise<Record<string, MappedWallet>> => {
-        try {
-          const response = await fetch('/api/admin/wallets', { method: 'POST' });
-          if (!response.ok) return {};
-          return await response.json();
-        } catch (error: any) {
-          toast({ title: 'Error Fetching Wallets', variant: 'destructive' });
-          return {};
-        }
-      };
-      
-      const [chatData, walletData] = await Promise.all([
-        getAllChats(),
-        fetchWallets(),
-      ]);
-
-      setChats(chatData);
-      setWallets(walletData);
-      setIsLoading(false);
-    }
+    const fetchWallets = async (): Promise<Record<string, MappedWallet>> => {
+      try {
+        const response = await fetch('/api/admin/wallets', { method: 'POST' });
+        if (!response.ok) return {};
+        const data = await response.json();
+        // The API returns wallets keyed by user ID, which is exactly what we need.
+        return data;
+      } catch (error: any) {
+        toast({ title: 'Error Fetching Wallets', variant: 'destructive' });
+        return {};
+      }
+    };
     
-    fetchData();
+    const fetchAllChats = async (): Promise<ChatHistory> => {
+        try {
+            const response = await fetch('/api/support/chat', { method: 'PATCH' });
+            if (!response.ok) return {};
+            return await response.json();
+        } catch {
+            return {};
+        }
+    };
+
+    const [chatData, walletData] = await Promise.all([
+      fetchAllChats(),
+      fetchWallets(),
+    ]);
+
+    setChats(chatData);
+    setWallets(walletData);
+    setIsLoading(false);
   }, [toast]);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSendMessage = async (userId: string) => {
     const text = replyMessages[userId];
     if (!text || !text.trim()) return;
 
     setIsSending((prev) => ({ ...prev, [userId]: true }));
-    await sendAdminMessage(userId, text);
-    await addNotification(userId, { title: "AstralCore Support", content: "An administrator has replied.", href: "/dashboard/support"});
-    const data = await getAllChats();
-    setChats(data);
+    
+    await fetch('/api/support/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userId, text: text, sender: 'admin' }),
+    });
+
+    await fetchData();
+
     setReplyMessages((prev) => ({ ...prev, [userId]: "" }));
     setIsSending((prev) => ({ ...prev, [userId]: false }));
   };

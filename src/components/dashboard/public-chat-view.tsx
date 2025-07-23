@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useUser } from "@/contexts/UserContext";
 import { Badge } from "../ui/badge";
-import { getUserRank, type Rank } from "@/lib/ranks";
+import { type Rank } from "@/lib/ranks";
 import type { TierSetting as TierData } from "@/lib/tiers";
 import { tierIcons, tierClassNames } from "@/lib/settings";
 
@@ -76,7 +76,7 @@ const initialLeaders: Omit<Leader, 'squadSize' | 'id'>[] = [
 
 export function PublicChatView({ isFloating = false }: { isFloating?: boolean }) {
   const { toast } = useToast();
-  const { user, wallet } = useUser();
+  const { user, wallet, rank, tier } = useUser();
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -145,7 +145,7 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
     e.preventDefault();
     if (!newMessage.trim() || !user?.id || !wallet) return;
 
-    if (!wallet.profile?.displayName) {
+    if (!wallet.profile?.displayName && !wallet.profile?.username) {
         toast({ title: "Display Name Required", description: "Please set a display name in your profile before chatting.", variant: "destructive"});
         return;
     }
@@ -159,6 +159,8 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
           body: JSON.stringify({
               userId: user.id,
               text: newMessage,
+              rank,
+              tier
           })
       });
 
@@ -178,7 +180,7 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
   const CardComponent = isFloating ? 'div' : Card;
 
   return (
-    <div className={cn("grid gap-6", !isFloating && "lg:grid-cols-1")}>
+    <div className={cn("grid gap-6", !isFloating && "lg:grid-cols-3")}>
         {!isFloating && (
              <Card>
                 <CardHeader>
@@ -192,7 +194,7 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
                 </CardContent>
             </Card>
         )}
-        <CardComponent className={cn("h-full flex flex-col", !isFloating && "lg:col-span-1")}>
+        <CardComponent className={cn("h-full flex flex-col", !isFloating && "lg:col-span-2")}>
             <CardHeader className="flex-row items-center justify-between">
                 <div>
                     <CardTitle>Public Chat</CardTitle>
@@ -218,7 +220,7 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
                     <div className="space-y-6">
                     {messages.map((message) => {
                         const isOwnMessage = message.userId === user?.id;
-                        const RankIcon = rankIcons[message.rank.Icon];
+                        const RankIcon = message.rank ? rankIcons[message.rank.Icon] : null;
                         const TierIcon = message.tier ? tierIcons[message.tier.id] : null;
                         const tierClassName = message.tier ? tierClassNames[message.tier.id] : null;
 
@@ -234,7 +236,7 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
                             <div className={cn("flex flex-col space-y-1 max-w-xs sm:max-w-md", isOwnMessage && "items-end")}>
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-semibold">{message.isAdmin ? "AstralCore" : message.displayName}</span>
-                                    {RankIcon && <Badge variant="outline" className={cn("h-5 px-1.5", message.rank.className)}><RankIcon className="h-3 w-3" /></Badge>}
+                                    {RankIcon && message.rank && <Badge variant="outline" className={cn("h-5 px-1.5", message.rank.className)}><RankIcon className="h-3 w-3" /></Badge>}
                                     {TierIcon && tierClassName && <Badge variant="outline" className={cn("h-5 px-1.5", tierClassName)}><TierIcon className="h-3 w-3" /></Badge>}
                                 </div>
                                 <div className={cn("rounded-lg px-4 py-2 text-sm", isOwnMessage ? "bg-primary text-primary-foreground" : message.isAdmin ? "bg-card text-foreground border" : "bg-muted")}>
@@ -243,7 +245,7 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
                                 <span className="text-xs text-muted-foreground">{format(new Date(message.timestamp), "h:mm a")}</span>
                             </div>
                             {isOwnMessage && (
-                                <Avatar className="h-10 w-10"><AvatarImage src={message.avatarUrl} /><AvatarFallback>{message.displayName.charAt(0)}</AvatarFallback></Avatar>
+                                <Avatar className="h-10 w-10"><AvatarImage src={wallet?.profile.avatarUrl} /><AvatarFallback>{(wallet?.profile.displayName || wallet?.profile.username || 'U').charAt(0)}</AvatarFallback></Avatar>
                             )}
                         </div>
                         )
