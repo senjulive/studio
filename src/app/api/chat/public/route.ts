@@ -2,15 +2,9 @@
 'use server';
 
 import { NextResponse } from 'next/server';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { getWalletByUserId } from '@/lib/wallet';
-import { getUserRank } from '@/lib/ranks';
-import { getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+import initialChat from '../../../../data/public-chat.json';
 import type { Rank } from '@/lib/ranks';
 import type { TierSetting } from '@/lib/tiers';
-
-const CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
 
 type ChatMessage = {
     id: string;
@@ -24,74 +18,62 @@ type ChatMessage = {
     isAdmin?: boolean;
 };
 
-async function readChatHistory(): Promise<ChatMessage[]> {
-  try {
-    const data = await fs.readFile(CHAT_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    // If the file doesn't exist, return an empty array
-    return [];
-  }
-}
-
-async function writeChatHistory(data: ChatMessage[]) {
-  await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(data, null, 4), 'utf-8');
-}
+// In-memory store for chat messages
+let chatMessages: ChatMessage[] = initialChat;
 
 export async function GET(request: Request) {
-    try {
-        const history = await readChatHistory();
-        const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
-        const recentHistory = history.filter(msg => msg.timestamp >= twentyFourHoursAgo);
-        return NextResponse.json(recentHistory);
-    } catch (error: any) {
-        return NextResponse.json({ error: 'Failed to fetch chat history' }, { status: 500 });
-    }
+    // Return messages sorted by timestamp
+    const sortedMessages = chatMessages.sort((a, b) => a.timestamp - b.timestamp);
+    return NextResponse.json(sortedMessages);
 }
-
 
 export async function POST(request: Request) {
     try {
-        const { userId, text } = await request.json();
-
-        if (!userId || !text) {
+        const body = await request.json();
+        const { userId, text, rank, tier } = body;
+        
+        if (!userId || !text || !rank) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
-
-        const [wallet, tierSettings] = await Promise.all([
-            getWalletByUserId(userId),
-            getBotTierSettings(),
-        ]);
-
-        if (!wallet) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
-        const rank = getUserRank(wallet.balances.usdt || 0);
-        const tier = await getCurrentTier(wallet.balances.usdt || 0, tierSettings);
+        
+        // This is a mock implementation, so we'll generate some details
+        const displayName = `User_${userId.slice(0, 4)}`;
 
         const newMessage: ChatMessage = {
             id: `msg_${Date.now()}_${Math.random()}`,
             userId,
-            displayName: wallet.profile.displayName || wallet.profile.username,
-            avatarUrl: wallet.profile.avatarUrl,
+            displayName,
             text,
             timestamp: Date.now(),
             rank,
             tier,
+            isAdmin: false
         };
 
-        const history = await readChatHistory();
-        history.push(newMessage);
+        chatMessages.push(newMessage);
         
-        // Keep only the last 100 messages to prevent the file from growing too large
-        const trimmedHistory = history.slice(-100);
-
-        await writeChatHistory(trimmedHistory);
+        // Keep the chat history to a reasonable size in memory
+        if (chatMessages.length > 100) {
+            chatMessages = chatMessages.slice(-100);
+        }
 
         return NextResponse.json({ success: true, message: 'Message sent' });
-
     } catch (error: any) {
         return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
+    }
+}
+
+export async function DELETE(request: Request) {
+    try {
+        const { messageId } = await request.json();
+        if (!messageId) {
+            return NextResponse.json({ error: 'Message ID is required' }, { status: 400 });
+        }
+
+        chatMessages = chatMessages.filter(msg => msg.id !== messageId);
+
+        return NextResponse.json({ success: true, message: 'Message deleted' });
+    } catch (error: any) {
+        return NextResponse.json({ error: 'Failed to delete message' }, { status: 500 });
     }
 }

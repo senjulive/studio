@@ -46,8 +46,8 @@ export function LoginForm() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "user@example.com",
+      password: "password123",
       rememberMe: false,
     },
   });
@@ -71,7 +71,6 @@ export function LoginForm() {
         } else {
             localStorage.removeItem(REMEMBERED_EMAIL_KEY);
         }
-        // Store email in session storage to determine role in dashboard layout
         sessionStorage.setItem('loggedInEmail', values.email);
     }
     
