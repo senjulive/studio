@@ -5,12 +5,33 @@ import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Gem, Trophy, TrendingUp, Unlock, Lock } from "lucide-react";
-import { type TierSetting as TierSettingData } from "@/lib/tiers";
+import { type TierSetting as TierSettingData, getBotTierSettings } from "@/lib/tiers";
 import { ranks } from "@/lib/ranks";
 import { Badge } from "@/components/ui/badge";
 import type { SVGProps } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { tierIcons, tierClassNames } from '@/lib/settings';
+
+// Import rank icons
+import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
+import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
+import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
+import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
+import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
+import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
+
+
+type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+const rankIcons: Record<string, IconComponent> = {
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
+};
 
 type TierSetting = TierSettingData & {
   Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
@@ -35,9 +56,7 @@ export function TradingInfoView() {
     async function fetchSettings() {
         setIsLoading(true);
         try {
-            const response = await fetch('/api/public-settings?key=botTierSettings');
-            if (!response.ok) throw new Error('Failed to fetch tier settings');
-            const settingsData = await response.json();
+            const settingsData = await getBotTierSettings();
             
             if (settingsData) {
                 const settingsWithComponents = settingsData.map((tier: TierSettingData) => ({
@@ -104,7 +123,7 @@ export function TradingInfoView() {
                                         <TableCell className="font-medium">
                                             <div className="flex items-center gap-2">
                                                 <tier.Icon className="h-5 w-5" />
-                                                <span className={tier.className}>{tier.name} ({tier.clicks} Grids)</span>
+                                                <span className={tier.className}>{tier.name}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right font-mono">${tier.balanceThreshold.toLocaleString()}</TableCell>
@@ -155,8 +174,8 @@ export function TradingInfoView() {
                                     </TableRow>
                                 ))
                             ) : (
-                                tierSettings.filter(t => t.balanceThreshold > 0).map((tier) => (
-                                    <TableRow key={`earnings-${tier.id}`} className={tier.locked ? 'opacity-50' : ''}>
+                                tierSettings.filter(t => t.balanceThreshold > 0 && !t.locked).map((tier) => (
+                                    <TableRow key={`earnings-${tier.id}`}>
                                         <TableCell className="font-medium">
                                             <div className="flex items-center gap-2">
                                                 <tier.Icon className="h-5 w-5" />
@@ -190,7 +209,7 @@ export function TradingInfoView() {
                         </TableHeader>
                         <TableBody>
                             {ranks.map((rank) => {
-                                const RankIcon = tierIcons[rank.Icon] || tierIcons['tier-1'];
+                                const RankIcon = rankIcons[rank.Icon] || Lock;
                                 return (
                                 <TableRow key={rank.name}>
                                     <TableCell className="font-medium">
