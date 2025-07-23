@@ -22,14 +22,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
-import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
-import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from "@/lib/tiers";
 import { tierIcons, tierClassNames } from '@/lib/settings';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SquadSystem } from "./squad-system";
@@ -166,7 +163,7 @@ const assetConfig = [
 ] as const;
 
 export function WalletView() {
-  const { user, wallet: walletData, tier, rank } = useUser();
+  const { wallet: walletData, tier, rank } = useUser();
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
 
   React.useEffect(() => {

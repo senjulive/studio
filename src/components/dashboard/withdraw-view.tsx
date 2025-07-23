@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Info, Loader2, Clock, KeyRound } from "lucide-react";
+import { Info, Loader2, Clock } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
