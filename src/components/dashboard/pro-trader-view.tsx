@@ -9,7 +9,8 @@ import { Button } from '../ui/button';
 import { useTradingBot } from '@/hooks/use-trading-bot';
 import { getOrCreateWallet, updateWallet, type WalletData } from '@/lib/wallet';
 import { useUser } from '@/contexts/UserContext';
-import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
+import { getCurrentTier } from '@/lib/ranks';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '../ui/skeleton';
 import { UsdtLogoIcon } from '../icons/usdt-logo';
@@ -153,7 +154,7 @@ export function ProTraderView() {
             if (!isAnimating) {
                 setDisplayBalance(wallet.balances?.usdt ?? 0);
             }
-            const tier = await getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
+            const tier = getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
             setCurrentTier(tier);
         }
     }, [user, isAnimating]);
@@ -434,3 +435,5 @@ export function ProTraderView() {
         </div>
     );
 }
+
+    
