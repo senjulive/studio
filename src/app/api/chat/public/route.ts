@@ -1,10 +1,11 @@
 
-'use server';
-
 import { NextResponse } from 'next/server';
-import initialChat from '../../../../data/public-chat.json';
-import type { Rank } from '@/lib/ranks';
-import type { TierSetting } from '@/lib/tiers';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { type Rank, getUserRank } from '@/lib/ranks';
+import { type TierSetting, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+
+const CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
 
 type ChatMessage = {
     id: string;
@@ -18,62 +19,62 @@ type ChatMessage = {
     isAdmin?: boolean;
 };
 
-// In-memory store for chat messages
-let chatMessages: ChatMessage[] = initialChat;
+async function readChatHistory(): Promise<ChatMessage[]> {
+  try {
+    const data = await fs.readFile(CHAT_FILE_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    // If the file doesn't exist or is empty, return an empty array
+    return [];
+  }
+}
 
-export async function GET(request: Request) {
-    // Return messages sorted by timestamp
-    const sortedMessages = chatMessages.sort((a, b) => a.timestamp - b.timestamp);
-    return NextResponse.json(sortedMessages);
+async function writeChatHistory(history: ChatMessage[]) {
+  await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(history, null, 4), 'utf-8');
+}
+
+export async function GET() {
+  try {
+    const history = await readChatHistory();
+    return NextResponse.json(history);
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Failed to fetch chat history' }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { userId, text, rank, tier } = body;
-        
+
         if (!userId || !text || !rank) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
         
-        // This is a mock implementation, so we'll generate some details
-        const displayName = `User_${userId.slice(0, 4)}`;
+        const history = await readChatHistory();
 
         const newMessage: ChatMessage = {
-            id: `msg_${Date.now()}_${Math.random()}`,
+            id: `msg_${crypto.randomUUID()}`,
             userId,
-            displayName,
+            displayName: 'MockUser',
             text,
             timestamp: Date.now(),
             rank,
             tier,
-            isAdmin: false
+            isAdmin: false,
         };
-
-        chatMessages.push(newMessage);
         
-        // Keep the chat history to a reasonable size in memory
-        if (chatMessages.length > 100) {
-            chatMessages = chatMessages.slice(-100);
+        history.push(newMessage);
+        
+        // Keep only the last 50 messages for performance
+        if (history.length > 50) {
+            history.splice(0, history.length - 50);
         }
+
+        await writeChatHistory(history);
 
         return NextResponse.json({ success: true, message: 'Message sent' });
     } catch (error: any) {
         return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
-    }
-}
-
-export async function DELETE(request: Request) {
-    try {
-        const { messageId } = await request.json();
-        if (!messageId) {
-            return NextResponse.json({ error: 'Message ID is required' }, { status: 400 });
-        }
-
-        chatMessages = chatMessages.filter(msg => msg.id !== messageId);
-
-        return NextResponse.json({ success: true, message: 'Message deleted' });
-    } catch (error: any) {
-        return NextResponse.json({ error: 'Failed to delete message' }, { status: 500 });
     }
 }
