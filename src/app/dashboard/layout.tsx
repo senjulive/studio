@@ -55,6 +55,7 @@ import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
 import { PromotionIcon } from '@/components/icons/nav/promotion-icon';
+import Script from 'next/script';
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -262,6 +263,11 @@ export default function DashboardLayout({
   
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
+      <Script
+          src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js"
+          type="module"
+          strategy="lazyOnload"
+      />
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
@@ -273,8 +279,23 @@ export default function DashboardLayout({
             </div>
           </SidebarHeader>
 
-          <div className="mt-12 mb-4 px-4 space-y-4">
-             <div className="flex items-center gap-3">
+          <div className="mt-12 mb-4 px-4 space-y-4 relative overflow-hidden">
+             <dotlottie-wc
+                src="https://lottie.host/26239d4a-dc79-43d9-83c9-365a0b427426/nVebvmSwSu.lottie"
+                style={{
+                  position: 'absolute',
+                  top: '-50%',
+                  left: '-50%',
+                  width: '200%',
+                  height: '200%',
+                  zIndex: 0,
+                  opacity: 0.5,
+                }}
+                speed="1"
+                autoplay
+                loop
+            ></dotlottie-wc>
+             <div className="flex items-center gap-3 relative z-10">
                   <AvatarUploadDialog 
                     onUploadSuccess={() => fetchWalletAndTiers(user.id)}
                     wallet={wallet}
@@ -296,7 +317,7 @@ export default function DashboardLayout({
                      <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
                   </div>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 relative z-10">
                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
                     <RankIcon className="h-4 w-4" />
                     <span>{rank.name}</span>

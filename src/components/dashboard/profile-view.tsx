@@ -28,9 +28,6 @@ import { format } from 'date-fns';
 import type { SVGProps } from 'react';
 import { Input } from "../ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { FacebookIcon } from "../icons/social/facebook-icon";
-import { InstagramIcon } from "../icons/social/instagram-icon";
-import { UsdtLogoIcon } from "../icons/usdt-logo"; 
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -299,15 +296,6 @@ export function ProfileView() {
             </DialogContent>
         </Dialog>
         <div className="relative max-w-md mx-auto">
-            <div className="absolute inset-0 -top-16 -left-16 -right-16 -bottom-16 flex items-center justify-center pointer-events-none z-0">
-                <dotlottie-wc
-                    src="https://lottie.host/26239d4a-dc79-43d9-83c9-365a0b427426/nVebvmSwSu.lottie"
-                    style={{width: '600px', height: '600px', position: 'absolute'}}
-                    speed="1"
-                    autoplay
-                    loop
-                ></dotlottie-wc>
-            </div>
             <Card className="relative z-10">
                 <CardHeader className="items-center text-center p-6">
                     <CardTitle className="text-2xl">
