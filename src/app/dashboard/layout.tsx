@@ -284,8 +284,9 @@ export default function DashboardLayout({
                 src="https://lottie.host/26239d4a-dc79-43d9-83c9-365a0b427426/nVebvmSwSu.lottie"
                 style={{
                   position: 'absolute',
-                  top: '-50%',
-                  left: '-50%',
+                  top: '-70%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
                   width: '200%',
                   height: '200%',
                   zIndex: 0,
@@ -295,7 +296,7 @@ export default function DashboardLayout({
                 autoplay
                 loop
             ></dotlottie-wc>
-             <div className="flex items-center gap-3 relative z-10">
+             <div className="flex flex-col items-center gap-4 relative z-10 text-center">
                   <AvatarUploadDialog 
                     onUploadSuccess={() => fetchWalletAndTiers(user.id)}
                     wallet={wallet}
@@ -310,14 +311,14 @@ export default function DashboardLayout({
                   </AvatarUploadDialog>
 
                   <div className="overflow-hidden">
-                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
+                     <p className="font-semibold text-sidebar-foreground truncate flex items-center justify-center gap-2">
                         {wallet?.profile?.username || 'User'}
                         {userCountry && <span className="text-lg">{userCountry.flag}</span>}
                      </p>
                      <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
                   </div>
               </div>
-              <div className="flex flex-wrap items-center gap-2 relative z-10">
+              <div className="flex flex-wrap items-center justify-center gap-2 relative z-10">
                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
                     <RankIcon className="h-4 w-4" />
                     <span>{rank.name}</span>
