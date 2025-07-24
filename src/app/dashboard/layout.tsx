@@ -289,8 +289,8 @@ export default function DashboardLayout({
                           top: '50%',
                           left: '50%',
                           transform: 'translate(-50%, -50%)',
-                          width: '120px',
-                          height: '120px',
+                          width: '30px',
+                          height: '30px',
                           zIndex: 0,
                           opacity: 0.5,
                         }}
@@ -492,4 +492,3 @@ export default function DashboardLayout({
     </UserProvider>
   );
 }
-
