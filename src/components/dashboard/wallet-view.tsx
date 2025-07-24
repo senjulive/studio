@@ -27,9 +27,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
 import Image from "next/image";
-import { getUserRank, getCurrentTier } from "@/lib/ranks";
+import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
-import { type TierSetting as TierData, getBotTierSettings } from "@/lib/tiers";
+import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from "@/lib/tiers";
 import { tierIcons, tierClassNames } from '@/lib/settings';
 
 // Import rank icons
@@ -118,7 +118,7 @@ export function WalletView() {
           getBotTierSettings(),
         ]);
         setWalletData(wallet);
-        const currentTier = getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
+        const currentTier = await getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
         setTier(currentTier);
       }
   }, [user]);
