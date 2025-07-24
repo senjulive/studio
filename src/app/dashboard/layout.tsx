@@ -289,8 +289,8 @@ export default function DashboardLayout({
                           top: '50%',
                           left: '50%',
                           transform: 'translate(-50%, -50%)',
-                          width: '30px',
-                          height: '30px',
+                          width: '130%',
+                          height: '130%',
                           zIndex: 0,
                           opacity: 0.5,
                         }}
