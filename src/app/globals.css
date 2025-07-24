@@ -5,33 +5,33 @@
 
 @layer base {
   :root {
-    --background: 240 10% 96%; /* Very light grayish-indigo (#F0F0F8) */
-    --foreground: 271 100% 25%; /* Deep Indigo for text */
+    --background: 240 20% 99%; /* Almost white with a hint of blue */
+    --foreground: 240 10% 3.9%; /* Dark Slate Gray */
     
     --card: 0 0% 100%;
-    --card-foreground: 271 100% 25%;
+    --card-foreground: 240 10% 3.9%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 271 100% 25%;
+    --popover-foreground: 240 10% 3.9%;
     
-    --primary: 271 100% 25%; /* Deep Indigo (#4B0082) */
-    --primary-foreground: 240 10% 98%;
+    --primary: 262 80% 50%; /* Vibrant Indigo */
+    --primary-foreground: 210 40% 98%;
     
-    --secondary: 240 10% 90%;
-    --secondary-foreground: 271 100% 25%;
+    --secondary: 240 4.8% 95.9%; /* Light Gray */
+    --secondary-foreground: 240 10% 3.9%;
     
-    --muted: 240 10% 90%;
-    --muted-foreground: 271 100% 25%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
     
-    --accent: 276 100% 50%; /* Electric Violet (#8F00FF) */
-    --accent-foreground: 240 10% 98%;
+    --accent: 262 80% 58%; /* Slightly lighter Indigo for accents */
+    --accent-foreground: 210 40% 98%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 240 10% 85%;
-    --input: 240 10% 90%;
-    --ring: 276 100% 50%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 262 80% 50%;
     
     --chart-1: 22 92% 58%;
     --chart-2: 142.1 76.2% 36.3%;
@@ -40,15 +40,15 @@
     --chart-5: 27 87% 67%;
     --radius: 0.75rem;
 
-    /* Custom Sidebar Vars - updated */
-    --sidebar-background: 240 100% 99%; /* Very Light Indigo */
-    --sidebar-foreground: 271 100% 35%; /* Electric Indigo */
-    --sidebar-primary: 271 100% 35%;
-    --sidebar-primary-foreground: 240 100% 99%;
-    --sidebar-accent: 240 10% 94%;
-    --sidebar-accent-foreground: 271 100% 35%;
-    --sidebar-border: 240 10% 90%;
-    --sidebar-ring: 271 100% 35%;
+    /* Custom Sidebar Vars - Light Theme */
+    --sidebar-background: 240 10% 97%; /* Slightly off-white */
+    --sidebar-foreground: 240 8% 25%;
+    --sidebar-primary: 262 80% 50%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 240 5.9% 90%;
+    --sidebar-accent-foreground: 240 10% 3.9%;
+    --sidebar-border: 240 5.9% 88%;
+    --sidebar-ring: 262 80% 50%;
 
     /* Chart Colors for Ranks */
     --color-recruit: 240 3.8% 46.1%;
@@ -69,8 +69,8 @@
     --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
     
-    --primary: 271 100% 25%; /* Deep Indigo */
-    --primary-foreground: 210 40% 98%;
+    --primary: 271 100% 70%; /* Brighter Purple */
+    --primary-foreground: 224 71% 4%;
     
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -88,15 +88,15 @@
     --input: 217 33% 17%;
     --ring: 276 100% 50%;
 
-    /* Custom Sidebar Vars - updated */
+    /* Custom Sidebar Vars - Dark Theme */
     --sidebar-background: 224 71% 6%; /* Slightly lighter dark indigo */
-    --sidebar-foreground: 271 100% 80%; /* Electric Indigo */
-    --sidebar-primary: 271 100% 80%;
+    --sidebar-foreground: 271 100% 85%;
+    --sidebar-primary: 271 100% 75%;
     --sidebar-primary-foreground: 224 71% 6%;
     --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 271 100% 80%;
+    --sidebar-accent-foreground: 271 100% 85%;
     --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 271 100% 80%;
+    --sidebar-ring: 271 100% 85%;
   }
 }
 
