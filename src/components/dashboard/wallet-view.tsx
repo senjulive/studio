@@ -118,7 +118,7 @@ export function WalletView() {
           getBotTierSettings(),
         ]);
         setWalletData(wallet);
-        const currentTier = await getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
+        const currentTier = getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
         setTier(currentTier);
       }
   }, [user]);
