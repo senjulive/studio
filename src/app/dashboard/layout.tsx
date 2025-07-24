@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Link from 'next/link';
@@ -49,13 +48,12 @@ import { MessageSquare, UserPlus, Shield, Lock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
-import { getUserRank, getCurrentTier } from '@/lib/ranks';
-import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
+import { getUserRank } from '@/lib/ranks';
+import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
 import { PromotionIcon } from '@/components/icons/nav/promotion-icon';
-import Script from 'next/script';
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -263,11 +261,6 @@ export default function DashboardLayout({
   
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
-      <Script
-          src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js"
-          type="module"
-          strategy="lazyOnload"
-      />
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
@@ -280,49 +273,29 @@ export default function DashboardLayout({
           </SidebarHeader>
 
           <div className="mt-12 mb-4 px-4 space-y-4">
-             <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="relative">
-                     <dotlottie-wc
-                        src="https://lottie.host/26239d4a-dc79-43d9-83c9-365a0b427426/nVebvmSwSu.lottie"
-                        style={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          width: '130%',
-                          height: '130%',
-                          zIndex: 0,
-                          opacity: 0.5,
-                        }}
-                        speed="1"
-                        autoplay
-                        loop
-                    ></dotlottie-wc>
-                    <div className="relative z-10">
-                      <AvatarUploadDialog 
-                        onUploadSuccess={() => fetchWalletAndTiers(user.id)}
-                        wallet={wallet}
-                      >
-                        <Avatar className="h-24 w-24 cursor-pointer">
-                          <AvatarImage
-                            src={wallet?.profile?.avatarUrl}
-                            alt={wallet?.profile?.username || 'User'}
-                          />
-                          <AvatarFallback>{userInitial}</AvatarFallback>
-                        </Avatar>
-                      </AvatarUploadDialog>
-                    </div>
-                  </div>
+             <div className="flex items-center gap-3">
+                  <AvatarUploadDialog 
+                    onUploadSuccess={() => fetchWalletAndTiers(user.id)}
+                    wallet={wallet}
+                  >
+                    <Avatar className="h-12 w-12 cursor-pointer">
+                      <AvatarImage
+                        src={wallet?.profile?.avatarUrl}
+                        alt={wallet?.profile?.username || 'User'}
+                      />
+                      <AvatarFallback>{userInitial}</AvatarFallback>
+                    </Avatar>
+                  </AvatarUploadDialog>
 
                   <div className="overflow-hidden">
-                     <p className="font-semibold text-sidebar-foreground truncate flex items-center justify-center gap-2">
+                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
                         {wallet?.profile?.username || 'User'}
                         {userCountry && <span className="text-lg">{userCountry.flag}</span>}
                      </p>
                      <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
                   </div>
               </div>
-              <div className="flex flex-wrap items-center justify-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
                     <RankIcon className="h-4 w-4" />
                     <span>{rank.name}</span>
@@ -492,7 +465,3 @@ export default function DashboardLayout({
     </UserProvider>
   );
 }
-
-    
-
-    
