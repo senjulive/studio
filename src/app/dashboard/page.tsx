@@ -1,13 +1,13 @@
-import { ProTraderView } from '@/components/dashboard/pro-trader-view';
+import { WalletView } from '@/components/dashboard/wallet-view';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: "Astral Core Trading - Dashboard",
-    description: "Engage with the CORE Nexus Quantum v3.76 trading bot.",
+    title: "Dashboard - AstralCore",
+    description: "View your crypto wallet, assets, and recent transactions.",
 };
 
 export default function DashboardPage() {
   return (
-    <ProTraderView />
+    <WalletView />
   );
 }
