@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Repeat, Lock, LineChart, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight, AlertCircle } from "lucide-react";
+import { Repeat, Lock, LineChart as LineChartIcon, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight, AlertCircle } from "lucide-react";
 import type { SVGProps } from 'react';
 
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +41,7 @@ import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { LiveTradingChart } from "./live-trading-chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Bitcoin, Landmark, Scale, TrendingUp } from "lucide-react";
+import { Line, LineChart, ResponsiveContainer } from "recharts";
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -77,7 +78,7 @@ type CryptoData = {
 };
 
 const quickAccessItems = [
-  { href: "/dashboard/market", label: "Market", icon: LineChart },
+  { href: "/dashboard/market", label: "Market", icon: LineChartIcon },
   { href: "/dashboard/deposit", label: "Deposit", icon: WalletIcon },
   { href: "/dashboard/trading", label: "Trade", icon: Repeat },
   { href: "/dashboard/profile", label: "Profile", icon: User },
@@ -489,29 +490,34 @@ export function WalletView() {
           </div>
         </CardContent>
       </Card>
+        
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-3">
+          <Tabs defaultValue="crypto" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 m-6 mb-0">
+                    <TabsTrigger value="crypto" disabled><Bitcoin className="mr-2"/>Crypto</TabsTrigger>
+                    <TabsTrigger value="stocks" disabled><TrendingUp className="mr-2"/>Stocks</TabsTrigger>
+                    <TabsTrigger value="commodities" disabled><Scale className="mr-2"/>Commodities</TabsTrigger>
+                    <TabsTrigger value="forex" disabled><Landmark className="mr-2"/>Forex</TabsTrigger>
+                </TabsList>
+                <TabsContent value="crypto">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Live Crypto Market</CardTitle>
+                        <CardDescription>Select a cryptocurrency to view its live chart. Data refreshes automatically.</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Table>
+                            <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead className="text-right">Market Cap</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
+                            <TableBody>{renderRows(allAssetsData)}</TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                </TabsContent>
+              </Tabs>
+          </Card>
+      </div>
 
-      <Tabs defaultValue="crypto" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="crypto" disabled><Bitcoin className="mr-2"/>Crypto</TabsTrigger>
-                <TabsTrigger value="stocks" disabled><TrendingUp className="mr-2"/>Stocks</TabsTrigger>
-                <TabsTrigger value="commodities" disabled><Scale className="mr-2"/>Commodities</TabsTrigger>
-                <TabsTrigger value="forex" disabled><Landmark className="mr-2"/>Forex</TabsTrigger>
-            </TabsList>
-            <TabsContent value="crypto">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Live Crypto Market</CardTitle>
-                    <CardDescription>Select a cryptocurrency to view its live chart. Data refreshes automatically.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead className="text-right">Market Cap</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
-                        <TableBody>{renderRows(allAssetsData)}</TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-            </TabsContent>
-          </Tabs>
 
       <Card>
         <CardHeader>
