@@ -363,44 +363,47 @@ export default function DashboardLayout({
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-2">
-                   <SettingsIcon className="mr-2 h-4 w-4" />
-                   Settings & Logout
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none text-foreground">
-                      {wallet?.profile?.username || 'User'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {userEmail || '...'}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/profile">
-                    <ProfileIcon className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/security">
-                    <SettingsIcon className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogoutIcon className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+             <div className="flex items-center justify-between p-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="justify-start text-sidebar-foreground h-auto p-2">
+                      <SettingsIcon className="mr-2 h-4 w-4" />
+                      Settings
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none text-foreground">
+                          {wallet?.profile?.username || 'User'}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {userEmail || '...'}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/profile">
+                        <ProfileIcon className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/security">
+                        <SettingsIcon className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogoutIcon className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <ThemeToggle />
+              </div>
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
@@ -451,7 +454,6 @@ export default function DashboardLayout({
                 </Link>
               </Button>
               <NotificationBell />
-              <ThemeToggle />
             </div>
           </header>
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
@@ -490,3 +492,4 @@ export default function DashboardLayout({
     </UserProvider>
   );
 }
+
