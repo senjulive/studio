@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -27,6 +28,7 @@ import type { MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp, Scale, Landmark, Bitcoin } from 'lucide-react';
+import { AllAssetsChart } from "./all-assets-chart";
 
 type CryptoData = {
   id: string;
@@ -155,125 +157,15 @@ export function MarketView() {
     return `$${value.toFixed(2)}`;
   }
 
-  const renderRows = (currentData: GenericAsset[]) => {
-    if (isLoading && data.length === 0) {
-      return Array.from({ length: 10 }).map((_, index) => (
-        <TableRow key={index}>
-          <TableCell>
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-8 w-8 rounded-full" />
-              <div className="space-y-1">
-                 <Skeleton className="h-4 w-20" />
-                 <Skeleton className="h-3 w-10" />
-              </div>
-            </div>
-          </TableCell>
-          <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-28" /></TableCell>
-          {currentData[0]?.marketCap !== undefined && <TableCell><Skeleton className="h-5 w-24" /></TableCell>}
-          <TableCell><Skeleton className="h-8 w-32" /></TableCell>
-        </TableRow>
-      ));
-    }
-
-    if (error) {
-      return (
-        <TableRow>
-          <TableCell colSpan={6} className="h-24 text-center">
-            <AlertCircle className="mx-auto h-6 w-6 text-destructive mb-2"/>
-            Failed to load market data. Please try again later.
-          </TableCell>
-        </TableRow>
-      );
-    }
-
-    return currentData.map((asset) => (
-      <TableRow 
-        key={asset.id}
-        onClick={() => setSelectedAsset(asset)}
-        className={cn(
-          "cursor-pointer",
-          selectedAsset?.id === asset.id && "bg-muted/50 hover:bg-muted/60"
-        )}
-      >
-        <TableCell>
-          <div className="flex items-center gap-3">
-            {asset.iconUrl && <Image
-              src={asset.iconUrl}
-              alt={`${asset.name} logo`}
-              width={32}
-              height={32}
-              className="rounded-full"
-            />}
-            <div>
-              <div className="font-medium">{asset.name}</div>
-              <div className="text-xs text-muted-foreground">{asset.ticker}</div>
-            </div>
-          </div>
-        </TableCell>
-        <TableCell className="font-mono text-right">{formatCurrency(asset.price, asset.price < 1 ? 4 : 2)}</TableCell>
-        <TableCell
-          className={cn(
-            "text-right",
-            asset.change24h >= 0 ? "text-green-600" : "text-red-600"
-          )}
-        >
-          {asset.change24h >= 0 ? "+" : ""}
-          {asset.change24h.toFixed(2)}%
-        </TableCell>
-        <TableCell className="text-right">{formatMarketCap(asset.volume24h)}</TableCell>
-        {asset.marketCap !== undefined && <TableCell className="text-right">{formatMarketCap(asset.marketCap)}</TableCell>}
-        <TableCell>
-          <div className="h-8 w-32">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={asset.priceHistory}>
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke={asset.change24h >= 0 ? "hsl(var(--chart-2))" : "hsl(var(--destructive))"}
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </TableCell>
-      </TableRow>
-    ));
-  };
-
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
+          <AllAssetsChart coins={data} />
           {(isLoading && !selectedAsset) ? (
               <Skeleton className="h-[480px] w-full rounded-lg" />
           ) : (
               <LiveTradingChart coin={selectedAsset} />
           )}
-          <Tabs defaultValue="crypto" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="crypto" disabled><Bitcoin className="mr-2"/>Crypto</TabsTrigger>
-                <TabsTrigger value="stocks" disabled><TrendingUp className="mr-2"/>Stocks</TabsTrigger>
-                <TabsTrigger value="commodities" disabled><Scale className="mr-2"/>Commodities</TabsTrigger>
-                <TabsTrigger value="forex" disabled><Landmark className="mr-2"/>Forex</TabsTrigger>
-            </TabsList>
-            <TabsContent value="crypto">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Live Crypto Market</CardTitle>
-                    <CardDescription>Select a cryptocurrency to view its live chart. Data refreshes automatically.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead className="text-right">Market Cap</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
-                        <TableBody>{renderRows(data)}</TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-            </TabsContent>
-          </Tabs>
       </div>
       <div className="lg:col-span-1 space-y-6">
         <Card>
