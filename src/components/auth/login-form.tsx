@@ -84,7 +84,18 @@ export function LoginForm() {
         });
     } else {
         toast({
-          title: "Login Successful",
+          title: (
+            <div className="flex items-center gap-2">
+              <dotlottie-wc 
+                src="https://lottie.host/658fbffd-0655-458f-aea6-f68350a4e55f/TshL6EHslj.lottie" 
+                style={{width: '30px', height: '30px', display: 'inline-block'}} 
+                speed="1" 
+                autoplay 
+                loop>
+              </dotlottie-wc>
+              <span>Login Successful</span>
+            </div>
+          ),
           description: "Welcome to AstralCore!",
         });
         router.push('/dashboard');
@@ -198,3 +209,5 @@ export function LoginForm() {
     </Card>
   );
 }
+
+    
