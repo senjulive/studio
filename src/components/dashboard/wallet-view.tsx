@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrCreateWallet, updateWallet, type WalletData } from "@/lib/wallet";
+import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { AllAssetsChart } from "./all-assets-chart";
@@ -238,8 +238,8 @@ export function WalletView() {
     }
 
     const growth = walletData.growth as any;
-    if (growth.earnings_history) {
-        growth.earnings_history.forEach((earning: any, index: number) => {
+    if (growth.earningsHistory) {
+        growth.earningsHistory.forEach((earning: any, index: number) => {
         history.push({
           id: `grid-profit-${earning.timestamp}-${index}`,
           type: "Grid Profit",
@@ -298,7 +298,7 @@ export function WalletView() {
     );
   }, [walletData, allAssetsData]);
 
-  const dailyEarnings = (walletData?.growth as any)?.daily_earnings ?? 0;
+  const dailyEarnings = walletData?.growth?.dailyEarnings ?? 0;
   
   const rank = getUserRank(totalBalance);
   const RankIcon = rankIcons[rank.Icon] || RecruitRankIcon;

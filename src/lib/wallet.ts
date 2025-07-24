@@ -52,7 +52,7 @@ export async function getOrCreateWallet(userId?: string): Promise<WalletData> {
             
             if(currentTier) {
                 wallet.growth.clicksLeft = currentTier.clicks;
-                wallet.growth.lastReset = new Date().toISOString();
+                wallet.growth.lastReset = Date.now();
                 wallet.growth.dailyEarnings = 0;
             }
         }
