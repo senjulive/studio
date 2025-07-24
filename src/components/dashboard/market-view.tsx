@@ -83,11 +83,16 @@ export function MarketView() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch data: ${response.statusText}`);
-      }
-      const apiData: CryptoData[] = await response.json();
+      const fetchCryptoPrices = async () => {
+        const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true');
+        if (!res.ok) {
+            throw new Error(`Failed to fetch data: ${res.statusText}`);
+        }
+        const data: CryptoData[] = await res.json();
+        return data;
+      };
+      
+      const apiData = await fetchCryptoPrices();
       const mappedData = mapApiDataToGenericAsset(apiData);
       setData(mappedData);
       if (!selectedAsset && mappedData.length > 0) {
