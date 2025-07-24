@@ -8,10 +8,10 @@ export default function WelcomePage() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center p-8 text-center bg-background animate-in fade-in-50 duration-1000 overflow-hidden">
       <div className="relative">
-        <div className="absolute -bottom-1/2 -left-1/2 w-[300px] h-[300px] z-0 hidden md:block opacity-50 blur-sm">
+        <div className="absolute -bottom-1/4 -left-1/4 w-[150px] h-[150px] z-0 hidden md:block opacity-50 blur-sm">
             <dotlottie-wc 
                 src="https://lottie.host/d510a415-f962-4b02-9335-747023e45903/RLAi1VFiEq.lottie" 
-                style={{width: '300px', height: '300px'}} 
+                style={{width: '150px', height: '150px'}} 
                 speed="1" 
                 autoplay 
                 loop>
