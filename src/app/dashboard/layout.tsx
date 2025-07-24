@@ -284,11 +284,11 @@ export default function DashboardLayout({
                 src="https://lottie.host/26239d4a-dc79-43d9-83c9-365a0b427426/nVebvmSwSu.lottie"
                 style={{
                   position: 'absolute',
-                  top: '-70%',
+                  top: '-30%',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  width: '200%',
-                  height: '200%',
+                  width: '150%',
+                  height: '150%',
                   zIndex: 0,
                   opacity: 0.5,
                 }}
