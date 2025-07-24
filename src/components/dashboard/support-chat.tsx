@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
+import Lottie from "lottie-react";
 import { Send, Loader2, Paperclip, X } from "lucide-react";
 import {
   Card,
@@ -30,9 +31,16 @@ export function SupportChat() {
   const { user } = useUser();
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSending, setIsSending] = React.useState(false);
+  const [animationData, setAnimationData] = React.useState<object | null>(null);
   
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    fetch('https://lottie.host/c9d8f69c-726c-4532-8d5c-093fd275ba37/K5S1BnjBit.json')
+        .then(res => res.json())
+        .then(data => setAnimationData(data));
+  }, []);
 
   const fetchHistory = React.useCallback(async () => {
     if (user?.id) {
@@ -158,8 +166,11 @@ export function SupportChat() {
               <Skeleton className="h-16 w-3/4" />
             </div>
           ) : messages.length === 0 ? (
-            <div className="flex h-full items-center justify-center">
-              <p className="text-muted-foreground">
+            <div className="flex h-full flex-col items-center justify-center text-center">
+              {animationData && (
+                <Lottie animationData={animationData} className="w-64 h-64"/>
+              )}
+              <p className="text-muted-foreground -mt-8">
                 No messages yet. Start the conversation!
               </p>
             </div>

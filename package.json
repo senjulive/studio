@@ -39,6 +39,7 @@
     "date-fns": "^3.6.0",
     "framer-motion": "^11.2.10",
     "genkit": "^1.13.0",
+    "lottie-react": "^2.4.0",
     "lucide-react": "^0.475.0",
     "next": "15.3.3",
     "next-themes": "^0.3.0",
