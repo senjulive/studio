@@ -66,6 +66,7 @@ import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -424,6 +425,7 @@ export default function DashboardLayout({
                 </Link>
               </Button>
               <NotificationBell />
+              <ThemeToggle />
             </div>
           </header>
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
