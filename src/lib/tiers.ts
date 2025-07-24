@@ -1,11 +1,7 @@
-
 // This is a server-safe module for tier data and logic.
 // It does not contain any client-side code (like React components or hooks).
 
-import * as fs from 'fs/promises';
-import * as path from 'path';
-
-const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
+import settings from '@/data/settings.json';
 
 export type TierSetting = {
   id: string; // e.g., 'tier-1'
@@ -27,19 +23,10 @@ const defaultTierSettings: TierSetting[] = [
   { id: 'tier-8', name: 'VIP CORE VIII', balanceThreshold: 100000, dailyProfit: 0.12, clicks: 15, locked: true },
 ];
 
-async function readSettings() {
-  try {
-    const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {};
-  }
-}
 
-export async function getBotTierSettings(): Promise<TierSetting[]> {
+export function getBotTierSettings(): TierSetting[] {
     try {
-        const settings = await readSettings();
-        const tierSettings = settings['botTierSettings'];
+        const tierSettings = settings.botTierSettings;
         if (tierSettings && Array.isArray(tierSettings) && tierSettings.length > 0) {
             return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
         }
