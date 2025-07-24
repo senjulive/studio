@@ -2,82 +2,78 @@
 import { NextResponse } from 'next/server';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { type Rank, getUserRank, getCurrentTier } from '@/lib/ranks';
-import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
-import { getWalletByUserId } from '@/lib/wallet';
+import { getOrCreateWallet } from '@/lib/wallet'; // Assuming wallet can provide user details
+import { getUserRank } from '@/lib/ranks';
+import { getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 
-const CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
+const PUBLIC_CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
 
-type ChatMessage = {
-    id: string;
-    userId: string;
-    displayName: string;
-    avatarUrl?: string;
-    text: string;
-    timestamp: number;
-    rank: Rank;
-    tier: TierData | null;
-    isAdmin?: boolean;
-};
-
-async function readChatHistory(): Promise<ChatMessage[]> {
+async function readPublicChat() {
   try {
-    const data = await fs.readFile(CHAT_FILE_PATH, 'utf-8');
+    const data = await fs.readFile(PUBLIC_CHAT_FILE_PATH, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
+    // If the file doesn't exist or is empty, return an empty array
     return [];
   }
 }
 
-async function writeChatHistory(messages: ChatMessage[]): Promise<void> {
-  await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(messages, null, 4), 'utf-8');
+async function writePublicChat(data: any[]) {
+  await fs.writeFile(PUBLIC_CHAT_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
 }
 
 export async function GET(request: Request) {
     try {
-        const history = await readChatHistory();
-        return NextResponse.json(history);
+        const messages = await readPublicChat();
+        return NextResponse.json(messages);
     } catch (error: any) {
-        return NextResponse.json({ error: 'Failed to fetch chat history' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch public chat history' }, { status: 500 });
     }
 }
 
-
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { userId, text } = body;
+    try {
+        const { userId, text } = await request.json();
+        if (!userId || !text) {
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
 
-    if (!userId || !text) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        const [wallet, tierSettings] = await Promise.all([
+            getOrCreateWallet(userId),
+            getBotTierSettings()
+        ]);
+
+        if (!wallet) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+        
+        const balance = wallet.balances?.usdt || 0;
+        const rank = getUserRank(balance);
+        const tier = await getCurrentTier(balance, tierSettings);
+
+        const newMessage = {
+            id: `msg_${crypto.randomUUID()}`,
+            userId,
+            displayName: wallet.profile?.displayName || wallet.profile?.username || 'Anonymous',
+            avatarUrl: wallet.profile?.avatarUrl || '',
+            text,
+            timestamp: Date.now(),
+            rank,
+            tier,
+        };
+
+        const messages = await readPublicChat();
+        messages.push(newMessage);
+
+        // Keep only the last 50 messages to prevent the file from getting too large
+        if (messages.length > 50) {
+            messages.splice(0, messages.length - 50);
+        }
+        
+        await writePublicChat(messages);
+
+        return NextResponse.json({ success: true, message: 'Message sent' });
+    } catch (error: any) {
+        return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
     }
-    
-    const wallet = await getWalletByUserId(userId);
-    if (!wallet) {
-        return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const tierSettings = await getBotTierSettings();
-    const balance = wallet.balances.usdt || 0;
-
-    const newMessage: ChatMessage = {
-        id: `msg_${crypto.randomUUID()}`,
-        userId,
-        displayName: wallet.profile.displayName || wallet.profile.username,
-        avatarUrl: wallet.profile.avatarUrl,
-        text,
-        timestamp: Date.now(),
-        rank: getUserRank(balance),
-        tier: getCurrentTier(balance, tierSettings),
-    };
-    
-    const history = await readChatHistory();
-    history.push(newMessage);
-    // Keep only the last 100 messages to prevent the file from getting too large
-    await writeChatHistory(history.slice(-100));
-
-    return NextResponse.json({ success: true, message: 'Message sent' });
-  } catch (error: any) {
-    return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
-  }
 }

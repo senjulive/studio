@@ -16,7 +16,7 @@
       "earningsHistory": []
     },
     "squad": {
-      "referralCode": "XYS0AR6R",
+      "referral_code": "XYS0AR6R",
       "members": [
         "mock-member-1",
         "mock-member-2"
