@@ -298,101 +298,112 @@ export function ProfileView() {
                 </Button>
             </DialogContent>
         </Dialog>
-        <Card className="max-w-md mx-auto">
-            <CardHeader className="items-center text-center p-6">
-                <CardTitle className="text-2xl">
-                    {isLoading ? <Skeleton className="h-8 w-40 mx-auto" /> : profileDisplayName}
-                </CardTitle>
-                <div className="mt-2 flex justify-center gap-2 items-center">
+        <div className="relative max-w-md mx-auto">
+            <div className="absolute inset-0 -top-16 -left-16 -right-16 -bottom-16 flex items-center justify-center pointer-events-none z-0">
+                <dotlottie-wc
+                    src="https://lottie.host/26239d4a-dc79-43d9-83c9-365a0b427426/nVebvmSwSu.lottie"
+                    style={{width: '600px', height: '600px', position: 'absolute'}}
+                    speed="1"
+                    autoplay
+                    loop
+                ></dotlottie-wc>
+            </div>
+            <Card className="relative z-10">
+                <CardHeader className="items-center text-center p-6">
+                    <CardTitle className="text-2xl">
+                        {isLoading ? <Skeleton className="h-8 w-40 mx-auto" /> : profileDisplayName}
+                    </CardTitle>
+                    <div className="mt-2 flex justify-center gap-2 items-center">
+                        {isLoading ? (
+                        <>
+                            <Skeleton className="h-8 w-24" />
+                            <Skeleton className="h-6 w-20" />
+                        </>
+                        ) : (
+                        <>
+                            <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
+                            <RankIcon className="h-5 w-5" />
+                            <span>{rank.name}</span>
+                            </Badge>
+                            <VerificationStatusBadge status={profile?.verificationStatus} />
+                        </>
+                        )}
+                    </div>
+                </CardHeader>
+                <CardContent>
+                <div className="mb-6">
+                    <Label className="text-xs text-muted-foreground text-center block mb-4">Asset Balances</Label>
                     {isLoading ? (
-                    <>
-                        <Skeleton className="h-8 w-24" />
-                        <Skeleton className="h-6 w-20" />
-                    </>
+                        <div className="flex justify-around">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className="flex flex-col items-center gap-2">
+                                    <Skeleton className="h-10 w-10 rounded-full" />
+                                    <Skeleton className="h-5 w-16" />
+                                </div>
+                            ))}
+                        </div>
                     ) : (
-                    <>
-                        <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                        <RankIcon className="h-5 w-5" />
-                        <span>{rank.name}</span>
-                        </Badge>
-                        <VerificationStatusBadge status={profile?.verificationStatus} />
-                    </>
+                        <div className="flex justify-around text-center">
+                            {assetConfig.map(asset => (
+                                <div key={asset.ticker} className="flex flex-col items-center gap-2">
+                                    <Image src={asset.iconUrl} alt={asset.name} width={40} height={40} className="rounded-full" />
+                                    <span className="text-sm font-semibold font-mono">
+                                        {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 6,
+                                        }) ?? '0.00'}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
-            </CardHeader>
-            <CardContent>
-            <div className="mb-6">
-                <Label className="text-xs text-muted-foreground text-center block mb-4">Asset Balances</Label>
-                {isLoading ? (
-                    <div className="flex justify-around">
-                        {Array.from({ length: 3 }).map((_, i) => (
-                             <div key={i} className="flex flex-col items-center gap-2">
-                                <Skeleton className="h-10 w-10 rounded-full" />
-                                <Skeleton className="h-5 w-16" />
-                             </div>
-                        ))}
+
+                <div className="mb-6 p-4">
+                <VirtualCard walletData={walletData} userEmail={user?.email || null} />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 mb-6">
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit Display Name</Button>
+                        </DialogTrigger>
+                        <DialogContent><DialogHeader><DialogTitle>Set Display Name</DialogTitle><DialogDescription>This name will be visible in the public chat.</DialogDescription></DialogHeader><div className="space-y-4"><div className="relative"><User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input id="display-name" placeholder="Your public name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="pl-9"/></div></div><DialogFooter><Button onClick={handleUpdateDisplayName} disabled={isUpdatingDisplayName || !displayName}>{isUpdatingDisplayName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Save Name</Button></DialogFooter></DialogContent>
+                    </Dialog>
+                </div>
+
+                <Separator className="mb-6"/>
+
+                    <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
+                        <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
+                        <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
+                        <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={user?.email} />
+                        <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="ID Card No." value={profile?.idCardNo} />
+                        <ProfileDetailItem isLoading={isLoading} icon={<Phone className="h-4 w-4" />} label="Contact Number" value={profile?.contactNumber} />
+                        <ProfileDetailItem isLoading={isLoading} icon={<MapPin className="h-4 w-4" />} label="Country" value={profile?.country} />
+                        {isVerified && (
+                        <>
+                            <ProfileDetailItem isLoading={isLoading} icon={<Home className="h-4 w-4" />} label="Address" value={profile?.address} />
+                            <ProfileDetailItem isLoading={isLoading} icon={<Calendar className="h-4 w-4" />} label="Date of Birth" value={profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set'} />
+                        </>
+                        )}
+                        <div className="sm:col-span-2">
+                            <ProfileDetailItem isLoading={isLoading} icon={<Users className="h-4 w-4" />} label="Squad Members" value={`${squadSize} member${squadSize !== 1 ? 's' : ''}`} />
+                        </div>
                     </div>
-                ) : (
-                    <div className="flex justify-around text-center">
-                        {assetConfig.map(asset => (
-                            <div key={asset.ticker} className="flex flex-col items-center gap-2">
-                                <Image src={asset.iconUrl} alt={asset.name} width={40} height={40} className="rounded-full" />
-                                <span className="text-sm font-semibold font-mono">
-                                    {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 6,
-                                    }) ?? '0.00'}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
+                </CardContent>
+                {!isVerified && !isLoading && (
+                    <CardFooter>
+                    <Button asChild className="w-full">
+                        <Link href="/dashboard/profile/verify">
+                            <ShieldCheck className="mr-2 h-4 w-4" />
+                            Start Verification
+                        </Link>
+                    </Button>
+                </CardFooter>
                 )}
-            </div>
-
-            <div className="mb-6 p-4">
-              <VirtualCard walletData={walletData} userEmail={user?.email || null} />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 mb-6">
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit Display Name</Button>
-                    </DialogTrigger>
-                    <DialogContent><DialogHeader><DialogTitle>Set Display Name</DialogTitle><DialogDescription>This name will be visible in the public chat.</DialogDescription></DialogHeader><div className="space-y-4"><div className="relative"><User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input id="display-name" placeholder="Your public name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="pl-9"/></div></div><DialogFooter><Button onClick={handleUpdateDisplayName} disabled={isUpdatingDisplayName || !displayName}>{isUpdatingDisplayName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Save Name</Button></DialogFooter></DialogContent>
-                </Dialog>
-            </div>
-
-            <Separator className="mb-6"/>
-
-                <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
-                    <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={user?.email} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="ID Card No." value={profile?.idCardNo} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<Phone className="h-4 w-4" />} label="Contact Number" value={profile?.contactNumber} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<MapPin className="h-4 w-4" />} label="Country" value={profile?.country} />
-                    {isVerified && (
-                    <>
-                        <ProfileDetailItem isLoading={isLoading} icon={<Home className="h-4 w-4" />} label="Address" value={profile?.address} />
-                        <ProfileDetailItem isLoading={isLoading} icon={<Calendar className="h-4 w-4" />} label="Date of Birth" value={profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set'} />
-                    </>
-                    )}
-                    <div className="sm:col-span-2">
-                        <ProfileDetailItem isLoading={isLoading} icon={<Users className="h-4 w-4" />} label="Squad Members" value={`${squadSize} member${squadSize !== 1 ? 's' : ''}`} />
-                    </div>
-                </div>
-            </CardContent>
-            {!isVerified && !isLoading && (
-                <CardFooter>
-                <Button asChild className="w-full">
-                    <Link href="/dashboard/profile/verify">
-                        <ShieldCheck className="mr-2 h-4 w-4" />
-                        Start Verification
-                    </Link>
-                </Button>
-            </CardFooter>
-            )}
-        </Card>
+            </Card>
+        </div>
     </>
   );
 }
