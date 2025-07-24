@@ -84,64 +84,6 @@ const quickAccessItems = [
   { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowLeftRight },
 ];
 
-const initialCryptoData: CryptoData[] = [
-  {
-    id: "bitcoin",
-    name: "Bitcoin",
-    ticker: "BTC",
-    iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
-    price: 68000.0,
-    change24h: 2.5,
-    volume24h: 45000000000,
-    marketCap: 1300000000000,
-    priceHistory: Array.from({ length: 50 }, () => ({ value: 68000 + (Math.random() - 0.5) * 2000 })),
-  },
-  {
-    id: "ethereum",
-    name: "Ethereum",
-    ticker: "ETH",
-    iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
-    price: 3500.0,
-    change24h: -1.2,
-    volume24h: 25000000000,
-    marketCap: 420000000000,
-    priceHistory: Array.from({ length: 50 }, () => ({ value: 3500 + (Math.random() - 0.5) * 200 })),
-  },
-  {
-    id: "tether",
-    name: "Tether",
-    ticker: "USDT",
-    iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
-    price: 1.0,
-    change24h: 0.01,
-    volume24h: 80000000000,
-    marketCap: 110000000000,
-    priceHistory: Array.from({ length: 50 }, () => ({ value: 1 + (Math.random() - 0.5) * 0.01 })),
-  },
-    {
-    id: "solana",
-    name: "Solana",
-    ticker: "SOL",
-    iconUrl: "https://assets.coincap.io/assets/icons/sol@2x.png",
-    price: 150.0,
-    change24h: 5.8,
-    volume24h: 5000000000,
-    marketCap: 70000000000,
-    priceHistory: Array.from({ length: 50 }, () => ({ value: 150 + (Math.random() - 0.5) * 15 })),
-  },
-  {
-    id: "ripple",
-    name: "XRP",
-    ticker: "XRP",
-    iconUrl: "https://assets.coincap.io/assets/icons/xrp@2x.png",
-    price: 0.48,
-    change24h: -0.5,
-    volume24h: 1500000000,
-    marketCap: 26000000000,
-    priceHistory: Array.from({ length: 50 }, () => ({ value: 0.48 + (Math.random() - 0.5) * 0.05 })),
-  },
-];
-
 const assetConfig = [
     {
         ticker: "USDT",
@@ -187,27 +129,33 @@ export function WalletView() {
   
 
   React.useEffect(() => {
-    setAllAssetsData(initialCryptoData);
+    const fetchMarketData = async () => {
+        try {
+            const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true');
+            if (!response.ok) {
+                throw new Error('Failed to fetch market data');
+            }
+            const apiData = await response.json();
+            const mappedData = apiData.map((coin: any) => ({
+                id: coin.id,
+                name: coin.name,
+                ticker: coin.symbol.toUpperCase(),
+                iconUrl: coin.image,
+                price: coin.current_price,
+                change24h: coin.price_change_percentage_24h,
+                volume24h: coin.total_volume,
+                marketCap: coin.market_cap,
+                priceHistory: coin.sparkline_in_7d.price.map((p: number) => ({ value: p })),
+            }));
+            setAllAssetsData(mappedData);
+        } catch (error) {
+            console.error(error);
+            // Optionally set an error state
+        }
+    };
 
-    const interval = setInterval(() => {
-      setAllAssetsData((prevData) => {
-        if (!prevData || prevData.length === 0) return [];
-        return prevData.map((coin) => {
-          const changeFactor = (Math.random() - 0.5) * 0.01;
-          const newPrice = coin.price * (1 + changeFactor);
-          const newHistory = [
-            ...coin.priceHistory.slice(1),
-            { value: newPrice },
-          ];
-          return {
-            ...coin,
-            price: newPrice,
-            priceHistory: newHistory,
-          };
-        });
-      });
-    }, 2000);
-
+    fetchMarketData();
+    const interval = setInterval(fetchMarketData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);
 

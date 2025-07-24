@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-type CryptoData = {
+type GenericAsset = {
   id: string;
   name: string;
   ticker: string;
@@ -32,7 +32,7 @@ type CryptoData = {
 };
 
 type LiveTradingChartProps = {
-  coin: CryptoData | null;
+  coin: GenericAsset | null;
 };
 
 export function LiveTradingChart({ coin }: LiveTradingChartProps) {
