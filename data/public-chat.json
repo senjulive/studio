@@ -1,0 +1,112 @@
+[
+    {
+        "id": "msg_000eb3cc-5cc5-4517-a2e2-e558da654a2a",
+        "userId": "mock-user-123",
+        "displayName": "DefaultUser",
+        "avatarUrl": "",
+        "text": "Hi",
+        "timestamp": 1753316696745,
+        "rank": {
+            "name": "Recruit",
+            "minBalance": 0,
+            "Icon": "RecruitRankIcon",
+            "className": "text-muted-foreground"
+        },
+        "tier": {
+            "id": "tier-1",
+            "name": "VIP CORE I",
+            "balanceThreshold": 0,
+            "dailyProfit": 0.02,
+            "clicks": 4,
+            "locked": false
+        }
+    },
+    {
+        "id": "msg_d741fb37-094a-4bde-a39b-101d84c8b2ef",
+        "userId": "mock-user-123",
+        "displayName": "DefaultUser",
+        "avatarUrl": "",
+        "text": "Hello ",
+        "timestamp": 1753316755490,
+        "rank": {
+            "name": "Recruit",
+            "minBalance": 0,
+            "Icon": "RecruitRankIcon",
+            "className": "text-muted-foreground"
+        },
+        "tier": {
+            "id": "tier-1",
+            "name": "VIP CORE I",
+            "balanceThreshold": 0,
+            "dailyProfit": 0.02,
+            "clicks": 4,
+            "locked": false
+        }
+    },
+    {
+        "id": "msg_4b624a98-1cac-4010-b760-b99c1ed46267",
+        "userId": "mock-user-123",
+        "displayName": "DefaultUser",
+        "avatarUrl": "",
+        "text": "Hello ",
+        "timestamp": 1753316777091,
+        "rank": {
+            "name": "Recruit",
+            "minBalance": 0,
+            "Icon": "RecruitRankIcon",
+            "className": "text-muted-foreground"
+        },
+        "tier": {
+            "id": "tier-1",
+            "name": "VIP CORE I",
+            "balanceThreshold": 0,
+            "dailyProfit": 0.02,
+            "clicks": 4,
+            "locked": false
+        }
+    },
+    {
+        "id": "msg_75e8e77d-f40b-43bb-8435-d58307ec68e2",
+        "userId": "mock-user-123",
+        "displayName": "DefaultUser",
+        "avatarUrl": "",
+        "text": "😴🪪🏆",
+        "timestamp": 1753316787221,
+        "rank": {
+            "name": "Recruit",
+            "minBalance": 0,
+            "Icon": "RecruitRankIcon",
+            "className": "text-muted-foreground"
+        },
+        "tier": {
+            "id": "tier-1",
+            "name": "VIP CORE I",
+            "balanceThreshold": 0,
+            "dailyProfit": 0.02,
+            "clicks": 4,
+            "locked": false
+        }
+    },
+    {
+        "id": "msg_fe70d454-48c4-4a6a-bdc2-1f6892aa4024",
+        "userId": "mock-user-123",
+        "displayName": "DefaultUser",
+        "avatarUrl": "",
+        "text": "Esfyyg",
+        "timestamp": 1753316792419,
+        "rank": {
+            "name": "Recruit",
+            "minBalance": 0,
+            "Icon": "RecruitRankIcon",
+            "className": "text-muted-foreground"
+        },
+        "tier": {
+            "id": "tier-1",
+            "name": "VIP CORE I",
+            "balanceThreshold": 0,
+            "dailyProfit": 0.02,
+            "clicks": 4,
+            "locked": false
+        }
+    }
+]

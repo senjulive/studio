@@ -279,7 +279,7 @@ export default function DashboardLayout({
                     onUploadSuccess={() => fetchWalletAndTiers(user.id)}
                     wallet={wallet}
                   >
-                    <Avatar className="h-12 w-12 cursor-pointer">
+                    <Avatar className="h-16 w-16 cursor-pointer">
                       <AvatarImage
                         src={wallet?.profile?.avatarUrl}
                         alt={wallet?.profile?.username || 'User'}
