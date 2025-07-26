@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Gauge, Zap, AlertCircle, TrendingUp } from "lucide-react";
+import { Gauge } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
@@ -33,9 +33,11 @@ export function FearGreedGauge({ data, isLoading }: { data: FearGreedData | null
 
   const content = isLoading ? (
     <>
-      <Skeleton className="h-5 w-32" />
       <Skeleton className="h-4 w-full mt-2" />
-      <Skeleton className="h-6 w-24 mt-1" />
+      <div className="flex justify-between items-baseline mt-2">
+        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-4 w-8" />
+      </div>
     </>
   ) : (
     <>
@@ -74,5 +76,3 @@ export function FearGreedGauge({ data, isLoading }: { data: FearGreedData | null
     </Card>
   );
 }
-
-    

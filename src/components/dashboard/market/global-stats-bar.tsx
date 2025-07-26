@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import { LineChart, BarChart, PieChart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -49,5 +48,3 @@ export function GlobalStatsBar({ stats, isLoading }: { stats: GlobalStats | null
     </Card>
   );
 }
-
-    

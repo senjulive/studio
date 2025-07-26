@@ -77,5 +77,3 @@ export function TrendingCoins({ coins, isLoading }: { coins: TrendingCoin[], isL
     </Card>
   );
 }
-
-    

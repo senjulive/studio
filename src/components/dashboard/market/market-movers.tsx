@@ -3,8 +3,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { ArrowUp, ArrowDown } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type GenericAsset } from "../market-view";
 import { cn } from "@/lib/utils";
@@ -69,5 +68,3 @@ export function MarketMovers({ assets, isLoading }: { assets: GenericAsset[], is
     </Card>
   );
 }
-
-    
