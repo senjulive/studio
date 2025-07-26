@@ -66,7 +66,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { RightDock } from '@/components/dashboard/right-dock';
+import { FloatingNav } from '@/components/dashboard/floating-nav';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -461,7 +461,7 @@ export default function DashboardLayout({
               </Link>
             ))}
           </nav>
-          <RightDock />
+          <FloatingNav />
         </SidebarInset>
       </SidebarProvider>
     </UserProvider>
