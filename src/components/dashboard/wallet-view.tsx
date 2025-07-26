@@ -114,7 +114,7 @@ function getTypeDetails(type: string) {
   switch (type) {
     case 'Deposit':
     case 'Registration Bonus':
-      return { label: type, amountColor: 'text-green-500' };
+      return { label: 'Deposit', amountColor: 'text-green-500' };
     case 'Withdrawal':
       return { label: 'Withdraw', amountColor: 'text-red-500' };
     case 'Grid Profit':
@@ -129,7 +129,7 @@ function getTypeDetails(type: string) {
 
 function TransactionItem({ type, amount, date, status, balance }: Transaction & { balance: number }) {
   const isDepositLike = amount >= 0;
-  const statusColor = status === 'Completed' ? 'text-green-600' : 'text-yellow-500';
+  const statusColor = status === 'Completed' ? 'text-green-600' : status === 'Pending' ? 'text-yellow-500' : 'text-red-500';
   const { label, amountColor } = getTypeDetails(type);
   const time = new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
@@ -143,8 +143,8 @@ function TransactionItem({ type, amount, date, status, balance }: Transaction & 
         </div>
       </div>
       <div className="text-right">
-        <p className={cn('font-bold', amountColor)}>
-          {isDepositLike ? '+' : ''}${amount.toFixed(2)}
+        <p className={cn('font-bold font-mono', amountColor)}>
+          {isDepositLike ? '+' : ''}${Math.abs(amount).toFixed(2)}
         </p>
         <p className={cn('text-sm', statusColor)}>{status}</p>
         <p className="text-xs text-muted-foreground">Balance: ${balance.toFixed(2)}</p>
@@ -177,7 +177,7 @@ function groupByDate(transactions: Transaction[]) {
   }, {} as Record<string, Transaction[]>);
 }
 
-function TransactionHistory({ transactions }: { transactions: Transaction[] }) {
+function TransactionHistory({ transactions, initialBalance }: { transactions: Transaction[], initialBalance: number }) {
     if (!transactions.length) {
         return (
             <div className="h-24 text-center flex flex-col items-center justify-center text-muted-foreground border-dashed border rounded-md p-4">
@@ -190,19 +190,12 @@ function TransactionHistory({ transactions }: { transactions: Transaction[] }) {
   const grouped = groupByDate(transactions);
   const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-  let runningBalance = transactions.reduce((acc, tx) => {
-    if (tx.status === 'Completed') {
-      return acc + tx.amount;
-    }
-    return acc;
-  }, 0);
-
-  const finalBalance = runningBalance;
-
+  let runningBalance = initialBalance;
+  
   return (
     <div className="space-y-5">
       <div className="text-center text-lg font-bold text-foreground">
-        Final Balance: ${finalBalance.toFixed(2)}
+        Current Balance: ${initialBalance.toFixed(2)}
       </div>
 
       {sortedDates.map(date => {
@@ -217,20 +210,20 @@ function TransactionHistory({ transactions }: { transactions: Transaction[] }) {
           const currentBalance = runningBalance;
           if (tx.status === 'Completed') {
             switch (tx.type) {
-              case 'Deposit':
-              case 'Registration Bonus':
-                deposits += tx.amount;
-                break;
-              case 'Withdrawal':
-                withdrawals += Math.abs(tx.amount);
-                break;
-              case 'Grid Profit':
-                grid += tx.amount;
-                break;
-              case 'Team Earnings':
-              case 'Invitation Bonus':
-                squad += tx.amount;
-                break;
+                case 'Deposit':
+                case 'Registration Bonus':
+                  deposits += tx.amount;
+                  break;
+                case 'Withdrawal':
+                  withdrawals += Math.abs(tx.amount);
+                  break;
+                case 'Grid Profit':
+                  grid += tx.amount;
+                  break;
+                case 'Team Earnings':
+                case 'Invitation Bonus':
+                  squad += tx.amount;
+                  break;
             }
             runningBalance -= tx.amount;
           }
@@ -547,6 +540,7 @@ export function WalletView() {
   
   const balances = walletData.balances as any;
   const assetsWithFunds = assetConfig.filter(asset => balances[asset.balanceKey] > 0);
+  const usdtBalance = walletData.balances.usdt;
 
   return (
     <div className="space-y-6">
@@ -693,7 +687,7 @@ export function WalletView() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <TransactionHistory transactions={transactions} />
+          <TransactionHistory transactions={transactions} initialBalance={usdtBalance} />
         </CardContent>
       </Card>
     </div>
