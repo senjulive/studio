@@ -681,7 +681,7 @@ export function WalletView() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Wallet History (USDT)</CardTitle>
+          <CardTitle>Transaction History</CardTitle>
           <CardDescription>
             A record of all your deposits, withdrawals, and earnings.
           </CardDescription>
