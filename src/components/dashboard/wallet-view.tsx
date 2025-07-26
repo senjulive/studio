@@ -2,7 +2,6 @@
 'use client';
 
 import * as React from "react";
-import Link from "next/link";
 import { Repeat, Lock, LineChart as LineChartIcon, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight, AlertCircle, Calendar } from "lucide-react";
 import type { SVGProps } from 'react';
 
@@ -77,16 +76,6 @@ type CryptoData = {
   marketCap: number;
   priceHistory: { value: number }[];
 };
-
-const quickAccessItems = [
-  { href: "/dashboard/market", label: "Market", icon: LineChartIcon },
-  { href: "/dashboard/deposit", label: "Deposit", icon: WalletIcon },
-  { href: "/dashboard/trading", label: "Trade", icon: Repeat },
-  { href: "/dashboard/profile", label: "Profile", icon: User },
-  { href: "/dashboard/support", label: "Support", icon: HeartHandshake },
-  { href: "/dashboard/squad", label: "Squad", icon: Users },
-  { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowLeftRight },
-];
 
 const assetConfig = [
     {
@@ -624,30 +613,6 @@ export function WalletView() {
                 You currently have no funds. Make a deposit to get started.
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Access</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 text-center">
-            {quickAccessItems.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                className="flex flex-col items-center justify-center space-y-1 rounded-lg p-1 transition-colors hover:bg-muted"
-              >
-                <div className="rounded-full bg-primary/10 p-2">
-                  <item.icon className="h-7 w-7 text-primary" />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground">
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </div>
         </CardContent>
       </Card>
         
