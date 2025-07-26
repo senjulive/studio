@@ -2,15 +2,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Card,
   CardContent,
@@ -18,16 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LineChart, Line, ResponsiveContainer } from "recharts";
-import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
-import { LiveTradingChart } from "./live-trading-chart";
 import { Button } from "../ui/button";
-import { BrainCircuit, Loader2, AlertCircle } from "lucide-react";
+import { BrainCircuit, Loader2 } from "lucide-react";
 import type { MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Scale, Landmark, Bitcoin } from 'lucide-react';
 import { AllAssetsChart } from "./all-assets-chart";
 
 type CryptoData = {
@@ -62,7 +48,6 @@ export function MarketView() {
   const [data, setData] = React.useState<GenericAsset[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [selectedAsset, setSelectedAsset] = React.useState<GenericAsset | null>(null);
   const [summary, setSummary] = React.useState<MarketSummaryOutput | null>(null);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
 
@@ -96,15 +81,12 @@ export function MarketView() {
       const apiData = await fetchCryptoPrices();
       const mappedData = mapApiDataToGenericAsset(apiData);
       setData(mappedData);
-      if (!selectedAsset && mappedData.length > 0) {
-        setSelectedAsset(mappedData[0]);
-      }
     } catch (err: any) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [selectedAsset]);
+  }, []);
 
   React.useEffect(() => {
     fetchData();
@@ -143,29 +125,10 @@ export function MarketView() {
     }
   };
 
-
-  const formatCurrency = (value: number, decimals = 2) =>
-    `$${value.toLocaleString(undefined, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    })}`;
-  
-  const formatMarketCap = (value: number) => {
-    if (value >= 1_000_000_000_000) return `$${(value / 1_000_000_000_000).toFixed(2)}T`;
-    if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
-    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
-    return `$${value.toFixed(2)}`;
-  }
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
           <AllAssetsChart coins={data} />
-          {(isLoading && !selectedAsset) ? (
-              <Skeleton className="h-[480px] w-full rounded-lg" />
-          ) : (
-              <LiveTradingChart coin={selectedAsset} />
-          )}
       </div>
       <div className="lg:col-span-1 space-y-6">
         <Card>
