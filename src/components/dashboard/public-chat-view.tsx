@@ -180,7 +180,7 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
   const CardComponent = isFloating ? 'div' : Card;
 
   return (
-    <div className={cn("grid gap-6", !isFloating && "lg:grid-cols-3")}>
+    <div className={cn("grid gap-6 h-full", !isFloating && "lg:grid-cols-3")}>
         {!isFloating && (
              <Card>
                 <CardHeader>

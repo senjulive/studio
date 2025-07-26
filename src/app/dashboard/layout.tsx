@@ -68,6 +68,7 @@ import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { FloatingNav } from '@/components/dashboard/floating-nav';
 import { RightSideDock } from '@/components/dashboard/right-side-dock';
+import { FloatingChat } from '@/components/dashboard/floating-chat';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -464,6 +465,7 @@ export default function DashboardLayout({
           </nav>
           <div className="hidden md:block">
             <FloatingNav />
+            <FloatingChat />
           </div>
           <RightSideDock />
         </SidebarInset>
