@@ -24,28 +24,17 @@ const dockItems = [
 
 export function FloatingNav() {
   const pathname = usePathname();
-  let mouseX = React.useRef(0);
-
-  const onMouseMove = (event: React.MouseEvent) => {
-    mouseX.current = event.nativeEvent.x;
-  };
-
-  React.useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      mouseX.current = event.clientX;
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  const mouseX = useSpring(Infinity);
 
   return (
     <nav 
-      onMouseMove={onMouseMove}
+      onMouseMove={(e) => mouseX.set(e.clientX)}
+      onMouseLeave={() => mouseX.set(Infinity)}
       className="fixed top-1/2 -translate-y-1/2 right-4 z-40 hidden md:flex"
     >
       <TooltipProvider delayDuration={0}>
         <div 
-          className="flex flex-col items-center gap-2 p-2 rounded-full bg-background/50 backdrop-blur-lg border shadow-lg"
+          className="flex flex-col items-center gap-2 p-2 rounded-full bg-card/50 backdrop-blur-lg border shadow-lg"
         >
           {dockItems.map((item) => (
             <AppIcon key={item.href} mouseX={mouseX} item={item} pathname={pathname} />
@@ -56,7 +45,7 @@ export function FloatingNav() {
   );
 }
 
-function AppIcon({ item, pathname, mouseX }: { item: typeof dockItems[0], pathname: string, mouseX: React.MutableRefObject<number> }) {
+function AppIcon({ item, pathname, mouseX }: { item: typeof dockItems[0], pathname: string, mouseX: any }) {
   let ref = React.useRef<HTMLDivElement>(null);
   
   let distance = useTransform(mouseX, (val) => {
@@ -64,7 +53,7 @@ function AppIcon({ item, pathname, mouseX }: { item: typeof dockItems[0], pathna
     return val - bounds.x - bounds.width / 2;
   });
 
-  let widthSync = useTransform(distance, [-150, 0, 150], [48, 80, 48]);
+  let widthSync = useTransform(distance, [-100, 0, 100], [40, 60, 40]);
   let width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 });
 
   const isActive = pathname.endsWith(item.href);
@@ -81,7 +70,7 @@ function AppIcon({ item, pathname, mouseX }: { item: typeof dockItems[0], pathna
               isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             )}
           >
-            <item.icon className={cn("h-7 w-7", item.label === 'CORE' && 'p-0.5')} />
+            <item.icon className={cn("h-5 w-5", item.label === 'CORE' && 'p-0.5')} />
           </motion.div>
         </Link>
       </TooltipTrigger>
