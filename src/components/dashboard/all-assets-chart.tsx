@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -49,7 +50,7 @@ const cryptoColors: { [key: string]: string } = {
 
 export function AllAssetsChart({ coins, className }: AllAssetsChartProps) {
   const filteredCoins = React.useMemo(() => {
-    const tickersToShow = ['BTC', 'ETH', 'USDT'];
+    const tickersToShow = ['BTC', 'ETH', 'USDT', 'XRP'];
     return coins.filter(coin => tickersToShow.includes(coin.ticker));
   }, [coins]);
 
@@ -111,7 +112,7 @@ export function AllAssetsChart({ coins, className }: AllAssetsChartProps) {
       <CardHeader>
         <CardTitle>Key Asset Performance</CardTitle>
         <CardDescription>
-          Normalized performance of BTC, ETH, and USDT over time.
+          Normalized performance of key assets over time.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -179,6 +180,17 @@ export function AllAssetsChart({ coins, className }: AllAssetsChartProps) {
                 fill="url(#color-ETH)"
                 dot={false}
                 name="Ethereum"
+              />
+               <Area
+                key="XRP"
+                type="natural"
+                dataKey="XRP"
+                stroke={cryptoColors['XRP']}
+                strokeWidth={2}
+                fillOpacity={0.1}
+                fill="url(#color-XRP)"
+                dot={false}
+                name="XRP"
               />
               <Line
                 key="USDT"

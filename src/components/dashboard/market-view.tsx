@@ -19,6 +19,7 @@ import { GlobalStatsBar, type GlobalStats } from "./market/global-stats-bar";
 import { FearGreedGauge, type FearGreedData } from "./market/fear-greed-gauge";
 import { MarketMovers } from "./market/market-movers";
 import { TrendingCoins, type TrendingCoin } from "./market/trending-coins";
+import { TopCoinsCard } from "./market/top-coins-card";
 
 type CryptoData = {
   id: string;
@@ -159,6 +160,7 @@ export function MarketView() {
                 <FearGreedGauge data={fearGreed} isLoading={isLoading} />
                 <MarketMovers assets={allAssetsData} isLoading={isLoading} />
                 <TrendingCoins coins={trending} isLoading={isLoading} />
+                <TopCoinsCard assets={allAssetsData.slice(0, 10)} isLoading={isLoading} />
                 <Card>
                 <CardHeader>
                     <CardTitle>AI Market Summary</CardTitle>
