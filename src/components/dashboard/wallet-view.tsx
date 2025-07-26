@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Repeat, Lock, LineChart as LineChartIcon, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight, AlertCircle } from "lucide-react";
+import { Repeat, Lock, LineChart as LineChartIcon, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight, AlertCircle, Calendar } from "lucide-react";
 import type { SVGProps } from 'react';
 
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +42,7 @@ import { LiveTradingChart } from "./live-trading-chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Bitcoin, Landmark, Scale, TrendingUp } from "lucide-react";
 import { Line, LineChart, ResponsiveContainer } from "recharts";
+import { UsdtLogoIcon } from "../icons/usdt-logo";
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -107,6 +108,156 @@ const assetConfig = [
         balanceKey: "btc",
     },
 ] as const;
+
+// --- New Transaction History Components ---
+function getTypeDetails(type: string) {
+  switch (type) {
+    case 'Deposit':
+    case 'Registration Bonus':
+      return { label: type, amountColor: 'text-green-500' };
+    case 'Withdrawal':
+      return { label: 'Withdraw', amountColor: 'text-red-500' };
+    case 'Grid Profit':
+      return { label: 'Grid Profit', amountColor: 'text-sky-500' };
+    case 'Team Earnings':
+    case 'Invitation Bonus':
+      return { label: 'Squad Earnings', amountColor: 'text-purple-500' };
+    default:
+      return { label: type, amountColor: 'text-foreground' };
+  }
+}
+
+function TransactionItem({ type, amount, date, status, balance }: Transaction & { balance: number }) {
+  const isDepositLike = amount >= 0;
+  const statusColor = status === 'Completed' ? 'text-green-600' : 'text-yellow-500';
+  const { label, amountColor } = getTypeDetails(type);
+  const time = new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+  return (
+    <div className="flex justify-between items-center border-b pb-3 pt-3">
+      <div className="flex items-center space-x-3">
+        <UsdtLogoIcon className="w-6 h-6"/>
+        <div>
+          <p className="font-semibold capitalize">{label}</p>
+          <p className="text-sm text-muted-foreground">{time}</p>
+        </div>
+      </div>
+      <div className="text-right">
+        <p className={cn('font-bold', amountColor)}>
+          {isDepositLike ? '+' : ''}${amount.toFixed(2)}
+        </p>
+        <p className={cn('text-sm', statusColor)}>{status}</p>
+        <p className="text-xs text-muted-foreground">Balance: ${balance.toFixed(2)}</p>
+      </div>
+    </div>
+  );
+}
+
+function DailyEarningsSummary({ deposits, withdrawals, grid, squad }: { deposits: number, withdrawals: number, grid: number, squad: number }) {
+  const net = deposits + squad + grid - withdrawals;
+  const netColor = net >= 0 ? 'text-green-600' : 'text-red-500';
+
+  return (
+    <div className="mt-2 border-t pt-2 text-sm text-muted-foreground grid grid-cols-2 gap-x-4 gap-y-1">
+      <div>Total Deposits: <span className="font-medium text-green-600">${deposits.toFixed(2)}</span></div>
+      <div>Grid Profits: <span className="font-medium text-sky-500">${grid.toFixed(2)}</span></div>
+      <div>Squad Earnings: <span className="font-medium text-purple-500">${squad.toFixed(2)}</span></div>
+      <div>Total Withdrawals: <span className="font-medium text-red-600">${withdrawals.toFixed(2)}</span></div>
+      <div className="col-span-2 font-semibold">Net for Day: <span className={netColor}>${net.toFixed(2)}</span></div>
+    </div>
+  );
+}
+
+function groupByDate(transactions: Transaction[]) {
+  return transactions.reduce((acc, tx) => {
+    const date = new Date(tx.date).toISOString().split('T')[0];
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(tx);
+    return acc;
+  }, {} as Record<string, Transaction[]>);
+}
+
+function TransactionHistory({ transactions }: { transactions: Transaction[] }) {
+    if (!transactions.length) {
+        return (
+            <div className="h-24 text-center flex flex-col items-center justify-center text-muted-foreground border-dashed border rounded-md p-4">
+                <p className="font-medium">No transactions yet.</p>
+                <p className="text-sm">Your transaction history will appear here.</p>
+            </div>
+        )
+    }
+
+  const grouped = groupByDate(transactions);
+  const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+  let runningBalance = transactions.reduce((acc, tx) => {
+    if (tx.status === 'Completed') {
+      return acc + tx.amount;
+    }
+    return acc;
+  }, 0);
+
+  const finalBalance = runningBalance;
+
+  return (
+    <div className="space-y-5">
+      <div className="text-center text-lg font-bold text-foreground">
+        Final Balance: ${finalBalance.toFixed(2)}
+      </div>
+
+      {sortedDates.map(date => {
+        const dayTxs = grouped[date];
+
+        let deposits = 0;
+        let withdrawals = 0;
+        let grid = 0;
+        let squad = 0;
+
+        const items = dayTxs.map(tx => {
+          const currentBalance = runningBalance;
+          if (tx.status === 'Completed') {
+            switch (tx.type) {
+              case 'Deposit':
+              case 'Registration Bonus':
+                deposits += tx.amount;
+                break;
+              case 'Withdrawal':
+                withdrawals += Math.abs(tx.amount);
+                break;
+              case 'Grid Profit':
+                grid += tx.amount;
+                break;
+              case 'Team Earnings':
+              case 'Invitation Bonus':
+                squad += tx.amount;
+                break;
+            }
+            runningBalance -= tx.amount;
+          }
+          return <TransactionItem key={tx.id} {...tx} balance={currentBalance} />;
+        }).reverse(); // Show oldest transaction first for the day
+
+        return (
+          <div key={date}>
+            <h2 className="text-lg font-semibold text-primary border-b pb-1 mb-2 flex items-center gap-2">
+                <Calendar className="h-4 w-4"/>
+                {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </h2>
+            {items}
+            <DailyEarningsSummary
+              deposits={deposits}
+              withdrawals={withdrawals}
+              grid={grid}
+              squad={squad}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+// --- End New Transaction History Components ---
+
 
 export function WalletView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
@@ -239,6 +390,21 @@ export function WalletView() {
         });
       });
     }
+    
+    // Add pending deposits
+    if (walletData.pending_deposits) {
+        walletData.pending_deposits.forEach((d: any) => {
+            history.push({
+                id: d.id,
+                type: "Deposit",
+                asset: "USDT",
+                amount: d.amount,
+                date: new Date(d.timestamp).toISOString(),
+                status: "Pending",
+            });
+        });
+    }
+
 
     return history.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -521,76 +687,13 @@ export function WalletView() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Transaction History</CardTitle>
+          <CardTitle>Wallet History (USDT)</CardTitle>
           <CardDescription>
             A record of all your deposits, withdrawals, and earnings.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Asset</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    No transactions yet.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                transactions.map((txn) => (
-                  <TableRow key={txn.id}>
-                    <TableCell>
-                      <div className="font-medium">{txn.type}</div>
-                    </TableCell>
-                    <TableCell>{txn.asset}</TableCell>
-                    <TableCell
-                      className={cn(
-                        "font-mono",
-                        txn.amount >= 0 ? "text-green-600" : "text-red-600"
-                      )}
-                    >
-                      {txn.asset === 'USDT' ? (
-                        `${txn.amount >= 0 ? "+" : "-"}$${Math.abs(txn.amount).toFixed(2)}`
-                      ) : (
-                        `${txn.amount >= 0 ? "+" : ""}${Math.abs(txn.amount).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 8,
-                        })} ${txn.asset}`
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(txn.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Badge
-                        variant={
-                          txn.status === "Completed"
-                            ? "default"
-                            : txn.status === "Pending"
-                            ? "secondary"
-                            : "destructive"
-                        }
-                        className="capitalize"
-                      >
-                        {txn.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <TransactionHistory transactions={transactions} />
         </CardContent>
       </Card>
     </div>
