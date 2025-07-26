@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { motion } from "framer-motion";
+import { motion, useTransform, useSpring } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
@@ -91,26 +91,3 @@ function AppIcon({ item, pathname, mouseX }: { item: typeof dockItems[0], pathna
     </Tooltip>
   );
 }
-
-// Dummy hooks for framer-motion transform/spring
-const useTransform = (value: React.MutableRefObject<number>, transformer: (val: number) => number) => {
-  // This is a simplified mock. In a real scenario, you'd use framer-motion's actual hook.
-  // For our purpose, we can just return a value that doesn't change to avoid errors.
-  const [transformed, setTransformed] = React.useState(transformer(value.current));
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setTransformed(transformer(value.current));
-    }, 16);
-    return () => clearInterval(interval);
-  }, [value, transformer]);
-  return transformed;
-};
-
-const useSpring = (value: any, config: any) => {
-  // Simplified spring mock
-  const [springVal, setSpringVal] = React.useState(value);
-  React.useEffect(() => {
-    setSpringVal(value);
-  }, [value]);
-  return springVal;
-};
