@@ -3,22 +3,26 @@ import { NextResponse } from 'next/server';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-const PUBLIC_CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
+const CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
 
-async function readPublicChat() {
+type ChatMessage = {
+  id: string;
+  // other properties...
+};
+
+async function readChatFile(): Promise<ChatMessage[]> {
   try {
-    const data = await fs.readFile(PUBLIC_CHAT_FILE_PATH, 'utf-8');
+    const data = await fs.readFile(CHAT_FILE_PATH, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
-    // If the file doesn't exist or is empty, return an empty array
+    // If the file doesn't exist, return an empty array
     return [];
   }
 }
 
-async function writePublicChat(data: any[]) {
-  await fs.writeFile(PUBLIC_CHAT_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+async function writeChatFile(data: ChatMessage[]): Promise<void> {
+  await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
 }
-
 
 export async function DELETE(request: Request) {
   try {
@@ -27,10 +31,14 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Message ID is required' }, { status: 400 });
     }
 
-    const messages = await readPublicChat();
-    const updatedMessages = messages.filter((msg: any) => msg.id !== messageId);
-    
-    await writePublicChat(updatedMessages);
+    const messages = await readChatFile();
+    const updatedMessages = messages.filter((msg) => msg.id !== messageId);
+
+    if (messages.length === updatedMessages.length) {
+        return NextResponse.json({ error: 'Message not found' }, { status: 404 });
+    }
+
+    await writeChatFile(updatedMessages);
 
     return NextResponse.json({ success: true, message: 'Message deleted successfully.' });
   } catch (error: any) {
