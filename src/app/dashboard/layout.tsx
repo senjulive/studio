@@ -461,7 +461,9 @@ export default function DashboardLayout({
               </Link>
             ))}
           </nav>
-          <FloatingNav />
+          <div className="hidden md:block">
+            <FloatingNav />
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </UserProvider>
