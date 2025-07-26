@@ -67,6 +67,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { FloatingNav } from '@/components/dashboard/floating-nav';
+import { RightSideDock } from '@/components/dashboard/right-side-dock';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -464,6 +465,7 @@ export default function DashboardLayout({
           <div className="hidden md:block">
             <FloatingNav />
           </div>
+          <RightSideDock />
         </SidebarInset>
       </SidebarProvider>
     </UserProvider>
