@@ -15,6 +15,10 @@ import { BrainCircuit, Loader2 } from "lucide-react";
 import type { MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AllAssetsChart } from "./all-assets-chart";
+import { GlobalStatsBar, type GlobalStats } from "./market/global-stats-bar";
+import { FearGreedGauge, type FearGreedData } from "./market/fear-greed-gauge";
+import { MarketMovers } from "./market/market-movers";
+import { TrendingCoins, type TrendingCoin } from "./market/trending-coins";
 
 type CryptoData = {
   id: string;
@@ -31,7 +35,7 @@ type CryptoData = {
 };
 
 // A more generic asset type for use in components
-type GenericAsset = {
+export type GenericAsset = {
   id: string;
   name: string;
   ticker: string;
@@ -45,7 +49,11 @@ type GenericAsset = {
 
 
 export function MarketView() {
-  const [data, setData] = React.useState<GenericAsset[]>([]);
+  const [allAssetsData, setAllAssetsData] = React.useState<GenericAsset[]>([]);
+  const [globalStats, setGlobalStats] = React.useState<GlobalStats | null>(null);
+  const [fearGreed, setFearGreed] = React.useState<FearGreedData | null>(null);
+  const [trending, setTrending] = React.useState<TrendingCoin[]>([]);
+  
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [summary, setSummary] = React.useState<MarketSummaryOutput | null>(null);
@@ -69,18 +77,35 @@ export function MarketView() {
     setIsLoading(true);
     setError(null);
     try {
-      const fetchCryptoPrices = async () => {
-        const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true');
-        if (!res.ok) {
-            throw new Error(`Failed to fetch data: ${res.statusText}`);
-        }
-        const data: CryptoData[] = await res.json();
-        return data;
-      };
+        const [
+            assetsRes,
+            globalRes,
+            fearGreedRes,
+            trendingRes
+        ] = await Promise.all([
+            fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true'),
+            fetch('https://api.coingecko.com/api/v3/global'),
+            fetch('https://api.alternative.me/fng/?limit=1'),
+            fetch('https://api.coingecko.com/api/v3/search/trending')
+        ]);
+
+        if (!assetsRes.ok) throw new Error(`Failed to fetch market data: ${assetsRes.statusText}`);
+        if (!globalRes.ok) throw new Error(`Failed to fetch global stats: ${globalRes.statusText}`);
+        if (!fearGreedRes.ok) throw new Error(`Failed to fetch Fear & Greed Index: ${fearGreedRes.statusText}`);
+        if (!trendingRes.ok) throw new Error(`Failed to fetch trending coins: ${trendingRes.statusText}`);
+
+        const assetsApiData: CryptoData[] = await assetsRes.json();
+        const globalApiData = await globalRes.json();
+        const fearGreedApiData = await fearGreedRes.json();
+        const trendingApiData = await trendingRes.json();
+
+        const mappedAssets = mapApiDataToGenericAsset(assetsApiData);
+        setAllAssetsData(mappedAssets);
+        
+        setGlobalStats(globalApiData.data);
+        setFearGreed(fearGreedApiData.data[0]);
+        setTrending(trendingApiData.coins);
       
-      const apiData = await fetchCryptoPrices();
-      const mappedData = mapApiDataToGenericAsset(apiData);
-      setData(mappedData);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -90,19 +115,17 @@ export function MarketView() {
 
   React.useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 30000); // Refresh every 30 seconds
-    return () => clearInterval(interval);
   }, [fetchData]);
 
   
   const handleAnalyzeMarket = async () => {
-    if (!data.length) return;
+    if (!allAssetsData.length) return;
     setIsAnalyzing(true);
     setSummary(null);
     
     try {
         const analysisInput = {
-            coins: data.map(c => ({
+            coins: allAssetsData.slice(0, 10).map(c => ({
                 name: c.name,
                 ticker: c.ticker,
                 price: c.price,
@@ -126,43 +149,51 @@ export function MarketView() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-          <AllAssetsChart coins={data} />
-      </div>
-      <div className="lg:col-span-1 space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>AI Market Summary</CardTitle>
-            <CardDescription>Get an AI-generated snapshot of the market.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isAnalyzing ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ) : summary ? (
-              <p className="text-sm text-muted-foreground">{summary.summary}</p>
-            ) : (
-                <Alert>
-                    <BrainCircuit className="h-4 w-4" />
-                    <AlertTitle>Ready for analysis</AlertTitle>
-                    <AlertDescription>
-                        Click the button below to get a real-time market summary from our AI analyst.
-                    </AlertDescription>
-                </Alert>
-            )}
-          </CardContent>
-          <CardContent>
-            <Button onClick={handleAnalyzeMarket} disabled={isAnalyzing || isLoading || !!error} className="w-full">
-                {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
-                {summary ? 'Regenerate Summary' : 'Analyze Market'}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+    <div className="space-y-6">
+        <GlobalStatsBar stats={globalStats} isLoading={isLoading} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+                <AllAssetsChart coins={allAssetsData} />
+            </div>
+            <div className="lg:col-span-1 space-y-6">
+                <FearGreedGauge data={fearGreed} isLoading={isLoading} />
+                <MarketMovers assets={allAssetsData} isLoading={isLoading} />
+                <TrendingCoins coins={trending} isLoading={isLoading} />
+                <Card>
+                <CardHeader>
+                    <CardTitle>AI Market Summary</CardTitle>
+                    <CardDescription>Get an AI-generated snapshot of the market.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {isAnalyzing ? (
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                    </div>
+                    ) : summary ? (
+                    <p className="text-sm text-muted-foreground">{summary.summary}</p>
+                    ) : (
+                        <Alert>
+                            <BrainCircuit className="h-4 w-4" />
+                            <AlertTitle>Ready for analysis</AlertTitle>
+                            <AlertDescription>
+                                Click the button below to get a real-time market summary from our AI analyst.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                </CardContent>
+                <CardContent>
+                    <Button onClick={handleAnalyzeMarket} disabled={isAnalyzing || isLoading || !!error} className="w-full">
+                        {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
+                        {summary ? 'Regenerate Summary' : 'Analyze Market'}
+                    </Button>
+                </CardContent>
+                </Card>
+            </div>
+        </div>
     </div>
   );
 }
+
+    
