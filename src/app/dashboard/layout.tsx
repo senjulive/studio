@@ -43,9 +43,13 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Repeat, Megaphone, Shield } from 'lucide-react';
+import { UserPlus, Repeat, Megaphone, Shield, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
+import { FloatingNav } from '@/components/dashboard/floating-nav';
+import { FloatingChat } from '@/components/dashboard/floating-chat';
+import { RightSideDock } from '@/components/dashboard/right-side-dock';
+
 
 // Mock user object since Supabase is removed
 const mockUser = {
@@ -107,6 +111,7 @@ export default function DashboardLayout({
     { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
     { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
+    { href: '/dashboard/chat', label: 'Public Chat', icon: MessageSquare },
     { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
     { href: '/dashboard/about', label: 'About', icon: AboutIcon },
@@ -286,6 +291,11 @@ export default function DashboardLayout({
               </Link>
             ))}
           </nav>
+          <div className="hidden md:block">
+            <FloatingNav />
+            <FloatingChat />
+          </div>
+          <RightSideDock />
         </SidebarInset>
       </SidebarProvider>
     </UserProvider>
