@@ -1,3 +1,4 @@
+
 import { SecurityView } from "@/components/dashboard/security-view";
 import type { Metadata } from 'next';
 

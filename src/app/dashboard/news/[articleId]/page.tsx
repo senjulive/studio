@@ -1,3 +1,4 @@
+
 import { NewsArticleView } from '@/components/dashboard/news-article-view';
 import type { Metadata } from 'next';
 

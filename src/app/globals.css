@@ -41,10 +41,8 @@
     --sidebar-ring: 272 100% 25%;
   }
 
-  * {
-    @apply border-border;
-  }
   body {
     @apply bg-background text-foreground;
+    border-color: hsl(var(--border));
   }
 }

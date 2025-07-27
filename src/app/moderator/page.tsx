@@ -1,3 +1,4 @@
+
 import {ModeratorPanel} from '@/components/moderator/moderator-panel';
 import {ModeratorAuth} from '@/components/moderator/moderator-auth';
 import type {Metadata} from 'next';
