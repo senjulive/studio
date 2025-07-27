@@ -40,9 +40,7 @@
     --sidebar-border: 246 30% 92%;
     --sidebar-ring: 272 100% 25%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
