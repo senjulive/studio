@@ -1,3 +1,8 @@
+@layer utilities {
+  .border-border {
+    border-color: theme('colors.border');
+  }
+}
 
 # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
 #
