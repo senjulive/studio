@@ -72,16 +72,25 @@ export function LoginForm() {
         }
     }
     
-    // Since Supabase is removed, this will just simulate a login
-    // and redirect.
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { error } = await login({ email: values.email, password: values.password });
+
+    if (error) {
+        toast({
+            title: "Login Failed",
+            description: error,
+            variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+    }
     
     toast({
       title: "Login Successful",
-      description: "Welcome to AstralCore! (Demo Mode)",
+      description: "Welcome to AstralCore!",
     });
 
     router.push('/dashboard');
+    router.refresh(); // Ensure the layout re-renders with user data
     setIsLoading(false);
   };
 

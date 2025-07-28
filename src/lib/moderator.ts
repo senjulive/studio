@@ -1,6 +1,3 @@
-
-'use server';
-
 // This is a placeholder for moderator logic.
 // In a real app, you would connect to a database or external service here.
 

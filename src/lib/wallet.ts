@@ -1,6 +1,3 @@
-
-'use server';
-
 // This is a mock implementation of the wallet logic since Supabase has been removed.
 // It uses a simple JSON file to simulate a database.
 

@@ -1,9 +1,18 @@
 
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarTrigger,
+  SidebarInset,
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,292 +21,122 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarTrigger,
-  SidebarInset,
-} from '@/components/ui/sidebar';
-import { logout } from '@/lib/auth';
-import * as React from 'react';
-import { cn } from '@/lib/utils';
-import { NotificationBell } from '@/components/dashboard/notification-bell';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { AstralLogo } from '@/components/icons/astral-logo';
-import { Skeleton } from '@/components/ui/skeleton';
-
-import { HomeIcon } from '@/components/icons/nav/home-icon';
-import { MarketIcon } from '@/components/icons/nav/market-icon';
-import { DepositIcon } from '@/components/icons/nav/deposit-icon';
-import { WithdrawIcon } from '@/components/icons/nav/withdraw-icon';
-import { SquadIcon } from '@/components/icons/nav/squad-icon';
-import { ProfileIcon } from '@/components/icons/nav/profile-icon';
-import { SupportIcon } from '@/components/icons/nav/support-icon';
-import { AboutIcon } from '@/components/icons/nav/about-icon';
-import { DownloadIcon } from '@/components/icons/nav/download-icon';
-import { SettingsIcon } from '@/components/icons/nav/settings-icon';
-import { LogoutIcon } from '@/components/icons/nav/logout-icon';
-import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { UserPlus, Repeat, Megaphone, Shield, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { UserProvider } from '@/contexts/UserContext';
+import { SidebarNav } from '@/components/dashboard/sidebar-nav';
+import { usePathname } from 'next/navigation';
+import { UserProvider, useUser } from '@/contexts/UserContext';
+import { NotificationBell } from '@/components/dashboard/notification-bell';
+import { logout } from '@/lib/auth';
+import { useRouter }from 'next/navigation';
 import { FloatingNav } from '@/components/dashboard/floating-nav';
 import { FloatingChat } from '@/components/dashboard/floating-chat';
 import { RightSideDock } from '@/components/dashboard/right-side-dock';
 
+function UserProfileDropdown() {
+    const { user } = useUser();
+    const router = useRouter();
 
-// Mock user object since Supabase is removed
-const mockUser = {
-  id: 'mock-user-123',
-  email: 'user@example.com',
-};
+    const handleLogout = async () => {
+        await logout();
+        router.push('/');
+    };
+    
+    if (!user) return null;
 
-function DashboardLoading() {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start gap-2 px-2">
+                <Avatar className="h-8 w-8">
+                    <AvatarFallback>{user.email ? user.email.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
+                </Avatar>
+                <div className="text-left">
+                    <p className="text-sm font-medium">{(user as any).username || 'User'}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                </div>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="right" align="start">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild><Link href="/dashboard/profile"><UserIcon className="mr-2 h-4 w-4" />Profile</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/security"><Settings className="mr-2 h-4 w-4" />Settings</Link></DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" />Log out</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  if (pathname === '/dashboard/chat') {
+    return (
+      <div className="flex h-dvh">
+        <SidebarProvider>
+          <Sidebar>
+            <SidebarHeader>
+              <Link href="/dashboard" className="flex items-center gap-2">
+                <AstralLogo />
+                <span className="font-semibold text-lg">AstralCore</span>
+              </Link>
+            </SidebarHeader>
+            <SidebarContent>
+              <SidebarNav />
+            </SidebarContent>
+          </Sidebar>
+          <SidebarInset>{children}</SidebarInset>
+        </SidebarProvider>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-background text-foreground animate-in fade-in-50">
-      <AstralLogo className="h-20 w-20 animate-pulse" />
-      <p className="mt-4 text-lg font-semibold">Loading Your Dashboard</p>
-      <p className="text-muted-foreground">Please wait a moment...</p>
-    </div>
+    <SidebarProvider>
+      <div className="flex min-h-dvh">
+        <Sidebar>
+          <SidebarHeader>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <AstralLogo />
+              <span className="font-semibold text-lg">AstralCore</span>
+            </Link>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarNav />
+          </SidebarContent>
+          <SidebarFooter className="flex items-center gap-2">
+            <UserProfileDropdown />
+          </SidebarFooter>
+        </Sidebar>
+        <SidebarInset>
+          <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6 sticky top-0 z-30">
+            <SidebarTrigger className="md:hidden" />
+            <div className="flex-1">
+              {/* Header content like breadcrumbs can go here */}
+            </div>
+            <NotificationBell />
+          </header>
+          <main className="flex-1 p-4 sm:p-6">{children}</main>
+        </SidebarInset>
+        <FloatingNav />
+        <FloatingChat />
+        <RightSideDock />
+      </div>
+    </SidebarProvider>
   );
 }
 
 export default function DashboardLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [user, setUser] = React.useState<any | null>(null);
-  const [isAdmin, setIsAdmin] = React.useState(false);
-  const [isModerator, setIsModerator] = React.useState(false);
-  const [isInitializing, setIsInitializing] = React.useState(true);
-  const [downloadHref, setDownloadHref] = React.useState('');
-
-  React.useEffect(() => {
-    // Simulate user session check
-    setTimeout(() => {
-      setUser(mockUser);
-      // You can toggle this to test admin/moderator views
-      setIsAdmin(false); 
-      setIsModerator(false);
-      setIsInitializing(false);
-    }, 500);
-  }, []);
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const fileContent = `[InternetShortcut]\nURL=${window.location.origin}`;
-      const dataUri = `data:text/plain;charset=utf-8,${encodeURIComponent(
-        fileContent
-      )}`;
-      setDownloadHref(dataUri);
-    }
-  }, []);
-
-  const baseMenuItems = [
-    { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
-    { href: '/dashboard/trading', label: 'Trading', icon: Repeat },
-    { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
-    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-    { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
-    { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
-    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
-    { href: '/dashboard/promotions', label: 'Promotions', icon: Megaphone },
-    { href: '/dashboard/chat', label: 'Public Chat', icon: MessageSquare },
-    { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/about', label: 'About', icon: AboutIcon },
-  ];
-  
-  if (isAdmin) {
-    baseMenuItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
-  }
-  if (isModerator) {
-    baseMenuItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
-  }
-
-
-  const menuItems = [
-      ...baseMenuItems,
-      {
-        href: downloadHref,
-        label: 'Download App',
-        icon: DownloadIcon,
-        download: 'AstralCore.url',
-      },
-  ]
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/');
-  };
-
-  const userEmail = user?.email;
-  const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
-
-  const bottomNavItems = [
-    { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
-  ];
-
-  if (isInitializing) {
-    return <DashboardLoading />;
-  }
-
-  const getPageTitle = () => {
-    if (pathname === '/dashboard/trading') return 'Astral Core Trading';
-    const currentItem = menuItems.find((item) => item.href === pathname);
-    return currentItem
-      ? currentItem.label
-      : pathname.split('/').pop()?.replace('-', ' ') || 'Home';
-  };
-
-  const isClient = typeof window !== 'undefined';
-
-  return (
-    <UserProvider value={{ user: user as any }}>
-      <SidebarProvider>
-        <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <AstralLogo className="h-8 w-8" />
-              <span className="text-lg font-semibold text-sidebar-foreground">
-                AstralCore
-              </span>
-            </div>
-          </SidebarHeader>
-          <SidebarContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={
-                      isClient ? pathname === item.href && !item.download : false
-                    }
-                  >
-                    <Link href={item.href} download={item.download}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-sidebar-accent/50">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={`https://placehold.co/100x100.png`}
-                      data-ai-hint="abstract user"
-                      alt="@user"
-                    />
-                    <AvatarFallback>{userInitial}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col overflow-hidden text-left">
-                    <p className="truncate text-sm font-medium text-sidebar-foreground">
-                      User
-                    </p>
-                    <p className="truncate text-xs text-sidebar-foreground/70">
-                      {userEmail || '...'}
-                    </p>
-                  </div>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none text-foreground">
-                      User
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {userEmail || '...'}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/profile">
-                    <ProfileIcon className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <SettingsIcon className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogoutIcon className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarFooter>
-        </Sidebar>
-        <SidebarInset>
-          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
-            <SidebarTrigger />
-            <div className="w-full flex-1">
-              <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                <AstralLogo className="h-6 w-6" />
-                {isClient ? (
-                  <span>{getPageTitle()}</span>
-                ) : (
-                  <Skeleton className="h-6 w-24" />
-                )}
-              </h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                <Link href="/dashboard/inbox">
-                  <InboxIcon className="h-5 w-5" />
-                  <span className="sr-only">Inbox</span>
-                </Link>
-              </Button>
-              <NotificationBell />
-            </div>
-          </header>
-          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
-            {children}
-          </main>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-10 md:hidden">
-            {bottomNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors',
-                  isClient && pathname === item.href
-                    ? 'text-primary font-medium'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <item.icon className="h-6 w-6" />
-                <span>{item.label}</span>
-              </Link>
-            ))}
-          </nav>
-          <div className="hidden md:block">
-            <FloatingNav />
-            <FloatingChat />
-          </div>
-          <RightSideDock />
-        </SidebarInset>
-      </SidebarProvider>
-    </UserProvider>
-  );
+    return (
+        <UserProvider>
+            <DashboardLayoutContent>{children}</DashboardLayoutContent>
+        </UserProvider>
+    )
 }

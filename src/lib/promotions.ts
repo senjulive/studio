@@ -1,6 +1,3 @@
-
-'use server';
-
 // This is a mock implementation. In a real app, this would query a database.
 
 export type Promotion = {
