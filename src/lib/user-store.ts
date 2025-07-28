@@ -93,7 +93,6 @@ class UserStore {
           lastLogin: new Date().toISOString(),
           isActive: true,
           hashedPassword: this.hashPassword('password123'),
-          emailVerified: false,
           twoFactorEnabled: false
         }
       ];
