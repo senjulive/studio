@@ -1,9 +1,7 @@
-
 'use server';
 
 import { redirect } from 'next/navigation';
-import { getOrCreateWallet, updateWalletByUserId } from './wallet';
-import { countries } from './countries';
+import { getOrCreateWallet } from './wallet';
 
 type Credentials = {
     email?: string;
@@ -11,35 +9,41 @@ type Credentials = {
     options?: any;
 }
 
-const MOCK_ADMIN_EMAIL = "admin@astralcore.io";
-const MOCK_MODERATOR_EMAIL = "moderator@astralcore.io";
-const MOCK_ADMIN_PASS = "admin";
-const MOCK_MODERATOR_PASS = "moderator";
-const MOCK_USER_PASS = "password123"; // Universal password for any other user
+type LoginResult = {
+    error: string | null;
+    role?: 'admin' | 'moderator' | 'user';
+    user?: any;
+}
 
-export async function login(credentials: Credentials) {
-  console.log("Mock Login Attempt with:", credentials.email);
-  
+export async function login(credentials: Credentials): Promise<LoginResult> {
+  console.log("Login attempt for:", credentials.email);
+
   if (!credentials.email || !credentials.password) {
       return { error: "Please provide both email and password." };
   }
 
-  if (credentials.email === MOCK_ADMIN_EMAIL && credentials.password === MOCK_ADMIN_PASS) {
-      return { error: null, role: 'admin' };
-  }
+  // Client-side authentication will be handled by userStore
+  // This server action just validates and returns success
 
-  if (credentials.email === MOCK_MODERATOR_EMAIL && credentials.password === MOCK_MODERATOR_PASS) {
-      return { error: null, role: 'moderator' };
-  }
+  try {
+    // Basic validation - actual auth happens client-side
+    const email = credentials.email.toLowerCase().trim();
+    const password = credentials.password.trim();
 
-  if (credentials.password === MOCK_USER_PASS) {
-      // For any other email, as long as the password is correct, log them in.
-      // This ensures our default mock user can log in.
-      await getOrCreateWallet('mock-user-123'); // Ensure the default user wallet exists
-      return { error: null, role: 'user' };
+    if (email.length < 3 || password.length < 6) {
+      return { error: "Invalid email or password format." };
+    }
+
+    // For demo purposes, create wallet for users
+    if (!email.includes('admin') && !email.includes('moderator')) {
+      await getOrCreateWallet(`user-${email.replace(/[^a-zA-Z0-9]/g, '-')}`);
+    }
+
+    return { error: null };
+  } catch (error) {
+    console.error('Login error:', error);
+    return { error: "Login failed. Please try again." };
   }
-  
-  return { error: "Invalid credentials. Use 'password123' for any user." };
 }
 
 export async function register(credentials: Credentials) {
