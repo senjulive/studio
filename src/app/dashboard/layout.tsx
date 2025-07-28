@@ -168,21 +168,29 @@ export default function DashboardLayout({
     },
   };
 
-  // Mock rank and tier calculation
+  // Mock rank and tier calculation using proper lib functions
   const balance = mockWallet.balances.usdt;
-  const rank = balance >= 15000 ? { name: 'Diamond', className: 'text-purple-400' } :
-               balance >= 10000 ? { name: 'Platinum', className: 'text-sky-400' } :
-               balance >= 5000 ? { name: 'Gold', className: 'text-amber-500' } :
-               balance >= 1000 ? { name: 'Silver', className: 'text-slate-400' } :
-               balance >= 500 ? { name: 'Bronze', className: 'text-orange-600' } :
-               { name: 'Recruit', className: 'text-muted-foreground' };
+  const rank = getUserRank(balance);
+  const tier = getCurrentTier(balance, tierSettings) || {
+    id: 'tier-1',
+    name: 'VIP CORE I',
+    balanceThreshold: 0,
+    dailyProfit: 0.02,
+    clicks: 4,
+    locked: false
+  };
 
-  const tier = balance >= 15000 ? { id: 'tier-6', name: 'VIP CORE VI' } :
-               balance >= 10000 ? { id: 'tier-5', name: 'VIP CORE V' } :
-               balance >= 5000 ? { id: 'tier-4', name: 'VIP CORE IV' } :
-               balance >= 1000 ? { id: 'tier-3', name: 'VIP CORE III' } :
-               balance >= 500 ? { id: 'tier-2', name: 'VIP CORE II' } :
-               { id: 'tier-1', name: 'VIP CORE I' };
+  // Create user context value
+  const userContextValue = {
+    user: user ? {
+      id: user.id,
+      email: user.email,
+    } : null,
+    wallet: mockWallet,
+    rank,
+    tier,
+    tierSettings
+  };
 
   const RankIcon = rankIcons[rank.name as keyof typeof rankIcons] || RecruitRankIcon;
   const TierIcon = tierIcons[tier.id as keyof typeof tierIcons] || RecruitTierIcon;
