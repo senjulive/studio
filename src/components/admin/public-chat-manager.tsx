@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -73,6 +72,8 @@ export function PublicChatManager() {
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isDeleting, setIsDeleting] = React.useState<string | null>(null);
+  const [isMuting, setIsMuting] = React.useState<string | null>(null);
+  const [mutedUsers, setMutedUsers] = React.useState<Set<string>>(new Set());
 
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
 
