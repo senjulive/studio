@@ -10,7 +10,7 @@ A fully functional, modern crypto trading platform built with Next.js 15, TypeSc
 - **Role-based Access Control** (Admin, Moderator, User)
 - **Persistent Sessions** with localStorage
 - **Route Protection** with automatic redirects
-- **Email Verification** simulation
+
 
 ### ✅ Dashboard & Trading
 - **Real-time Trading Bots** with live simulation
@@ -69,7 +69,7 @@ A fully functional, modern crypto trading platform built with Next.js 15, TypeSc
 ```
 Login Page → Auth Context → Route Guard → Dashboard
      ↓
-User Store (localStorage) → Session Management → Role-based Routing
+User Store (localStorage) �� Session Management → Role-based Routing
 ```
 
 ### Trading System
