@@ -57,7 +57,6 @@ class UserStore {
           lastLogin: new Date().toISOString(),
           isActive: true,
           hashedPassword: this.hashPassword('admin'),
-          emailVerified: true,
           twoFactorEnabled: false
         },
         {
