@@ -1,8 +1,6 @@
-
-
 import { NextResponse } from 'next/server';
-import { getUserRank, getCurrentTier } from '@/lib/ranks';
-import { getBotTierSettings } from '@/lib/tiers';
+import { getUserRank } from '@/lib/ranks';
+import { getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 
 const MOCK_USER_ID = 'mock-user-123';
 
