@@ -53,10 +53,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
+          <ErrorBoundary>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>
