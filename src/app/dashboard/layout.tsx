@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -24,7 +23,8 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { logout } from '@/lib/auth';
+import { useAuth } from '@/contexts/AuthContext';
+import { RouteGuard } from '@/components/auth/route-guard';
 import * as React from 'react';
 import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
