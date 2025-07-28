@@ -47,17 +47,23 @@ export function ForgotPasswordForm() {
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     setIsLoading(true);
     try {
-      const error = await resetPasswordForEmail(values.email);
-      if (error) {
-        throw new Error(error);
+      const result = await requestPasswordReset(values.email);
+      if (!result.success && result.error) {
+        toast({
+          title: "Request Failed",
+          description: result.error,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Password Reset Email Sent",
+          description:
+            "If an account with that email exists, we've sent instructions to reset your password.",
+        });
+        form.reset();
       }
-      toast({
-        title: "Password Reset Email Sent",
-        description:
-          "If an account with that email exists, we've sent instructions to reset your password.",
-      });
-      form.reset();
     } catch (error: any) {
+      console.error('Password reset error:', error);
       toast({
         title: "Request Failed",
         description: "An unexpected error occurred. Please try again.",
