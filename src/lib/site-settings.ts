@@ -1,5 +1,3 @@
-
-
 export type SiteSettings = {
   usdtDepositAddress: string;
   ethDepositAddress: string;
@@ -19,7 +17,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     return cachedSettings;
   }
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/public-settings?key=siteSettings`);
+    const response = await fetch(`/api/public-settings?key=siteSettings`);
     if (response.ok) {
         const data = await response.json();
         if (data) {
