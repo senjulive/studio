@@ -89,7 +89,31 @@ export async function logout() {
 }
 
 export async function resetPasswordForEmail(email: string) {
-  console.log("Mock Password Reset requested for:", email);
-  // In a real app, you would trigger a password reset flow (e.g., send an email).
-  return null;
+  console.log("Password reset requested for:", email);
+
+  try {
+    const normalizedEmail = email.toLowerCase().trim();
+
+    if (!normalizedEmail || !normalizedEmail.includes('@')) {
+      return { error: 'Please provide a valid email address.' };
+    }
+
+    // In a real app, you would:
+    // 1. Check if email exists in database
+    // 2. Generate secure reset token
+    // 3. Save token with expiration
+    // 4. Send email with reset link
+
+    // For demo, we'll simulate the process
+    const resetToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    console.log(`Reset token generated for ${normalizedEmail}: ${resetToken}`);
+
+    // Simulate email sending delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    return { success: true, message: 'If an account with this email exists, you will receive a password reset link.' };
+  } catch (error) {
+    console.error('Password reset error:', error);
+    return { error: 'Failed to process password reset. Please try again.' };
+  }
 }
