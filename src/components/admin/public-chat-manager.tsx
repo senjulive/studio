@@ -239,8 +239,15 @@ export function PublicChatManager() {
                                     <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteMessage(message.id)}>Delete</AlertDialogAction></AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
-                            <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => toast({title: "Feature Coming Soon"})}>
-                                <MicOff className="h-4 w-4" />
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className={cn("h-7 w-7", mutedUsers.has(message.userId) && "bg-destructive/10 text-destructive")}
+                                onClick={() => handleMuteUser(message.userId, message.displayName)}
+                                disabled={!!isMuting || message.isAdmin}
+                                title={message.isAdmin ? "Cannot mute admin users" : mutedUsers.has(message.userId) ? "User is muted" : "Mute user"}
+                            >
+                                {isMuting === message.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <MicOff className="h-4 w-4" />}
                             </Button>
                         </div>
                       </div>
