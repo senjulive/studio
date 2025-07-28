@@ -34,14 +34,14 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { AstralLogo } from "../icons/astral-logo";
-import { register } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { countries } from "@/lib/countries";
 
 const MALDIVES_COUNTRY = countries.find(c => c.code === "MV")!;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
-  const router = useRouter();
+  const { register, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
