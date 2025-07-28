@@ -62,44 +62,28 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    
-    if (typeof window !== 'undefined') {
-        if (values.rememberMe) {
-            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
-        } else {
-            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
-        }
-        sessionStorage.setItem('loggedInEmail', values.email);
-    }
-    
-    const { error } = await login(values);
 
-    if (error) {
+    try {
+      const result = await login(values.email, values.password, values.rememberMe);
+
+      if (!result.success && result.error) {
         toast({
-            title: "Login Failed",
-            description: error,
-            variant: "destructive",
+          title: "Login Failed",
+          description: result.error,
+          variant: "destructive",
         });
-    } else {
-        toast({
-          title: "Login Successful",
-          description: (
-            <div className="flex items-center gap-2">
-              <dotlottie-wc 
-                src="https://lottie.host/658fbffd-0655-458f-aea6-f68350a4e55f/TshL6EHslj.lottie" 
-                style={{width: '30px', height: '30px', display: 'inline-block'}} 
-                speed="1" 
-                autoplay 
-                loop>
-              </dotlottie-wc>
-              <span>Welcome to AstralCore!</span>
-            </div>
-          ),
-        });
-        router.push('/dashboard');
+      }
+      // Success handling is done in the auth context
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
@@ -183,10 +167,10 @@ export function LoginForm() {
             <Button
               type="submit"
               className="w-full"
-              disabled={isLoading}
+              disabled={isLoading || authLoading}
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Authorizing..." : "Login"}
+              {(isLoading || authLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {(isLoading || authLoading) ? "Authorizing..." : "Login"}
             </Button>
           </form>
         </Form>
