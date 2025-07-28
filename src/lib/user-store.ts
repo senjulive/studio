@@ -190,9 +190,7 @@ class UserStore {
       return { success: false, error: 'Invalid email or password' };
     }
 
-    if (!user.emailVerified && user.role === 'user') {
-      return { success: false, error: 'Please verify your email before logging in' };
-    }
+
 
     // Update last login
     user.lastLogin = new Date().toISOString();
