@@ -71,7 +71,11 @@ export function RegisterForm() {
 
     const countryInfo = countries.find(c => c.code === values.country);
     if (!countryInfo) {
-      toast({ title: "Invalid Country", description: "Please select a valid country.", variant: "destructive"});
+      toast({
+        title: "Invalid Country",
+        description: "Please select a valid country.",
+        variant: "destructive"
+      });
       setIsLoading(false);
       return;
     }
@@ -79,32 +83,29 @@ export function RegisterForm() {
     const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      const { error } = await register({
+      const result = await register({
         email: values.email,
         password: values.password,
-        options: {
-            data: {
-                username: values.username,
-                contact_number: fullContactNumber,
-                country: countryInfo.name,
-                referral_code: values.referralCode,
-            }
-        }
+        username: values.username,
+        fullName: '', // Can be updated later in profile
+        contactNumber: fullContactNumber,
+        country: countryInfo.name,
+        referralCode: values.referralCode,
       });
-      
-      if (error) {
-        throw new Error(error);
+
+      if (!result.success && result.error) {
+        toast({
+          title: "Registration Failed",
+          description: result.error,
+          variant: "destructive",
+        });
       }
-      
-      toast({
-        title: "Account Created",
-        description: "Your account has been created successfully. You can now log in.",
-      });
-      router.push("/dashboard");
+      // Success handling is done in the auth context
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
-        description: error.message || "An unexpected error occurred.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
