@@ -268,9 +268,9 @@ export function RegisterForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Account
+            <Button type="submit" className="w-full" disabled={isLoading || authLoading}>
+              {(isLoading || authLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {(isLoading || authLoading) ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
         </Form>
