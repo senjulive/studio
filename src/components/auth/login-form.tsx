@@ -146,17 +146,21 @@ export function LoginForm() {
               control={form.control}
               name="rememberMe"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormItem className="flex items-center space-x-2">
                   <FormControl>
                     <Checkbox
+                      id="rememberMe"
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>
+                  <div className="grid gap-1.5 leading-none">
+                     <label
+                      htmlFor="rememberMe"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
                       Remember me
-                    </FormLabel>
+                    </label>
                   </div>
                 </FormItem>
               )}
