@@ -245,7 +245,6 @@ class UserStore {
       lastLogin: '',
       isActive: true,
       hashedPassword: this.hashPassword(userData.password),
-      emailVerified: false,
       twoFactorEnabled: false
     };
 
