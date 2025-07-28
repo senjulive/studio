@@ -3,6 +3,7 @@
 
 import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { AstralLogo } from '@/components/icons/astral-logo';
 
 type User = {
     id: string;
@@ -69,10 +70,3 @@ export const useUser = () => {
     }
     return context;
 };
-
-// Dummy logo to prevent breaking during loading
-const AstralLogo = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="4" fill="none" />
-    </svg>
-);
