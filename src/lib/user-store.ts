@@ -17,7 +17,6 @@ export interface User {
   lastLogin: string;
   isActive: boolean;
   hashedPassword: string; // In real app, this would be properly hashed
-  emailVerified: boolean;
   twoFactorEnabled: boolean;
 }
 
