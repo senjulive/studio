@@ -15,7 +15,7 @@ interface AuthContextType {
   updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
-  verifyEmail: () => Promise<{ success: boolean; error?: string }>;
+
 }
 
 interface RegisterData {
@@ -118,7 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (result.success) {
         toast({
           title: "Registration successful!",
-          description: "Please check your email to verify your account.",
+          description: "Welcome to Astral Core! You can start trading immediately.",
         });
         
         // Automatically log in the user (for demo purposes)
@@ -227,34 +227,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const verifyEmail = async (): Promise<{ success: boolean; error?: string }> => {
-    if (!user) {
-      return { success: false, error: 'Not authenticated' };
-    }
 
-    try {
-      const result = userStore.verifyEmail(user.id);
-      
-      if (result.success) {
-        const updatedUser = userStore.getCurrentUser();
-        if (updatedUser) {
-          setUser(updatedUser);
-        }
-        
-        toast({
-          title: "Email verified",
-          description: "Your email has been successfully verified.",
-        });
-        
-        return { success: true };
-      } else {
-        return { success: false, error: result.error || 'Email verification failed' };
-      }
-    } catch (error) {
-      console.error('Email verification error:', error);
-      return { success: false, error: 'An unexpected error occurred' };
-    }
-  };
 
   const isAuthenticated = !!user;
 
@@ -268,7 +241,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     updateProfile,
     changePassword,
     requestPasswordReset,
-    verifyEmail,
+
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
