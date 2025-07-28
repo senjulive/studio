@@ -328,19 +328,7 @@ class UserStore {
     return { success: true };
   }
 
-  public verifyEmail(userId: string): { success: boolean; error?: string } {
-    const users = this.getAllUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
 
-    if (userIndex === -1) {
-      return { success: false, error: 'User not found' };
-    }
-
-    users[userIndex].emailVerified = true;
-    this.saveUsers(users);
-
-    return { success: true };
-  }
 
   public getAllUsersForAdmin(): Omit<User, 'hashedPassword'>[] {
     return this.getAllUsers().map(user => {
