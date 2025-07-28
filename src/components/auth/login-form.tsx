@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -7,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
-import { login } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { AstralLogo } from "../icons/astral-logo";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
@@ -38,7 +36,7 @@ const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const router = useRouter();
+  const { login, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
@@ -209,5 +207,3 @@ export function LoginForm() {
     </Card>
   );
 }
-
-    
