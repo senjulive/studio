@@ -29,6 +29,8 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserProvider } from '@/contexts/UserContext';
+import { getUserRank } from '@/lib/ranks';
+import { getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 import { RouteGuard } from '@/components/auth/route-guard';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
@@ -137,9 +139,13 @@ export default function DashboardLayout({
   const { user, logout: authLogout } = useAuth();
   const pathname = usePathname();
   const [isClient, setIsClient] = React.useState(false);
+  const [tierSettings, setTierSettings] = React.useState([]);
 
   React.useEffect(() => {
     setIsClient(true);
+    // Load tier settings
+    const settings = getBotTierSettings();
+    setTierSettings(settings);
   }, []);
 
   const getPageTitle = () => {
