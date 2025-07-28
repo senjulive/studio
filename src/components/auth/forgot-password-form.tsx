@@ -27,12 +27,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { forgotPasswordSchema } from "@/lib/validators";
-import { resetPasswordForEmail } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { AstralLogo } from "../icons/astral-logo";
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
+  const { requestPasswordReset } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
