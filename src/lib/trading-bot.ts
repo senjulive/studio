@@ -415,6 +415,3 @@ export function useTradingBots() {
     getMarketData: tradingBotSimulator.getMarketData.bind(tradingBotSimulator),
   };
 }
-
-// For React import
-import * as React from 'react';
