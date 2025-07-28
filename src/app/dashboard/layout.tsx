@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
+import { UserProvider } from '@/contexts/UserContext';
 import { RouteGuard } from '@/components/auth/route-guard';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
