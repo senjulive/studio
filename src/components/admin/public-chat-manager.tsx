@@ -123,6 +123,46 @@ export function PublicChatManager() {
     }
   };
 
+  const handleMuteUser = async (userId: string, displayName: string) => {
+    if (mutedUsers.has(userId)) {
+      toast({
+        title: "User Already Muted",
+        description: `${displayName} is already muted.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsMuting(userId);
+    try {
+      // For now, store muted users locally
+      const newMutedUsers = new Set(mutedUsers);
+      newMutedUsers.add(userId);
+      setMutedUsers(newMutedUsers);
+
+      // In a real implementation, you would call an API:
+      // const response = await fetch('/api/admin/mute-user', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ userId }),
+      // });
+
+      toast({
+        title: "User Muted",
+        description: `${displayName} has been muted from the public chat.`,
+      });
+
+    } catch (error: any) {
+      toast({
+        title: "Error Muting User",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsMuting(null);
+    }
+  };
+
   return (
     <Card className="h-[70vh] flex flex-col">
       <CardHeader className="flex-row items-center justify-between">
