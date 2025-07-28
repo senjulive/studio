@@ -251,8 +251,7 @@ class UserStore {
     users.push(newUser);
     this.saveUsers(users);
 
-    // In a real app, send verification email here
-    console.log(`Verification email would be sent to: ${userData.email}`);
+
 
     return { 
       success: true, 
