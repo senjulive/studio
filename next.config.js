@@ -24,6 +24,11 @@ const nextConfig = {
       }
     ],
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:3000', '*.fly.dev'],
+    },
+  },
 };
 
 export default nextConfig;
