@@ -203,184 +203,186 @@ export default function DashboardLayout({
 
   return (
     <RouteGuard allowedRoles={['user']}>
-      <SidebarProvider>
-        <Sidebar>
-          <SidebarHeader className="border-b border-sidebar-border">
-            <div className="flex items-center gap-3 px-4 py-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage 
-                  src={mockWallet.profile.avatarUrl} 
-                  alt={mockWallet.profile.username} 
-                />
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  {(mockWallet.profile.username || 'U').charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-sidebar-foreground truncate">
-                  {mockWallet.profile.username}
-                </p>
-                <p className="text-xs text-sidebar-foreground/70 truncate">
-                  {user?.email || '...'}
-                </p>
+      <UserProvider value={userContextValue}>
+        <SidebarProvider>
+          <Sidebar>
+            <SidebarHeader className="border-b border-sidebar-border">
+              <div className="flex items-center gap-3 px-4 py-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage
+                    src={mockWallet.profile.avatarUrl}
+                    alt={mockWallet.profile.username}
+                  />
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {(mockWallet.profile.username || 'U').charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-sidebar-foreground truncate">
+                    {mockWallet.profile.username}
+                  </p>
+                  <p className="text-xs text-sidebar-foreground/70 truncate">
+                    {user?.email || '...'}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="px-4 pb-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
+              <div className="px-4 pb-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
+                    <RankIcon className="h-4 w-4" />
+                    <span>{rank.name}</span>
+                  </Badge>
+                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
+                    <TierIcon className="h-4 w-4" />
+                    <span>{tier.name}</span>
+                  </Badge>
+                </div>
+              </div>
+            </SidebarHeader>
+
+            <SidebarContent>
+              <SidebarMenu>
+                {menuConfig.map((group, index) => (
+                  <React.Fragment key={group.title}>
+                    {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
+                    <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
+                    {group.items.map((item) => (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isClient ? pathname === item.href : false}
+                        >
+                          <Link href={item.href}>
+                            <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </SidebarMenu>
+            </SidebarContent>
+
+            <SidebarFooter>
+              <div className="flex items-center justify-between p-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="justify-start text-sidebar-foreground h-auto p-2">
+                      <SettingsIcon className="mr-2 h-4 w-4" />
+                      Settings
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none text-foreground">
+                          {mockWallet.profile.username}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email || '...'}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/profile">
+                        <ProfileIcon className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/security">
+                        <SettingsIcon className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogoutIcon className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <ThemeToggle />
+              </div>
+            </SidebarFooter>
+          </Sidebar>
+
+          <SidebarInset>
+            <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
+              <SidebarTrigger />
+              <div className="w-full flex-1">
+                <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
+                  <AstralLogo className="h-6 w-6" />
+                  {isClient ? (
+                    <span>{getPageTitle()}</span>
+                  ) : (
+                    <Skeleton className="h-6 w-24" />
+                  )}
+                </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
                   <RankIcon className="h-4 w-4" />
                   <span>{rank.name}</span>
                 </Badge>
-                <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
+                <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
                   <TierIcon className="h-4 w-4" />
                   <span>{tier.name}</span>
                 </Badge>
+                <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                  <Link href="/dashboard/inbox">
+                    <InboxIcon className="h-5 w-5" />
+                    <span className="sr-only">Inbox</span>
+                  </Link>
+                </Button>
+                <NotificationBell />
               </div>
-            </div>
-          </SidebarHeader>
+            </header>
 
-          <SidebarContent>
-            <SidebarMenu>
-              {menuConfig.map((group, index) => (
-                <React.Fragment key={group.title}>
-                  {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
-                  <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
-                  {group.items.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isClient ? pathname === item.href : false}
-                      >
-                        <Link href={item.href}>
-                          <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
-                          <span>{item.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </React.Fragment>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
+            <main className="flex-1 bg-secondary p-4 md:p-6 pb-20 md:pb-6">
+              {children}
+            </main>
 
-          <SidebarFooter>
-            <div className="flex items-center justify-between p-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="justify-start text-sidebar-foreground h-auto p-2">
-                    <SettingsIcon className="mr-2 h-4 w-4" />
-                    Settings
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none text-foreground">
-                        {mockWallet.profile.username}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email || '...'}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/profile">
-                      <ProfileIcon className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/security">
-                      <SettingsIcon className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogoutIcon className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <ThemeToggle />
-            </div>
-          </SidebarFooter>
-        </Sidebar>
-
-        <SidebarInset>
-          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
-            <SidebarTrigger />
-            <div className="w-full flex-1">
-              <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                <AstralLogo className="h-6 w-6" />
-                {isClient ? (
-                  <span>{getPageTitle()}</span>
-                ) : (
-                  <Skeleton className="h-6 w-24" />
-                )}
-              </h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
-                <RankIcon className="h-4 w-4" />
-                <span>{rank.name}</span>
-              </Badge>
-              <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
-                <TierIcon className="h-4 w-4" />
-                <span>{tier.name}</span>
-              </Badge>
-              <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                <Link href="/dashboard/inbox">
-                  <InboxIcon className="h-5 w-5" />
-                  <span className="sr-only">Inbox</span>
-                </Link>
-              </Button>
-              <NotificationBell />
-            </div>
-          </header>
-
-          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20 md:pb-6">
-            {children}
-          </main>
-
-          {/* Mobile Bottom Navigation */}
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
-            {bottomNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
-                  isClient && pathname === item.href
-                    ? 'text-primary font-medium'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {item.label === 'CORE' ? (
-                  <div className="absolute -top-7 flex items-center justify-center">
-                    <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
-                      <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center p-1">
-                        <item.icon className="h-full w-full" />
+            {/* Mobile Bottom Navigation */}
+            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
+              {bottomNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
+                    isClient && pathname === item.href
+                      ? 'text-primary font-medium'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {item.label === 'CORE' ? (
+                    <div className="absolute -top-7 flex items-center justify-center">
+                      <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center p-1">
+                          <item.icon className="h-full w-full" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <item.icon className="h-6 w-6" />
-                )}
-                <span className={cn(item.label === 'CORE' && 'mt-8')}>{item.label}</span>
-              </Link>
-            ))}
-          </nav>
+                  ) : (
+                    <item.icon className="h-6 w-6" />
+                  )}
+                  <span className={cn(item.label === 'CORE' && 'mt-8')}>{item.label}</span>
+                </Link>
+              ))}
+            </nav>
 
-          {/* Desktop Floating Elements */}
-          <div className="hidden md:block">
-            <FloatingNav />
-            <FloatingChat />
-          </div>
-          <RightSideDock />
-        </SidebarInset>
-      </SidebarProvider>
+            {/* Desktop Floating Elements */}
+            <div className="hidden md:block">
+              <FloatingNav />
+              <FloatingChat />
+            </div>
+            <RightSideDock />
+          </SidebarInset>
+        </SidebarProvider>
+      </UserProvider>
     </RouteGuard>
   );
 }
