@@ -12,6 +12,49 @@ export default function WelcomePage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_70%)]" />
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
 
+      {/* Top Banner */}
+      <section className="relative z-10 h-32 sm:h-40 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets%2F4b279aceeead46d4bb4166202e68dc54%2F15d29863e19d4693b48a94b86f8336da?format=webp&width=1920')`
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
+        <div className="relative z-10 h-full flex items-center justify-between px-4 sm:px-8 max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-red-400 font-semibold text-sm sm:text-base">● LIVE QUANTUM AI</span>
+            </div>
+            <div className="text-white font-medium text-sm sm:text-base">
+              Next-Generation Trading Bot Active
+            </div>
+          </div>
+          <div className="hidden sm:flex items-center gap-4">
+            <Badge variant="outline" className="border-green-400/50 text-green-300 bg-green-400/10 animate-pulse">
+              <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
+              99.7% Uptime
+            </Badge>
+            <Badge variant="outline" className="border-blue-400/50 text-blue-300 bg-blue-400/10">
+              <TrendingUp className="w-3 h-3 mr-1" />
+              +2.8% Daily Avg
+            </Badge>
+          </div>
+        </div>
+
+        {/* Floating AI Elements */}
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-8">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-cyan-300">
+            <Brain className="w-4 h-4 animate-pulse" />
+            <span>AI Neural Processing...</span>
+          </div>
+        </div>
+
+        {/* Animated Border */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-pulse" />
+      </section>
+
       {/* Hero Section */}
       <section className="relative z-10 flex min-h-dvh flex-col items-center justify-center px-4 py-20">
         <div className="max-w-7xl mx-auto text-center">
