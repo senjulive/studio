@@ -248,23 +248,6 @@ export default function WelcomePage() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
             Ready to Experience the Future of Trading?
           </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Join thousands of traders who trust AstralCore's Quantum AI to grow their portfolios automatically.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold px-8 py-4 text-lg shadow-2xl shadow-blue-500/25">
-              <Link href="/register">
-                <Zap className="mr-2 h-5 w-5" />
-                Create Free Account
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="border-gray-600 text-gray-300 hover:bg-gray-800 px-8 py-4 text-lg">
-              <Link href="/login">
-                Already have an account? Sign In
-              </Link>
-            </Button>
-          </div>
         </div>
       </section>
     </main>
