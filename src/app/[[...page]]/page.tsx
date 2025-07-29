@@ -1,9 +1,9 @@
-// src/app/[[...page]]/page.tsx
 import { builder } from '@builder.io/sdk';
 import { RenderBuilderContent } from '@/components/builder/render-builder-content';
+import { notFound } from 'next/navigation';
 
-// Replace with your public API key
-builder.init('your-builder-io-api-key-here');
+// Initialize Builder with your public API key
+builder.init(process.env.NEXT_PUBLIC_BUILDER_API_KEY || 'demo-key');
 
 interface PageProps {
   params: {
@@ -11,14 +11,21 @@ interface PageProps {
   };
 }
 
-export default async function Page(props: PageProps) {
+export default async function Page({ params }: PageProps) {
+  const urlPath = '/' + (params.page?.join('/') || '');
+
   const content = await builder
     .get('page', {
       userAttributes: {
-        urlPath: '/' + (props.params.page?.join('/') || ''),
+        urlPath,
       },
     })
     .toPromise();
 
-  return <RenderBuilderContent content={content} />;
+  // If no content found and not the root path, show 404
+  if (!content && urlPath !== '/') {
+    notFound();
+  }
+
+  return <RenderBuilderContent content={content} urlPath={urlPath} />;
 }
