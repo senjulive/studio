@@ -65,6 +65,7 @@ import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from './profile-view';
+import { RightSidebar } from '../ui/right-sidebar';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -142,7 +143,8 @@ export default function DashboardLayout({
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const fileContent = `[InternetShortcut]\nURL=${window.location.origin}`;
+      const fileContent = `[InternetShortcut]
+URL=${window.location.origin}`;
       const dataUri = `data:text/plain;charset=utf-8,${encodeURIComponent(
         fileContent
       )}`;
@@ -254,6 +256,14 @@ export default function DashboardLayout({
   const TierIcon = tier ? tierIcons[tier.id] : null;
   const tierClassName = tier ? tierClassNames[tier.id] : null;
   const userCountry = countries.find(c => c.name === wallet?.profile?.country);
+
+  const quickAccessItems = [
+    { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
+    { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
+    { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
+    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/security', label: 'Settings', icon: SettingsIcon },
+  ];
 
   if (isInitializing) {
     return <DashboardLoading />;
@@ -458,6 +468,23 @@ export default function DashboardLayout({
             ))}
           </nav>
         </SidebarInset>
+        <RightSidebar>
+        <div className="p-4">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Access</h2>
+          <div className="space-y-2">
+            {quickAccessItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center p-2 rounded-lg text-foreground/80 hover:bg-muted/50 hover:text-foreground transition-colors"
+              >
+                <item.icon className="h-5 w-5 mr-3" />
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </RightSidebar>
       </SidebarProvider>
     </UserProvider>
   );

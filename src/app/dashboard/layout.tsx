@@ -23,7 +23,8 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
-} from '@/components/ui/sidebar';
+}
+from '@/components/ui/sidebar';
 import { logout } from '@/lib/auth';
 import * as React from 'react';
 import type { SVGProps } from 'react';
@@ -65,6 +66,8 @@ import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
+import { RightSidebar } from '@/components/ui/right-sidebar';
+import { ModeToggle } from '@/components/ui/mode-toggle';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -142,7 +145,8 @@ export default function DashboardLayout({
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const fileContent = `[InternetShortcut]\nURL=${window.location.origin}`;
+      const fileContent = `[InternetShortcut]
+URL=${window.location.origin}`;
       const dataUri = `data:text/plain;charset=utf-8,${encodeURIComponent(
         fileContent
       )}`;
@@ -376,59 +380,64 @@ export default function DashboardLayout({
             </DropdownMenu>
           </SidebarFooter>
         </Sidebar>
-        <SidebarInset>
-          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
-            <SidebarTrigger />
-            <div className="w-full flex-1">
-              <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                <AstralLogo className="h-6 w-6" />
-                {isClient ? (
-                  <span>{getPageTitle()}</span>
-                ) : (
-                  <Skeleton className="h-6 w-24" />
-                )}
-              </h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                     <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
-                        <RankIcon className="h-4 w-4" />
-                        <span>{rank.name}</span>
-                     </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Account Rank</p>
-                  </TooltipContent>
-                </Tooltip>
-                 {tier && TierIcon && tierClassName && (
+        <div className="flex flex-1">
+          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
+            <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30 -ml-4 -mr-4 md:-ml-6 md:-mr-6">
+              <SidebarTrigger />
+              <div className="w-full flex-1">
+                <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
+                  <AstralLogo className="h-6 w-6" />
+                  {isClient ? (
+                    <span>{getPageTitle()}</span>
+                  ) : (
+                    <Skeleton className="h-6 w-24" />
+                  )}
+                </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                        <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
-                          <TierIcon className="h-4 w-4" />
-                          <span>{tier.name}</span>
-                        </Badge>
+                       <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
+                          <RankIcon className="h-4 w-4" />
+                          <span>{rank.name}</span>
+                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>VIP CORE Tier</p>
+                      <p>Account Rank</p>
                     </TooltipContent>
                   </Tooltip>
-                )}
-              </TooltipProvider>
+                   {tier && TierIcon && tierClassName && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                          <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
+                            <TierIcon className="h-4 w-4" />
+                            <span>{tier.name}</span>
+                          </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>VIP CORE Tier</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </TooltipProvider>
 
-              <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                <Link href="/dashboard/inbox">
-                  <InboxIcon className="h-5 w-5" />
-                  <span className="sr-only">Inbox</span>
-                </Link>
-              </Button>
-              <NotificationBell />
-            </div>
-          </header>
-          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
+                <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                  <Link href="/dashboard/inbox">
+                    <InboxIcon className="h-5 w-5" />
+                    <span className="sr-only">Inbox</span>
+                  </Link>
+                </Button>
+                <NotificationBell />
+                <ModeToggle />
+              </div>
+            </header>
             {children}
           </main>
+          <div className="hidden lg:block border-l">
+            <RightSidebar />
+          </div>
+        </div>
           <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
             {bottomNavItems.map((item) => (
               <Link
@@ -457,10 +466,7 @@ export default function DashboardLayout({
               </Link>
             ))}
           </nav>
-        </SidebarInset>
       </SidebarProvider>
     </UserProvider>
   );
 }
-
-    

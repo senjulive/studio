@@ -24,6 +24,7 @@ import {
   Banknote,
   ArrowUpFromLine,
   GitBranch,
+  UserPlus,
 } from 'lucide-react';
 import { WalletManager } from './wallet-manager';
 import { SupportChatManager } from './support-chat-manager';
@@ -40,11 +41,13 @@ import { BotTierSettingsManager } from './bot-tier-settings-manager';
 import { WithdrawalManager } from './withdrawal-manager';
 import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
+import { UserManager } from './user-manager';
 
 
 const adminSections = {
     'Dashboard': { component: <AnalyticsManager />, icon: LayoutDashboard },
     'User Management': {
+        'Users': { component: <UserManager />, icon: UserPlus },
         'Wallets': { component: <WalletManager />, icon: WalletCards },
         'Verifications': { component: <VerificationManager />, icon: () => <span className="text-xl">🪪</span> },
         'Moderators': { component: <ModeratorManager />, icon: Users },

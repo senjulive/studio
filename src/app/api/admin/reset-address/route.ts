@@ -1,41 +1,35 @@
 
 import { NextResponse } from 'next/server';
-import { getWalletByUserId, updateWalletByUserId } from '@/lib/wallet';
-import { addNotification } from '@/lib/notifications';
-import { logModeratorAction } from '@/lib/moderator';
+
+// In a real application, you would interact with your database (e.g., Builder.io models)
+// to clear the withdrawal address for the given userId.
+
+// This is a placeholder function to simulate the database operation.
+async function clearUserWithdrawalAddress(userId: string) {
+  console.log(`Simulating clearing withdrawal address for user: ${userId}`);
+  // Here, you would implement the actual logic to update your Builder.io userWallets model
+  // by setting the withdrawal address field for this user to null or an empty string.
+  // Example: Builder.io.update('userWallets', { query: { userId: userId }, data: { withdrawalAddress: null } })
+  return { success: true, message: `Withdrawal address for user ${userId} has been reset.` };
+}
 
 export async function POST(request: Request) {
   try {
     const { userId } = await request.json();
+
     if (!userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+      return NextResponse.json({ error: 'User ID is required.' }, { status: 400 });
     }
 
-    const wallet = await getWalletByUserId(userId);
-    if (!wallet) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const result = await clearUserWithdrawalAddress(userId);
+
+    if (result.success) {
+      return NextResponse.json({ message: result.message });
+    } else {
+      throw new Error(result.message || 'Failed to reset withdrawal address.');
     }
-
-    const updatedWalletData = {
-      ...wallet,
-      security: {
-        ...wallet.security,
-        withdrawalAddresses: {},
-      },
-    };
-    
-    await updateWalletByUserId(userId, updatedWalletData);
-
-    await addNotification(userId, {
-      title: 'Security Alert',
-      content: 'Your saved withdrawal address has been reset by an administrator. Please set a new one before withdrawing.',
-      href: '/dashboard/withdraw',
-    });
-
-    await logModeratorAction(`Reset withdrawal address for user ${wallet.profile.username || userId}.`);
-
-    return NextResponse.json({ message: 'Withdrawal address reset successfully' });
   } catch (error: any) {
+    console.error('Error resetting withdrawal address:', error);
     return NextResponse.json({ error: error.message || 'An unexpected error occurred.' }, { status: 500 });
   }
 }

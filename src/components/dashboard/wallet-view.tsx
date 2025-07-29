@@ -73,16 +73,6 @@ type CryptoData = {
   priceHistory: { value: number }[];
 };
 
-const quickAccessItems = [
-  { href: "/dashboard/market", label: "Market", icon: LineChart },
-  { href: "/dashboard/deposit", label: "Deposit", icon: WalletIcon },
-  { href: "/dashboard/trading", label: "Trade", icon: Repeat },
-  { href: "/dashboard/profile", label: "Profile", icon: User },
-  { href: "/dashboard/support", label: "Support", icon: HeartHandshake },
-  { href: "/dashboard/invite", label: "Invite", icon: Users },
-  { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowLeftRight },
-];
-
 const initialCryptoData: CryptoData[] = [
   {
     id: "bitcoin",
@@ -364,20 +354,6 @@ export function WalletView() {
                       You currently have no funds. Make a deposit to get started.
                   </div>
                 )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader><CardTitle>Quick Access</CardTitle></CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 text-center">
-                  {quickAccessItems.map((item, index) => (
-                    <Link key={index} href={item.href} className="flex flex-col items-center justify-center space-y-1 rounded-lg p-1 transition-colors hover:bg-muted">
-                      <div className="rounded-full bg-primary/10 p-2"><item.icon className="h-7 w-7 text-primary" /></div>
-                      <span className="text-xs font-medium text-muted-foreground">{item.label}</span>
-                    </Link>
-                  ))}
-                </div>
               </CardContent>
             </Card>
 

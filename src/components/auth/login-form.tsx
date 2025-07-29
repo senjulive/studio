@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
 import { login } from "@/lib/auth";
 import { AstralLogo } from "../icons/astral-logo";
+import { Separator } from "../ui/separator";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
 
@@ -94,6 +95,16 @@ export function LoginForm() {
     setIsLoading(false);
   };
 
+  const handleGoogleSignIn = () => {
+    console.log("UI: Google sign-in clicked");
+    // Placeholder for Google sign-in logic
+  };
+
+  const handleEmailSignIn = () => {
+    console.log("UI: Email sign-in clicked");
+    // Placeholder for email sign-in logic
+  }
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
@@ -104,6 +115,20 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="flex flex-col gap-4">
+          <Button variant="outline" onClick={handleGoogleSignIn}>
+            Sign in with Google
+          </Button>
+          <Button variant="outline" onClick={handleEmailSignIn}>
+            Sign in with Email
+          </Button>
+        </div>
+        <div className="relative my-4">
+          <Separator />
+          <span className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+            OR
+          </span>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
