@@ -1,347 +1,450 @@
-
-"use client";
+'use client';
 
 import * as React from "react";
-import { Copy, Info, QrCode, Wallet, User, Loader2, ShieldCheck } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
-
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { getSiteSettings } from "@/lib/site-settings";
-import { Skeleton } from "../ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { getOrCreateWallet, type WalletData } from "@/lib/wallet";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import Image from "next/image";
-import { useUser } from "@/contexts/UserContext";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { Copy, Upload, Wallet, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { depositRequestSchema } from "@/lib/validators";
 
-const DepositAddressDisplay = ({
-  address,
-  isLoading,
-  network,
-  asset,
-}: {
-  address: string;
-  isLoading: boolean;
-  network: string;
-  asset: string;
-}) => {
-  const { toast } = useToast();
+type DepositFormValues = z.infer<typeof depositRequestSchema>;
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(address);
-      toast({ title: "Address copied to clipboard!" });
-    } catch (err) {
-      toast({
-        title: "Failed to copy",
-        description: "Could not copy address to clipboard.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const DepositAddressSkeleton = () => (
-    <div className="space-y-6 pt-6">
-      <div className="mx-auto flex h-48 w-48 items-center justify-center rounded-lg bg-muted">
-        <QrCode className="h-16 w-16 text-muted-foreground" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-5 w-48" />
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-10 flex-1" />
-          <Skeleton className="h-10 w-10" />
-        </div>
-      </div>
-    </div>
-  );
-
-  if (isLoading) {
-    return <DepositAddressSkeleton />;
+const cryptoAssets = [
+  {
+    symbol: "USDT",
+    name: "Tether",
+    iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
+    networks: [
+      { name: "TRC20 (TRON)", address: "TQn9Y2khEsLJW1ChVWFMSMeRDow5oNDMkx", fee: "1 USDT" },
+      { name: "ERC20 (Ethereum)", address: "0x742d35Cc6544A8E5D7C5B6E4b7b3f3", fee: "5 USDT" },
+      { name: "BEP20 (BSC)", address: "0x742d35Cc6544A8E5D7C5B6E4b7b3f3", fee: "1 USDT" }
+    ]
+  },
+  {
+    symbol: "BTC",
+    name: "Bitcoin",
+    iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
+    networks: [
+      { name: "Bitcoin Network", address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", fee: "0.0005 BTC" }
+    ]
+  },
+  {
+    symbol: "ETH",
+    name: "Ethereum",
+    iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
+    networks: [
+      { name: "ERC20 (Ethereum)", address: "0x742d35Cc6544A8E5D7C5B6E4b7b3f3", fee: "0.005 ETH" }
+    ]
   }
+];
 
-  return (
-    <div className="flex flex-col items-center gap-6 text-center pt-6">
-      <div className="rounded-lg bg-white p-4">
-        <QRCodeSVG value={address} size={176} />
-      </div>
-      <div className="w-full space-y-2 text-left">
-        <Label htmlFor={`deposit-address-${address}`}>{asset} Deposit Address ({network})</Label>
-        <div className="flex items-center gap-2">
-          <Input
-            id={`deposit-address-${address}`}
-            value={address}
-            readOnly
-            className="font-mono text-base"
-          />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleCopy}
-            aria-label="Copy address"
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const PersonalDepositRequest = () => {
-  const { toast } = useToast();
-  const { user } = useUser();
-  const [wallet, setWallet] = React.useState<WalletData | null>(null);
-  const [amount, setAmount] = React.useState("");
-  const [selectedAsset, setSelectedAsset] = React.useState("usdt");
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-
-  React.useEffect(() => {
-    if (user?.id) {
-      getOrCreateWallet().then(setWallet);
-    }
-  }, [user]);
-
-  const handleDepositRequest = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!amount || parseFloat(amount) <= 0 || !user) {
-      toast({
-        title: "Invalid Amount",
-        description: "Please enter a positive amount to deposit.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch('/api/deposit/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            userId: user.id,
-            amount: parseFloat(amount),
-            asset: selectedAsset,
-        }),
-      });
-      
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to submit request.");
-      }
-
-      toast({
-        title: "Deposit Request Sent",
-        description: "Your balance will be updated upon confirmation."
-      });
-
-      setAmount("");
-
-    } catch (error: any) {
-        toast({
-            title: "Request Failed",
-            description: error.message || "Could not submit your deposit request. Please try again later.",
-            variant: "destructive",
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
-  };
-  
-  const assets = [
-    { id: "usdt", name: "USDT", iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png" },
-    { id: "eth", name: "ETH", iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png" },
-    { id: "btc", name: "BTC", iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png" },
-  ];
-
-  return (
-    <form onSubmit={handleDepositRequest} className="space-y-6">
-        <div className="space-y-4">
-            <Label className="block text-center text-sm font-medium text-muted-foreground">Select Asset</Label>
-            <RadioGroup onValueChange={setSelectedAsset} value={selectedAsset} className="flex justify-center gap-4">
-                {assets.map(asset => (
-                    <Label key={asset.id} htmlFor={asset.id} className="cursor-pointer rounded-full border-2 p-1 transition-all hover:border-primary/50 has-[input:checked]:border-primary has-[input:checked]:ring-2 has-[input:checked]:ring-primary/20">
-                        <RadioGroupItem value={asset.id} id={asset.id} className="sr-only" />
-                        <Image src={asset.iconUrl} alt={`${asset.name} logo`} width={40} height={40} className="rounded-full" />
-                    </Label>
-                ))}
-            </RadioGroup>
-        </div>
-      <div className="space-y-2">
-        <Label htmlFor="deposit-amount">Amount to Deposit ({selectedAsset.toUpperCase()})</Label>
-        <Input 
-          id="deposit-amount"
-          type="number"
-          placeholder="e.g., 500.00"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          disabled={isSubmitting || !wallet}
-          min="0"
-          step="0.01"
-        />
-      </div>
-      <Button type="submit" disabled={isSubmitting || !amount || !wallet} className="w-full">
-        {isSubmitting ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : null}
-        Submit Deposit Request
-      </Button>
-    </form>
-  )
-}
+const pendingDeposits = [
+  {
+    id: "dep_001",
+    amount: 100,
+    currency: "USDT",
+    network: "TRC20 (TRON)",
+    transactionId: "a1b2c3d4e5f6g7h8i9j0",
+    status: "pending",
+    timestamp: "2024-01-15T10:30:00Z"
+  },
+  {
+    id: "dep_002",
+    amount: 0.05,
+    currency: "BTC",
+    network: "Bitcoin Network",
+    transactionId: "z9y8x7w6v5u4t3s2r1q0",
+    status: "confirmed",
+    timestamp: "2024-01-14T15:45:00Z"
+  }
+];
 
 export function DepositView() {
-  const { wallet } = useUser();
-  const [addresses, setAddresses] = React.useState({ usdt: '', eth: '', btc: ''});
-  const [isLoading, setIsLoading] = React.useState(true);
-  
-  React.useEffect(() => {
-    async function fetchAddresses() {
-      setIsLoading(true);
-      const settings = await getSiteSettings();
-      setAddresses({
-        usdt: settings.usdtDepositAddress,
-        eth: settings.ethDepositAddress,
-        btc: settings.btcDepositAddress,
+  const { toast } = useToast();
+  const [selectedAsset, setSelectedAsset] = React.useState(cryptoAssets[0]);
+  const [selectedNetwork, setSelectedNetwork] = React.useState(0);
+  const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
+
+  const form = useForm<DepositFormValues>({
+    resolver: zodResolver(depositRequestSchema),
+    defaultValues: {
+      amount: 0,
+      currency: "USDT",
+      transactionId: "",
+      proofOfPayment: "",
+    },
+  });
+
+  const onSubmit = async (values: DepositFormValues) => {
+    try {
+      // Here you would typically send the deposit request to your API
+      console.log("Deposit request:", values);
+      
+      toast({
+        title: "Deposit Request Submitted",
+        description: "Your deposit request has been submitted and is being processed. You will receive confirmation once verified.",
       });
-      setIsLoading(false);
+
+      form.reset();
+      setUploadedFile(null);
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "Failed to submit deposit request. Please try again.",
+        variant: "destructive"
+      });
     }
-    fetchAddresses();
-  }, []);
-  
-  const isVerified = wallet?.profile?.verificationStatus === 'verified';
+  };
 
-  if (!isVerified) {
-    return (
-        <Card className="w-full max-w-2xl mx-auto">
-             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                <Wallet className="h-6 w-6" />
-                <span>Deposit</span>
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <Alert variant="destructive">
-                    <ShieldCheck className="h-4 w-4" />
-                    <AlertTitle>Verification Required</AlertTitle>
-                    <AlertDescription>
-                        You must verify your identity before you can deposit funds. This is a security measure to protect your account.
-                    </AlertDescription>
-                    <div className="mt-4">
-                        <Button asChild>
-                            <Link href="/dashboard/profile/verify">Start Verification</Link>
-                        </Button>
-                    </div>
-                </Alert>
-            </CardContent>
-        </Card>
-    );
-  }
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Address copied to clipboard",
+    });
+  };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+      form.setValue("proofOfPayment", file.name);
+    }
+  };
+
+  const currentNetwork = selectedAsset.networks[selectedNetwork];
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Wallet className="h-6 w-6" />
-          <span>Deposit</span>
-        </CardTitle>
-        <CardDescription>
-          Choose a method below to fund your account.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="deposit" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="deposit">
-              <Wallet className="mr-2 h-4 w-4" />
-              Deposit
-            </TabsTrigger>
-            <TabsTrigger value="personal">
-              <User className="mr-2 h-4 w-4" />
-              Confirm Request
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="deposit" className="mt-6">
-            <Tabs defaultValue="usdt" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="usdt" className="gap-2">
-                        <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT" width={20} height={20} className="rounded-full" />
-                        USDT
-                    </TabsTrigger>
-                    <TabsTrigger value="eth" className="gap-2">
-                        <Image src="https://assets.coincap.io/assets/icons/eth@2x.png" alt="ETH" width={20} height={20} className="rounded-full" />
-                        ETH
-                    </TabsTrigger>
-                    <TabsTrigger value="btc" className="gap-2">
-                        <Image src="https://assets.coincap.io/assets/icons/btc@2x.png" alt="BTC" width={20} height={20} className="rounded-full" />
-                        BTC
-                    </TabsTrigger>
-                </TabsList>
-                <TabsContent value="usdt">
-                    <DepositAddressDisplay
-                    address={addresses.usdt}
-                    isLoading={isLoading}
-                    network="TRC20"
-                    asset="USDT"
-                    />
-                </TabsContent>
-                <TabsContent value="eth">
-                    <DepositAddressDisplay
-                    address={addresses.eth}
-                    isLoading={isLoading}
-                    network="ERC20"
-                    asset="ETH"
-                    />
-                </TabsContent>
-                <TabsContent value="btc">
-                    <DepositAddressDisplay
-                    address={addresses.btc}
-                    isLoading={isLoading}
-                    network="Bitcoin"
-                    asset="BTC"
-                    />
-                </TabsContent>
-            </Tabs>
-             <Alert className="mt-6 w-full text-left">
-                <Info className="h-4 w-4" />
-                <AlertTitle>Important Instructions</AlertTitle>
-                <AlertDescription>
-                    <ul className="list-inside list-disc space-y-1">
-                        <li>Deposit to the address, then confirm your request.</li>
-                        <li>Only send the correct asset to the corresponding address (e.g., USDT to the USDT address). Sending any other asset will result in the permanent loss of your funds.</li>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wallet className="h-5 w-5" />
+            Deposit Funds
+          </CardTitle>
+          <CardDescription>
+            Add funds to your AstralCore account to start automated trading
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      <Tabs defaultValue="deposit" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="deposit">Make Deposit</TabsTrigger>
+          <TabsTrigger value="history">Deposit History</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="deposit" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Asset Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Select Asset</CardTitle>
+                <CardDescription>
+                  Choose the cryptocurrency you want to deposit
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3">
+                  {cryptoAssets.map((asset) => (
+                    <button
+                      key={asset.symbol}
+                      onClick={() => {
+                        setSelectedAsset(asset);
+                        setSelectedNetwork(0);
+                        form.setValue("currency", asset.symbol as any);
+                      }}
+                      className={`flex items-center gap-3 p-3 border rounded-lg text-left transition-colors ${
+                        selectedAsset.symbol === asset.symbol
+                          ? "border-primary bg-primary/5"
+                          : "hover:bg-muted/50"
+                      }`}
+                    >
+                      <Image
+                        src={asset.iconUrl}
+                        alt={asset.symbol}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium">{asset.name}</p>
+                        <p className="text-sm text-muted-foreground">{asset.symbol}</p>
+                      </div>
+                      {selectedAsset.symbol === asset.symbol && (
+                        <CheckCircle className="h-5 w-5 text-primary" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Network Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Select Network</CardTitle>
+                <CardDescription>
+                  Choose the blockchain network for your deposit
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3">
+                  {selectedAsset.networks.map((network, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedNetwork(index)}
+                      className={`flex items-center justify-between p-3 border rounded-lg text-left transition-colors ${
+                        selectedNetwork === index
+                          ? "border-primary bg-primary/5"
+                          : "hover:bg-muted/50"
+                      }`}
+                    >
+                      <div>
+                        <p className="font-medium">{network.name}</p>
+                        <p className="text-sm text-muted-foreground">Fee: {network.fee}</p>
+                      </div>
+                      {selectedNetwork === index && (
+                        <CheckCircle className="h-5 w-5 text-primary" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Deposit Address */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Deposit Address</CardTitle>
+              <CardDescription>
+                Send {selectedAsset.symbol} to the address below using {currentNetwork.name}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex flex-col lg:flex-row gap-6">
+                <div className="flex-1 space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Deposit Address</label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={currentNetwork.address}
+                        readOnly
+                        className="font-mono text-sm"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => copyToClipboard(currentNetwork.address)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Network</label>
+                    <Input value={currentNetwork.name} readOnly />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Network Fee</label>
+                    <Input value={currentNetwork.fee} readOnly />
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="p-4 bg-white rounded-lg">
+                    <QRCodeSVG value={currentNetwork.address} size={150} />
+                  </div>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Scan QR code to copy address
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <div className="flex gap-2">
+                  <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                      Important Notice
+                    </p>
+                    <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
+                      <li>• Only send {selectedAsset.symbol} to this address</li>
+                      <li>• Minimum deposit: $10 USD equivalent</li>
+                      <li>• Deposits are processed after 1-3 network confirmations</li>
+                      <li>• Wrong network deposits will result in permanent loss</li>
                     </ul>
-                </AlertDescription>
-            </Alert>
-          </TabsContent>
-          <TabsContent value="personal" className="mt-6">
-            <PersonalDepositRequest />
-             <Alert className="mt-6 w-full text-left">
-                <Info className="h-4 w-4" />
-                <AlertTitle>How It Works</AlertTitle>
-                <AlertDescription>
-                    <ul className="list-inside list-disc space-y-1">
-                        <li>Select the asset, enter the amount you wish to deposit, and submit the request.</li>
-                        <li>Your funds will be credited to your account within 5-15 minutes of approval.</li>
-                        <li>You can contact support if you have any questions about your deposit status.</li>
-                    </ul>
-                </AlertDescription>
-            </Alert>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Deposit Confirmation Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Confirm Your Deposit</CardTitle>
+              <CardDescription>
+                After sending funds, please fill out this form to speed up processing
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="amount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Deposit Amount</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.000001"
+                              placeholder="0.00"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="currency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Currency</FormLabel>
+                          <FormControl>
+                            <Input value={selectedAsset.symbol} readOnly />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="transactionId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Transaction ID / Hash</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter the transaction hash from your wallet"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="proofOfPayment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Proof of Payment (Optional)</FormLabel>
+                        <FormControl>
+                          <div className="space-y-2">
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileUpload}
+                              className="cursor-pointer"
+                            />
+                            {uploadedFile && (
+                              <p className="text-sm text-green-600">
+                                File uploaded: {uploadedFile.name}
+                              </p>
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" className="w-full">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Submit Deposit Request
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Deposit History</CardTitle>
+              <CardDescription>
+                View all your previous deposit transactions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {pendingDeposits.map((deposit) => (
+                  <div key={deposit.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <Image
+                        src={cryptoAssets.find(a => a.symbol === deposit.currency)?.iconUrl || ""}
+                        alt={deposit.currency}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                      <div>
+                        <p className="font-medium">
+                          {deposit.amount} {deposit.currency}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {deposit.network} • {new Date(deposit.timestamp).toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {deposit.transactionId}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge
+                        variant={
+                          deposit.status === "confirmed" ? "default" :
+                          deposit.status === "pending" ? "secondary" : "destructive"
+                        }
+                      >
+                        {deposit.status === "confirmed" && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {deposit.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
+                        {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
