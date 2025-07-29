@@ -242,14 +242,7 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="relative z-10 py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Ready to Experience the Future of Trading?
-          </h2>
-        </div>
-      </section>
+
     </main>
   );
 }
