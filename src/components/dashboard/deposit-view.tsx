@@ -284,7 +284,7 @@ export function DepositView() {
                     </p>
                     <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
                       <li>• Only send {selectedAsset.symbol} to this address</li>
-                      <li>• Minimum deposit: $10 USD equivalent</li>
+                      <li>• Minimum deposit: $100 USD equivalent</li>
                       <li>• Deposits are processed after 1-3 network confirmations</li>
                       <li>• Wrong network deposits will result in permanent loss</li>
                     </ul>
