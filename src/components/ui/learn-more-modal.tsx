@@ -78,17 +78,10 @@ export function LearnMoreModal({ children }: LearnMoreModalProps) {
 
   const tiers = [
     {
-      name: "Recruit",
-      balance: "$0 - $99",
-      earnings: "0.5% daily",
-      features: ["Basic grid trading", "5 manual earnings/day", "Community access"],
-      color: "border-gray-400/50 text-gray-300"
-    },
-    {
-      name: "Bronze", 
+      name: "Bronze",
       balance: "$100 - $499",
-      earnings: "1.0% daily",
-      features: ["Enhanced grid trading", "10 manual earnings/day", "Priority support"],
+      earnings: "2.0% daily",
+      features: ["Enhanced grid trading", "4 manual earnings/day", "Priority support"],
       color: "border-amber-600/50 text-amber-400"
     },
     {
