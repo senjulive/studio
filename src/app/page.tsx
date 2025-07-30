@@ -245,6 +245,182 @@ export default function WelcomePage() {
         </div>
       </section>
 
+      {/* Exchange Partnerships Footer */}
+      <footer className="relative z-10 border-t border-gray-800/50">
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          {/* Partnerships Section */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Trusted by Leading <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Crypto Exchanges</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Our quantum AI technology powers trading strategies across the world's most prestigious cryptocurrency platforms
+            </p>
+          </div>
+
+          {/* Exchange Logos Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+            {/* Binance */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-yellow-400 transition-colors">
+                <span className="text-black font-bold text-lg">B</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-yellow-400 transition-colors">Binance</span>
+            </div>
+
+            {/* Coinbase */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-blue-400 transition-colors">
+                <span className="text-white font-bold text-lg">C</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-blue-400 transition-colors">Coinbase</span>
+            </div>
+
+            {/* Bybit */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-orange-400 transition-colors">
+                <span className="text-white font-bold text-lg">B</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-orange-400 transition-colors">Bybit</span>
+            </div>
+
+            {/* Kraken */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-purple-400 transition-colors">
+                <span className="text-white font-bold text-lg">K</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-purple-400 transition-colors">Kraken</span>
+            </div>
+
+            {/* KuCoin */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-green-400 transition-colors">
+                <span className="text-white font-bold text-lg">K</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-green-400 transition-colors">KuCoin</span>
+            </div>
+
+            {/* Gate.io */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-indigo-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-indigo-400 transition-colors">
+                <span className="text-white font-bold text-lg">G</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-indigo-400 transition-colors">Gate.io</span>
+            </div>
+
+            {/* Huobi */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-red-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-red-400 transition-colors">
+                <span className="text-white font-bold text-lg">H</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-red-400 transition-colors">Huobi</span>
+            </div>
+
+            {/* OKX */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-cyan-400 transition-colors">
+                <span className="text-white font-bold text-lg">O</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-cyan-400 transition-colors">OKX</span>
+            </div>
+
+            {/* Upbit */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-pink-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-pink-400 transition-colors">
+                <span className="text-white font-bold text-lg">U</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-pink-400 transition-colors">Upbit</span>
+            </div>
+
+            {/* Bitfinex */}
+            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-emerald-400 transition-colors">
+                <span className="text-white font-bold text-lg">B</span>
+              </div>
+              <span className="text-gray-300 font-semibold group-hover:text-emerald-400 transition-colors">Bitfinex</span>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="text-center p-6 bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-lg border border-blue-400/20">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-blue-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Bank-Level Security</h3>
+              <p className="text-gray-300 text-sm">Advanced encryption and multi-layer security protocols protect your assets</p>
+            </div>
+            <div className="text-center p-6 bg-gradient-to-br from-green-900/20 to-blue-900/20 rounded-lg border border-green-400/20">
+              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-green-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Proven Performance</h3>
+              <p className="text-gray-300 text-sm">$2.1B+ trading volume with consistent profitable results</p>
+            </div>
+            <div className="text-center p-6 bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-lg border border-purple-400/20">
+              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Globe className="w-8 h-8 text-purple-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Global Network</h3>
+              <p className="text-gray-300 text-sm">Trusted by 50,000+ traders across 150+ countries worldwide</p>
+            </div>
+          </div>
+
+          {/* Footer Links */}
+          <div className="border-t border-gray-800/50 pt-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+              <div>
+                <h4 className="text-white font-semibold mb-4">Platform</h4>
+                <ul className="space-y-2 text-gray-300 text-sm">
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Features</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Pricing</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">API Access</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Mobile App</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold mb-4">Support</h4>
+                <ul className="space-y-2 text-gray-300 text-sm">
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Help Center</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Contact Us</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Community</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Status</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold mb-4">Legal</h4>
+                <ul className="space-y-2 text-gray-300 text-sm">
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Terms of Service</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Privacy Policy</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Cookie Policy</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Compliance</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold mb-4">Connect</h4>
+                <ul className="space-y-2 text-gray-300 text-sm">
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Twitter</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Telegram</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">Discord</a></li>
+                  <li><a href="#" className="hover:text-blue-400 transition-colors">LinkedIn</a></li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Copyright */}
+            <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-800/50">
+              <div className="flex items-center gap-3 mb-4 md:mb-0">
+                <AstralLogo className="h-8 w-8 text-blue-400" />
+                <span className="text-white font-semibold">AstralCore</span>
+                <span className="text-gray-500">Quantum Nexus v3.76</span>
+              </div>
+              <div className="text-gray-400 text-sm">
+                © 2024 AstralCore Technologies. All rights reserved.
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
 
     </main>
   );
