@@ -83,12 +83,12 @@ export async function createClan(leaderId: string, name: string, avatarUrl: stri
     
     const minBalance = await getMinClanCreateBalance();
     
-    const membersWithBalance = squadMembers.filter((memberId: string) => {
+    const verifiedMembersWithBalance = squadMembers.filter((memberId: string) => {
         const memberWallet = allWallets[memberId];
-        return memberWallet?.balances?.usdt >= minBalance;
+        return memberWallet?.verification_status === 'verified' && memberWallet?.balances?.usdt >= minBalance;
     });
 
-    if (membersWithBalance.length < 5) {
+    if (verifiedMembersWithBalance.length < 5) {
         return null; // Not enough members meeting criteria
     }
 
