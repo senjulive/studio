@@ -1,4 +1,3 @@
-
 'use server';
 
 import * as fs from 'fs/promises';
@@ -84,9 +83,9 @@ export async function createClan(leaderId: string, name: string, avatarUrl: stri
     
     const minBalance = await getMinClanCreateBalance();
     
-    const verifiedMembersWithBalance = squadMembers.filter((memberId: string) => {
+    const membersWithBalance = squadMembers.filter((memberId: string) => {
         const memberWallet = allWallets[memberId];
-        return memberWallet?.verification_status === 'verified' && memberWallet?.balances?.usdt >= minBalance;
+        return memberWallet?.balances?.usdt >= minBalance;
     });
 
     if (verifiedMembersWithBalance.length < 5) {
