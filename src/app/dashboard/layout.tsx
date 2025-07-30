@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -89,10 +88,121 @@ const mockUser = {
 
 function DashboardLoading() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-background text-foreground animate-in fade-in-50">
-      <AstralLogo className="h-40 w-40 animate-pulse" />
-      <p className="mt-4 text-lg font-semibold">Loading Your Dashboard</p>
-      <p className="text-muted-foreground">Please wait a moment...</p>
+    <div className="relative min-h-dvh overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-purple-950 flex flex-col items-center justify-center">
+      {/* Animated Background Pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_70%)]" />
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
+
+      {/* Floating Particles */}
+      <div className="absolute inset-0">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 3}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Neural Network Lines */}
+      <div className="absolute inset-0 opacity-20">
+        <svg className="w-full h-full" viewBox="0 0 1000 1000" fill="none">
+          <path d="M100,200 Q300,100 500,200 T900,200" stroke="rgb(59,130,246)" strokeWidth="1" className="animate-pulse" />
+          <path d="M100,400 Q300,300 500,400 T900,400" stroke="rgb(147,51,234)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '0.5s'}} />
+          <path d="M100,600 Q300,500 500,600 T900,600" stroke="rgb(6,182,212)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '1s'}} />
+          <path d="M100,800 Q300,700 500,800 T900,800" stroke="rgb(168,85,247)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '1.5s'}} />
+        </svg>
+      </div>
+
+      {/* Main Loading Content */}
+      <div className="relative z-10 flex flex-col items-center space-y-8 animate-in fade-in-50 duration-1000">
+        {/* Quantum Logo with Rotating Rings */}
+        <div className="relative">
+          {/* Outer rotating ring */}
+          <div className="absolute inset-0 w-48 h-48 border-2 border-blue-400/30 rounded-full animate-spin" style={{animationDuration: '4s'}} />
+
+          {/* Middle rotating ring */}
+          <div className="absolute inset-4 w-40 h-40 border-2 border-purple-400/40 rounded-full animate-spin" style={{animationDuration: '3s', animationDirection: 'reverse'}} />
+
+          {/* Inner rotating ring */}
+          <div className="absolute inset-8 w-32 h-32 border-2 border-cyan-400/50 rounded-full animate-spin" style={{animationDuration: '2s'}} />
+
+          {/* Central logo with pulse */}
+          <div className="relative flex items-center justify-center w-48 h-48">
+            <AstralLogo className="h-24 w-24 text-blue-400 animate-pulse" />
+          </div>
+
+          {/* Quantum dots */}
+          <div className="absolute top-4 left-1/2 w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0s'}} />
+          <div className="absolute top-1/2 right-4 w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.5s'}} />
+          <div className="absolute bottom-4 left-1/2 w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '1s'}} />
+          <div className="absolute top-1/2 left-4 w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '1.5s'}} />
+        </div>
+
+        {/* Loading Text with Gradient */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            Initializing AstralCore
+          </h1>
+          <div className="space-y-2">
+            <p className="text-xl text-gray-300 font-medium">Quantum AI Neural Networks</p>
+            <p className="text-gray-400">Calibrating trading algorithms...</p>
+          </div>
+        </div>
+
+        {/* Animated Progress Indicators */}
+        <div className="flex space-x-2">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"
+              style={{
+                animationDelay: `${i * 0.2}s`,
+                animationDuration: '1s'
+              }}
+            />
+          ))}
+        </div>
+
+        {/* System Status */}
+        <div className="flex flex-col sm:flex-row gap-4 text-sm">
+          <div className="flex items-center space-x-2 px-4 py-2 bg-blue-500/20 rounded-full border border-blue-400/30">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-blue-300">Neural Grid: Active</span>
+          </div>
+          <div className="flex items-center space-x-2 px-4 py-2 bg-purple-500/20 rounded-full border border-purple-400/30">
+            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}} />
+            <span className="text-purple-300">Market Analysis: Online</span>
+          </div>
+          <div className="flex items-center space-x-2 px-4 py-2 bg-cyan-500/20 rounded-full border border-cyan-400/30">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{animationDelay: '1s'}} />
+            <span className="text-cyan-300">Quantum Core: Syncing</span>
+          </div>
+        </div>
+
+        {/* Loading Bar */}
+        <div className="w-80 h-2 bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full animate-pulse transform origin-left animate-[slide_2s_ease-in-out_infinite]" />
+        </div>
+      </div>
+
+      {/* Bottom Subtle Branding */}
+      <div className="absolute bottom-8 text-center">
+        <p className="text-sm text-gray-500">AstralCore Quantum Nexus v3.76</p>
+      </div>
+
+      <style jsx>{`
+        @keyframes slide {
+          0% { transform: translateX(-100%) scaleX(0); }
+          50% { transform: translateX(0%) scaleX(1); }
+          100% { transform: translateX(100%) scaleX(0); }
+        }
+      `}</style>
     </div>
   );
 }
