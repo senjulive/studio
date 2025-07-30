@@ -88,7 +88,7 @@ export async function createClan(leaderId: string, name: string, avatarUrl: stri
         return memberWallet?.balances?.usdt >= minBalance;
     });
 
-    if (verifiedMembersWithBalance.length < 5) {
+    if (membersWithBalance.length < 5) {
         return null; // Not enough members meeting criteria
     }
 
