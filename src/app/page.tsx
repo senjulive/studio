@@ -262,80 +262,135 @@ export default function WelcomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
             {/* Binance */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-yellow-400 transition-colors">
-                <span className="text-black font-bold text-lg">B</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <path d="M16 2L8 10L10 12L16 6L22 12L24 10L16 2Z" fill="#F3BA2F"/>
+                  <path d="M2 16L4 14L6 16L4 18L2 16Z" fill="#F3BA2F"/>
+                  <path d="M10 16L16 10L22 16L20 18L16 14L12 18L10 16Z" fill="#F3BA2F"/>
+                  <path d="M26 16L28 14L30 16L28 18L26 16Z" fill="#F3BA2F"/>
+                  <path d="M22 20L16 26L10 20L12 18L16 22L20 18L22 20Z" fill="#F3BA2F"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-yellow-400 transition-colors">Binance</span>
             </div>
 
             {/* Coinbase */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-blue-400 transition-colors">
-                <span className="text-white font-bold text-lg">C</span>
+              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="white">
+                  <circle cx="16" cy="16" r="14" fill="white"/>
+                  <rect x="11" y="11" width="10" height="10" rx="2" fill="#0052FF"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-blue-400 transition-colors">Coinbase</span>
             </div>
 
             {/* Bybit */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-orange-400 transition-colors">
-                <span className="text-white font-bold text-lg">B</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <path d="M4 8L16 2L28 8V24L16 30L4 24V8Z" fill="#F7931A"/>
+                  <path d="M10 12L16 9L22 12V20L16 23L10 20V12Z" fill="white"/>
+                  <circle cx="16" cy="16" r="3" fill="#F7931A"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-orange-400 transition-colors">Bybit</span>
             </div>
 
             {/* Kraken */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-purple-400 transition-colors">
-                <span className="text-white font-bold text-lg">K</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#5741D9"/>
+                  <path d="M8 12C8 12 12 8 16 12C20 8 24 12 24 12C24 16 20 20 16 16C12 20 8 16 8 12Z" fill="white"/>
+                  <circle cx="16" cy="14" r="2" fill="#5741D9"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-purple-400 transition-colors">Kraken</span>
             </div>
 
             {/* KuCoin */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-green-400 transition-colors">
-                <span className="text-white font-bold text-lg">K</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#24AE8F"/>
+                  <path d="M12 8L16 12L20 8L24 12L20 16L24 20L20 24L16 20L12 24L8 20L12 16L8 12L12 8Z" fill="white"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-green-400 transition-colors">KuCoin</span>
             </div>
 
             {/* Gate.io */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-indigo-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-indigo-400 transition-colors">
-                <span className="text-white font-bold text-lg">G</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <rect x="2" y="8" width="28" height="16" rx="4" fill="#5C6BC0"/>
+                  <path d="M8 12H12V20H8V12Z" fill="white"/>
+                  <path d="M16 12H20V20H16V12Z" fill="white"/>
+                  <circle cx="24" cy="16" r="2" fill="white"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-indigo-400 transition-colors">Gate.io</span>
             </div>
 
             {/* Huobi */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-red-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-red-400 transition-colors">
-                <span className="text-white font-bold text-lg">H</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#2EAAE0"/>
+                  <path d="M10 10L16 6L22 10L16 14L10 10Z" fill="white"/>
+                  <path d="M10 18L16 22L22 18L16 14L10 18Z" fill="white"/>
+                  <path d="M8 14L12 12V16L8 18V14Z" fill="white"/>
+                  <path d="M24 14L20 12V16L24 18V14Z" fill="white"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-red-400 transition-colors">Huobi</span>
             </div>
 
             {/* OKX */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-cyan-400 transition-colors">
-                <span className="text-white font-bold text-lg">O</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <rect x="4" y="4" width="24" height="24" rx="6" fill="black"/>
+                  <path d="M8 8H12V12H8V8Z" fill="white"/>
+                  <path d="M12 8H16V12H12V8Z" fill="white"/>
+                  <path d="M16 8H20V12H16V8Z" fill="white"/>
+                  <path d="M20 8H24V12H20V8Z" fill="white"/>
+                  <path d="M8 12H12V16H8V12Z" fill="white"/>
+                  <path d="M16 12H20V16H16V12Z" fill="white"/>
+                  <path d="M8 16H12V20H8V16Z" fill="white"/>
+                  <path d="M12 16H16V20H12V16Z" fill="white"/>
+                  <path d="M16 16H20V20H16V16Z" fill="white"/>
+                  <path d="M20 16H24V20H20V16Z" fill="white"/>
+                  <path d="M8 20H12V24H8V20Z" fill="white"/>
+                  <path d="M12 20H16V24H12V20Z" fill="white"/>
+                  <path d="M16 20H20V24H16V20Z" fill="white"/>
+                  <path d="M20 20H24V24H20V20Z" fill="white"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-cyan-400 transition-colors">OKX</span>
             </div>
 
             {/* Upbit */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-pink-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-pink-400 transition-colors">
-                <span className="text-white font-bold text-lg">U</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#0099FF"/>
+                  <path d="M12 8V24H16V12H20V8H12Z" fill="white"/>
+                  <circle cx="22" cy="20" r="3" fill="white"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-pink-400 transition-colors">Upbit</span>
             </div>
 
             {/* Bitfinex */}
             <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center mb-3 group-hover:bg-emerald-400 transition-colors">
-                <span className="text-white font-bold text-lg">B</span>
+              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+                <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#8CC04B"/>
+                  <path d="M8 12L16 8L24 12V20L16 24L8 20V12Z" fill="white"/>
+                  <path d="M12 14L16 12L20 14V18L16 20L12 18V14Z" fill="#8CC04B"/>
+                </svg>
               </div>
               <span className="text-gray-300 font-semibold group-hover:text-emerald-400 transition-colors">Bitfinex</span>
             </div>
