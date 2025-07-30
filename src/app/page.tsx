@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AstralLogo } from '@/components/icons/astral-logo';
+import { LearnMoreModal } from '@/components/ui/learn-more-modal';
 import { ArrowRight, Zap, Brain, TrendingUp, Shield, Cpu, Sparkles } from 'lucide-react';
 
 export default function WelcomePage() {
