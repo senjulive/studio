@@ -1,5 +1,3 @@
-
-'use server';
 // This is a server-safe module for tier data and logic.
 // It does not contain any client-side code (like React components or hooks).
 
@@ -56,4 +54,3 @@ export async function getCurrentTier(userId: string): Promise<TierSetting | unde
   // TODO: Implement logic to get the current tier for a user
   return defaultTierSettings[0]; // Return a default tier for now
 }
-    
