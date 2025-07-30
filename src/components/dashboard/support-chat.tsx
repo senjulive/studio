@@ -90,7 +90,7 @@ const faqs = [
   },
   {
     question: "What are the withdrawal limits?",
-    answer: "All accounts have a daily withdrawal limit of $10,000. This helps ensure security and regulatory compliance."
+    answer: "Withdrawal limits depend on your verification level. Verified accounts can withdraw up to $10,000 daily, while unverified accounts have a $500 daily limit."
   },
   {
     question: "How does the trading bot work?",
