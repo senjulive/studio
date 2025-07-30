@@ -100,10 +100,12 @@ export default function WelcomePage() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button variant="outline" size="lg" className="border-gray-600 text-gray-300 hover:bg-gray-800 px-8 py-4 text-lg">
-                <Brain className="mr-2 h-5 w-5" />
-                Learn More
-              </Button>
+              <LearnMoreModal>
+                <Button variant="outline" size="lg" className="border-gray-600 text-gray-300 hover:bg-gray-800 px-8 py-4 text-lg">
+                  <Brain className="mr-2 h-5 w-5" />
+                  Learn More
+                </Button>
+              </LearnMoreModal>
             </div>
           </div>
         </div>
