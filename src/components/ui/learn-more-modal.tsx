@@ -203,7 +203,7 @@ export function LearnMoreModal({ children }: LearnMoreModalProps) {
                       <h4 className="font-semibold text-blue-400 mb-2">Getting Started</h4>
                       <ul className="text-sm text-gray-300 space-y-1">
                         <li>• Sign up in 2 minutes</li>
-                        <li>• Deposit minimum $10</li>
+                        <li>• Deposit minimum $100</li>
                         <li>• Activate your AI bot</li>
                         <li>• Start earning immediately</li>
                       </ul>
