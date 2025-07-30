@@ -86,30 +86,30 @@ export function LearnMoreModal({ children }: LearnMoreModalProps) {
     },
     {
       name: "Silver",
-      balance: "$500 - $999", 
-      earnings: "1.5% daily",
-      features: ["Advanced algorithms", "15 manual earnings/day", "Squad bonuses"],
+      balance: "$500 - $999",
+      earnings: "3.0% daily",
+      features: ["Advanced algorithms", "5 manual earnings/day", "Squad bonuses"],
       color: "border-slate-400/50 text-slate-300"
     },
     {
       name: "Gold",
       balance: "$1,000 - $4,999",
-      earnings: "2.0% daily", 
-      features: ["Premium strategies", "20 manual earnings/day", "VIP access"],
+      earnings: "4.0% daily",
+      features: ["Premium strategies", "6 manual earnings/day", "VIP access"],
       color: "border-yellow-400/50 text-yellow-400"
     },
     {
       name: "Platinum",
-      balance: "$5,000 - $9,999",
-      earnings: "2.5% daily",
-      features: ["Elite algorithms", "25 manual earnings/day", "Personal advisor"],
+      balance: "$5,000 - $14,999",
+      earnings: "5.5% daily",
+      features: ["Elite algorithms", "7 manual earnings/day", "Personal advisor"],
       color: "border-blue-400/50 text-blue-400"
     },
     {
-      name: "Diamond", 
-      balance: "$10,000+",
-      earnings: "3.0% daily",
-      features: ["Quantum AI access", "Unlimited earnings", "Exclusive features"],
+      name: "Diamond",
+      balance: "$15,000+",
+      earnings: "8.5% daily",
+      features: ["Quantum AI access", "10+ manual earnings/day", "Exclusive features"],
       color: "border-purple-400/50 text-purple-400"
     }
   ];
