@@ -16,7 +16,7 @@ export type TierSetting = {
 };
 
 const defaultTierSettings: TierSetting[] = [
-  { id: 'tier-1', name: 'VIP CORE I', balanceThreshold: 0, dailyProfit: 0.02, clicks: 4, locked: false },
+  { id: 'tier-1', name: 'VIP CORE I', balanceThreshold: 100, dailyProfit: 0.02, clicks: 4, locked: false },
   { id: 'tier-2', name: 'VIP CORE II', balanceThreshold: 500, dailyProfit: 0.03, clicks: 5, locked: false },
   { id: 'tier-3', name: 'VIP CORE III', balanceThreshold: 1000, dailyProfit: 0.04, clicks: 6, locked: false },
   { id: 'tier-4', name: 'VIP CORE IV', balanceThreshold: 5000, dailyProfit: 0.055, clicks: 7, locked: false },
