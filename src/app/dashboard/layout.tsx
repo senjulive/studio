@@ -396,41 +396,52 @@ URL=${window.location.origin}`;
             </div>
           </SidebarHeader>
 
-          <div className="mt-12 mb-4 px-4 space-y-4">
-             <div className="flex items-center gap-3">
-                  <AvatarUploadDialog 
+          <div className="p-4 space-y-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-xl"></div>
+              <div className="relative p-4 rounded-xl border border-sidebar-border/50 bg-sidebar-background/50 backdrop-blur-sm">
+                <div className="flex items-center gap-3 mb-3">
+                  <AvatarUploadDialog
                     onUploadSuccess={() => fetchWalletAndTiers(user.id)}
                     wallet={wallet}
                   >
-                    <Avatar className="h-12 w-12 cursor-pointer">
-                      <AvatarImage
-                        src={wallet?.profile?.avatarUrl}
-                        alt={wallet?.profile?.username || 'User'}
-                      />
-                      <AvatarFallback>{userInitial}</AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-primary/30 rounded-full blur-sm animate-pulse"></div>
+                      <Avatar className="h-12 w-12 cursor-pointer relative border-2 border-primary/20">
+                        <AvatarImage
+                          src={wallet?.profile?.avatarUrl}
+                          alt={wallet?.profile?.username || 'User'}
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-bold">
+                          {userInitial}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
                   </AvatarUploadDialog>
 
-                  <div className="overflow-hidden">
-                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
+                  <div className="flex-1 overflow-hidden">
+                     <p className="font-bold text-sidebar-foreground truncate flex items-center gap-2 text-sm">
                         {wallet?.profile?.username || 'User'}
-                        {userCountry && <span className="text-lg">{userCountry.flag}</span>}
+                        {userCountry && <span className="text-base">{userCountry.flag}</span>}
                      </p>
-                     <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
+                     <p className="text-xs text-sidebar-foreground/60 truncate font-medium">{userEmail}</p>
                   </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
-                    <RankIcon className="h-4 w-4" />
-                    <span>{rank.name}</span>
-                 </Badge>
-                 {tier && TierIcon && tierClassName && (
-                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
-                    <TierIcon className="h-4 w-4" />
-                    <span>{tier.name}</span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1 border-opacity-50 bg-opacity-10", rank.className)}>
+                    <RankIcon className="h-3 w-3" />
+                    <span className="font-medium">{rank.name}</span>
                   </Badge>
-                )}
+                  {tier && TierIcon && tierClassName && (
+                    <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1 border-opacity-50 bg-opacity-10", tierClassName)}>
+                      <TierIcon className="h-3 w-3" />
+                      <span className="font-medium">{tier.name}</span>
+                    </Badge>
+                  )}
+                </div>
               </div>
+            </div>
           </div>
           <Separator className="bg-sidebar-border" />
 
