@@ -261,8 +261,8 @@ export default function WelcomePage() {
           {/* Exchange Logos Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
             {/* Binance */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <path d="M16 2L8 10L10 12L16 6L22 12L24 10L16 2Z" fill="#F3BA2F"/>
                   <path d="M2 16L4 14L6 16L4 18L2 16Z" fill="#F3BA2F"/>
