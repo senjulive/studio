@@ -1,38 +1,38 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* Dark Theme (Default) */
     --background: 224 71% 4%;
     --foreground: 210 40% 98%;
-    
+
     --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
-    
+
     --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
-    
+
     --primary: 213 94% 68%; /* A vibrant blue */
     --primary-foreground: 222 47% 11%;
-    
+
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-    
+
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-    
+
     --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
-    
+
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    
-    --border: 217 33% 25%; /* Slightly lighter border for glass effect */
+
+    --border: 217 33% 25%;
     --input: 217 33% 17%;
     --ring: 213 94% 68%;
-    
+
     --chart-1: 22 92% 58%;
     --chart-2: 142.1 76.2% 36.3%;
     --chart-3: 197 37% 24%;
@@ -57,6 +57,88 @@
     --color-gold: 47.9 95.8% 53.1%;
     --color-platinum: 197.8 91.1% 47.6%;
     --color-diamond: 270 95.2% 60.2%;
+  }
+
+  /* Light Theme */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 213 94% 68%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 213 94% 68%;
+
+    /* Light Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-primary: 222.2 84% 4.9%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222.2 84% 4.9%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 213 94% 68%;
+  }
+
+  /* Purple Theme */
+  .purple {
+    --background: 270 20% 8%;
+    --foreground: 270 15% 98%;
+
+    --card: 270 30% 12%;
+    --card-foreground: 270 15% 98%;
+
+    --popover: 270 20% 8%;
+    --popover-foreground: 270 15% 98%;
+
+    --primary: 270 95% 75%;
+    --primary-foreground: 270 30% 12%;
+
+    --secondary: 270 25% 15%;
+    --secondary-foreground: 270 15% 98%;
+
+    --muted: 270 25% 15%;
+    --muted-foreground: 270 15% 65%;
+
+    --accent: 270 25% 15%;
+    --accent-foreground: 270 15% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 270 15% 98%;
+
+    --border: 270 25% 25%;
+    --input: 270 25% 15%;
+    --ring: 270 95% 75%;
+
+    /* Purple Sidebar */
+    --sidebar-background: 270 20% 8%;
+    --sidebar-foreground: 270 15% 98%;
+    --sidebar-primary: 270 15% 98%;
+    --sidebar-primary-foreground: 270 30% 12%;
+    --sidebar-accent: 270 25% 15%;
+    --sidebar-accent-foreground: 270 15% 98%;
+    --sidebar-border: 270 25% 15%;
+    --sidebar-ring: 270 95% 75%;
   }
 }
 
