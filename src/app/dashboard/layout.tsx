@@ -637,7 +637,7 @@ URL=${window.location.origin}`;
                   </Link>
                 </Button>
                 <NotificationBell />
-                <ThemeSwitcher />
+                <ModeToggle />
               </div>
             </header>
             {children}
