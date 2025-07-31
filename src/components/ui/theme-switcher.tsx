@@ -12,7 +12,26 @@ import {
 import { Sun, Moon, Palette, Monitor } from "lucide-react";
 
 export function ThemeSwitcher() {
+  const [mounted, setMounted] = React.useState(false);
   const { theme, setTheme } = useTheme();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-10 px-4 bg-background/50 backdrop-blur-sm border-white/10"
+        disabled
+      >
+        <Monitor className="h-4 w-4 mr-2 text-gray-400" />
+        <span className="hidden sm:inline">Theme</span>
+      </Button>
+    );
+  }
 
   const themes = [
     {
