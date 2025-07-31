@@ -1,11 +1,11 @@
-
 'use server';
 
 import { NextResponse } from 'next/server';
 import { getClanForUser, addClanMessage, getClanMessages } from '@/lib/squad-clans';
 import { getWalletByUserId } from '@/lib/wallet';
 import { getUserRank } from '@/lib/ranks';
-import { getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+import { getCurrentTier } from '@/lib/tiers';
+import { getBotTierSettingsServer } from '@/lib/tiers-server';
 
 export async function POST(request: Request) {
     try {
