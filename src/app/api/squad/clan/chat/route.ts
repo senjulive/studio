@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
         const [wallet, tierSettings] = await Promise.all([
             getWalletByUserId(userId),
-            getBotTierSettings()
+            getBotTierSettingsServer()
         ]);
 
         if (!wallet) {
