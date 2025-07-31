@@ -89,7 +89,7 @@ const mockUser = {
 
 function DashboardLoading() {
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-purple-950 flex flex-col items-center justify-center">
+    <div className="purple relative min-h-dvh overflow-hidden bg-gradient-to-br from-background via-blue-950 to-purple-950 flex flex-col items-center justify-center">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_70%)]" />
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
