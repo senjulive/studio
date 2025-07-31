@@ -15,7 +15,7 @@ export type SquadMember = {
 
 export async function GET(request: Request) {
     try {
-        const tierSettings = await getBotTierSettings();
+        const tierSettings = await getBotTierSettingsServer();
 
         // This is mock data and would be replaced by a database query in a real app
         const mockSquad: Omit<SquadMember, 'rank' | 'tier'>[] = [
