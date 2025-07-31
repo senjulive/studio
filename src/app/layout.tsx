@@ -50,8 +50,9 @@ export default function RootLayout({
       <body className="font-body antialiased bg-background">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
+          themes={['light', 'dark', 'purple', 'system']}
           disableTransitionOnChange
         >
           {children}
