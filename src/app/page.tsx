@@ -9,7 +9,7 @@ import { ArrowRight, Zap, Brain, TrendingUp, Shield, Cpu, Sparkles, Globe } from
 
 export default function WelcomePage() {
   return (
-    <main className="relative min-h-dvh overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
+    <main className="purple relative min-h-dvh overflow-hidden bg-gradient-to-br from-background via-blue-950 to-purple-950">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_70%)]" />
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
