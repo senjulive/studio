@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { LearnMoreModal } from '@/components/ui/learn-more-modal';
-// import { ThemeSwitcher } from '@/components/ui/theme-switcher';
+import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import { ArrowRight, Zap, Brain, TrendingUp, Shield, Cpu, Sparkles, Globe } from 'lucide-react';
 
 export default function WelcomePage() {
