@@ -33,15 +33,18 @@ export default function WelcomePage() {
               Next-Generation Trading Bot Active
             </div>
           </div>
-          <div className="hidden sm:flex items-center gap-4">
-            <Badge variant="outline" className="border-green-400/50 text-green-300 bg-green-400/10 animate-pulse">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
-              99.7% Uptime
-            </Badge>
-            <Badge variant="outline" className="border-blue-400/50 text-blue-300 bg-blue-400/10">
-              <TrendingUp className="w-3 h-3 mr-1" />
-              +2.8% Daily Avg
-            </Badge>
+          <div className="flex items-center gap-4">
+            <ThemeSwitcher />
+            <div className="hidden sm:flex items-center gap-4">
+              <Badge variant="outline" className="border-green-400/50 text-green-300 bg-green-400/10 animate-pulse">
+                <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
+                99.7% Uptime
+              </Badge>
+              <Badge variant="outline" className="border-blue-400/50 text-blue-300 bg-blue-400/10">
+                <TrendingUp className="w-3 h-3 mr-1" />
+                +2.8% Daily Avg
+              </Badge>
+            </div>
           </div>
         </div>
 
