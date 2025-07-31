@@ -443,31 +443,71 @@ URL=${window.location.origin}`;
               </div>
             </div>
           </div>
-          <Separator className="bg-sidebar-border" />
-
-          <SidebarContent>
-            <SidebarMenu>
+          <SidebarContent className="px-2">
+            <SidebarMenu className="space-y-1">
               {menuConfig.map((group, index) => (
-                  <React.Fragment key={group.title}>
-                    {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
-                    <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
-                    {group.items.map((item) => (
-                      <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
-                          }
-                        >
-                          <Link href={item.href} download={item.download}>
-                            <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
-                            <span>{item.label}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </React.Fragment>
-                ))}
+                <React.Fragment key={group.title}>
+                  {index > 0 && (
+                    <div className="my-4">
+                      <Separator className="bg-sidebar-border/30" />
+                    </div>
+                  )}
+                  <div className="px-3 py-2">
+                    <h3 className="text-xs font-bold text-sidebar-foreground/40 uppercase tracking-wider mb-2 flex items-center gap-2">
+                      {group.title === 'Overview' && <Cpu className="h-3 w-3" />}
+                      {group.title === 'Community' && <Users className="h-3 w-3" />}
+                      {group.title === 'Manage' && <Shield className="h-3 w-3" />}
+                      {group.title === 'Account' && <User className="h-3 w-3" />}
+                      {group.title === 'Platform' && <Globe className="h-3 w-3" />}
+                      {group.title === 'Admin Tools' && <Lock className="h-3 w-3" />}
+                      {group.title}
+                    </h3>
+                    <div className="space-y-1">
+                      {group.items.map((item) => {
+                        const isActive = isClient ? (pathname.endsWith(item.href) && !item.download) : false;
+                        return (
+                          <SidebarMenuItem key={item.href}>
+                            <SidebarMenuButton
+                              asChild
+                              className={cn(
+                                "h-10 px-3 rounded-lg transition-all duration-200 group hover:shadow-sm",
+                                isActive
+                                  ? "bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/20 text-primary shadow-sm"
+                                  : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                              )}
+                            >
+                              <Link href={item.href} download={item.download} className="flex items-center gap-3 w-full">
+                                {item.label === 'CORE' ? (
+                                  <div className="relative">
+                                    <div className="absolute inset-0 bg-primary/30 rounded-md blur-sm animate-pulse"></div>
+                                    <div className="relative bg-gradient-to-br from-primary/20 to-primary/10 p-1 rounded-md border border-primary/20">
+                                      <item.icon className="h-4 w-4 text-primary" />
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <item.icon className={cn(
+                                    "h-4 w-4 transition-colors",
+                                    isActive ? "text-primary" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
+                                  )} />
+                                )}
+                                <span className={cn(
+                                  "font-medium text-sm transition-colors",
+                                  isActive ? "text-primary font-semibold" : "text-sidebar-foreground group-hover:text-sidebar-foreground"
+                                )}>
+                                  {item.label}
+                                </span>
+                                {isActive && (
+                                  <div className="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                                )}
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </React.Fragment>
+              ))}
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
