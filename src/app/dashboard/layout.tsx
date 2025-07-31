@@ -376,13 +376,23 @@ URL=${window.location.origin}`;
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
-        <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <AstralLogo className="h-10 w-10" />
-              <span className="text-lg font-semibold text-sidebar-foreground">
-                AstralCore
-              </span>
+        <Sidebar className="border-r-0 shadow-lg">
+          <SidebarHeader className="border-b border-sidebar-border/50 bg-gradient-to-r from-sidebar-background to-sidebar-background/80 backdrop-blur-sm">
+            <div className="flex items-center gap-3 p-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-lg blur-sm"></div>
+                <div className="relative bg-gradient-to-br from-primary/20 to-primary/10 p-2 rounded-lg border border-primary/20">
+                  <AstralLogo className="h-8 w-8 text-primary" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-bold bg-gradient-to-r from-sidebar-foreground to-sidebar-foreground/80 bg-clip-text text-transparent">
+                  AstralCore
+                </span>
+                <span className="text-xs text-sidebar-foreground/60 font-medium">
+                  Quantum Nexus v3.76
+                </span>
+              </div>
             </div>
           </SidebarHeader>
 
