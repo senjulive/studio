@@ -226,7 +226,7 @@ export default function DashboardLayout({
     try {
         const [walletData, tiers] = await Promise.all([
             getOrCreateWallet(userId),
-            getBotTierSettings()
+            Promise.resolve(getBotTierSettings())
         ]);
         setWallet(walletData);
         setTierSettings(tiers);
