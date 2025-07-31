@@ -1,8 +1,4 @@
-
-'use server';
-
-import { getBotTierSettings } from './tiers';
-import { getCurrentTier } from './ranks';
+import { getBotTierSettings, getCurrentTier } from './tiers';
 import initialWallets from '../../data/wallets.json';
 
 let mockWallets: Record<string, any> = initialWallets;
@@ -63,7 +59,7 @@ export async function getOrCreateWallet(userId?: string): Promise<WalletData> {
         const lastReset = growthData?.lastReset ? new Date(growthData.lastReset).getTime() : 0;
 
         if (now - lastReset > oneDay) {
-            const settings = await getBotTierSettings();
+            const settings = getBotTierSettings();
             const balance = wallet.balances?.usdt || 0;
             const currentTier = getCurrentTier(balance, settings);
             
@@ -104,5 +100,3 @@ export async function getWithdrawalAddresses(): Promise<WithdrawalAddresses> {
     const wallet = await getOrCreateWallet();
     return wallet.security?.withdrawalAddresses || {};
 }
-
-    

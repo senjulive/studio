@@ -1,62 +1,144 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 224 71% 4%;
+    /* Dark Theme - Welcome Page Style */
+    --background: 220 71% 4%; /* Deep slate-blue like welcome page */
     --foreground: 210 40% 98%;
-    
-    --card: 222 47% 11%;
+
+    --card: 220 47% 8%; /* Darker slate-blue for cards */
     --card-foreground: 210 40% 98%;
-    
-    --popover: 224 71% 4%;
+
+    --popover: 220 71% 4%;
     --popover-foreground: 210 40% 98%;
-    
-    --primary: 213 94% 68%; /* A vibrant blue */
-    --primary-foreground: 222 47% 11%;
-    
-    --secondary: 217 33% 17%;
+
+    --primary: 213 94% 68%; /* Vibrant blue from welcome page */
+    --primary-foreground: 220 47% 8%;
+
+    --secondary: 220 33% 12%; /* Muted blue-slate */
     --secondary-foreground: 210 40% 98%;
-    
-    --muted: 217 33% 17%;
+
+    --muted: 220 33% 12%;
     --muted-foreground: 215 20% 65%;
-    
-    --accent: 217 33% 17%;
+
+    --accent: 220 33% 15%; /* Slightly lighter for accent */
     --accent-foreground: 210 40% 98%;
-    
+
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    
-    --border: 217 33% 25%; /* Slightly lighter border for glass effect */
-    --input: 217 33% 17%;
-    --ring: 213 94% 68%;
-    
-    --chart-1: 22 92% 58%;
-    --chart-2: 142.1 76.2% 36.3%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
+    --border: 220 33% 20%; /* More visible borders */
+    --input: 220 33% 12%;
+    --ring: 213 94% 68%; /* Blue ring to match primary */
+
+    --chart-1: 213 94% 68%; /* Vibrant blue */
+    --chart-2: 270 95% 75%; /* Purple */
+    --chart-3: 180 98% 60%; /* Cyan */
+    --chart-4: 43 74% 66%; /* Gold accent */
+    --chart-5: 120 60% 50%; /* Green accent */
     --radius: 0.75rem;
 
-    /* Custom Sidebar Vars */
-    --sidebar-background: 224 71% 4%;
+    /* Custom Sidebar Vars - Welcome Page Style */
+    --sidebar-background: 220 71% 4%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 210 40% 98%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 217 33% 17%;
+    --sidebar-primary-foreground: 220 47% 8%;
+    --sidebar-accent: 220 33% 15%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
+    --sidebar-border: 220 33% 15%;
     --sidebar-ring: 213 94% 68%;
 
-    /* Chart Colors for Ranks */
-    --color-recruit: 240 3.8% 46.1%;
-    --color-bronze: 24 9.8% 30%;
-    --color-silver: 240 4.8% 95.9%;
+    /* Chart Colors for Ranks - Welcome Page Palette */
+    --color-recruit: 220 20% 50%;
+    --color-bronze: 24 75% 50%;
+    --color-silver: 240 10% 80%;
     --color-gold: 47.9 95.8% 53.1%;
-    --color-platinum: 197.8 91.1% 47.6%;
-    --color-diamond: 270 95.2% 60.2%;
+    --color-platinum: 213 94% 68%;
+    --color-diamond: 270 95% 75%;
+  }
+
+  /* Light Theme */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 213 94% 68%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 213 94% 68%;
+
+    /* Light Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-primary: 222.2 84% 4.9%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222.2 84% 4.9%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 213 94% 68%;
+  }
+
+  /* Purple Theme - Welcome Page Style */
+  .purple {
+    --background: 220 71% 4%; /* Deep slate-blue similar to welcome page */
+    --foreground: 210 40% 98%;
+
+    --card: 220 47% 8%; /* Slightly lighter slate-blue for cards */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 71% 4%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 213 94% 68%; /* Vibrant blue like welcome page primary */
+    --primary-foreground: 220 47% 8%;
+
+    --secondary: 220 33% 12%; /* Muted blue-slate */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 220 33% 12%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 220 33% 15%; /* Slightly lighter for accent */
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 33% 20%; /* More visible borders */
+    --input: 220 33% 12%;
+    --ring: 213 94% 68%; /* Blue ring to match primary */
+
+    /* Purple Sidebar - Welcome Page Style */
+    --sidebar-background: 220 71% 4%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 40% 98%;
+    --sidebar-primary-foreground: 220 47% 8%;
+    --sidebar-accent: 220 33% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 33% 15%;
+    --sidebar-ring: 213 94% 68%;
   }
 }
 

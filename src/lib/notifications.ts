@@ -1,6 +1,3 @@
-
-'use server';
-
 // Mock implementation for notifications using a simple JSON structure.
 import initialNotifications from '../../data/notifications.json';
 

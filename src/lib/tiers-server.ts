@@ -1,14 +1,8 @@
-// Client-safe module for tier data and logic.
-// Contains types and client-side utilities only.
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import type { TierSetting } from './tiers';
 
-export type TierSetting = {
-  id: string; // e.g., 'tier-1'
-  name: string;
-  balanceThreshold: number;
-  dailyProfit: number; // as a decimal, e.g., 0.02 for 2%
-  clicks: number;
-  locked: boolean;
-};
+const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
 
 const defaultTierSettings: TierSetting[] = [
   { id: 'tier-1', name: 'VIP CORE I', balanceThreshold: 100, dailyProfit: 0.02, clicks: 4, locked: false },
@@ -21,16 +15,24 @@ const defaultTierSettings: TierSetting[] = [
   { id: 'tier-8', name: 'VIP CORE VIII', balanceThreshold: 100000, dailyProfit: 0.12, clicks: 15, locked: true },
 ];
 
-// Client-safe function to get tier settings
-export function getBotTierSettings(): TierSetting[] {
-    return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
+async function readSettings() {
+  try {
+    const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return {};
+  }
 }
 
-// Client-safe function to get current tier based on balance
-export function getCurrentTier(balance: number, tiers?: TierSetting[]): TierSetting | null {
-    const tierList = tiers || defaultTierSettings;
-    const applicableTier = [...tierList].reverse().find(
-        tier => balance >= tier.balanceThreshold && !tier.locked
-    );
-    return applicableTier || tierList.find(t => !t.locked) || null;
+export async function getBotTierSettingsServer(): Promise<TierSetting[]> {
+    try {
+        const settings = await readSettings();
+        const tierSettings = settings['botTierSettings'];
+        if (tierSettings && Array.isArray(tierSettings) && tierSettings.length > 0) {
+            return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
+        }
+    } catch (error) {
+        console.error("Could not read tier settings from file, using defaults.", error);
+    }
+    return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }

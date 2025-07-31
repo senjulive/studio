@@ -1,6 +1,6 @@
 {
   "botSettings": {
-    "minGridBalance": 0
+    "minGridBalance": 100
   },
   "botTierSettings": []
 }

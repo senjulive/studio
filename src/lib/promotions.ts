@@ -1,6 +1,3 @@
-
-'use server';
-
 // Mock implementation for promotions since Supabase is removed.
 
 export type Promotion = {

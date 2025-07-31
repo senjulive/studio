@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -45,12 +44,12 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { MessageSquare, UserPlus, Shield, Lock, Trophy } from 'lucide-react';
+import { MessageSquare, UserPlus, Shield, Lock, Trophy, Cpu, Users, User, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
-import { getUserRank, getCurrentTier } from '@/lib/ranks';
-import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
+import { getUserRank } from '@/lib/ranks';
+import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
@@ -68,6 +67,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
 import { RightSidebar } from '@/components/ui/right-sidebar';
 import { ModeToggle } from '@/components/ui/mode-toggle';
+import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -89,10 +89,121 @@ const mockUser = {
 
 function DashboardLoading() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-background text-foreground animate-in fade-in-50">
-      <AstralLogo className="h-40 w-40 animate-pulse" />
-      <p className="mt-4 text-lg font-semibold">Loading Your Dashboard</p>
-      <p className="text-muted-foreground">Please wait a moment...</p>
+    <div className="purple relative min-h-dvh overflow-hidden bg-gradient-to-br from-background via-blue-950 to-purple-950 flex flex-col items-center justify-center">
+      {/* Animated Background Pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_70%)]" />
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
+
+      {/* Floating Particles */}
+      <div className="absolute inset-0">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 3}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Neural Network Lines */}
+      <div className="absolute inset-0 opacity-20">
+        <svg className="w-full h-full" viewBox="0 0 1000 1000" fill="none">
+          <path d="M100,200 Q300,100 500,200 T900,200" stroke="rgb(59,130,246)" strokeWidth="1" className="animate-pulse" />
+          <path d="M100,400 Q300,300 500,400 T900,400" stroke="rgb(147,51,234)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '0.5s'}} />
+          <path d="M100,600 Q300,500 500,600 T900,600" stroke="rgb(6,182,212)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '1s'}} />
+          <path d="M100,800 Q300,700 500,800 T900,800" stroke="rgb(168,85,247)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '1.5s'}} />
+        </svg>
+      </div>
+
+      {/* Main Loading Content */}
+      <div className="relative z-10 flex flex-col items-center space-y-8 animate-in fade-in-50 duration-1000">
+        {/* Quantum Logo with Rotating Rings */}
+        <div className="relative">
+          {/* Outer rotating ring */}
+          <div className="absolute inset-0 w-48 h-48 border-2 border-blue-400/30 rounded-full animate-spin" style={{animationDuration: '4s'}} />
+
+          {/* Middle rotating ring */}
+          <div className="absolute inset-4 w-40 h-40 border-2 border-purple-400/40 rounded-full animate-spin" style={{animationDuration: '3s', animationDirection: 'reverse'}} />
+
+          {/* Inner rotating ring */}
+          <div className="absolute inset-8 w-32 h-32 border-2 border-cyan-400/50 rounded-full animate-spin" style={{animationDuration: '2s'}} />
+
+          {/* Central logo with pulse */}
+          <div className="relative flex items-center justify-center w-48 h-48">
+            <AstralLogo className="h-24 w-24 text-blue-400 animate-pulse" />
+          </div>
+
+          {/* Quantum dots */}
+          <div className="absolute top-4 left-1/2 w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0s'}} />
+          <div className="absolute top-1/2 right-4 w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.5s'}} />
+          <div className="absolute bottom-4 left-1/2 w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '1s'}} />
+          <div className="absolute top-1/2 left-4 w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '1.5s'}} />
+        </div>
+
+        {/* Loading Text with Gradient */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            Initializing AstralCore
+          </h1>
+          <div className="space-y-2">
+            <p className="text-xl text-gray-300 font-medium">Quantum AI Neural Networks</p>
+            <p className="text-gray-400">Calibrating trading algorithms...</p>
+          </div>
+        </div>
+
+        {/* Animated Progress Indicators */}
+        <div className="flex space-x-2">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"
+              style={{
+                animationDelay: `${i * 0.2}s`,
+                animationDuration: '1s'
+              }}
+            />
+          ))}
+        </div>
+
+        {/* System Status */}
+        <div className="flex flex-col sm:flex-row gap-4 text-sm">
+          <div className="flex items-center space-x-2 px-4 py-2 bg-blue-500/20 rounded-full border border-blue-400/30">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-blue-300">Neural Grid: Active</span>
+          </div>
+          <div className="flex items-center space-x-2 px-4 py-2 bg-purple-500/20 rounded-full border border-purple-400/30">
+            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}} />
+            <span className="text-purple-300">Market Analysis: Online</span>
+          </div>
+          <div className="flex items-center space-x-2 px-4 py-2 bg-cyan-500/20 rounded-full border border-cyan-400/30">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{animationDelay: '1s'}} />
+            <span className="text-cyan-300">Quantum Core: Syncing</span>
+          </div>
+        </div>
+
+        {/* Loading Bar */}
+        <div className="w-80 h-2 bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full animate-pulse transform origin-left animate-[slide_2s_ease-in-out_infinite]" />
+        </div>
+      </div>
+
+      {/* Bottom Subtle Branding */}
+      <div className="absolute bottom-8 text-center">
+        <p className="text-sm text-gray-500">AstralCore Quantum Nexus v3.76</p>
+      </div>
+
+      <style jsx>{`
+        @keyframes slide {
+          0% { transform: translateX(-100%) scaleX(0); }
+          50% { transform: translateX(0%) scaleX(1); }
+          100% { transform: translateX(100%) scaleX(0); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -116,7 +227,7 @@ export default function DashboardLayout({
     try {
         const [walletData, tiers] = await Promise.all([
             getOrCreateWallet(userId),
-            getBotTierSettings()
+            Promise.resolve(getBotTierSettings())
         ]);
         setWallet(walletData);
         setTierSettings(tiers);
@@ -266,118 +377,215 @@ URL=${window.location.origin}`;
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
-        <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <AstralLogo className="h-10 w-10" />
-              <span className="text-lg font-semibold text-sidebar-foreground">
-                AstralCore
-              </span>
+        <Sidebar className="border-r-0 shadow-lg">
+          <SidebarHeader className="border-b border-sidebar-border/50 bg-gradient-to-r from-sidebar-background to-sidebar-background/80 backdrop-blur-sm">
+            <div className="flex items-center gap-3 p-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-lg blur-sm"></div>
+                <div className="relative bg-gradient-to-br from-primary/20 to-primary/10 p-2 rounded-lg border border-primary/20">
+                  <AstralLogo className="h-8 w-8 text-primary" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-bold bg-gradient-to-r from-sidebar-foreground to-sidebar-foreground/80 bg-clip-text text-transparent">
+                  AstralCore
+                </span>
+                <span className="text-xs text-sidebar-foreground/60 font-medium">
+                  Quantum Nexus v3.76
+                </span>
+              </div>
             </div>
           </SidebarHeader>
 
-          <div className="mt-12 mb-4 px-4 space-y-4">
-             <div className="flex items-center gap-3">
-                  <AvatarUploadDialog 
+          <div className="p-4 space-y-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-xl"></div>
+              <div className="relative p-4 rounded-xl border border-sidebar-border/50 bg-sidebar-background/50 backdrop-blur-sm">
+                <div className="flex items-center gap-3 mb-3">
+                  <AvatarUploadDialog
                     onUploadSuccess={() => fetchWalletAndTiers(user.id)}
                     wallet={wallet}
                   >
-                    <Avatar className="h-12 w-12 cursor-pointer">
-                      <AvatarImage
-                        src={wallet?.profile?.avatarUrl}
-                        alt={wallet?.profile?.username || 'User'}
-                      />
-                      <AvatarFallback>{userInitial}</AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-primary/30 rounded-full blur-sm animate-pulse"></div>
+                      <Avatar className="h-12 w-12 cursor-pointer relative border-2 border-primary/20">
+                        <AvatarImage
+                          src={wallet?.profile?.avatarUrl}
+                          alt={wallet?.profile?.username || 'User'}
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-bold">
+                          {userInitial}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
                   </AvatarUploadDialog>
 
-                  <div className="overflow-hidden">
-                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
+                  <div className="flex-1 overflow-hidden">
+                     <p className="font-bold text-sidebar-foreground truncate flex items-center gap-2 text-sm">
                         {wallet?.profile?.username || 'User'}
-                        {userCountry && <span className="text-lg">{userCountry.flag}</span>}
+                        {userCountry && <span className="text-base">{userCountry.flag}</span>}
                      </p>
-                     <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
+                     <p className="text-xs text-sidebar-foreground/60 truncate font-medium">{userEmail}</p>
                   </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
-                    <RankIcon className="h-4 w-4" />
-                    <span>{rank.name}</span>
-                 </Badge>
-                 {tier && TierIcon && tierClassName && (
-                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
-                    <TierIcon className="h-4 w-4" />
-                    <span>{tier.name}</span>
-                  </Badge>
-                )}
-              </div>
-          </div>
-          <Separator className="bg-sidebar-border" />
+                </div>
 
-          <SidebarContent>
-            <SidebarMenu>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1 border-opacity-50 bg-opacity-10", rank.className)}>
+                    <RankIcon className="h-3 w-3" />
+                    <span className="font-medium">{rank.name}</span>
+                  </Badge>
+                  {tier && TierIcon && tierClassName && (
+                    <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1 border-opacity-50 bg-opacity-10", tierClassName)}>
+                      <TierIcon className="h-3 w-3" />
+                      <span className="font-medium">{tier.name}</span>
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <SidebarContent className="px-2">
+            <SidebarMenu className="space-y-1">
               {menuConfig.map((group, index) => (
-                  <React.Fragment key={group.title}>
-                    {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
-                    <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
-                    {group.items.map((item) => (
-                      <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
-                          }
-                        >
-                          <Link href={item.href} download={item.download}>
-                            <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
-                            <span>{item.label}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </React.Fragment>
-                ))}
+                <React.Fragment key={group.title}>
+                  {index > 0 && (
+                    <div className="my-4">
+                      <Separator className="bg-sidebar-border/30" />
+                    </div>
+                  )}
+                  <div className="px-3 py-2">
+                    <h3 className="text-xs font-bold text-sidebar-foreground/40 uppercase tracking-wider mb-2 flex items-center gap-2">
+                      {group.title === 'Overview' && <Cpu className="h-3 w-3" />}
+                      {group.title === 'Community' && <Users className="h-3 w-3" />}
+                      {group.title === 'Manage' && <Shield className="h-3 w-3" />}
+                      {group.title === 'Account' && <User className="h-3 w-3" />}
+                      {group.title === 'Platform' && <Globe className="h-3 w-3" />}
+                      {group.title === 'Admin Tools' && <Lock className="h-3 w-3" />}
+                      {group.title}
+                    </h3>
+                    <div className="space-y-1">
+                      {group.items.map((item) => {
+                        const isActive = isClient ? (pathname.endsWith(item.href) && !item.download) : false;
+                        return (
+                          <SidebarMenuItem key={item.href}>
+                            <SidebarMenuButton
+                              asChild
+                              className={cn(
+                                "h-10 px-3 rounded-lg transition-all duration-200 group hover:shadow-sm",
+                                isActive
+                                  ? "bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/20 text-primary shadow-sm"
+                                  : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                              )}
+                            >
+                              <Link href={item.href} download={item.download} className="flex items-center gap-3 w-full">
+                                {item.label === 'CORE' ? (
+                                  <div className="relative">
+                                    <div className="absolute inset-0 bg-primary/30 rounded-md blur-sm animate-pulse"></div>
+                                    <div className="relative bg-gradient-to-br from-primary/20 to-primary/10 p-1 rounded-md border border-primary/20">
+                                      <item.icon className="h-4 w-4 text-primary" />
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <item.icon className={cn(
+                                    "h-4 w-4 transition-colors",
+                                    isActive ? "text-primary" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
+                                  )} />
+                                )}
+                                <span className={cn(
+                                  "font-medium text-sm transition-colors",
+                                  isActive ? "text-primary font-semibold" : "text-sidebar-foreground group-hover:text-sidebar-foreground"
+                                )}>
+                                  {item.label}
+                                </span>
+                                {isActive && (
+                                  <div className="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                                )}
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </React.Fragment>
+              ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-2">
-                   <SettingsIcon className="mr-2 h-4 w-4" />
-                   Settings & Logout
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none text-foreground">
-                      {wallet?.profile?.username || 'User'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {userEmail || '...'}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/profile">
-                    <ProfileIcon className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/security">
-                    <SettingsIcon className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogoutIcon className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <SidebarFooter className="border-t border-sidebar-border/50 bg-gradient-to-t from-sidebar-background/50 to-transparent">
+            <div className="p-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-sidebar-foreground h-auto p-3 rounded-lg border border-sidebar-border/30 bg-sidebar-background/50 backdrop-blur-sm hover:bg-sidebar-accent/50 transition-all duration-200 hover:shadow-sm"
+                  >
+                    <div className="flex items-center gap-3 w-full">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/20 rounded-md blur-sm"></div>
+                        <div className="relative bg-gradient-to-br from-primary/10 to-primary/5 p-1.5 rounded-md border border-primary/20">
+                          <SettingsIcon className="h-4 w-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-start flex-1">
+                        <span className="font-semibold text-sm">Settings</span>
+                        <span className="text-xs text-sidebar-foreground/60">Manage account</span>
+                      </div>
+                      <Lock className="h-3 w-3 text-sidebar-foreground/40" />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-64 bg-background/95 backdrop-blur-md border-border/50" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal p-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8 border border-primary/20">
+                        <AvatarImage
+                          src={wallet?.profile?.avatarUrl}
+                          alt={wallet?.profile?.username || 'User'}
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-xs font-bold">
+                          {userInitial}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-semibold leading-none text-foreground">
+                          {wallet?.profile?.username || 'User'}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {userEmail || '...'}
+                        </p>
+                      </div>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild className="p-3 cursor-pointer">
+                    <Link href="/dashboard/profile" className="flex items-center gap-3">
+                      <ProfileIcon className="h-4 w-4 text-primary" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Profile</span>
+                        <span className="text-xs text-muted-foreground">Manage your profile</span>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="p-3 cursor-pointer">
+                    <Link href="/dashboard/security" className="flex items-center gap-3">
+                      <SettingsIcon className="h-4 w-4 text-primary" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Settings</span>
+                        <span className="text-xs text-muted-foreground">Security & preferences</span>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="p-3 cursor-pointer text-destructive hover:text-destructive">
+                    <LogoutIcon className="mr-3 h-4 w-4" />
+                    <div className="flex flex-col">
+                      <span className="font-medium">Log out</span>
+                      <span className="text-xs text-muted-foreground">Sign out of your account</span>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </SidebarFooter>
         </Sidebar>
         <div className="flex flex-1">
@@ -429,7 +637,7 @@ URL=${window.location.origin}`;
                   </Link>
                 </Button>
                 <NotificationBell />
-                <ModeToggle />
+                <ThemeSwitcher />
               </div>
             </header>
             {children}
