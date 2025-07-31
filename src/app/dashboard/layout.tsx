@@ -67,7 +67,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
 import { RightSidebar } from '@/components/ui/right-sidebar';
 import { ModeToggle } from '@/components/ui/mode-toggle';
-import { ThemeSwitcher } from '@/components/ui/theme-switcher';
+// import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
