@@ -275,8 +275,8 @@ export default function WelcomePage() {
             </div>
 
             {/* Coinbase */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="white">
                   <circle cx="16" cy="16" r="14" fill="white"/>
                   <rect x="11" y="11" width="10" height="10" rx="2" fill="#0052FF"/>
@@ -286,8 +286,8 @@ export default function WelcomePage() {
             </div>
 
             {/* Bybit */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <path d="M4 8L16 2L28 8V24L16 30L4 24V8Z" fill="#F7931A"/>
                   <path d="M10 12L16 9L22 12V20L16 23L10 20V12Z" fill="white"/>
@@ -298,8 +298,8 @@ export default function WelcomePage() {
             </div>
 
             {/* Kraken */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <circle cx="16" cy="16" r="14" fill="#5741D9"/>
                   <path d="M8 12C8 12 12 8 16 12C20 8 24 12 24 12C24 16 20 20 16 16C12 20 8 16 8 12Z" fill="white"/>
@@ -310,8 +310,8 @@ export default function WelcomePage() {
             </div>
 
             {/* KuCoin */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <circle cx="16" cy="16" r="14" fill="#24AE8F"/>
                   <path d="M12 8L16 12L20 8L24 12L20 16L24 20L20 24L16 20L12 24L8 20L12 16L8 12L12 8Z" fill="white"/>
@@ -321,8 +321,8 @@ export default function WelcomePage() {
             </div>
 
             {/* Gate.io */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-indigo-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <rect x="2" y="8" width="28" height="16" rx="4" fill="#5C6BC0"/>
                   <path d="M8 12H12V20H8V12Z" fill="white"/>
@@ -334,8 +334,8 @@ export default function WelcomePage() {
             </div>
 
             {/* Huobi */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-red-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <circle cx="16" cy="16" r="14" fill="#2EAAE0"/>
                   <path d="M10 10L16 6L22 10L16 14L10 10Z" fill="white"/>
@@ -348,8 +348,8 @@ export default function WelcomePage() {
             </div>
 
             {/* OKX */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <rect x="4" y="4" width="24" height="24" rx="6" fill="black"/>
                   <path d="M8 8H12V12H8V8Z" fill="white"/>
@@ -372,8 +372,8 @@ export default function WelcomePage() {
             </div>
 
             {/* Upbit */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-pink-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <circle cx="16" cy="16" r="14" fill="#0099FF"/>
                   <path d="M12 8V24H16V12H20V8H12Z" fill="white"/>
@@ -384,8 +384,8 @@ export default function WelcomePage() {
             </div>
 
             {/* Bitfinex */}
-            <div className="group flex flex-col items-center p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-gray-700/50 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105">
-              <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center mb-3 p-2">
+            <div className="group flex flex-col items-center p-6 transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 flex items-center justify-center mb-3 p-2">
                 <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
                   <circle cx="16" cy="16" r="14" fill="#8CC04B"/>
                   <path d="M8 12L16 8L24 12V20L16 24L8 20V12Z" fill="white"/>
