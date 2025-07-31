@@ -421,56 +421,127 @@ export default function WelcomePage() {
             </div>
           </div>
 
-          {/* Footer Links */}
+          {/* Footer Copyright and Crypto Icons */}
           <div className="border-t border-gray-800/50 pt-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-              <div>
-                <h4 className="text-white font-semibold mb-4">Platform</h4>
-                <ul className="space-y-2 text-gray-300 text-sm">
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Features</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Pricing</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">API Access</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Mobile App</a></li>
-                </ul>
+            <div className="flex flex-col items-center space-y-6">
+              {/* Copyright */}
+              <div className="flex flex-col md:flex-row justify-between items-center w-full">
+                <div className="flex items-center gap-3 mb-4 md:mb-0">
+                  <AstralLogo className="h-8 w-8 text-blue-400" />
+                  <span className="text-white font-semibold">AstralCore</span>
+                  <span className="text-gray-500">Quantum Nexus v3.76</span>
+                </div>
+                <div className="text-gray-400 text-sm">
+                  © 2024 AstralCore Technologies. All rights reserved.
+                </div>
               </div>
-              <div>
-                <h4 className="text-white font-semibold mb-4">Support</h4>
-                <ul className="space-y-2 text-gray-300 text-sm">
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Help Center</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Contact Us</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Community</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Status</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-white font-semibold mb-4">Legal</h4>
-                <ul className="space-y-2 text-gray-300 text-sm">
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Terms of Service</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Privacy Policy</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Cookie Policy</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Compliance</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-white font-semibold mb-4">Connect</h4>
-                <ul className="space-y-2 text-gray-300 text-sm">
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Twitter</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Telegram</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">Discord</a></li>
-                  <li><a href="#" className="hover:text-blue-400 transition-colors">LinkedIn</a></li>
-                </ul>
-              </div>
-            </div>
 
-            {/* Copyright */}
-            <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-800/50">
-              <div className="flex items-center gap-3 mb-4 md:mb-0">
-                <AstralLogo className="h-8 w-8 text-blue-400" />
-                <span className="text-white font-semibold">AstralCore</span>
-                <span className="text-gray-500">Quantum Nexus v3.76</span>
-              </div>
-              <div className="text-gray-400 text-sm">
-                © 2024 AstralCore Technologies. All rights reserved.
+              {/* Crypto Exchange Icons - Moved to Bottom */}
+              <div className="flex flex-wrap justify-center items-center gap-[5mm] pt-4">
+                {/* Binance */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 2L8 10L10 12L16 6L22 12L24 10L16 2Z" fill="#F3BA2F"/>
+                    <path d="M2 16L4 14L6 16L4 18L2 16Z" fill="#F3BA2F"/>
+                    <path d="M10 16L16 10L22 16L20 18L16 14L12 18L10 16Z" fill="#F3BA2F"/>
+                    <path d="M26 16L28 14L30 16L28 18L26 16Z" fill="#F3BA2F"/>
+                    <path d="M22 20L16 26L10 20L12 18L16 22L20 18L22 20Z" fill="#F3BA2F"/>
+                  </svg>
+                </div>
+
+                {/* Coinbase */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="white">
+                    <circle cx="16" cy="16" r="14" fill="white"/>
+                    <rect x="11" y="11" width="10" height="10" rx="2" fill="#0052FF"/>
+                  </svg>
+                </div>
+
+                {/* Bybit */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <path d="M4 8L16 2L28 8V24L16 30L4 24V8Z" fill="#F7931A"/>
+                    <path d="M10 12L16 9L22 12V20L16 23L10 20V12Z" fill="white"/>
+                    <circle cx="16" cy="16" r="3" fill="#F7931A"/>
+                  </svg>
+                </div>
+
+                {/* Kraken */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" fill="#5741D9"/>
+                    <path d="M8 12C8 12 12 8 16 12C20 8 24 12 24 12C24 16 20 20 16 16C12 20 8 16 8 12Z" fill="white"/>
+                    <circle cx="16" cy="14" r="2" fill="#5741D9"/>
+                  </svg>
+                </div>
+
+                {/* KuCoin */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" fill="#24AE8F"/>
+                    <path d="M12 8L16 12L20 8L24 12L20 16L24 20L20 24L16 20L12 24L8 20L12 16L8 12L12 8Z" fill="white"/>
+                  </svg>
+                </div>
+
+                {/* Gate.io */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <rect x="2" y="8" width="28" height="16" rx="4" fill="#5C6BC0"/>
+                    <path d="M8 12H12V20H8V12Z" fill="white"/>
+                    <path d="M16 12H20V20H16V12Z" fill="white"/>
+                    <circle cx="24" cy="16" r="2" fill="white"/>
+                  </svg>
+                </div>
+
+                {/* Huobi */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" fill="#2EAAE0"/>
+                    <path d="M10 10L16 6L22 10L16 14L10 10Z" fill="white"/>
+                    <path d="M10 18L16 22L22 18L16 14L10 18Z" fill="white"/>
+                    <path d="M8 14L12 12V16L8 18V14Z" fill="white"/>
+                    <path d="M24 14L20 12V16L24 18V14Z" fill="white"/>
+                  </svg>
+                </div>
+
+                {/* OKX */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <rect x="4" y="4" width="24" height="24" rx="6" fill="black"/>
+                    <path d="M8 8H12V12H8V8Z" fill="white"/>
+                    <path d="M12 8H16V12H12V8Z" fill="white"/>
+                    <path d="M16 8H20V12H16V8Z" fill="white"/>
+                    <path d="M20 8H24V12H20V8Z" fill="white"/>
+                    <path d="M8 12H12V16H8V12Z" fill="white"/>
+                    <path d="M16 12H20V16H16V12Z" fill="white"/>
+                    <path d="M8 16H12V20H8V16Z" fill="white"/>
+                    <path d="M12 16H16V20H12V16Z" fill="white"/>
+                    <path d="M16 16H20V20H16V16Z" fill="white"/>
+                    <path d="M20 16H24V20H20V16Z" fill="white"/>
+                    <path d="M8 20H12V24H8V20Z" fill="white"/>
+                    <path d="M12 20H16V24H12V20Z" fill="white"/>
+                    <path d="M16 20H20V24H16V20Z" fill="white"/>
+                    <path d="M20 20H24V24H20V20Z" fill="white"/>
+                  </svg>
+                </div>
+
+                {/* Upbit */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" fill="#0099FF"/>
+                    <path d="M12 8V24H16V12H20V8H12Z" fill="white"/>
+                    <circle cx="22" cy="20" r="3" fill="white"/>
+                  </svg>
+                </div>
+
+                {/* Bitfinex */}
+                <div className="group transition-all duration-300 hover:scale-110">
+                  <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" fill="#8CC04B"/>
+                    <path d="M8 12L16 8L24 12V20L16 24L8 20V12Z" fill="white"/>
+                    <path d="M12 14L16 12L20 14V18L16 20L12 18V14Z" fill="#8CC04B"/>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
