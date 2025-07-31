@@ -65,7 +65,8 @@ export function ThemeSwitcher() {
   ];
 
   const getCurrentTheme = () => {
-    return themes.find(t => t.value === theme) || themes[1]; // Default to dark
+    if (!theme) return themes[1]; // Default to dark theme if no theme is set
+    return themes.find(t => t.value === theme) || themes[1];
   };
 
   const currentTheme = getCurrentTheme();
