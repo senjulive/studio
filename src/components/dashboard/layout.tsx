@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -114,7 +113,7 @@ export default function DashboardLayout({
     try {
         const [walletData, tiers] = await Promise.all([
             getOrCreateWallet(userId),
-            getBotTierSettings()
+            Promise.resolve(getBotTierSettings())
         ]);
         setWallet(walletData);
         setTierSettings(tiers);
