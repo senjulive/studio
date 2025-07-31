@@ -100,45 +100,45 @@
     --sidebar-ring: 213 94% 68%;
   }
 
-  /* Purple Theme */
+  /* Purple Theme - Welcome Page Style */
   .purple {
-    --background: 270 20% 8%;
-    --foreground: 270 15% 98%;
+    --background: 220 71% 4%; /* Deep slate-blue similar to welcome page */
+    --foreground: 210 40% 98%;
 
-    --card: 270 30% 12%;
-    --card-foreground: 270 15% 98%;
+    --card: 220 47% 8%; /* Slightly lighter slate-blue for cards */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 270 20% 8%;
-    --popover-foreground: 270 15% 98%;
+    --popover: 220 71% 4%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 270 95% 75%;
-    --primary-foreground: 270 30% 12%;
+    --primary: 213 94% 68%; /* Vibrant blue like welcome page primary */
+    --primary-foreground: 220 47% 8%;
 
-    --secondary: 270 25% 15%;
-    --secondary-foreground: 270 15% 98%;
+    --secondary: 220 33% 12%; /* Muted blue-slate */
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 270 25% 15%;
-    --muted-foreground: 270 15% 65%;
+    --muted: 220 33% 12%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 270 25% 15%;
-    --accent-foreground: 270 15% 98%;
+    --accent: 220 33% 15%; /* Slightly lighter for accent */
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 63% 31%;
-    --destructive-foreground: 270 15% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 270 25% 25%;
-    --input: 270 25% 15%;
-    --ring: 270 95% 75%;
+    --border: 220 33% 20%; /* More visible borders */
+    --input: 220 33% 12%;
+    --ring: 213 94% 68%; /* Blue ring to match primary */
 
-    /* Purple Sidebar */
-    --sidebar-background: 270 20% 8%;
-    --sidebar-foreground: 270 15% 98%;
-    --sidebar-primary: 270 15% 98%;
-    --sidebar-primary-foreground: 270 30% 12%;
-    --sidebar-accent: 270 25% 15%;
-    --sidebar-accent-foreground: 270 15% 98%;
-    --sidebar-border: 270 25% 15%;
-    --sidebar-ring: 270 95% 75%;
+    /* Purple Sidebar - Welcome Page Style */
+    --sidebar-background: 220 71% 4%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 40% 98%;
+    --sidebar-primary-foreground: 220 47% 8%;
+    --sidebar-accent: 220 33% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 33% 15%;
+    --sidebar-ring: 213 94% 68%;
   }
 }
 
