@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrCreateWallet } from '@/lib/wallet';
 import { getUserRank } from '@/lib/ranks';
-import { getCurrentTier } from '@/lib/ranks';
-import { getBotTierSettings } from '@/lib/tiers';
+import { getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 
 // Mock chat storage (in production, this would be a database)
 let chatMessages: any[] = [
