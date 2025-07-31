@@ -510,45 +510,81 @@ URL=${window.location.origin}`;
               ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-2">
-                   <SettingsIcon className="mr-2 h-4 w-4" />
-                   Settings & Logout
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none text-foreground">
-                      {wallet?.profile?.username || 'User'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {userEmail || '...'}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/profile">
-                    <ProfileIcon className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/security">
-                    <SettingsIcon className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogoutIcon className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <SidebarFooter className="border-t border-sidebar-border/50 bg-gradient-to-t from-sidebar-background/50 to-transparent">
+            <div className="p-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-sidebar-foreground h-auto p-3 rounded-lg border border-sidebar-border/30 bg-sidebar-background/50 backdrop-blur-sm hover:bg-sidebar-accent/50 transition-all duration-200 hover:shadow-sm"
+                  >
+                    <div className="flex items-center gap-3 w-full">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/20 rounded-md blur-sm"></div>
+                        <div className="relative bg-gradient-to-br from-primary/10 to-primary/5 p-1.5 rounded-md border border-primary/20">
+                          <SettingsIcon className="h-4 w-4 text-primary" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-start flex-1">
+                        <span className="font-semibold text-sm">Settings</span>
+                        <span className="text-xs text-sidebar-foreground/60">Manage account</span>
+                      </div>
+                      <Lock className="h-3 w-3 text-sidebar-foreground/40" />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-64 bg-background/95 backdrop-blur-md border-border/50" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal p-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8 border border-primary/20">
+                        <AvatarImage
+                          src={wallet?.profile?.avatarUrl}
+                          alt={wallet?.profile?.username || 'User'}
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-xs font-bold">
+                          {userInitial}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-semibold leading-none text-foreground">
+                          {wallet?.profile?.username || 'User'}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {userEmail || '...'}
+                        </p>
+                      </div>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild className="p-3 cursor-pointer">
+                    <Link href="/dashboard/profile" className="flex items-center gap-3">
+                      <ProfileIcon className="h-4 w-4 text-primary" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Profile</span>
+                        <span className="text-xs text-muted-foreground">Manage your profile</span>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="p-3 cursor-pointer">
+                    <Link href="/dashboard/security" className="flex items-center gap-3">
+                      <SettingsIcon className="h-4 w-4 text-primary" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Settings</span>
+                        <span className="text-xs text-muted-foreground">Security & preferences</span>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="p-3 cursor-pointer text-destructive hover:text-destructive">
+                    <LogoutIcon className="mr-3 h-4 w-4" />
+                    <div className="flex flex-col">
+                      <span className="font-medium">Log out</span>
+                      <span className="text-xs text-muted-foreground">Sign out of your account</span>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </SidebarFooter>
         </Sidebar>
         <div className="flex flex-1">
