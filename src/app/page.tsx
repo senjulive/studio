@@ -34,7 +34,7 @@ export default function WelcomePage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <ThemeSwitcher />
+            {/* <ThemeSwitcher /> */}
             <div className="hidden sm:flex items-center gap-4">
               <Badge variant="outline" className="border-green-400/50 text-green-300 bg-green-400/10 animate-pulse">
                 <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
