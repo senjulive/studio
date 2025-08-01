@@ -412,7 +412,38 @@ export function WalletView() {
               </CardContent>
             </Card>
 
-            <AllAssetsChart coins={allAssetsData} />
+            {/* Quick Actions */}
+            <Card className="overflow-hidden bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-blue-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-blue-600" />
+                  Quick Actions
+                </CardTitle>
+                <CardDescription>Manage your trading activities</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button asChild className="h-16 flex-col gap-2 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
+                    <Link href="/dashboard/deposit">
+                      <Wallet className="h-6 w-6" />
+                      <span>Deposit Funds</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-16 flex-col gap-2 border-blue-500/30 hover:bg-blue-500/10">
+                    <Link href="/dashboard/trading">
+                      <BarChart3 className="h-6 w-6" />
+                      <span>Start Trading</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-16 flex-col gap-2 border-purple-500/30 hover:bg-purple-500/10">
+                    <Link href="/dashboard/market">
+                      <TrendingUp className="h-6 w-6" />
+                      <span>View Markets</span>
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader><CardTitle>Transaction History</CardTitle><CardDescription>A record of all your deposits, withdrawals, and earnings.</CardDescription></CardHeader>
