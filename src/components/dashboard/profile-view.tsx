@@ -345,9 +345,7 @@ export function ProfileView() {
                 )}
             </div>
 
-            <div className="mb-6 p-4">
-              <VirtualCard walletData={walletData} userEmail={user?.email || null} />
-            </div>
+
 
             <div className="grid grid-cols-1 gap-4 mb-6">
                 <Dialog>
