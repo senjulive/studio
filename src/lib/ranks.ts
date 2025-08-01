@@ -1,14 +1,14 @@
 import type { SVGProps } from 'react';
 
-// Define TierSetting here to avoid circular dependencies
-type TierSetting = {
+// Import TierSetting type
+interface TierSetting {
   id: string;
   name: string;
   balanceThreshold: number;
   dailyProfit: number;
   clicks: number;
   locked: boolean;
-};
+}
 
 export type Rank = {
   name: string;
