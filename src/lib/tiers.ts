@@ -7,14 +7,14 @@ import * as path from 'path';
 
 const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
 
-export type TierSetting = {
+export interface TierSetting {
   id: string; // e.g., 'tier-1'
   name: string;
   balanceThreshold: number;
   dailyProfit: number; // as a decimal, e.g., 0.02 for 2%
   clicks: number;
   locked: boolean;
-};
+}
 
 const defaultTierSettings: TierSetting[] = [
   { id: 'tier-1', name: 'VIP CORE I', balanceThreshold: 0, dailyProfit: 0.02, clicks: 4, locked: false },
