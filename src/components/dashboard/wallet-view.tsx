@@ -298,22 +298,18 @@ export function WalletView() {
         <TabsContent value="wallet">
           <div className="space-y-6">
             {/* User Status & Badges */}
-            <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
-              <CardContent className="p-6">
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  <Badge variant="outline" className={cn("text-lg py-2 px-4 flex items-center gap-2", rank.className)}>
-                    <RankIcon className="h-6 w-6" />
-                    <span>{rank.name}</span>
-                  </Badge>
-                  {tier && TierIcon && tierClassName && (
-                    <Badge variant="outline" className={cn("text-lg py-2 px-4 flex items-center gap-2", tierClassName)}>
-                      <TierIcon className="h-6 w-6" />
-                      <span>{tier.name}</span>
-                    </Badge>
-                  )}
+            <div className="flex flex-wrap items-center justify-center gap-4 py-4">
+              <div className={cn("text-lg py-2 px-4 flex items-center gap-2 font-semibold", rank.className)}>
+                <RankIcon className="h-6 w-6" />
+                <span>{rank.name}</span>
+              </div>
+              {tier && TierIcon && tierClassName && (
+                <div className={cn("text-lg py-2 px-4 flex items-center gap-2 font-semibold", tierClassName)}>
+                  <TierIcon className="h-6 w-6" />
+                  <span>{tier.name}</span>
                 </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
 
             {/* Portfolio Overview */}
             <Card className="overflow-hidden bg-gradient-to-br from-green-500/5 to-blue-500/5 border-green-500/20">
