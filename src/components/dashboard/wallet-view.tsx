@@ -160,10 +160,11 @@ export function WalletView() {
   }, [walletData]);
 
   const totalBalance = React.useMemo(() => {
-    if (!walletData || allAssetsData.length === 0) return 0;
-    
-    const btcPrice = allAssetsData.find(c => c.ticker === "BTC")?.price ?? 0;
-    const ethPrice = allAssetsData.find(c => c.ticker === "ETH")?.price ?? 0;
+    if (!walletData) return 0;
+
+    // Use approximate current market prices for calculation
+    const btcPrice = 68000;
+    const ethPrice = 3500;
 
     const balances = walletData.balances as any;
     return (
@@ -171,7 +172,7 @@ export function WalletView() {
         (balances.btc * btcPrice) +
         (balances.eth * ethPrice)
     );
-  }, [walletData, allAssetsData]);
+  }, [walletData]);
 
   const dailyEarnings = (walletData?.growth as any)?.dailyEarnings ?? 0;
   
