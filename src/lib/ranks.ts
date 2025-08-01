@@ -34,7 +34,7 @@ export const getUserRank = (balance: number): Rank => {
   return sortedRanks.find(rank => balance >= rank.minBalance && rank.Icon !== 'Lock') || ranks[0];
 };
 
-export function getCurrentTier(balance: number, tiers: TierSetting[]): TierSetting | null {
+export function getCurrentTier(balance: number, tiers: any[]): any | null {
     if (!tiers || tiers.length === 0) return null;
     const applicableTier = [...tiers].reverse().find(
       tier => balance >= tier.balanceThreshold && !tier.locked
