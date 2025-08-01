@@ -67,7 +67,9 @@ export function CryptoStats({ className }: CryptoStatsProps) {
             variant={stat.variant}
             className="animate-fade-in"
             style={{ animationDelay: `${index * 100}ms` }}
-          />
+          >
+            <div />
+          </StatCard>
         ))}
       </div>
 
