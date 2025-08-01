@@ -66,7 +66,7 @@ export function FloatingChat() {
                 }}
                 className="flex justify-between items-center p-2 rounded-t-lg border-b border-border cursor-grab"
             >
-                <h3 className="font-semibold ml-2 text-foreground">Public Chat</h3>
+                <h3 className="font-semibold ml-2 text-foreground">Community Blog</h3>
                 <div>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleMinimize}>
                         <Minus className="h-4 w-4" />
