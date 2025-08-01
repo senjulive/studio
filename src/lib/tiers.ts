@@ -1,4 +1,3 @@
-
 'use server';
 // This is a server-safe module for tier data and logic.
 // It does not contain any client-side code (like React components or hooks).
@@ -50,4 +49,34 @@ export async function getBotTierSettings(): Promise<TierSetting[]> {
     return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
-    
+export async function getCurrentTier(balance: number, tierSettings?: TierSetting[]): Promise<TierSetting | null> {
+    const tiers = tierSettings || await getBotTierSettings();
+
+    // Find the highest tier that the user qualifies for
+    let currentTier: TierSetting | null = null;
+
+    for (const tier of tiers) {
+        if (balance >= tier.balanceThreshold) {
+            currentTier = tier;
+        } else {
+            break; // Since tiers are sorted by threshold, we can break here
+        }
+    }
+
+    return currentTier;
+}
+
+// Client-side version that doesn't use async file operations
+export function getCurrentTierSync(balance: number, tierSettings: TierSetting[]): TierSetting | null {
+    let currentTier: TierSetting | null = null;
+
+    for (const tier of tierSettings) {
+        if (balance >= tier.balanceThreshold) {
+            currentTier = tier;
+        } else {
+            break;
+        }
+    }
+
+    return currentTier;
+}
