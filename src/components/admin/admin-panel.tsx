@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -42,6 +41,8 @@ import { WithdrawalManager } from './withdrawal-manager';
 import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
+import { SlideshowImageManager } from './slideshow-image-manager';
+import { RewardsAdminManager } from './rewards-admin-manager';
 
 
 const adminSections = {
@@ -62,6 +63,8 @@ const adminSections = {
     'Content & Engagement': {
         'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
         'Promotions': { component: <PromotionManager />, icon: Gift },
+        'Rewards System': { component: <RewardsAdminManager />, icon: () => <span className="text-xl">🏆</span> },
+        'Slideshow Images': { component: <SlideshowImageManager />, icon: () => <span className="text-xl">🖼️</span> },
     },
     'Platform Settings': {
         'General Settings': { component: <SiteSettingsManager />, icon: Settings },

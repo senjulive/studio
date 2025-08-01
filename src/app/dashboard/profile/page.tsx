@@ -1,4 +1,4 @@
-import { ProfileView } from "@/components/dashboard/profile-view";
+import { ModernProfileView } from "@/components/dashboard/modern-profile-view";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
     return (
-        <ProfileView />
+        <ModernProfileView />
     );
 }

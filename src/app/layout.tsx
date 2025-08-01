@@ -2,7 +2,7 @@ import type {Metadata, Viewport} from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/providers/theme-provider";
+import { AdvancedThemeProvider } from "@/providers/advanced-theme-provider";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -43,15 +43,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <body className="font-body antialiased bg-background">
-        <ThemeProvider
+        <AdvancedThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
-          disableTransitionOnChange
+          disableTransitionOnChange={false}
         >
           {children}
           <Toaster />
-        </ThemeProvider>
+        </AdvancedThemeProvider>
       </body>
     </html>
   );
