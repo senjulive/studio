@@ -331,6 +331,19 @@ export function MarketView() {
         </Card>
       </div>
 
+      {/* Key Asset Performance Chart */}
+      <AllAssetsChart coins={marketData.map(coin => ({
+        id: coin.id,
+        name: coin.name,
+        ticker: coin.symbol,
+        iconUrl: coin.iconUrl,
+        price: coin.currentPrice,
+        change24h: coin.priceChangePercentage24h,
+        volume24h: coin.volume24h,
+        marketCap: coin.marketCap,
+        priceHistory: Array.from({ length: 50 }, () => ({ value: coin.currentPrice + (Math.random() - 0.5) * coin.currentPrice * 0.1 }))
+      }))} />
+
       {/* Market Data Table */}
       <Card>
         <CardHeader>
