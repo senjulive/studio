@@ -126,7 +126,9 @@ export default function WelcomePage() {
                 variant="gradient"
                 className="animate-fade-in"
                 style={{ animationDelay: `${index * 150}ms` }}
-              />
+              >
+                <div />
+              </StatCard>
             ))}
           </div>
         </section>
