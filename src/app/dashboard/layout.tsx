@@ -417,6 +417,7 @@ export default function DashboardLayout({
                 )}
               </TooltipProvider>
 
+              <ThemeSwitcher />
               <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
                 <Link href="/dashboard/inbox">
                   <InboxIcon className="h-5 w-5" />
