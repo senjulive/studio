@@ -3,7 +3,7 @@
 import * as React from "react"
 import { X, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { PublicChatView } from "./public-chat-view"
+import { CommunityBlog } from "./community-blog"
 import { AnimatePresence, motion } from "framer-motion"
 import { AstralLogo } from "../icons/astral-logo"
 
