@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Moon, Sun, Palette, Zap } from 'lucide-react';
+import { Moon, Sun, Palette, Zap, TrendingUp, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
