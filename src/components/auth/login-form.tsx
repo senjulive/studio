@@ -218,13 +218,13 @@ export function LoginForm() {
             </form>
           </Form>
 
-          {/* Quick login hints */}
+          {/* Quick login hint */}
           <div className="space-y-3 pt-4 border-t border-border/50">
             <div className="text-xs text-center text-muted-foreground">Quick Access</div>
-            <div className="grid grid-cols-2 gap-3">
-              <Button 
-                variant="outline" 
-                size="sm" 
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                size="sm"
                 className="h-9 text-xs bg-background/50 border-primary/30 hover:bg-primary/10"
                 onClick={() => {
                   form.setValue('email', 'demo@astralcore.io');
@@ -233,18 +233,6 @@ export function LoginForm() {
               >
                 <Smartphone className="h-3 w-3 mr-1" />
                 Demo User
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-9 text-xs bg-background/50 border-primary/30 hover:bg-primary/10"
-                onClick={() => {
-                  form.setValue('email', 'admin@astralcore.io');
-                  form.setValue('password', 'admin123');
-                }}
-              >
-                <Shield className="h-3 w-3 mr-1" />
-                Admin
               </Button>
             </div>
           </div>
