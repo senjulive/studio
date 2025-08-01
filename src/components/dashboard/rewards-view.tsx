@@ -555,7 +555,7 @@ export function RewardsView() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-7">
+              <div className="grid gap-2 sm:gap-4 grid-cols-3 sm:grid-cols-5 md:grid-cols-7">
                 {dailyRewards.map((reward) => {
                   const isToday = reward.day === dailyStreak + 1;
                   const isPast = reward.day <= dailyStreak;
