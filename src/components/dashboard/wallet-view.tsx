@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from "react";
@@ -30,6 +29,7 @@ import { useUser } from "@/contexts/UserContext";
 import { tierIcons, tierClassNames } from '@/lib/settings';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SquadSystem } from "./squad-system";
+import { VirtualCard } from "./virtual-card";
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -153,7 +153,7 @@ const assetConfig = [
 ] as const;
 
 export function WalletView() {
-  const { wallet: walletData, tier, rank } = useUser();
+  const { wallet: walletData, tier, rank, user } = useUser();
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
 
   React.useEffect(() => {
@@ -330,6 +330,11 @@ export function WalletView() {
                       </p>
                     </div>
                   </div>
+                </div>
+
+                {/* Virtual Card */}
+                <div className="flex justify-center py-4">
+                  <VirtualCard walletData={walletData} userEmail={walletData?.profile?.email || null} />
                 </div>
                 {assetsWithFunds.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
