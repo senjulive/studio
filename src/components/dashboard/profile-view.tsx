@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -18,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit, Plus } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
-import { VirtualCard } from "./virtual-card";
+
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
