@@ -1,16 +1,12 @@
-import {ModeratorPanel} from '@/components/moderator/moderator-panel';
-import {ModeratorAuth} from '@/components/moderator/moderator-auth';
+import { redirect } from 'next/navigation';
 import type {Metadata} from 'next';
 
 export const metadata: Metadata = {
-  title: 'AstralCore AI - Moderator Panel',
-  description: 'Manage the AstralCore Platform.',
+  title: 'AstralCore AI - Dashboard',
+  description: 'Access the AstralCore Platform.',
 };
 
 export default function ModeratorPage() {
-  return (
-    <ModeratorAuth>
-      <ModeratorPanel />
-    </ModeratorAuth>
-  );
+  // Moderator panel is disabled - redirect to dashboard
+  redirect('/dashboard');
 }
