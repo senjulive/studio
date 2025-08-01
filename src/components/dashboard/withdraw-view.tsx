@@ -15,8 +15,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-import { Send, Wallet, AlertCircle, CheckCircle, Clock, Shield } from "lucide-react";
+import { Send, Wallet, AlertCircle, CheckCircle, Clock, Shield, ArrowUpRight, TrendingUp, Zap, Calculator } from "lucide-react";
 import { withdrawRequestSchema } from "@/lib/validators";
+import { cn } from "@/lib/utils";
 
 type WithdrawFormValues = z.infer<typeof withdrawRequestSchema>;
 
@@ -120,7 +121,6 @@ export function WithdrawView() {
 
   const confirmWithdrawal = async () => {
     try {
-      // Here you would typically send the withdrawal request to your API
       const withdrawalData = {
         ...form.getValues(),
         currency: selectedAsset.symbol,
@@ -155,60 +155,100 @@ export function WithdrawView() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Send className="h-5 w-5" />
-            Withdraw Funds
-          </CardTitle>
-          <CardDescription>
-            Withdraw your earnings to your personal cryptocurrency wallet
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500/10 via-orange-500/10 to-yellow-500/10 border border-red-500/20">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+        <div className="relative p-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-red-500/20 rounded-full">
+                  <ArrowUpRight className="h-8 w-8 text-red-500" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Withdraw Funds</h1>
+                  <p className="text-muted-foreground">Transfer your earnings to your personal wallet</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Badge variant="outline" className="bg-green-500/10 border-green-500/20 text-green-400">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Secure Transfer
+                </Badge>
+                <Badge variant="outline" className="bg-blue-500/10 border-blue-500/20 text-blue-400">
+                  <Clock className="h-3 w-3 mr-1" />
+                  24h Processing
+                </Badge>
+                <Badge variant="outline" className="bg-purple-500/10 border-purple-500/20 text-purple-400">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  Low Fees
+                </Badge>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <div className="text-3xl font-bold text-primary">
+                ${availableBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <div className="text-sm text-muted-foreground">Available Balance</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <Tabs defaultValue="withdraw" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="withdraw">Make Withdrawal</TabsTrigger>
-          <TabsTrigger value="history">Withdrawal History</TabsTrigger>
+      <Tabs defaultValue="withdraw" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="withdraw" className="flex items-center gap-2">
+            <ArrowUpRight className="h-4 w-4" />
+            Make Withdrawal
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            History
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="withdraw" className="space-y-6">
           {/* Available Balances */}
-          <Card>
+          <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
             <CardHeader>
-              <CardTitle>Available Balances</CardTitle>
-              <CardDescription>
-                Your current cryptocurrency balances available for withdrawal
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="h-5 w-5 text-primary" />
+                Available Balances
+              </CardTitle>
+              <CardDescription>Your cryptocurrency holdings ready for withdrawal</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">
                 {cryptoAssets.map((asset) => {
                   const balance = balances?.[asset.symbol.toLowerCase()] || 0;
                   return (
-                    <div key={asset.symbol} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Image
-                          src={asset.iconUrl}
-                          alt={asset.symbol}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
-                        <div>
-                          <p className="font-medium">{asset.name}</p>
+                    <div key={asset.symbol} className="group relative overflow-hidden rounded-xl border p-4 hover:border-primary/50 transition-all duration-300">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-full bg-gradient-to-br from-primary/10 to-purple-500/10">
+                            <Image
+                              src={asset.iconUrl}
+                              alt={asset.symbol}
+                              width={24}
+                              height={24}
+                              className="rounded-full"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{asset.name}</p>
+                            <p className="text-sm text-muted-foreground">{asset.symbol}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-foreground">
+                            {balance.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: asset.symbol === 'USDT' ? 2 : 6
+                            })}
+                          </p>
                           <p className="text-sm text-muted-foreground">{asset.symbol}</p>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold">
-                          {balance.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: asset.symbol === 'USDT' ? 2 : 6
-                          })}
-                        </p>
-                        <p className="text-sm text-muted-foreground">{asset.symbol}</p>
                       </div>
                     </div>
                   );
@@ -219,16 +259,17 @@ export function WithdrawView() {
 
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Asset & Network Selection */}
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
-                <CardTitle>Select Asset & Network</CardTitle>
-                <CardDescription>
-                  Choose the cryptocurrency and blockchain network for withdrawal
-                </CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Asset & Network
+                </CardTitle>
+                <CardDescription>Select cryptocurrency and blockchain network</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div className="space-y-3">
-                  <label className="text-sm font-medium">Asset</label>
+                  <label className="text-sm font-medium text-foreground">Choose Asset</label>
                   <div className="grid gap-2">
                     {cryptoAssets.map((asset) => (
                       <button
@@ -238,11 +279,12 @@ export function WithdrawView() {
                           setSelectedNetwork(0);
                           form.setValue("currency", asset.symbol as any);
                         }}
-                        className={`flex items-center gap-3 p-3 border rounded-lg text-left transition-colors ${
+                        className={cn(
+                          "flex items-center gap-3 p-3 border rounded-lg text-left transition-colors",
                           selectedAsset.symbol === asset.symbol
                             ? "border-primary bg-primary/5"
-                            : "hover:bg-muted/50"
-                        }`}
+                            : "border-border hover:border-primary/50 hover:bg-accent/50"
+                        )}
                       >
                         <Image
                           src={asset.iconUrl}
@@ -251,7 +293,7 @@ export function WithdrawView() {
                           height={24}
                           className="rounded-full"
                         />
-                        <span className="font-medium">{asset.symbol}</span>
+                        <span className="font-medium text-foreground">{asset.symbol}</span>
                         {selectedAsset.symbol === asset.symbol && (
                           <CheckCircle className="h-4 w-4 text-primary ml-auto" />
                         )}
@@ -261,7 +303,7 @@ export function WithdrawView() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-sm font-medium">Network</label>
+                  <label className="text-sm font-medium text-foreground">Choose Network</label>
                   <div className="grid gap-2">
                     {selectedAsset.networks.map((network, index) => (
                       <button
@@ -270,14 +312,15 @@ export function WithdrawView() {
                           setSelectedNetwork(index);
                           form.setValue("network", network.name);
                         }}
-                        className={`flex items-center justify-between p-3 border rounded-lg text-left transition-colors ${
+                        className={cn(
+                          "flex items-center justify-between p-3 border rounded-lg text-left transition-colors",
                           selectedNetwork === index
                             ? "border-primary bg-primary/5"
-                            : "hover:bg-muted/50"
-                        }`}
+                            : "border-border hover:border-primary/50 hover:bg-accent/50"
+                        )}
                       >
-                        <div>
-                          <p className="font-medium">{network.name}</p>
+                        <div className="space-y-1">
+                          <p className="font-medium text-foreground">{network.name}</p>
                           <p className="text-sm text-muted-foreground">
                             Fee: {network.fee} • Min: {network.minWithdraw} {selectedAsset.symbol}
                           </p>
@@ -293,26 +336,28 @@ export function WithdrawView() {
             </Card>
 
             {/* Withdrawal Form */}
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
-                <CardTitle>Withdrawal Details</CardTitle>
-                <CardDescription>
-                  Enter the amount and destination wallet address
-                </CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5 text-primary" />
+                  Withdrawal Details
+                </CardTitle>
+                <CardDescription>Enter amount and destination wallet</CardDescription>
               </CardHeader>
               <CardContent>
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
                       control={form.control}
                       name="walletAddress"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Wallet Address</FormLabel>
+                          <FormLabel>Destination Wallet Address</FormLabel>
                           <FormControl>
                             <Input
                               placeholder={`Enter ${selectedAsset.symbol} wallet address`}
                               {...field}
+                              className="font-mono bg-background/50"
                             />
                           </FormControl>
                           <FormMessage />
@@ -325,9 +370,9 @@ export function WithdrawView() {
                       name="amount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Amount</FormLabel>
+                          <FormLabel>Withdrawal Amount</FormLabel>
                           <FormControl>
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                               <div className="flex gap-2">
                                 <Input
                                   type="number"
@@ -335,12 +380,14 @@ export function WithdrawView() {
                                   placeholder="0.00"
                                   {...field}
                                   onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                  className="bg-background/50"
                                 />
                                 <Button
                                   type="button"
                                   variant="outline"
                                   onClick={setMaxAmount}
                                   disabled={availableBalance <= feeAmount}
+                                  className="border-primary/30 hover:bg-primary/10"
                                 >
                                   Max
                                 </Button>
@@ -355,20 +402,26 @@ export function WithdrawView() {
                       )}
                     />
 
-                    {/* Fee Breakdown */}
+                    {/* Fee Calculation */}
                     {watchedAmount > 0 && (
-                      <div className="p-4 bg-muted/50 rounded-lg space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Withdrawal Amount:</span>
-                          <span>{watchedAmount} {selectedAsset.symbol}</span>
+                      <div className="p-4 bg-gradient-to-r from-primary/5 to-purple-500/5 border border-primary/20 rounded-xl space-y-3">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Calculator className="h-4 w-4 text-primary" />
+                          <span className="font-medium text-foreground">Fee Breakdown</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Network Fee:</span>
-                          <span>-{currentNetwork.fee}</span>
-                        </div>
-                        <div className="border-t pt-2 flex justify-between font-medium">
-                          <span>You Will Receive:</span>
-                          <span>{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Withdrawal Amount:</span>
+                            <span className="font-medium text-foreground">{watchedAmount} {selectedAsset.symbol}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Network Fee:</span>
+                            <span className="font-medium text-red-400">-{currentNetwork.fee}</span>
+                          </div>
+                          <div className="border-t border-primary/20 pt-2 flex justify-between">
+                            <span className="font-medium text-foreground">You Will Receive:</span>
+                            <span className="font-bold text-primary">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -377,50 +430,50 @@ export function WithdrawView() {
                       <AlertDialogTrigger asChild>
                         <Button 
                           type="submit" 
-                          className="w-full"
+                          className="w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-semibold py-3"
                           disabled={availableBalance === 0 || watchedAmount <= 0}
                         >
                           <Send className="h-4 w-4 mr-2" />
                           Request Withdrawal
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="max-w-md">
                         <AlertDialogHeader>
                           <AlertDialogTitle>Confirm Withdrawal</AlertDialogTitle>
                           <AlertDialogDescription asChild>
                             <div className="space-y-4">
                               <p>Please verify your withdrawal details:</p>
-                              <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                  <span>Asset:</span>
-                                  <span className="font-medium">{selectedAsset.symbol}</span>
+                              <div className="space-y-3 p-4 bg-gradient-to-r from-primary/5 to-purple-500/5 border border-primary/20 rounded-lg">
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Asset:</span>
+                                  <span className="font-medium text-foreground">{selectedAsset.symbol}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>Network:</span>
-                                  <span className="font-medium">{currentNetwork.name}</span>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Network:</span>
+                                  <span className="font-medium text-foreground">{currentNetwork.name}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>Address:</span>
-                                  <span className="font-mono text-xs break-all">
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Address:</span>
+                                  <span className="font-mono text-xs break-all text-foreground">
                                     {form.getValues("walletAddress")}
                                   </span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>Amount:</span>
-                                  <span className="font-medium">{watchedAmount} {selectedAsset.symbol}</span>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Amount:</span>
+                                  <span className="font-medium text-foreground">{watchedAmount} {selectedAsset.symbol}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>Fee:</span>
-                                  <span className="font-medium">{currentNetwork.fee}</span>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Fee:</span>
+                                  <span className="font-medium text-red-400">{currentNetwork.fee}</span>
                                 </div>
-                                <div className="flex justify-between border-t pt-2">
-                                  <span>Net Amount:</span>
-                                  <span className="font-bold">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
+                                <div className="flex justify-between border-t border-primary/20 pt-2">
+                                  <span className="font-medium text-foreground">Net Amount:</span>
+                                  <span className="font-bold text-primary">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
                                 </div>
                               </div>
-                              <div className="flex gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                                <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-                                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                              <div className="flex gap-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-yellow-600 dark:text-yellow-400">
                                   This action cannot be undone. Please double-check the wallet address.
                                 </p>
                               </div>
@@ -429,7 +482,7 @@ export function WithdrawView() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={confirmWithdrawal}>
+                          <AlertDialogAction onClick={confirmWithdrawal} className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700">
                             Confirm Withdrawal
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -441,25 +494,31 @@ export function WithdrawView() {
             </Card>
           </div>
 
-          {/* Security Notice */}
-          <Card>
+          {/* Security Information */}
+          <Card className="overflow-hidden bg-gradient-to-br from-green-500/5 to-blue-500/5 border-green-500/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Security Information
+                <Shield className="h-5 w-5 text-green-500" />
+                Security & Processing Information
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Processing Time</h4>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-blue-500" />
+                    Processing Time
+                  </h4>
                   <p className="text-sm text-muted-foreground">
                     Withdrawals are processed within 24 hours during business days.
                     Large amounts may require additional KYC verification.
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium">Security Measures</h4>
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-green-500" />
+                    Security Measures
+                  </h4>
                   <p className="text-sm text-muted-foreground">
                     All withdrawals are reviewed by our security team to ensure 
                     the safety of your funds. Email confirmation is required.
@@ -471,51 +530,63 @@ export function WithdrawView() {
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader>
-              <CardTitle>Withdrawal History</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Withdrawal History
+              </CardTitle>
               <CardDescription>
-                View all your previous withdrawal transactions
+                Track all your withdrawal transactions and their status
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {pendingWithdrawals.map((withdrawal) => (
-                  <div key={withdrawal.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <Image
-                        src={cryptoAssets.find(a => a.symbol === withdrawal.currency)?.iconUrl || ""}
-                        alt={withdrawal.currency}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <p className="font-medium">
-                          {withdrawal.amount} {withdrawal.currency}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {withdrawal.network} • {new Date(withdrawal.timestamp).toLocaleDateString()}
-                        </p>
-                        <p className="text-xs text-muted-foreground font-mono">
-                          To: {withdrawal.walletAddress.slice(0, 20)}...
+                  <div key={withdrawal.id} className="group relative overflow-hidden rounded-xl border p-4 hover:border-primary/50 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-full bg-gradient-to-br from-primary/10 to-purple-500/10">
+                          <Image
+                            src={cryptoAssets.find(a => a.symbol === withdrawal.currency)?.iconUrl || ""}
+                            alt={withdrawal.currency}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-semibold text-foreground">
+                            {withdrawal.amount} {withdrawal.currency}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {withdrawal.network} • {new Date(withdrawal.timestamp).toLocaleDateString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground font-mono">
+                            To: {withdrawal.walletAddress.slice(0, 20)}...
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <Badge
+                          variant={
+                            withdrawal.status === "completed" ? "default" :
+                            withdrawal.status === "pending" ? "secondary" : "destructive"
+                          }
+                          className={cn(
+                            "font-medium",
+                            withdrawal.status === "completed" && "bg-green-500/10 border-green-500/20 text-green-400"
+                          )}
+                        >
+                          {withdrawal.status === "completed" && <CheckCircle className="h-3 w-3 mr-1" />}
+                          {withdrawal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
+                          {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">
+                          Fee: {withdrawal.fee}
                         </p>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge
-                        variant={
-                          withdrawal.status === "completed" ? "default" :
-                          withdrawal.status === "pending" ? "secondary" : "destructive"
-                        }
-                      >
-                        {withdrawal.status === "completed" && <CheckCircle className="h-3 w-3 mr-1" />}
-                        {withdrawal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
-                        {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Fee: {withdrawal.fee}
-                      </p>
                     </div>
                   </div>
                 ))}
