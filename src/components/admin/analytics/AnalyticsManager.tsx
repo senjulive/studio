@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -71,9 +70,9 @@ export function AnalyticsManager() {
 
   return (
     <Tabs defaultValue="overview">
-        <TabsList>
-            <TabsTrigger value="overview"><LayoutDashboard className="mr-2 h-4 w-4"/>Overview</TabsTrigger>
-            <TabsTrigger value="leaderboard"><BarChart className="mr-2 h-4 w-4"/>Leaderboard</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 gap-1">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm"><LayoutDashboard className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"/>Overview</TabsTrigger>
+            <TabsTrigger value="leaderboard" className="text-xs sm:text-sm"><BarChart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"/>Leaderboard</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-4">
             <AnalyticsOverview data={data} />
