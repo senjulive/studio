@@ -27,9 +27,9 @@ const cryptoAssets = [
     name: "Tether",
     iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
     networks: [
-      { name: "TRC20 (TRON)", fee: "1 USDT", minWithdraw: 10 },
-      { name: "ERC20 (Ethereum)", fee: "5 USDT", minWithdraw: 20 },
-      { name: "BEP20 (BSC)", fee: "1 USDT", minWithdraw: 10 }
+      { name: "TRC20 (TRON)", minWithdraw: 10 },
+      { name: "ERC20 (Ethereum)", minWithdraw: 20 },
+      { name: "BEP20 (BSC)", minWithdraw: 10 }
     ]
   },
   {
