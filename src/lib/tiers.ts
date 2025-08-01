@@ -1,6 +1,5 @@
-'use server';
-// This is a server-safe module for tier data and logic.
-// It does not contain any client-side code (like React components or hooks).
+// Tier data and logic module
+// Contains both server and client-side functions
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
