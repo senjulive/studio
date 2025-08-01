@@ -1,12 +1,16 @@
-import { redirect } from 'next/navigation';
+import { AdminPanel } from "@/components/admin/admin-panel";
+import { AdminAuth } from "@/components/admin/admin-auth";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: "AstralCore AI - Dashboard",
-    description: "Access the AstralCore Platform.",
+    title: "AstralCore AI - Admin Panel",
+    description: "Manage the AstralCore Platform.",
 };
 
 export default function AdminPage() {
-  // Admin panel is disabled - redirect to dashboard
-  redirect('/dashboard');
+  return (
+    <AdminAuth>
+      <AdminPanel />
+    </AdminAuth>
+  );
 }
