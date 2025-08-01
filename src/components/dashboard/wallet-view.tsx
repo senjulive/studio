@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { AllAssetsChart } from "./all-assets-chart";
+
 import Image from "next/image";
 import { useUser } from "@/contexts/UserContext";
 import { tierIcons, tierClassNames } from '@/lib/settings';
