@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -265,9 +264,9 @@ export function WalletManager() {
         </CardHeader>
         <CardContent>
             <Tabs defaultValue="search">
-                <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="search">Search by Email</TabsTrigger>
-                    <TabsTrigger value="list">Select from List</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 gap-1">
+                    <TabsTrigger value="search" className="text-xs sm:text-sm">Search by Email</TabsTrigger>
+                    <TabsTrigger value="list" className="text-xs sm:text-sm">Select from List</TabsTrigger>
                 </TabsList>
                 <TabsContent value="search" className="pt-4">
                     <Form {...searchForm}>
