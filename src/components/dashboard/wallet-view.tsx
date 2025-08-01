@@ -340,18 +340,18 @@ export function WalletView() {
             </Card>
 
             {/* Virtual Card */}
-            <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <div className="space-y-4">
+              <div className="text-center">
+                <h2 className="text-xl font-semibold text-foreground flex items-center justify-center gap-2">
                   <Wallet className="h-5 w-5 text-primary" />
                   AstralCore Card
-                </CardTitle>
-                <CardDescription>Your virtual trading card with live balance</CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center py-4">
+                </h2>
+                <p className="text-muted-foreground">Your virtual trading card with live balance</p>
+              </div>
+              <div className="flex justify-center py-4">
                 <VirtualCard walletData={walletData} userEmail={user?.email || null} />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Asset Balances */}
             <Card className="overflow-hidden">
