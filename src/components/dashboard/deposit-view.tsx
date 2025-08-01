@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -14,9 +15,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Upload, Wallet, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { Copy, Upload, Wallet, AlertCircle, CheckCircle, Clock, TrendingUp, ArrowDownLeft, Shield, Zap } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { depositRequestSchema } from "@/lib/validators";
+import { cn } from "@/lib/utils";
 
 type DepositFormValues = z.infer<typeof depositRequestSchema>;
 
@@ -88,7 +90,6 @@ export function DepositView() {
 
   const onSubmit = async (values: DepositFormValues) => {
     try {
-      // Here you would typically send the deposit request to your API
       console.log("Deposit request:", values);
       
       toast({
@@ -127,165 +128,207 @@ export function DepositView() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="h-5 w-5" />
-            Deposit Funds
-          </CardTitle>
-          <CardDescription>
-            Add funds to your AstralCore account to start automated trading
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 via-purple-500/10 to-blue-500/10 border border-primary/20">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+        <div className="relative p-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-primary/20 rounded-full">
+                  <ArrowDownLeft className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Fund Your Account</h1>
+                  <p className="text-muted-foreground">Deposit cryptocurrency to start automated trading</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Badge variant="outline" className="bg-green-500/10 border-green-500/20 text-green-400">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Bank-Level Security
+                </Badge>
+                <Badge variant="outline" className="bg-blue-500/10 border-blue-500/20 text-blue-400">
+                  <Zap className="h-3 w-3 mr-1" />
+                  Instant Processing
+                </Badge>
+                <Badge variant="outline" className="bg-purple-500/10 border-purple-500/20 text-purple-400">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  Start Trading Now
+                </Badge>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <div className="text-3xl font-bold text-primary">$100</div>
+              <div className="text-sm text-muted-foreground">Minimum Deposit</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <Tabs defaultValue="deposit" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="deposit">Make Deposit</TabsTrigger>
-          <TabsTrigger value="history">Deposit History</TabsTrigger>
+      <Tabs defaultValue="deposit" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="deposit" className="flex items-center gap-2">
+            <ArrowDownLeft className="h-4 w-4" />
+            Make Deposit
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            History
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="deposit" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Asset Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Select Asset</CardTitle>
-                <CardDescription>
-                  Choose the cryptocurrency you want to deposit
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-3">
-                  {cryptoAssets.map((asset) => (
-                    <button
-                      key={asset.symbol}
-                      onClick={() => {
-                        setSelectedAsset(asset);
-                        setSelectedNetwork(0);
-                        form.setValue("currency", asset.symbol as any);
-                      }}
-                      className={`flex items-center gap-3 p-3 border rounded-lg text-left transition-colors ${
-                        selectedAsset.symbol === asset.symbol
-                          ? "border-primary bg-primary/5"
-                          : "hover:bg-muted/50"
-                      }`}
-                    >
-                      <Image
-                        src={asset.iconUrl}
-                        alt={asset.symbol}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
+          {/* Asset Selection */}
+          <Card className="overflow-hidden bg-gradient-to-br from-background to-background/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="h-5 w-5 text-primary" />
+                Choose Cryptocurrency
+              </CardTitle>
+              <CardDescription>Select the digital asset you want to deposit</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3 md:grid-cols-3">
+                {cryptoAssets.map((asset) => (
+                  <button
+                    key={asset.symbol}
+                    onClick={() => {
+                      setSelectedAsset(asset);
+                      setSelectedNetwork(0);
+                      form.setValue("currency", asset.symbol as any);
+                    }}
+                    className={cn(
+                      "group relative overflow-hidden rounded-xl border p-6 text-left transition-all duration-300 hover:shadow-lg",
+                      selectedAsset.symbol === asset.symbol
+                        ? "border-primary bg-primary/5 shadow-lg shadow-primary/20"
+                        : "border-border hover:border-primary/50 hover:bg-accent/50"
+                    )}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative flex items-center gap-4">
+                      <div className="p-2 rounded-full bg-gradient-to-br from-primary/10 to-purple-500/10">
+                        <Image
+                          src={asset.iconUrl}
+                          alt={asset.symbol}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                      </div>
                       <div className="flex-1">
-                        <p className="font-medium">{asset.name}</p>
+                        <p className="font-semibold text-foreground">{asset.name}</p>
                         <p className="text-sm text-muted-foreground">{asset.symbol}</p>
                       </div>
                       {selectedAsset.symbol === asset.symbol && (
                         <CheckCircle className="h-5 w-5 text-primary" />
                       )}
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Network Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Select Network</CardTitle>
-                <CardDescription>
-                  Choose the blockchain network for your deposit
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-3">
-                  {selectedAsset.networks.map((network, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedNetwork(index)}
-                      className={`flex items-center justify-between p-3 border rounded-lg text-left transition-colors ${
-                        selectedNetwork === index
-                          ? "border-primary bg-primary/5"
-                          : "hover:bg-muted/50"
-                      }`}
-                    >
-                      <div>
-                        <p className="font-medium">{network.name}</p>
-                        <p className="text-sm text-muted-foreground">Fee: {network.fee}</p>
-                      </div>
-                      {selectedNetwork === index && (
-                        <CheckCircle className="h-5 w-5 text-primary" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Network Selection */}
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Select Network
+              </CardTitle>
+              <CardDescription>Choose the blockchain network for your {selectedAsset.symbol} deposit</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3">
+                {selectedAsset.networks.map((network, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedNetwork(index)}
+                    className={cn(
+                      "flex items-center justify-between p-4 border rounded-xl text-left transition-all duration-300",
+                      selectedNetwork === index
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-accent/50"
+                    )}
+                  >
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">{network.name}</p>
+                      <p className="text-sm text-muted-foreground">Network fee: {network.fee}</p>
+                    </div>
+                    {selectedNetwork === index && (
+                      <CheckCircle className="h-5 w-5 text-primary" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Deposit Address */}
-          <Card>
+          <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
             <CardHeader>
-              <CardTitle>Deposit Address</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Copy className="h-5 w-5 text-primary" />
+                Deposit Address
+              </CardTitle>
               <CardDescription>
-                Send {selectedAsset.symbol} to the address below using {currentNetwork.name}
+                Send {selectedAsset.symbol} to this address using {currentNetwork.name}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex flex-col lg:flex-row gap-6">
-                <div className="flex-1 space-y-4">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Deposit Address</label>
+                    <label className="text-sm font-medium text-foreground">Wallet Address</label>
                     <div className="flex gap-2">
                       <Input
                         value={currentNetwork.address}
                         readOnly
-                        className="font-mono text-sm"
+                        className="font-mono text-sm bg-background/50"
                       />
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => copyToClipboard(currentNetwork.address)}
+                        className="border-primary/30 hover:bg-primary/10"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Network</label>
-                    <Input value={currentNetwork.name} readOnly />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Network Fee</label>
-                    <Input value={currentNetwork.fee} readOnly />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Network</label>
+                      <Input value={currentNetwork.name} readOnly className="bg-background/50" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Fee</label>
+                      <Input value={currentNetwork.fee} readOnly className="bg-background/50" />
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="p-4 bg-white rounded-lg">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="p-4 bg-white rounded-xl shadow-lg">
                     <QRCodeSVG value={currentNetwork.address} size={150} />
                   </div>
                   <p className="text-sm text-muted-foreground text-center">
-                    Scan QR code to copy address
+                    Scan QR code with your wallet app
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <div className="flex gap-2">
-                  <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                      Important Notice
-                    </p>
-                    <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
+              <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl">
+                <div className="flex gap-3">
+                  <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-foreground">Important Notice</p>
+                    <ul className="text-sm text-muted-foreground space-y-1">
                       <li>• Only send {selectedAsset.symbol} to this address</li>
                       <li>• Minimum deposit: $100 USD equivalent</li>
-                      <li>• Deposits are processed after 1-3 network confirmations</li>
+                      <li>• Deposits are processed after 1-3 confirmations</li>
                       <li>• Wrong network deposits will result in permanent loss</li>
                     </ul>
                   </div>
@@ -294,17 +337,20 @@ export function DepositView() {
             </CardContent>
           </Card>
 
-          {/* Deposit Confirmation Form */}
-          <Card>
+          {/* Confirmation Form */}
+          <Card className="overflow-hidden">
             <CardHeader>
-              <CardTitle>Confirm Your Deposit</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5 text-primary" />
+                Confirm Your Deposit
+              </CardTitle>
               <CardDescription>
-                After sending funds, please fill out this form to speed up processing
+                Submit transaction details to speed up processing
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                       control={form.control}
@@ -319,6 +365,7 @@ export function DepositView() {
                               placeholder="0.00"
                               {...field}
                               onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              className="bg-background/50"
                             />
                           </FormControl>
                           <FormMessage />
@@ -333,7 +380,7 @@ export function DepositView() {
                         <FormItem>
                           <FormLabel>Currency</FormLabel>
                           <FormControl>
-                            <Input value={selectedAsset.symbol} readOnly />
+                            <Input value={selectedAsset.symbol} readOnly className="bg-background/50" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -351,6 +398,7 @@ export function DepositView() {
                           <Input
                             placeholder="Enter the transaction hash from your wallet"
                             {...field}
+                            className="bg-background/50 font-mono"
                           />
                         </FormControl>
                         <FormMessage />
@@ -365,17 +413,20 @@ export function DepositView() {
                       <FormItem>
                         <FormLabel>Proof of Payment (Optional)</FormLabel>
                         <FormControl>
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             <Input
                               type="file"
                               accept="image/*"
                               onChange={handleFileUpload}
-                              className="cursor-pointer"
+                              className="cursor-pointer bg-background/50"
                             />
                             {uploadedFile && (
-                              <p className="text-sm text-green-600">
-                                File uploaded: {uploadedFile.name}
-                              </p>
+                              <div className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                                <p className="text-sm text-green-400">
+                                  File uploaded: {uploadedFile.name}
+                                </p>
+                              </div>
                             )}
                           </div>
                         </FormControl>
@@ -384,7 +435,7 @@ export function DepositView() {
                     )}
                   />
 
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 text-primary-foreground font-semibold py-3">
                     <Upload className="h-4 w-4 mr-2" />
                     Submit Deposit Request
                   </Button>
@@ -395,48 +446,60 @@ export function DepositView() {
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader>
-              <CardTitle>Deposit History</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Deposit History
+              </CardTitle>
               <CardDescription>
-                View all your previous deposit transactions
+                Track all your deposit transactions and their status
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {pendingDeposits.map((deposit) => (
-                  <div key={deposit.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <Image
-                        src={cryptoAssets.find(a => a.symbol === deposit.currency)?.iconUrl || ""}
-                        alt={deposit.currency}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <p className="font-medium">
-                          {deposit.amount} {deposit.currency}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {deposit.network} • {new Date(deposit.timestamp).toLocaleDateString()}
-                        </p>
-                        <p className="text-xs text-muted-foreground font-mono">
-                          {deposit.transactionId}
-                        </p>
+                  <div key={deposit.id} className="group relative overflow-hidden rounded-xl border p-4 hover:border-primary/50 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-full bg-gradient-to-br from-primary/10 to-purple-500/10">
+                          <Image
+                            src={cryptoAssets.find(a => a.symbol === deposit.currency)?.iconUrl || ""}
+                            alt={deposit.currency}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-semibold text-foreground">
+                            {deposit.amount} {deposit.currency}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {deposit.network} • {new Date(deposit.timestamp).toLocaleDateString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground font-mono">
+                            {deposit.transactionId}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge
-                        variant={
-                          deposit.status === "confirmed" ? "default" :
-                          deposit.status === "pending" ? "secondary" : "destructive"
-                        }
-                      >
-                        {deposit.status === "confirmed" && <CheckCircle className="h-3 w-3 mr-1" />}
-                        {deposit.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
-                        {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
-                      </Badge>
+                      <div className="text-right">
+                        <Badge
+                          variant={
+                            deposit.status === "confirmed" ? "default" :
+                            deposit.status === "pending" ? "secondary" : "destructive"
+                          }
+                          className={cn(
+                            "font-medium",
+                            deposit.status === "confirmed" && "bg-green-500/10 border-green-500/20 text-green-400"
+                          )}
+                        >
+                          {deposit.status === "confirmed" && <CheckCircle className="h-3 w-3 mr-1" />}
+                          {deposit.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
+                          {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 ))}
