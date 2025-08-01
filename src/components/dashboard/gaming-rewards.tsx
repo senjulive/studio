@@ -72,7 +72,9 @@ export function GamingRewards({ className }: GamingRewardsProps) {
             variant={feature.variant}
             className="animate-fade-in"
             style={{ animationDelay: `${index * 100}ms` }}
-          />
+          >
+            <div />
+          </FeatureCard>
         ))}
       </div>
 
