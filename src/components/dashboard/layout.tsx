@@ -164,7 +164,7 @@ URL=${window.location.origin}`;
       {
         title: 'Community',
         items: [
-          { href: '/dashboard/chat', label: 'Chat', icon: MessageSquare },
+          { href: '/dashboard/chat', label: 'Community', icon: MessageSquare },
           { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
           { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
           { href: '/dashboard/rewards', label: 'Rewards', icon: Trophy },
