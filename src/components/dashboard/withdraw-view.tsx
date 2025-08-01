@@ -92,8 +92,7 @@ export function WithdrawView() {
   const currentNetwork = selectedAsset.networks[selectedNetwork];
   const balances = wallet?.balances as any;
   const availableBalance = balances?.[selectedAsset.symbol.toLowerCase()] || 0;
-  const feeAmount = currentNetwork.fee.includes("USDT") ? parseFloat(currentNetwork.fee) : 0;
-  const netAmount = Math.max(0, watchedAmount - feeAmount);
+  const netAmount = watchedAmount;
 
   const onSubmit = async (values: WithdrawFormValues) => {
     if (values.amount > availableBalance) {
