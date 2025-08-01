@@ -9,10 +9,8 @@ export const metadata: Metadata = {
 
 export default function AdminPage() {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-secondary p-4">
-      <AdminAuth>
-        <AdminPanel />
-      </AdminAuth>
-    </main>
+    <AdminAuth>
+      <AdminPanel />
+    </AdminAuth>
   );
 }
