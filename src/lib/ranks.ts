@@ -1,6 +1,14 @@
-
 import type { SVGProps } from 'react';
-import type { TierSetting } from './tiers';
+
+// Define TierSetting here to avoid circular dependencies
+type TierSetting = {
+  id: string;
+  name: string;
+  balanceThreshold: number;
+  dailyProfit: number;
+  clicks: number;
+  locked: boolean;
+};
 
 export type Rank = {
   name: string;
@@ -33,5 +41,3 @@ export function getCurrentTier(balance: number, tiers: TierSetting[]): TierSetti
     );
     return applicableTier || tiers.find(t => !t.locked) || null;
 };
-
-    
