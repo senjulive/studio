@@ -399,12 +399,12 @@ export function WithdrawView() {
                       )}
                     />
 
-                    {/* Fee Calculation */}
+                    {/* No Fee Confirmation */}
                     {watchedAmount > 0 && (
-                      <div className="p-4 bg-gradient-to-r from-primary/5 to-purple-500/5 border border-primary/20 rounded-xl space-y-3">
+                      <div className="p-4 bg-gradient-to-r from-green-500/5 to-emerald-500/5 border border-green-500/20 rounded-xl space-y-3">
                         <div className="flex items-center gap-2 mb-3">
-                          <Calculator className="h-4 w-4 text-primary" />
-                          <span className="font-medium text-foreground">Fee Breakdown</span>
+                          <Calculator className="h-4 w-4 text-green-600" />
+                          <span className="font-medium text-foreground">Withdrawal Summary</span>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
@@ -413,11 +413,11 @@ export function WithdrawView() {
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Network Fee:</span>
-                            <span className="font-medium text-red-400">-{currentNetwork.fee}</span>
+                            <span className="font-medium text-green-600">FREE</span>
                           </div>
-                          <div className="border-t border-primary/20 pt-2 flex justify-between">
+                          <div className="border-t border-green-500/20 pt-2 flex justify-between">
                             <span className="font-medium text-foreground">You Will Receive:</span>
-                            <span className="font-bold text-primary">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
+                            <span className="font-bold text-green-600">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
                           </div>
                         </div>
                       </div>
