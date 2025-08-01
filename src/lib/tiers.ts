@@ -1,10 +1,5 @@
 // Tier data and logic module
-// Contains both server and client-side functions
-
-import * as fs from 'fs/promises';
-import * as path from 'path';
-
-const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
+// Client-side compatible version
 
 export interface TierSetting {
   id: string; // e.g., 'tier-1'
@@ -15,7 +10,7 @@ export interface TierSetting {
   locked: boolean;
 }
 
-const defaultTierSettings: TierSetting[] = [
+export const defaultTierSettings: TierSetting[] = [
   { id: 'tier-1', name: 'VIP CORE I', balanceThreshold: 0, dailyProfit: 0.02, clicks: 4, locked: false },
   { id: 'tier-2', name: 'VIP CORE II', balanceThreshold: 500, dailyProfit: 0.03, clicks: 5, locked: false },
   { id: 'tier-3', name: 'VIP CORE III', balanceThreshold: 1000, dailyProfit: 0.04, clicks: 6, locked: false },
@@ -26,34 +21,42 @@ const defaultTierSettings: TierSetting[] = [
   { id: 'tier-8', name: 'VIP CORE VIII', balanceThreshold: 100000, dailyProfit: 0.12, clicks: 15, locked: true },
 ];
 
-async function readSettings() {
-  try {
-    const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {};
-  }
+// Client-side version that returns the default tiers
+export function getBotTierSettings(): TierSetting[] {
+  return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
-export async function getBotTierSettings(): Promise<TierSetting[]> {
+// Server-side version for API routes (async)
+export async function getBotTierSettingsAsync(): Promise<TierSetting[]> {
+  // For server-side, we can try to read from file system
+  if (typeof window === 'undefined') {
     try {
-        const settings = await readSettings();
-        const tierSettings = settings['botTierSettings'];
-        if (tierSettings && Array.isArray(tierSettings) && tierSettings.length > 0) {
-            return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
-        }
+      // Dynamic import to avoid client-side bundling
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      
+      const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
+      const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
+      const settings = JSON.parse(data);
+      const tierSettings = settings['botTierSettings'];
+      
+      if (tierSettings && Array.isArray(tierSettings) && tierSettings.length > 0) {
+        return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
+      }
     } catch (error) {
-        console.error("Could not read tier settings from file, using defaults.", error);
+      console.error("Could not read tier settings from file, using defaults.", error);
     }
-    return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
+  }
+  
+  return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
-export async function getCurrentTier(balance: number, tierSettings?: TierSetting[]): Promise<TierSetting | null> {
-    const tiers = tierSettings || await getBotTierSettings();
-
+export function getCurrentTier(balance: number, tierSettings?: TierSetting[]): TierSetting | null {
+    const tiers = tierSettings || getBotTierSettings();
+    
     // Find the highest tier that the user qualifies for
     let currentTier: TierSetting | null = null;
-
+    
     for (const tier of tiers) {
         if (balance >= tier.balanceThreshold) {
             currentTier = tier;
@@ -61,14 +64,14 @@ export async function getCurrentTier(balance: number, tierSettings?: TierSetting
             break; // Since tiers are sorted by threshold, we can break here
         }
     }
-
+    
     return currentTier;
 }
 
 // Client-side version that doesn't use async file operations
 export function getCurrentTierSync(balance: number, tierSettings: TierSetting[]): TierSetting | null {
     let currentTier: TierSetting | null = null;
-
+    
     for (const tier of tierSettings) {
         if (balance >= tier.balanceThreshold) {
             currentTier = tier;
@@ -76,6 +79,6 @@ export function getCurrentTierSync(balance: number, tierSettings: TierSetting[])
             break;
         }
     }
-
+    
     return currentTier;
 }
