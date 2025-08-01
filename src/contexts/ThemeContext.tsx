@@ -55,7 +55,7 @@ export function ThemeProvider({ children, defaultTheme = 'dark' }: ThemeProvider
     const root = document.documentElement;
     
     // Remove existing theme classes
-    root.classList.remove('dark', 'light', 'modern', 'volcanic');
+    root.classList.remove('dark', 'light', 'modern', 'volcanic', 'crypto', 'gaming');
     
     // Add current theme class
     root.classList.add(theme);
