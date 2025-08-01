@@ -37,6 +37,18 @@ const themes = [
     icon: Zap,
     description: 'Fiery orange theme',
   },
+  {
+    name: 'Crypto',
+    value: 'crypto' as Theme,
+    icon: TrendingUp,
+    description: 'Trading interface theme',
+  },
+  {
+    name: 'Gaming',
+    value: 'gaming' as Theme,
+    icon: Gamepad2,
+    description: 'Gamified experience theme',
+  },
 ];
 
 export function ThemeSwitcher() {
