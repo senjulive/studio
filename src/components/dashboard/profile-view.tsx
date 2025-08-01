@@ -404,7 +404,7 @@ export function ProfileView() {
               <CardDescription>Your personal information and account details</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* Basic Information */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-foreground flex items-center gap-2">
