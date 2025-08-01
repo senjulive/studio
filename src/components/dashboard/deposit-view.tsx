@@ -28,9 +28,9 @@ const cryptoAssets = [
     name: "Tether",
     iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
     networks: [
-      { name: "TRC20 (TRON)", address: "TQn9Y2khEsLJW1ChVWFMSMeRDow5oNDMkx", fee: "1 USDT" },
-      { name: "ERC20 (Ethereum)", address: "0x742d35Cc6544A8E5D7C5B6E4b7b3f3", fee: "5 USDT" },
-      { name: "BEP20 (BSC)", address: "0x742d35Cc6544A8E5D7C5B6E4b7b3f3", fee: "1 USDT" }
+      { name: "TRC20 (TRON)", address: "TQn9Y2khEsLJW1ChVWFMSMeRDow5oNDMkx" },
+      { name: "ERC20 (Ethereum)", address: "0x742d35Cc6544A8E5D7C5B6E4b7b3f3" },
+      { name: "BEP20 (BSC)", address: "0x742d35Cc6544A8E5D7C5B6E4b7b3f3" }
     ]
   },
   {
