@@ -326,7 +326,7 @@ export function ProfileView() {
           </Card>
 
           {/* Action Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* Edit Profile */}
             <Card className="hover:bg-accent/50 transition-colors">
               <CardHeader>
