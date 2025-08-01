@@ -65,6 +65,7 @@ const adminSections = {
         'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
         'Promotions': { component: <PromotionManager />, icon: Gift },
         'Rewards': { component: <RewardsManager />, icon: Trophy },
+        'Marketing': { component: <MarketingManager />, icon: TrendingUp },
     },
     'Platform Settings': {
         'General Settings': { component: <SiteSettingsManager />, icon: Settings },
