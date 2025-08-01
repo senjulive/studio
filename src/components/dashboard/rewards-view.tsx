@@ -342,16 +342,18 @@ export function RewardsView() {
 
       <Tabs defaultValue="achievements" className="space-y-6">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 gap-1">
-          <TabsTrigger value="achievements" className="flex items-center gap-2">
-            <Trophy className="h-4 w-4" />
-            Achievements
+          <TabsTrigger value="achievements" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Achievements</span>
+            <span className="sm:hidden">Achieve</span>
           </TabsTrigger>
-          <TabsTrigger value="daily" className="flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            Daily Rewards
+          <TabsTrigger value="daily" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Daily Rewards</span>
+            <span className="sm:hidden">Daily</span>
           </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
+          <TabsTrigger value="history" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
             History
           </TabsTrigger>
         </TabsList>
