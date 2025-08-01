@@ -128,6 +128,8 @@ export default function DashboardLayout({
       const currentUser = { ...mockUser, email: loggedInEmail };
 
       setUser(currentUser);
+      setIsAdmin(loggedInEmail === 'admin@astralcore.io');
+      setIsModerator(loggedInEmail === 'moderator@astralcore.io');
 
       if (currentUser.id) {
         await fetchWalletAndTiers(currentUser.id);
