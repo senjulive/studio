@@ -2,6 +2,7 @@ import type {Metadata, Viewport} from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -40,10 +41,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable}`}>
-      <body className="font-body antialiased bg-background">
-        {children}
-        <Toaster />
+    <html lang="en" className={`${inter.variable} dark`}>
+      <body className="font-body antialiased bg-background text-foreground">
+        <ThemeProvider defaultTheme="dark">
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
