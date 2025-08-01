@@ -45,7 +45,7 @@ export function ThemeProvider({ children, defaultTheme = 'dark' }: ThemeProvider
   useEffect(() => {
     // Load saved theme from localStorage
     const savedTheme = localStorage.getItem('astral-theme') as Theme;
-    if (savedTheme && ['dark', 'light', 'modern', 'volcanic'].includes(savedTheme)) {
+    if (savedTheme && ['dark', 'light', 'modern', 'volcanic', 'crypto', 'gaming'].includes(savedTheme)) {
       setTheme(savedTheme);
     }
   }, []);
