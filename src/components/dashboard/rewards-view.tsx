@@ -341,7 +341,7 @@ export function RewardsView() {
       </div>
 
       <Tabs defaultValue="achievements" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 gap-1">
           <TabsTrigger value="achievements" className="flex items-center gap-2">
             <Trophy className="h-4 w-4" />
             Achievements
