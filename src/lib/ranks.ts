@@ -1,14 +1,5 @@
 import type { SVGProps } from 'react';
-
-// Import TierSetting type
-interface TierSetting {
-  id: string;
-  name: string;
-  balanceThreshold: number;
-  dailyProfit: number;
-  clicks: number;
-  locked: boolean;
-}
+import type { TierSetting } from './tiers';
 
 export type Rank = {
   name: string;
