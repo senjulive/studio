@@ -45,7 +45,7 @@ const cryptoAssets = [
     name: "Ethereum",
     iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
     networks: [
-      { name: "ERC20 (Ethereum)", fee: "0.005 ETH", minWithdraw: 0.01 }
+      { name: "ERC20 (Ethereum)", minWithdraw: 0.01 }
     ]
   }
 ];
