@@ -255,7 +255,7 @@ export function DepositView() {
                   >
                     <div className="space-y-1">
                       <p className="font-medium text-foreground">{network.name}</p>
-                      <p className="text-sm text-muted-foreground">Network fee: {network.fee}</p>
+                      <p className="text-sm text-green-600 font-medium">✓ No network fees</p>
                     </div>
                     {selectedNetwork === index && (
                       <CheckCircle className="h-5 w-5 text-primary" />
