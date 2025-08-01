@@ -319,7 +319,7 @@ export function WithdrawView() {
                         <div className="space-y-1">
                           <p className="font-medium text-foreground">{network.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            Fee: {network.fee} • Min: {network.minWithdraw} {selectedAsset.symbol}
+                            Min: {network.minWithdraw} {selectedAsset.symbol} • <span className="text-green-600 font-medium">No fees</span>
                           </p>
                         </div>
                         {selectedNetwork === index && (
