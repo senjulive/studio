@@ -42,6 +42,7 @@ import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
 import { SlideshowImageManager } from './slideshow-image-manager';
+import { RewardsAdminManager } from './rewards-admin-manager';
 
 
 const adminSections = {
