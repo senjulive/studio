@@ -62,6 +62,7 @@ const adminSections = {
     'Content & Engagement': {
         'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
         'Promotions': { component: <PromotionManager />, icon: Gift },
+        'Rewards': { component: <RewardsManager />, icon: Trophy },
     },
     'Platform Settings': {
         'General Settings': { component: <SiteSettingsManager />, icon: Settings },
