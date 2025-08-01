@@ -211,7 +211,7 @@ export default function DashboardLayout({
     }
 
     return baseConfig;
-  }, [downloadHref]);
+  }, [isAdmin, isModerator, downloadHref]);
 
 
   const handleLogout = async () => {
