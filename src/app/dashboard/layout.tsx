@@ -196,7 +196,7 @@ export default function DashboardLayout({
     // Admin tools section removed - admin panel not accessible via navigation
 
     return baseConfig;
-  }, [isAdmin, isModerator, downloadHref]);
+  }, [downloadHref]);
 
 
   const handleLogout = async () => {
