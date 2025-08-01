@@ -104,15 +104,15 @@ export function InviteView() {
       </Card>
 
       <Tabs defaultValue="invite" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="invite">Share Invite</TabsTrigger>
-          <TabsTrigger value="squad">My Squad</TabsTrigger>
-          <TabsTrigger value="rewards">Rewards</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 gap-1">
+          <TabsTrigger value="invite" className="text-xs sm:text-sm">Share Invite</TabsTrigger>
+          <TabsTrigger value="squad" className="text-xs sm:text-sm">My Squad</TabsTrigger>
+          <TabsTrigger value="rewards" className="text-xs sm:text-sm">Rewards</TabsTrigger>
         </TabsList>
 
         <TabsContent value="invite" className="space-y-6">
           {/* Current Stats */}
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Squad Members</CardTitle>
@@ -253,7 +253,7 @@ export function InviteView() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 {socialPlatforms.map((platform) => (
                   <Button
                     key={platform.name}
