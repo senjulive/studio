@@ -383,7 +383,7 @@ export function WithdrawView() {
                                   type="button"
                                   variant="outline"
                                   onClick={setMaxAmount}
-                                  disabled={availableBalance <= feeAmount}
+                                  disabled={availableBalance <= 0}
                                   className="border-primary/30 hover:bg-primary/10"
                                 >
                                   Max
