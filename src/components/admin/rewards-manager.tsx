@@ -395,10 +395,10 @@ export function RewardsManager() {
       </div>
 
       <Tabs defaultValue="achievements" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="achievements">Achievements</TabsTrigger>
-          <TabsTrigger value="daily-rewards">Daily Rewards</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 gap-1">
+          <TabsTrigger value="achievements" className="text-xs sm:text-sm">Achievements</TabsTrigger>
+          <TabsTrigger value="daily-rewards" className="text-xs sm:text-sm">Daily Rewards</TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="achievements" className="space-y-6">
