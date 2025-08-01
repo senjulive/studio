@@ -41,7 +41,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+
 
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
 import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
