@@ -196,13 +196,14 @@ export function WithdrawView() {
       </div>
 
       <Tabs defaultValue="withdraw" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="withdraw" className="flex items-center gap-2">
-            <ArrowUpRight className="h-4 w-4" />
-            Make Withdrawal
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 gap-1">
+          <TabsTrigger value="withdraw" className="flex items-center gap-2 text-xs sm:text-sm">
+            <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Make Withdrawal</span>
+            <span className="sm:hidden">Withdraw</span>
           </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
+          <TabsTrigger value="history" className="flex items-center gap-2 text-xs sm:text-sm">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
             History
           </TabsTrigger>
         </TabsList>
