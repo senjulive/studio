@@ -454,8 +454,8 @@ export function WithdrawView() {
                 <div className="space-y-2">
                   <h4 className="font-medium">Processing Time</h4>
                   <p className="text-sm text-muted-foreground">
-                    Withdrawals are processed within 24 hours during business days. 
-                    Large amounts may require additional verification.
+                    Withdrawals are processed within 24 hours during business days.
+                    Large amounts may require additional KYC verification.
                   </p>
                 </div>
                 <div className="space-y-2">
