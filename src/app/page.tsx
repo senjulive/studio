@@ -6,8 +6,10 @@ import { AstralLogo } from '@/components/icons/astral-logo';
 import { AutoSlideshow } from '@/components/ui/auto-slideshow';
 import { ArrowRight, Zap, TrendingUp, Shield, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
-const slideshowImages = [
+// Default fallback images
+const defaultSlideshowImages = [
   'https://cdn.builder.io/api/v1/image/assets%2F0c47262c92b84a109dd6e67be1a5c00d%2F05e9f1234f914ffda9f9d733faad0708?format=webp&width=800',
   'https://cdn.builder.io/api/v1/image/assets%2F0c47262c92b84a109dd6e67be1a5c00d%2F5324f6073a2d4094b1457cf686d328f2?format=webp&width=800',
   'https://cdn.builder.io/api/v1/image/assets%2F0c47262c92b84a109dd6e67be1a5c00d%2F6c22b44704904e0ba0d6191447bdec8c?format=webp&width=800',
@@ -21,6 +23,27 @@ const slideshowImages = [
 ];
 
 export default function WelcomePage() {
+  const [slideshowImages, setSlideshowImages] = useState(defaultSlideshowImages);
+
+  useEffect(() => {
+    // Fetch dynamic slideshow images
+    const fetchImages = async () => {
+      try {
+        const response = await fetch('/api/slideshow-images');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+            setSlideshowImages(data.images);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load slideshow images:', error);
+        // Keep using default images on error
+      }
+    };
+
+    fetchImages();
+  }, []);
   return (
     <main className="relative min-h-dvh w-full overflow-hidden">
       <AutoSlideshow
