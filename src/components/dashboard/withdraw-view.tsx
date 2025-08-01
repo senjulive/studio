@@ -37,7 +37,7 @@ const cryptoAssets = [
     name: "Bitcoin",
     iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
     networks: [
-      { name: "Bitcoin Network", fee: "0.0005 BTC", minWithdraw: 0.001 }
+      { name: "Bitcoin Network", minWithdraw: 0.001 }
     ]
   },
   {
