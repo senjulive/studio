@@ -44,7 +44,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { MessageSquare, UserPlus, Shield, Lock, Trophy, Cpu, Users, User, Globe } from 'lucide-react';
+import { MessageSquare, UserPlus, Shield, Lock, Trophy, Cpu, Users, User, Globe, Waves, Atom, Zap, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -89,121 +89,135 @@ const mockUser = {
 
 function DashboardLoading() {
   return (
-    <div className="purple relative min-h-dvh overflow-hidden bg-gradient-to-br from-background via-blue-950 to-purple-950 flex flex-col items-center justify-center">
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_70%)]" />
-      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
-
-      {/* Floating Particles */}
+    <div className="purple relative min-h-dvh overflow-hidden bg-black flex flex-col items-center justify-center">
+      {/* Enhanced Neural Background */}
       <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-950/90 via-purple-950/80 to-cyan-950/70 animate-pulse" 
+             style={{animationDuration: '3s'}} />
+        
+        {/* Quantum particles */}
+        {[...Array(30)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-blue-400 rounded-full animate-pulse"
+            className="absolute w-1 h-1 bg-blue-400/80 rounded-full animate-quantum-float"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
+              animationDelay: `${Math.random() * 6}s`,
+              filter: 'drop-shadow(0 0 3px rgba(59,130,246,0.8))'
             }}
           />
         ))}
       </div>
 
-      {/* Neural Network Lines */}
-      <div className="absolute inset-0 opacity-20">
+      {/* Neural Network Animation */}
+      <div className="absolute inset-0 opacity-30">
         <svg className="w-full h-full" viewBox="0 0 1000 1000" fill="none">
-          <path d="M100,200 Q300,100 500,200 T900,200" stroke="rgb(59,130,246)" strokeWidth="1" className="animate-pulse" />
-          <path d="M100,400 Q300,300 500,400 T900,400" stroke="rgb(147,51,234)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '0.5s'}} />
-          <path d="M100,600 Q300,500 500,600 T900,600" stroke="rgb(6,182,212)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '1s'}} />
-          <path d="M100,800 Q300,700 500,800 T900,800" stroke="rgb(168,85,247)" strokeWidth="1" className="animate-pulse" style={{animationDelay: '1.5s'}} />
+          <defs>
+            <linearGradient id="neuralFlow" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="rgb(59,130,246)" stopOpacity="0.8"/>
+              <stop offset="50%" stopColor="rgb(147,51,234)" stopOpacity="0.6"/>
+              <stop offset="100%" stopColor="rgb(6,182,212)" stopOpacity="0.4"/>
+            </linearGradient>
+          </defs>
+          
+          <path d="M100,200 Q300,100 500,200 T900,200" stroke="url(#neuralFlow)" strokeWidth="2" className="animate-pulse" />
+          <path d="M100,400 Q300,300 500,400 T900,400" stroke="url(#neuralFlow)" strokeWidth="2" className="animate-pulse" style={{animationDelay: '0.5s'}} />
+          <path d="M100,600 Q300,500 500,600 T900,600" stroke="url(#neuralFlow)" strokeWidth="2" className="animate-pulse" style={{animationDelay: '1s'}} />
+          <path d="M100,800 Q300,700 500,800 T900,800" stroke="url(#neuralFlow)" strokeWidth="2" className="animate-pulse" style={{animationDelay: '1.5s'}} />
         </svg>
       </div>
 
-      {/* Main Loading Content */}
+      {/* Enhanced Loading Content */}
       <div className="relative z-10 flex flex-col items-center space-y-8 animate-in fade-in-50 duration-1000">
-        {/* Quantum Logo with Rotating Rings */}
+        
+        {/* Quantum Core with Enhanced Rings */}
         <div className="relative">
-          {/* Outer rotating ring */}
-          <div className="absolute inset-0 w-48 h-48 border-2 border-blue-400/30 rounded-full animate-spin" style={{animationDuration: '4s'}} />
-
-          {/* Middle rotating ring */}
-          <div className="absolute inset-4 w-40 h-40 border-2 border-purple-400/40 rounded-full animate-spin" style={{animationDuration: '3s', animationDirection: 'reverse'}} />
-
-          {/* Inner rotating ring */}
-          <div className="absolute inset-8 w-32 h-32 border-2 border-cyan-400/50 rounded-full animate-spin" style={{animationDuration: '2s'}} />
-
-          {/* Central logo with pulse */}
-          <div className="relative flex items-center justify-center w-48 h-48">
-            <AstralLogo className="h-24 w-24 text-blue-400 animate-pulse" />
+          {/* Multi-layer rotating energy rings */}
+          <div className="absolute inset-0 w-56 h-56">
+            <div className="absolute inset-0 border-2 border-blue-400/40 rounded-full animate-quantum-spin"></div>
+            <div className="absolute inset-3 border-2 border-purple-400/50 rounded-full animate-quantum-spin" style={{animationDirection: 'reverse', animationDuration: '5s'}}></div>
+            <div className="absolute inset-6 border-2 border-cyan-400/60 rounded-full animate-quantum-spin" style={{animationDuration: '3s'}}></div>
+            <div className="absolute inset-9 border border-pink-400/40 rounded-full animate-quantum-spin" style={{animationDirection: 'reverse', animationDuration: '7s'}}></div>
           </div>
 
-          {/* Quantum dots */}
-          <div className="absolute top-4 left-1/2 w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0s'}} />
-          <div className="absolute top-1/2 right-4 w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.5s'}} />
-          <div className="absolute bottom-4 left-1/2 w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '1s'}} />
-          <div className="absolute top-1/2 left-4 w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '1.5s'}} />
+          {/* Pulsing energy core */}
+          <div className="relative flex items-center justify-center w-56 h-56">
+            <div className="absolute inset-12 bg-gradient-radial from-blue-500/30 to-transparent rounded-full animate-neural-pulse"></div>
+            <AstralLogo className="h-20 w-20 text-blue-400 drop-shadow-[0_0_30px_rgba(59,130,246,0.8)] animate-hologram-flicker" />
+          </div>
+
+          {/* Orbiting quantum particles */}
+          <div className="absolute top-6 left-1/2 w-3 h-3 bg-blue-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+          <div className="absolute top-1/2 right-6 w-3 h-3 bg-purple-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(147,51,234,0.8)]" style={{animationDelay: '0.5s'}} />
+          <div className="absolute bottom-6 left-1/2 w-3 h-3 bg-cyan-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(6,182,212,0.8)]" style={{animationDelay: '1s'}} />
+          <div className="absolute top-1/2 left-6 w-3 h-3 bg-pink-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(236,72,153,0.8)]" style={{animationDelay: '1.5s'}} />
         </div>
 
-        {/* Loading Text with Gradient */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+        {/* Enhanced Loading Text */}
+        <div className="text-center space-y-6">
+          <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent animate-hologram-flicker">
             Initializing AstralCore
           </h1>
-          <div className="space-y-2">
-            <p className="text-xl text-gray-300 font-medium">Quantum AI Neural Networks</p>
-            <p className="text-gray-400">Calibrating trading algorithms...</p>
+          <div className="space-y-3">
+            <p className="text-2xl text-gray-300 font-medium flex items-center justify-center gap-3">
+              <Brain className="w-6 h-6 text-blue-400 animate-pulse" />
+              Quantum Neural Networks
+              <Atom className="w-6 h-6 text-purple-400 animate-spin" />
+            </p>
+            <p className="text-gray-400 text-lg">Synchronizing market algorithms...</p>
           </div>
         </div>
 
-        {/* Animated Progress Indicators */}
-        <div className="flex space-x-2">
-          {[...Array(4)].map((_, i) => (
+        {/* Enhanced Progress Indicators */}
+        <div className="flex space-x-3">
+          {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"
+              className="w-4 h-4 rounded-full animate-neural-pulse"
               style={{
-                animationDelay: `${i * 0.2}s`,
-                animationDuration: '1s'
+                background: `linear-gradient(45deg, ${
+                  i % 2 === 0 ? 'rgb(59,130,246)' : 'rgb(147,51,234)'
+                }, ${i % 2 === 0 ? 'rgb(6,182,212)' : 'rgb(236,72,153)'})`,
+                animationDelay: `${i * 0.3}s`,
+                boxShadow: `0 0 20px ${
+                  i % 2 === 0 ? 'rgba(59,130,246,0.6)' : 'rgba(147,51,234,0.6)'
+                }`
               }}
             />
           ))}
         </div>
 
-        {/* System Status */}
-        <div className="flex flex-col sm:flex-row gap-4 text-sm">
-          <div className="flex items-center space-x-2 px-4 py-2 bg-blue-500/20 rounded-full border border-blue-400/30">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-blue-300">Neural Grid: Active</span>
+        {/* Enhanced System Status */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm max-w-4xl">
+          <div className="flex items-center space-x-3 px-6 py-3 bg-black/40 backdrop-blur-xl rounded-2xl border border-blue-400/30">
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]" />
+            <span className="text-blue-300 font-medium">Neural Grid: Active</span>
           </div>
-          <div className="flex items-center space-x-2 px-4 py-2 bg-purple-500/20 rounded-full border border-purple-400/30">
-            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}} />
-            <span className="text-purple-300">Market Analysis: Online</span>
+          <div className="flex items-center space-x-3 px-6 py-3 bg-black/40 backdrop-blur-xl rounded-2xl border border-purple-400/30">
+            <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(147,51,234,0.8)]" style={{animationDelay: '0.5s'}} />
+            <span className="text-purple-300 font-medium">Market Analysis: Online</span>
           </div>
-          <div className="flex items-center space-x-2 px-4 py-2 bg-cyan-500/20 rounded-full border border-cyan-400/30">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{animationDelay: '1s'}} />
-            <span className="text-cyan-300">Quantum Core: Syncing</span>
+          <div className="flex items-center space-x-3 px-6 py-3 bg-black/40 backdrop-blur-xl rounded-2xl border border-cyan-400/30">
+            <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(6,182,212,0.8)]" style={{animationDelay: '1s'}} />
+            <span className="text-cyan-300 font-medium">Quantum Core: Syncing</span>
           </div>
         </div>
 
-        {/* Loading Bar */}
-        <div className="w-80 h-2 bg-slate-800 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full animate-pulse transform origin-left animate-[slide_2s_ease-in-out_infinite]" />
+        {/* Enhanced Loading Bar */}
+        <div className="w-96 max-w-[90vw] h-3 bg-black/40 rounded-full overflow-hidden border border-blue-400/30 backdrop-blur-xl">
+          <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full animate-data-stream shadow-[0_0_20px_rgba(59,130,246,0.6)]" />
         </div>
       </div>
 
-      {/* Bottom Subtle Branding */}
+      {/* Enhanced Bottom Branding */}
       <div className="absolute bottom-8 text-center">
-        <p className="text-sm text-gray-500">AstralCore Quantum Nexus v3.76</p>
+        <p className="text-gray-500 flex items-center justify-center gap-2">
+          <Zap className="w-4 h-4" />
+          AstralCore Quantum Nexus v4.0
+          <Waves className="w-4 h-4" />
+        </p>
       </div>
-
-      <style jsx>{`
-        @keyframes slide {
-          0% { transform: translateX(-100%) scaleX(0); }
-          50% { transform: translateX(0%) scaleX(1); }
-          100% { transform: translateX(100%) scaleX(0); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -377,21 +391,22 @@ URL=${window.location.origin}`;
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
-        <Sidebar className="border-r-0 shadow-lg">
-          <SidebarHeader className="border-b border-sidebar-border/50 bg-gradient-to-r from-sidebar-background to-sidebar-background/80 backdrop-blur-sm">
+        <Sidebar className="border-r-0 shadow-xl bg-black/40 backdrop-blur-xl">
+          <SidebarHeader className="border-b border-sidebar-border/30 bg-gradient-to-r from-black/60 to-black/40 backdrop-blur-xl">
             <div className="flex items-center gap-3 p-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-lg blur-sm"></div>
-                <div className="relative bg-gradient-to-br from-primary/20 to-primary/10 p-2 rounded-lg border border-primary/20">
-                  <AstralLogo className="h-8 w-8 text-primary" />
+                <div className="absolute inset-0 bg-blue-400/30 rounded-xl blur-md animate-neural-pulse"></div>
+                <div className="relative bg-gradient-to-br from-blue-500/30 to-purple-500/20 p-3 rounded-xl border border-blue-400/40 backdrop-blur-xl">
+                  <AstralLogo className="h-8 w-8 text-blue-400 animate-hologram-flicker" />
                 </div>
               </div>
               <div className="flex flex-col">
-                <span className="text-lg font-bold bg-gradient-to-r from-sidebar-foreground to-sidebar-foreground/80 bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   AstralCore
                 </span>
-                <span className="text-xs text-sidebar-foreground/60 font-medium">
-                  Quantum Nexus v3.76
+                <span className="text-xs text-sidebar-foreground/60 font-medium flex items-center gap-1">
+                  <Atom className="w-3 h-3 animate-spin" />
+                  Quantum Nexus v4.0
                 </span>
               </div>
             </div>
@@ -399,21 +414,21 @@ URL=${window.location.origin}`;
 
           <div className="p-4 space-y-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-xl"></div>
-              <div className="relative p-4 rounded-xl border border-sidebar-border/50 bg-sidebar-background/50 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl blur-lg"></div>
+              <div className="relative p-4 rounded-xl border border-sidebar-border/40 bg-black/30 backdrop-blur-xl">
                 <div className="flex items-center gap-3 mb-3">
                   <AvatarUploadDialog
                     onUploadSuccess={() => fetchWalletAndTiers(user.id)}
                     wallet={wallet}
                   >
                     <div className="relative">
-                      <div className="absolute inset-0 bg-primary/30 rounded-full blur-sm animate-pulse"></div>
-                      <Avatar className="h-12 w-12 cursor-pointer relative border-2 border-primary/20">
+                      <div className="absolute inset-0 bg-blue-400/40 rounded-full blur-lg animate-neural-pulse"></div>
+                      <Avatar className="h-14 w-14 cursor-pointer relative border-2 border-blue-400/40 backdrop-blur-xl">
                         <AvatarImage
                           src={wallet?.profile?.avatarUrl}
                           alt={wallet?.profile?.username || 'User'}
                         />
-                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-bold">
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500/30 to-purple-500/20 text-blue-400 font-bold text-lg backdrop-blur-xl">
                           {userInitial}
                         </AvatarFallback>
                       </Avatar>
@@ -423,19 +438,19 @@ URL=${window.location.origin}`;
                   <div className="flex-1 overflow-hidden">
                      <p className="font-bold text-sidebar-foreground truncate flex items-center gap-2 text-sm">
                         {wallet?.profile?.username || 'User'}
-                        {userCountry && <span className="text-base">{userCountry.flag}</span>}
+                        {userCountry && <span className="text-lg drop-shadow-lg">{userCountry.flag}</span>}
                      </p>
                      <p className="text-xs text-sidebar-foreground/60 truncate font-medium">{userEmail}</p>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1 border-opacity-50 bg-opacity-10", rank.className)}>
+                  <Badge variant="outline" className={cn("text-xs py-1.5 px-3 flex items-center gap-1.5 border-opacity-60 bg-opacity-20 backdrop-blur-xl", rank.className)}>
                     <RankIcon className="h-3 w-3" />
                     <span className="font-medium">{rank.name}</span>
                   </Badge>
                   {tier && TierIcon && tierClassName && (
-                    <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1 border-opacity-50 bg-opacity-10", tierClassName)}>
+                    <Badge variant="outline" className={cn("text-xs py-1.5 px-3 flex items-center gap-1.5 border-opacity-60 bg-opacity-20 backdrop-blur-xl", tierClassName)}>
                       <TierIcon className="h-3 w-3" />
                       <span className="font-medium">{tier.name}</span>
                     </Badge>
@@ -444,23 +459,24 @@ URL=${window.location.origin}`;
               </div>
             </div>
           </div>
+          
           <SidebarContent className="px-2">
             <SidebarMenu className="space-y-1">
               {menuConfig.map((group, index) => (
                 <React.Fragment key={group.title}>
                   {index > 0 && (
                     <div className="my-4">
-                      <Separator className="bg-sidebar-border/30" />
+                      <Separator className="bg-sidebar-border/20" />
                     </div>
                   )}
                   <div className="px-3 py-2">
-                    <h3 className="text-xs font-bold text-sidebar-foreground/40 uppercase tracking-wider mb-2 flex items-center gap-2">
-                      {group.title === 'Overview' && <Cpu className="h-3 w-3" />}
-                      {group.title === 'Community' && <Users className="h-3 w-3" />}
-                      {group.title === 'Manage' && <Shield className="h-3 w-3" />}
-                      {group.title === 'Account' && <User className="h-3 w-3" />}
-                      {group.title === 'Platform' && <Globe className="h-3 w-3" />}
-                      {group.title === 'Admin Tools' && <Lock className="h-3 w-3" />}
+                    <h3 className="text-xs font-bold text-sidebar-foreground/50 uppercase tracking-wider mb-2 flex items-center gap-2">
+                      {group.title === 'Overview' && <Cpu className="h-3 w-3 text-blue-400" />}
+                      {group.title === 'Community' && <Users className="h-3 w-3 text-purple-400" />}
+                      {group.title === 'Manage' && <Shield className="h-3 w-3 text-cyan-400" />}
+                      {group.title === 'Account' && <User className="h-3 w-3 text-green-400" />}
+                      {group.title === 'Platform' && <Globe className="h-3 w-3 text-pink-400" />}
+                      {group.title === 'Admin Tools' && <Lock className="h-3 w-3 text-orange-400" />}
                       {group.title}
                     </h3>
                     <div className="space-y-1">
@@ -471,34 +487,34 @@ URL=${window.location.origin}`;
                             <SidebarMenuButton
                               asChild
                               className={cn(
-                                "h-10 px-3 rounded-lg transition-all duration-200 group hover:shadow-sm",
+                                "h-11 px-3 rounded-xl transition-all duration-300 group hover:shadow-lg backdrop-blur-xl",
                                 isActive
-                                  ? "bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/20 text-primary shadow-sm"
-                                  : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                                  ? "bg-gradient-to-r from-blue-500/30 to-purple-500/20 border border-blue-400/40 text-blue-400 shadow-lg shadow-blue-500/20"
+                                  : "hover:bg-white/5 hover:text-sidebar-accent-foreground hover:border-white/10 border border-transparent"
                               )}
                             >
                               <Link href={item.href} download={item.download} className="flex items-center gap-3 w-full">
                                 {item.label === 'CORE' ? (
                                   <div className="relative">
-                                    <div className="absolute inset-0 bg-primary/30 rounded-md blur-sm animate-pulse"></div>
-                                    <div className="relative bg-gradient-to-br from-primary/20 to-primary/10 p-1 rounded-md border border-primary/20">
-                                      <item.icon className="h-4 w-4 text-primary" />
+                                    <div className="absolute inset-0 bg-blue-400/40 rounded-lg blur-lg animate-neural-pulse"></div>
+                                    <div className="relative bg-gradient-to-br from-blue-500/30 to-purple-500/20 p-1.5 rounded-lg border border-blue-400/40 backdrop-blur-xl">
+                                      <item.icon className="h-4 w-4 text-blue-400" />
                                     </div>
                                   </div>
                                 ) : (
                                   <item.icon className={cn(
-                                    "h-4 w-4 transition-colors",
-                                    isActive ? "text-primary" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
+                                    "h-4 w-4 transition-colors drop-shadow-sm",
+                                    isActive ? "text-blue-400" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
                                   )} />
                                 )}
                                 <span className={cn(
                                   "font-medium text-sm transition-colors",
-                                  isActive ? "text-primary font-semibold" : "text-sidebar-foreground group-hover:text-sidebar-foreground"
+                                  isActive ? "text-blue-400 font-semibold" : "text-sidebar-foreground group-hover:text-sidebar-foreground"
                                 )}>
                                   {item.label}
                                 </span>
                                 {isActive && (
-                                  <div className="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                                  <div className="ml-auto w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
                                 )}
                               </Link>
                             </SidebarMenuButton>
@@ -511,19 +527,20 @@ URL=${window.location.origin}`;
               ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter className="border-t border-sidebar-border/50 bg-gradient-to-t from-sidebar-background/50 to-transparent">
+          
+          <SidebarFooter className="border-t border-sidebar-border/30 bg-gradient-to-t from-black/60 to-transparent backdrop-blur-xl">
             <div className="p-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-full justify-start text-sidebar-foreground h-auto p-3 rounded-lg border border-sidebar-border/30 bg-sidebar-background/50 backdrop-blur-sm hover:bg-sidebar-accent/50 transition-all duration-200 hover:shadow-sm"
+                    className="w-full justify-start text-sidebar-foreground h-auto p-3 rounded-xl border border-sidebar-border/40 bg-black/30 backdrop-blur-xl hover:bg-white/5 transition-all duration-300 hover:shadow-lg hover:border-blue-400/30"
                   >
                     <div className="flex items-center gap-3 w-full">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-primary/20 rounded-md blur-sm"></div>
-                        <div className="relative bg-gradient-to-br from-primary/10 to-primary/5 p-1.5 rounded-md border border-primary/20">
-                          <SettingsIcon className="h-4 w-4 text-primary" />
+                        <div className="absolute inset-0 bg-blue-400/20 rounded-lg blur-sm"></div>
+                        <div className="relative bg-gradient-to-br from-blue-500/20 to-purple-500/10 p-1.5 rounded-lg border border-blue-400/30">
+                          <SettingsIcon className="h-4 w-4 text-blue-400" />
                         </div>
                       </div>
                       <div className="flex flex-col items-start flex-1">
@@ -534,15 +551,15 @@ URL=${window.location.origin}`;
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-64 bg-background/95 backdrop-blur-md border-border/50" align="end" forceMount>
+                <DropdownMenuContent className="w-64 bg-black/90 backdrop-blur-xl border-border/40" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal p-3">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8 border border-primary/20">
+                      <Avatar className="h-8 w-8 border border-blue-400/30">
                         <AvatarImage
                           src={wallet?.profile?.avatarUrl}
                           alt={wallet?.profile?.username || 'User'}
                         />
-                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-xs font-bold">
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500/30 to-purple-500/20 text-blue-400 text-xs font-bold backdrop-blur-xl">
                           {userInitial}
                         </AvatarFallback>
                       </Avatar>
@@ -559,7 +576,7 @@ URL=${window.location.origin}`;
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild className="p-3 cursor-pointer">
                     <Link href="/dashboard/profile" className="flex items-center gap-3">
-                      <ProfileIcon className="h-4 w-4 text-primary" />
+                      <ProfileIcon className="h-4 w-4 text-blue-400" />
                       <div className="flex flex-col">
                         <span className="font-medium">Profile</span>
                         <span className="text-xs text-muted-foreground">Manage your profile</span>
@@ -568,7 +585,7 @@ URL=${window.location.origin}`;
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="p-3 cursor-pointer">
                     <Link href="/dashboard/security" className="flex items-center gap-3">
-                      <SettingsIcon className="h-4 w-4 text-primary" />
+                      <SettingsIcon className="h-4 w-4 text-blue-400" />
                       <div className="flex flex-col">
                         <span className="font-medium">Settings</span>
                         <span className="text-xs text-muted-foreground">Security & preferences</span>
@@ -588,25 +605,38 @@ URL=${window.location.origin}`;
             </div>
           </SidebarFooter>
         </Sidebar>
+        
         <div className="flex flex-1">
-          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
-            <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30 -ml-4 -mr-4 md:-ml-6 md:-mr-6">
+          <main className="flex-1 bg-gradient-to-br from-black via-gray-900/50 to-black p-4 md:p-6 pb-20 relative">
+            {/* Background Effects */}
+            <div className="fixed inset-0 pointer-events-none">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(59,130,246,0.05),transparent_50%)]"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.05),transparent_50%)]"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_80%,rgba(6,182,212,0.05),transparent_50%)]"></div>
+            </div>
+            
+            <header className="flex h-16 items-center gap-4 border-b border-border/20 bg-black/40 backdrop-blur-xl px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30 -ml-4 -mr-4 md:-ml-6 md:-mr-6 rounded-b-xl">
               <SidebarTrigger />
               <div className="w-full flex-1">
-                <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                  <AstralLogo className="h-6 w-6" />
+                <h1 className="flex items-center gap-3 text-lg font-semibold md:text-2xl capitalize">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-blue-400/20 rounded-lg blur-sm animate-pulse"></div>
+                    <AstralLogo className="h-6 w-6 relative text-blue-400" />
+                  </div>
                   {isClient ? (
-                    <span>{getPageTitle()}</span>
+                    <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                      {getPageTitle()}
+                    </span>
                   ) : (
                     <Skeleton className="h-6 w-24" />
                   )}
                 </h1>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                       <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
+                       <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5 backdrop-blur-xl border-opacity-60 bg-opacity-20", rank.className)}>
                           <RankIcon className="h-4 w-4" />
                           <span>{rank.name}</span>
                        </Badge>
@@ -618,7 +648,7 @@ URL=${window.location.origin}`;
                    {tier && TierIcon && tierClassName && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                          <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
+                          <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5 backdrop-blur-xl border-opacity-60 bg-opacity-20", tierClassName)}>
                             <TierIcon className="h-4 w-4" />
                             <span>{tier.name}</span>
                           </Badge>
@@ -630,7 +660,7 @@ URL=${window.location.origin}`;
                   )}
                 </TooltipProvider>
 
-                <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-white/5 backdrop-blur-xl" asChild>
                   <Link href="/dashboard/inbox">
                     <InboxIcon className="h-5 w-5" />
                     <span className="sr-only">Inbox</span>
@@ -640,40 +670,56 @@ URL=${window.location.origin}`;
                 <ThemeSwitcher />
               </div>
             </header>
-            {children}
+            <div className="relative z-20">
+              {children}
+            </div>
           </main>
-          <div className="hidden lg:block border-l">
+          
+          <div className="hidden lg:block border-l border-border/20">
             <RightSidebar />
           </div>
         </div>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
-            {bottomNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
-                  isClient && pathname.endsWith(item.href)
-                    ? 'text-primary font-medium'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {item.label === 'CORE' ? (
-                  <div className="absolute -top-7 flex items-center justify-center">
-                     <div className="h-16 w-16 rounded-full bg-transparent flex items-center justify-center">
-                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center p-1">
-                           <item.icon className="h-full w-full" />
-                        </div>
-                     </div>
-                  </div>
-                ) : (
-                  <item.icon className="h-6 w-6" />
-                )}
-                
-                <span className={cn(item.label === 'CORE' && 'mt-8')}>{item.label}</span>
-              </Link>
-            ))}
-          </nav>
+        
+        {/* Enhanced Mobile Bottom Navigation */}
+        <nav className="fixed bottom-0 left-0 right-0 h-20 bg-black/80 backdrop-blur-xl border-t border-border/30 flex items-center justify-around z-50 md:hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/40"></div>
+          {bottomNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'relative flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-all duration-300',
+                isClient && pathname.endsWith(item.href)
+                  ? 'text-blue-400 font-medium'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {item.label === 'CORE' ? (
+                <div className="absolute -top-8 flex items-center justify-center">
+                   <div className="relative h-16 w-16 rounded-full bg-transparent flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-purple-500/20 rounded-full blur-lg animate-neural-pulse"></div>
+                      <div className="relative h-14 w-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center p-1 border-2 border-blue-400/40 backdrop-blur-xl shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+                         <item.icon className="h-full w-full" />
+                      </div>
+                   </div>
+                </div>
+              ) : (
+                <item.icon className={cn(
+                  "h-6 w-6 transition-all duration-300",
+                  isClient && pathname.endsWith(item.href) && "drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]"
+                )} />
+              )}
+              
+              <span className={cn(
+                "transition-all duration-300",
+                item.label === 'CORE' && 'mt-8',
+                isClient && pathname.endsWith(item.href) && "text-blue-400 font-medium"
+              )}>
+                {item.label}
+              </span>
+            </Link>
+          ))}
+        </nav>
       </SidebarProvider>
     </UserProvider>
   );
