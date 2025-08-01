@@ -77,7 +77,7 @@ export function FloatingChat() {
                 </div>
             </motion.div>
             <div className="flex-1 overflow-hidden rounded-b-lg">
-                <PublicChatView isFloating />
+                <CommunityBlog isFloating />
             </div>
           </motion.div>
         )}
