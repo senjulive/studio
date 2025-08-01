@@ -1,3 +1,5 @@
+'use client';
+
 import { RegisterForm } from "@/components/auth/register-form";
 import { AutoSlideshow } from '@/components/ui/auto-slideshow';
 import { motion } from 'framer-motion';
