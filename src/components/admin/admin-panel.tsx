@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -42,6 +41,7 @@ import { WithdrawalManager } from './withdrawal-manager';
 import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
+import { SlideshowImageManager } from './slideshow-image-manager';
 
 
 const adminSections = {
