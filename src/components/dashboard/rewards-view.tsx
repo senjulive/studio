@@ -360,7 +360,7 @@ export function RewardsView() {
 
         <TabsContent value="achievements" className="space-y-6">
           {/* Stats Overview */}
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
             <Card className="overflow-hidden bg-gradient-to-br from-green-500/5 to-green-600/5 border-green-500/20">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
