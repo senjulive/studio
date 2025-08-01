@@ -43,15 +43,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <body className="font-body antialiased bg-background">
-        <ThemeProvider
+        <AdvancedThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
-          disableTransitionOnChange
+          disableTransitionOnChange={false}
         >
           {children}
           <Toaster />
-        </ThemeProvider>
+        </AdvancedThemeProvider>
       </body>
     </html>
   );
