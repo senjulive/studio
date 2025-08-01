@@ -67,8 +67,7 @@ const pendingWithdrawals = [
     network: "Bitcoin Network",
     walletAddress: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
     status: "completed",
-    timestamp: "2024-01-14T09:15:00Z",
-    fee: "0.0005 BTC"
+    timestamp: "2024-01-14T09:15:00Z"
   }
 ];
 
