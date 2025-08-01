@@ -296,67 +296,120 @@ export function WalletView() {
         </TabsList>
         <TabsContent value="wallet">
           <div className="space-y-6">
-            <Card className="relative overflow-hidden">
-              <div className="absolute inset-0 bg-primary/5 -z-10"/>
-              <CardHeader>
-                <CardTitle className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                  Available Assets
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                      <RankIcon className="h-5 w-5" />
-                      <span>{rank.name}</span>
+            {/* User Status & Badges */}
+            <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
+              <CardContent className="p-6">
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Badge variant="outline" className={cn("text-lg py-2 px-4 flex items-center gap-2", rank.className)}>
+                    <RankIcon className="h-6 w-6" />
+                    <span>{rank.name}</span>
+                  </Badge>
+                  {tier && TierIcon && tierClassName && (
+                    <Badge variant="outline" className={cn("text-lg py-2 px-4 flex items-center gap-2", tierClassName)}>
+                      <TierIcon className="h-6 w-6" />
+                      <span>{tier.name}</span>
                     </Badge>
-                    {tier && TierIcon && tierClassName && (
-                      <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", tierClassName)}>
-                        <TierIcon className="h-5 w-5" />
-                        <span>{tier.name}</span>
-                      </Badge>
-                    )}
-                  </div>
-                </CardTitle>
-                <CardDescription>Your total asset value and individual balances.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <div className="flex items-baseline justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Total Value (USD)</p>
-                      <p className="text-4xl font-bold tracking-tighter">${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Today's Earnings</p>
-                      <p className="text-lg font-semibold text-green-600">
-                        +${dailyEarnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
+              </CardContent>
+            </Card>
 
-                {/* Virtual Card */}
-                <div className="flex justify-center py-4">
-                  <VirtualCard walletData={walletData} userEmail={user?.email || null} />
+            {/* Portfolio Overview */}
+            <Card className="overflow-hidden bg-gradient-to-br from-green-500/5 to-blue-500/5 border-green-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
+                  Portfolio Overview
+                </CardTitle>
+                <CardDescription>Your total asset value and daily performance</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Total Portfolio Value</p>
+                    <p className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                      ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Today's Earnings</p>
+                    <p className="text-3xl font-bold text-green-600 flex items-center gap-2">
+                      <TrendingUp className="h-6 w-6" />
+                      +${dailyEarnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Virtual Card */}
+            <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-primary" />
+                  AstralCore Card
+                </CardTitle>
+                <CardDescription>Your virtual trading card with live balance</CardDescription>
+              </CardHeader>
+              <CardContent className="flex justify-center py-4">
+                <VirtualCard walletData={walletData} userEmail={user?.email || null} />
+              </CardContent>
+            </Card>
+
+            {/* Asset Balances */}
+            <Card className="overflow-hidden">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ArrowLeftRight className="h-5 w-5" />
+                  Asset Balances
+                </CardTitle>
+                <CardDescription>Your cryptocurrency holdings breakdown</CardDescription>
+              </CardHeader>
+              <CardContent>
                 {assetsWithFunds.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     {assetsWithFunds.map(asset => (
-                        <div key={asset.ticker} className="rounded-lg border bg-background/50 p-4">
-                            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                                <Image src={asset.iconUrl} alt={asset.ticker} width={20} height={20} className="rounded-full" />
-                                <span>{asset.name}</span>
+                      <div key={asset.ticker} className="group relative overflow-hidden rounded-xl border bg-gradient-to-br from-background to-background/80 p-6 hover:shadow-lg transition-all duration-300 hover:border-primary/30">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="relative space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/10 to-purple-500/10 flex items-center justify-center p-2">
+                              <Image src={asset.iconUrl} alt={asset.ticker} width={32} height={32} className="rounded-full" />
                             </div>
-                            <p className="text-2xl font-bold mt-1">
-                                {asset.balanceKey === 'usdt' && '$'}
-                                {balances[asset.balanceKey].toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: asset.balanceKey === 'usdt' ? 2 : 6,
-                                }) ?? '0.00'}
+                            <div>
+                              <p className="font-semibold text-foreground">{asset.ticker}</p>
+                              <p className="text-sm text-muted-foreground">{asset.name}</p>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-3xl font-bold tracking-tight">
+                              {asset.balanceKey === 'usdt' && '$'}
+                              {balances[asset.balanceKey].toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: asset.balanceKey === 'usdt' ? 2 : 6,
+                              }) ?? '0.00'}
                             </p>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">{asset.ticker} Balance</p>
+                          </div>
                         </div>
+                      </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center text-muted-foreground p-4 border border-dashed rounded-lg">
-                      You currently have no funds. Make a deposit to get started.
+                  <div className="text-center py-12">
+                    <div className="mx-auto w-24 h-24 bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-full flex items-center justify-center mb-4">
+                      <Wallet className="h-12 w-12 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">No Assets Yet</h3>
+                    <p className="text-muted-foreground max-w-sm mx-auto">
+                      You currently have no funds. Make a deposit to get started with automated trading.
+                    </p>
+                    <Button asChild className="mt-4">
+                      <Link href="/dashboard/deposit">
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Make Your First Deposit
+                      </Link>
+                    </Button>
                   </div>
                 )}
               </CardContent>
