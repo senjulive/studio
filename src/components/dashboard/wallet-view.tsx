@@ -334,7 +334,7 @@ export function WalletView() {
 
                 {/* Virtual Card */}
                 <div className="flex justify-center py-4">
-                  <VirtualCard walletData={walletData} userEmail={walletData?.profile?.email || null} />
+                  <VirtualCard walletData={walletData} userEmail={user?.email || null} />
                 </div>
                 {assetsWithFunds.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
