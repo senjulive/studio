@@ -90,8 +90,8 @@ const defaultCoins: CryptoData[] = [
   }
 ];
 
-export function AllAssetsChart({ coins, className }: AllAssetsChartProps) {
-  const safeCoins = coins || defaultCoins;
+export function AllAssetsChart({ coins = defaultCoins, className }: AllAssetsChartProps) {
+  const safeCoins = coins;
 
   const filteredCoins = React.useMemo(() => {
     const tickersToShow = ['BTC', 'ETH', 'USDT'];
