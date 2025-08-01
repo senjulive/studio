@@ -580,8 +580,8 @@ export function WithdrawView() {
                           {withdrawal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
                           {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
                         </Badge>
-                        <p className="text-xs text-muted-foreground">
-                          Fee: {withdrawal.fee}
+                        <p className="text-xs text-green-600 font-medium">
+                          No fees charged
                         </p>
                       </div>
                     </div>
