@@ -14,10 +14,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit, Plus } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit, Plus, Wallet, TrendingUp, Award, Settings } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
-
 import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
@@ -104,8 +103,8 @@ export function AvatarUploadDialog({ children, wallet, onUploadSuccess }: { chil
             <DialogTrigger asChild>
                 <div className="relative group">
                     {children}
-                    <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-red-600 rounded-full flex items-center justify-center border-2 border-card cursor-pointer group-hover:bg-red-500 transition-colors">
-                        <Plus className="h-4 w-4 text-white" />
+                    <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-primary rounded-full flex items-center justify-center border-2 border-card cursor-pointer group-hover:bg-primary/80 transition-colors">
+                        <Plus className="h-4 w-4 text-primary-foreground" />
                     </div>
                 </div>
             </DialogTrigger>
@@ -127,54 +126,6 @@ export function AvatarUploadDialog({ children, wallet, onUploadSuccess }: { chil
         </Dialog>
     );
 }
-
-
-const ProfileDetailItem = ({
-  icon,
-  label,
-  value,
-  isLoading,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-  isLoading: boolean;
-}) => (
-  <div>
-    <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
-      {icon}
-      {label}
-    </Label>
-    <div className="mt-1">
-      {isLoading ? (
-        <Skeleton className="h-6 w-3/4" />
-      ) : (
-        <p className="text-base font-medium text-foreground break-words">{value || <span className="text-sm text-muted-foreground italic">Not set</span>}</p>
-      )}
-    </div>
-  </div>
-);
-
-const assetConfig = [
-    {
-        ticker: "USDT",
-        name: "Tether",
-        iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
-        balanceKey: "usdt",
-    },
-    {
-        ticker: "ETH",
-        name: "Ethereum",
-        iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
-        balanceKey: "eth",
-    },
-    {
-        ticker: "BTC",
-        name: "Bitcoin",
-        iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
-        balanceKey: "btc",
-    },
-] as const;
 
 const VerificationStatusBadge = ({ status }: { status?: string }) => {
   if (status === 'verified') {
@@ -201,7 +152,6 @@ const VerificationStatusBadge = ({ status }: { status?: string }) => {
   );
 };
 
-
 export function ProfileView() {
   const [walletData, setWalletData] = React.useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -227,7 +177,6 @@ export function ProfileView() {
         setIsLoading(false);
     }
   }, [user]);
-
 
   React.useEffect(() => {
     fetchWallet();
@@ -269,7 +218,6 @@ export function ProfileView() {
     }
   };
 
-
   const profile = walletData?.profile;
   const profileDisplayName = profile?.displayName || profile?.fullName || profile?.username || "User Profile";
   const squadSize = walletData?.squad?.members?.length ?? 0;
@@ -284,109 +232,279 @@ export function ProfileView() {
        <Dialog open={showVerificationPopup} onOpenChange={setShowVerificationPopup}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Verify Your Account</DialogTitle>
+                    <DialogTitle>Update Your KYC</DialogTitle>
                     <DialogDescription>
-                        To access all features and ensure your account's security, please complete your profile. Verification is quick and helps us protect your assets.
+                        To access all features and ensure your account's security, please complete your profile. KYC verification is quick and helps us protect your assets.
                     </DialogDescription>
                 </DialogHeader>
                 <Button asChild onClick={() => setShowVerificationPopup(false)}>
-                    <Link href="/dashboard/profile/verify">Start Verification</Link>
+                    <Link href="/dashboard/profile/verify">Start KYC Update</Link>
                 </Button>
             </DialogContent>
         </Dialog>
-        <Card className="max-w-md mx-auto">
-            <CardHeader className="items-center text-center p-6">
-                <CardTitle className="text-2xl">
-                    {isLoading ? <Skeleton className="h-8 w-40 mx-auto" /> : profileDisplayName}
-                </CardTitle>
-                <div className="mt-2 flex justify-center gap-2 items-center">
-                    {isLoading ? (
-                    <>
-                        <Skeleton className="h-8 w-24" />
-                        <Skeleton className="h-6 w-20" />
-                    </>
-                    ) : (
-                    <>
-                        <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                        <RankIcon className="h-5 w-5" />
-                        <span>{rank.name}</span>
-                        </Badge>
-                        <VerificationStatusBadge status={profile?.verificationStatus} />
-                    </>
-                    )}
+
+        <div className="space-y-6">
+          {/* Profile Header */}
+          <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
+            <CardContent className="p-8">
+              <div className="flex flex-col lg:flex-row gap-8">
+                {/* Avatar and Basic Info */}
+                <div className="flex flex-col items-center lg:items-start">
+                  <AvatarUploadDialog wallet={walletData} onUploadSuccess={fetchWallet}>
+                    <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-primary to-purple-600 p-1 cursor-pointer group">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-background">
+                        <Image
+                          src={profile?.avatarUrl || "https://placehold.co/128x128.png"}
+                          alt="Profile"
+                          width={128}
+                          height={128}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </div>
+                    </div>
+                  </AvatarUploadDialog>
+                  
+                  <div className="mt-4 text-center lg:text-left">
+                    <h1 className="text-2xl font-bold text-foreground">
+                      {isLoading ? <Skeleton className="h-8 w-40" /> : profileDisplayName}
+                    </h1>
+                    <p className="text-muted-foreground">{user?.email}</p>
+                    
+                    <div className="flex flex-wrap gap-2 mt-3 justify-center lg:justify-start">
+                      {isLoading ? (
+                        <>
+                          <Skeleton className="h-8 w-24" />
+                          <Skeleton className="h-6 w-20" />
+                        </>
+                      ) : (
+                        <>
+                          <Badge variant="outline" className={cn("flex items-center gap-1.5", rank.className)}>
+                            <RankIcon className="h-4 w-4" />
+                            <span>{rank.name}</span>
+                          </Badge>
+                          <VerificationStatusBadge status={profile?.verificationStatus} />
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                {/* Quick Stats */}
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-background/60 rounded-lg p-4 border border-border/50">
+                    <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                      <Wallet className="h-4 w-4" />
+                      <span className="text-sm">Total Balance</span>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">
+                      {isLoading ? <Skeleton className="h-8 w-20" /> : `$${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    </p>
+                  </div>
+                  
+                  <div className="bg-background/60 rounded-lg p-4 border border-border/50">
+                    <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                      <Users className="h-4 w-4" />
+                      <span className="text-sm">Squad Members</span>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">
+                      {isLoading ? <Skeleton className="h-8 w-8" /> : squadSize}
+                    </p>
+                  </div>
+                  
+                  <div className="bg-background/60 rounded-lg p-4 border border-border/50">
+                    <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                      <Award className="h-4 w-4" />
+                      <span className="text-sm">Rank</span>
+                    </div>
+                    <p className="text-lg font-semibold text-foreground">
+                      {isLoading ? <Skeleton className="h-6 w-16" /> : rank.name}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Action Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Edit Profile */}
+            <Card className="hover:bg-accent/50 transition-colors">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Edit className="h-5 w-5" />
+                  Edit Display Name
+                </CardTitle>
+                <CardDescription>Update your public display name</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Change Display Name
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Set Display Name</DialogTitle>
+                      <DialogDescription>This name will be visible in the public chat.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input 
+                          id="display-name" 
+                          placeholder="Your public name" 
+                          value={displayName} 
+                          onChange={(e) => setDisplayName(e.target.value)} 
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={handleUpdateDisplayName} disabled={isUpdatingDisplayName || !displayName}>
+                        {isUpdatingDisplayName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save Name
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+
+            {/* KYC Verification */}
+            <Card className="hover:bg-accent/50 transition-colors">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5" />
+                  KYC Status
+                </CardTitle>
+                <CardDescription>
+                  {isVerified ? "Your account is fully verified" : "Complete KYC to unlock all features"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild className="w-full" variant={isVerified ? "outline" : "default"}>
+                  <Link href="/dashboard/profile/verify">
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    {isVerified ? "Update KYC" : "Complete KYC"}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Profile Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Profile Information
+              </CardTitle>
+              <CardDescription>Your personal information and account details</CardDescription>
             </CardHeader>
             <CardContent>
-            <div className="mb-6">
-                <Label className="text-xs text-muted-foreground text-center block mb-4">Asset Balances</Label>
-                {isLoading ? (
-                    <div className="flex justify-around">
-                        {Array.from({ length: 3 }).map((_, i) => (
-                             <div key={i} className="flex flex-col items-center gap-2">
-                                <Skeleton className="h-10 w-10 rounded-full" />
-                                <Skeleton className="h-5 w-16" />
-                             </div>
-                        ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    <BadgeInfo className="h-4 w-4" />
+                    Basic Information
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Username</Label>
+                      <p className="text-sm font-medium text-foreground mt-1">
+                        {isLoading ? <Skeleton className="h-4 w-24" /> : (profile?.username || "Not set")}
+                      </p>
                     </div>
-                ) : (
-                    <div className="flex justify-around text-center">
-                        {assetConfig.map(asset => (
-                            <div key={asset.ticker} className="flex flex-col items-center gap-2">
-                                <Image src={asset.iconUrl} alt={asset.name} width={40} height={40} className="rounded-full" />
-                                <span className="text-sm font-semibold font-mono">
-                                    {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 6,
-                                    }) ?? '0.00'}
-                                </span>
-                            </div>
-                        ))}
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Full Name</Label>
+                      <p className="text-sm font-medium text-foreground mt-1">
+                        {isLoading ? <Skeleton className="h-4 w-32" /> : (profile?.fullName || "Not set")}
+                      </p>
                     </div>
-                )}
-            </div>
-
-
-
-            <div className="grid grid-cols-1 gap-4 mb-6">
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit Display Name</Button>
-                    </DialogTrigger>
-                    <DialogContent><DialogHeader><DialogTitle>Set Display Name</DialogTitle><DialogDescription>This name will be visible in the public chat.</DialogDescription></DialogHeader><div className="space-y-4"><div className="relative"><User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input id="display-name" placeholder="Your public name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="pl-9"/></div></div><DialogFooter><Button onClick={handleUpdateDisplayName} disabled={isUpdatingDisplayName || !displayName}>{isUpdatingDisplayName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Save Name</Button></DialogFooter></DialogContent>
-                </Dialog>
-            </div>
-
-            <Separator className="mb-6"/>
-
-                <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
-                    <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={user?.email} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="ID Card No." value={profile?.idCardNo} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<Phone className="h-4 w-4" />} label="Contact Number" value={profile?.contactNumber} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<MapPin className="h-4 w-4" />} label="Country" value={profile?.country} />
-                    {isVerified && (
-                    <>
-                        <ProfileDetailItem isLoading={isLoading} icon={<Home className="h-4 w-4" />} label="Address" value={profile?.address} />
-                        <ProfileDetailItem isLoading={isLoading} icon={<Calendar className="h-4 w-4" />} label="Date of Birth" value={profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set'} />
-                    </>
-                    )}
-                    <div className="sm:col-span-2">
-                        <ProfileDetailItem isLoading={isLoading} icon={<Users className="h-4 w-4" />} label="Squad Members" value={`${squadSize} member${squadSize !== 1 ? 's' : ''}`} />
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Email</Label>
+                      <p className="text-sm font-medium text-foreground mt-1">
+                        {isLoading ? <Skeleton className="h-4 w-40" /> : (user?.email || "Not set")}
+                      </p>
                     </div>
+                  </div>
                 </div>
+
+                {/* Contact Information */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    Contact Information
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Phone Number</Label>
+                      <p className="text-sm font-medium text-foreground mt-1">
+                        {isLoading ? <Skeleton className="h-4 w-28" /> : (profile?.contactNumber || "Not set")}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Country</Label>
+                      <p className="text-sm font-medium text-foreground mt-1">
+                        {isLoading ? <Skeleton className="h-4 w-24" /> : (profile?.country || "Not set")}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">ID Card Number</Label>
+                      <p className="text-sm font-medium text-foreground mt-1">
+                        {isLoading ? <Skeleton className="h-4 w-32" /> : (profile?.idCardNo || "Not set")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Information (only if verified) */}
+                {isVerified && (
+                  <>
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-foreground flex items-center gap-2">
+                        <Home className="h-4 w-4" />
+                        Additional Details
+                      </h3>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Address</Label>
+                          <p className="text-sm font-medium text-foreground mt-1">
+                            {isLoading ? <Skeleton className="h-4 w-48" /> : (profile?.address || "Not set")}
+                          </p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Date of Birth</Label>
+                          <p className="text-sm font-medium text-foreground mt-1">
+                            {isLoading ? <Skeleton className="h-4 w-24" /> : (profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-foreground flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        Account Stats
+                      </h3>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Squad Members</Label>
+                          <p className="text-sm font-medium text-foreground mt-1">
+                            {isLoading ? <Skeleton className="h-4 w-16" /> : `${squadSize} member${squadSize !== 1 ? 's' : ''}`}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </CardContent>
-            {!isVerified && !isLoading && (
-                <CardFooter>
-                <Button asChild className="w-full">
-                    <Link href="/dashboard/profile/verify">
-                        <ShieldCheck className="mr-2 h-4 w-4" />
-                        Edit Profile & Verify
-                    </Link>
-                </Button>
-            </CardFooter>
-            )}
-        </Card>
+          </Card>
+        </div>
     </>
   );
 }
