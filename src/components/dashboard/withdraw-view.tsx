@@ -145,7 +145,7 @@ export function WithdrawView() {
   };
 
   const setMaxAmount = () => {
-    const maxAmount = Math.max(0, availableBalance - feeAmount);
+    const maxAmount = availableBalance;
     form.setValue("amount", maxAmount);
   };
 
