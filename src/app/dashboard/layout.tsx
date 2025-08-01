@@ -196,7 +196,19 @@ export default function DashboardLayout({
       },
     ];
 
-    // Admin tools section removed - admin panel not accessible via navigation
+    if (isAdmin || isModerator) {
+      const adminItems = [];
+      if (isAdmin) {
+        adminItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
+      }
+      if (isModerator) {
+        adminItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
+      }
+      baseConfig.push({
+        title: 'Admin Tools',
+        items: adminItems,
+      });
+    }
 
     return baseConfig;
   }, [downloadHref]);
