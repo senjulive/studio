@@ -58,8 +58,7 @@ const pendingWithdrawals = [
     network: "TRC20 (TRON)",
     walletAddress: "TQn9Y2khEsLJW1ChVWFMSMeRDow5oNDMkx",
     status: "pending",
-    timestamp: "2024-01-15T14:30:00Z",
-    fee: "1 USDT"
+    timestamp: "2024-01-15T14:30:00Z"
   },
   {
     id: "with_002",
