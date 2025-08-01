@@ -122,7 +122,6 @@ export function WithdrawView() {
         ...form.getValues(),
         currency: selectedAsset.symbol,
         network: currentNetwork.name,
-        fee: currentNetwork.fee,
         netAmount
       };
       
