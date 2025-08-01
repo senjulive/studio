@@ -9,10 +9,8 @@ export const metadata: Metadata = {
 
 export default function ModeratorPage() {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-secondary p-4">
-      <ModeratorAuth>
-        <ModeratorPanel />
-      </ModeratorAuth>
-    </main>
+    <ModeratorAuth>
+      <ModeratorPanel />
+    </ModeratorAuth>
   );
 }
