@@ -1,3 +1,5 @@
+'use client';
+
 import { LoginForm } from "@/components/auth/login-form";
 import { AutoSlideshow } from '@/components/ui/auto-slideshow';
 import { motion } from 'framer-motion';
