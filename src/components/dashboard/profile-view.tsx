@@ -291,27 +291,27 @@ export function ProfileView() {
 
                 {/* Quick Stats */}
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="bg-background/60 rounded-lg p-4 border border-border/50">
+                  <div className="bg-background/60 rounded-lg p-3 sm:p-4 border border-border/50">
                     <div className="flex items-center gap-2 text-muted-foreground mb-2">
                       <Wallet className="h-4 w-4" />
                       <span className="text-sm">Total Balance</span>
                     </div>
-                    <p className="text-2xl font-bold text-foreground">
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">
                       {isLoading ? <Skeleton className="h-8 w-20" /> : `$${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                     </p>
                   </div>
-                  
-                  <div className="bg-background/60 rounded-lg p-4 border border-border/50">
+
+                  <div className="bg-background/60 rounded-lg p-3 sm:p-4 border border-border/50">
                     <div className="flex items-center gap-2 text-muted-foreground mb-2">
                       <Users className="h-4 w-4" />
                       <span className="text-sm">Squad Members</span>
                     </div>
-                    <p className="text-2xl font-bold text-foreground">
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">
                       {isLoading ? <Skeleton className="h-8 w-8" /> : squadSize}
                     </p>
                   </div>
-                  
-                  <div className="bg-background/60 rounded-lg p-4 border border-border/50">
+
+                  <div className="bg-background/60 rounded-lg p-3 sm:p-4 border border-border/50">
                     <div className="flex items-center gap-2 text-muted-foreground mb-2">
                       <Award className="h-4 w-4" />
                       <span className="text-sm">Rank</span>
