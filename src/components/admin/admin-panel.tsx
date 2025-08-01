@@ -43,6 +43,7 @@ import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
 import { RewardsManager } from './rewards-manager';
+import { MarketingManager } from './marketing-manager';
 
 
 const adminSections = {
