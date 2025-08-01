@@ -104,8 +104,7 @@ export default function DashboardLayout({
   const [user, setUser] = React.useState<any | null>(null);
   const [wallet, setWallet] = React.useState<WalletData | null>(null);
   const [tierSettings, setTierSettings] = React.useState<TierData[]>([]);
-  const [isAdmin, setIsAdmin] = React.useState(false);
-  const [isModerator, setIsModerator] = React.useState(false);
+  // Admin/moderator detection removed
   const [isInitializing, setIsInitializing] = React.useState(true);
   const [downloadHref, setDownloadHref] = React.useState('');
 
