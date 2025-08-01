@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Repeat, Lock, LineChart, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight, TrendingUp, Wallet } from "lucide-react";
+import { Repeat, Lock, LineChart, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight, TrendingUp, Wallet, Activity, BarChart3 } from "lucide-react";
 import type { SVGProps } from 'react';
 import { Button } from "@/components/ui/button";
 
