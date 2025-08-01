@@ -155,32 +155,6 @@ const assetConfig = [
 
 export function WalletView() {
   const { wallet: walletData, tier, rank, user } = useUser();
-  const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
-
-  React.useEffect(() => {
-    setAllAssetsData(initialCryptoData);
-
-    const interval = setInterval(() => {
-      setAllAssetsData((prevData) => {
-        if (!prevData || prevData.length === 0) return [];
-        return prevData.map((coin) => {
-          const changeFactor = (Math.random() - 0.5) * 0.01;
-          const newPrice = coin.price * (1 + changeFactor);
-          const newHistory = [
-            ...coin.priceHistory.slice(1),
-            { value: newPrice },
-          ];
-          return {
-            ...coin,
-            price: newPrice,
-            priceHistory: newHistory,
-          };
-        });
-      });
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const transactions = React.useMemo(() => {
     if (!walletData || !walletData.created_at) return [];
