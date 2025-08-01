@@ -543,26 +543,30 @@ export function CommunityBlog({ isFloating = false }: { isFloating?: boolean }) 
                         Mention
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-64 p-0">
-                      <Command>
-                        <CommandInput placeholder="Search squad members..." />
-                        <CommandEmpty>No squad members found.</CommandEmpty>
-                        <CommandGroup>
-                          {squadMembers.map((member: any, index) => (
-                            <CommandItem
-                              key={index}
-                              onSelect={() => handleMentionSelect(member.username || `User${index + 1}`)}
-                            >
-                              <Avatar className="h-6 w-6 mr-2">
-                                <AvatarFallback className="text-xs">
-                                  {member.username?.[0]?.toUpperCase() || 'U'}
-                                </AvatarFallback>
-                              </Avatar>
-                              {member.username || `User ${index + 1}`}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </Command>
+                    <PopoverContent className="w-64 p-2">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Squad Members</h4>
+                        <div className="space-y-1 max-h-40 overflow-y-auto">
+                          {squadMembers.length === 0 ? (
+                            <p className="text-xs text-muted-foreground">No squad members found</p>
+                          ) : (
+                            squadMembers.map((member: any, index) => (
+                              <button
+                                key={index}
+                                onClick={() => handleMentionSelect(member.username || `User${index + 1}`)}
+                                className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-accent text-left"
+                              >
+                                <Avatar className="h-6 w-6">
+                                  <AvatarFallback className="text-xs">
+                                    {member.username?.[0]?.toUpperCase() || 'U'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm">{member.username || `User ${index + 1}`}</span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      </div>
                     </PopoverContent>
                   </Popover>
                 </div>
