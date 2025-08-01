@@ -161,7 +161,9 @@ export default function WelcomePage() {
                   variant={feature.variant}
                   className="animate-fade-in hover:scale-[1.02] transition-transform duration-300"
                   style={{ animationDelay: `${index * 200}ms` }}
-                />
+                >
+                  <div />
+                </FeatureCard>
               ))}
             </div>
           </div>
