@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, TrendingUp, TrendingDown, Activity, DollarSign, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AllAssetsChart } from "./all-assets-chart";
 
 type MarketData = {
   id: string;
