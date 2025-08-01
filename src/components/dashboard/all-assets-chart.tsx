@@ -34,7 +34,7 @@ type CryptoData = {
 };
 
 type AllAssetsChartProps = {
-  coins: CryptoData[];
+  coins?: CryptoData[];
   className?: string;
 };
 
