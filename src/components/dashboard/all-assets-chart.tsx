@@ -47,11 +47,56 @@ const cryptoColors: { [key: string]: string } = {
 };
 
 
+// Default mock data for when coins prop is not provided
+const defaultCoins: CryptoData[] = [
+  {
+    id: 'bitcoin',
+    name: 'Bitcoin',
+    ticker: 'BTC',
+    iconUrl: '',
+    price: 45000,
+    change24h: 2.5,
+    volume24h: 25000000000,
+    marketCap: 850000000000,
+    priceHistory: Array.from({ length: 30 }, (_, i) => ({
+      value: 45000 + (Math.sin(i / 5) * 2000) + (Math.random() - 0.5) * 1000
+    }))
+  },
+  {
+    id: 'ethereum',
+    name: 'Ethereum',
+    ticker: 'ETH',
+    iconUrl: '',
+    price: 3200,
+    change24h: 1.8,
+    volume24h: 15000000000,
+    marketCap: 380000000000,
+    priceHistory: Array.from({ length: 30 }, (_, i) => ({
+      value: 3200 + (Math.sin(i / 4) * 150) + (Math.random() - 0.5) * 100
+    }))
+  },
+  {
+    id: 'tether',
+    name: 'Tether',
+    ticker: 'USDT',
+    iconUrl: '',
+    price: 1.0,
+    change24h: 0.01,
+    volume24h: 50000000000,
+    marketCap: 75000000000,
+    priceHistory: Array.from({ length: 30 }, (_, i) => ({
+      value: 1.0 + (Math.random() - 0.5) * 0.002
+    }))
+  }
+];
+
 export function AllAssetsChart({ coins, className }: AllAssetsChartProps) {
+  const safeCoins = coins || defaultCoins;
+
   const filteredCoins = React.useMemo(() => {
     const tickersToShow = ['BTC', 'ETH', 'USDT'];
-    return coins.filter(coin => tickersToShow.includes(coin.ticker));
-  }, [coins]);
+    return safeCoins.filter(coin => tickersToShow.includes(coin.ticker));
+  }, [safeCoins]);
 
 
   const chartData = React.useMemo(() => {
