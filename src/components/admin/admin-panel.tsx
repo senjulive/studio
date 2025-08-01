@@ -24,6 +24,7 @@ import {
   ArrowUpFromLine,
   GitBranch,
   UserPlus,
+  Trophy,
 } from 'lucide-react';
 import { WalletManager } from './wallet-manager';
 import { SupportChatManager } from './support-chat-manager';
