@@ -246,8 +246,8 @@ export function ProfileView() {
         <div className="space-y-6">
           {/* Profile Header */}
           <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
-            <CardContent className="p-8">
-              <div className="flex flex-col lg:flex-row gap-8">
+            <CardContent className="p-4 sm:p-6 lg:p-8">
+              <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
                 {/* Avatar and Basic Info */}
                 <div className="flex flex-col items-center lg:items-start">
                   <AvatarUploadDialog wallet={walletData} onUploadSuccess={fetchWallet}>
