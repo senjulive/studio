@@ -1,4 +1,3 @@
-
 import { SquadClanChat } from '@/components/dashboard/squad-clan-chat';
 import type { Metadata } from 'next';
 
@@ -7,10 +6,16 @@ export const metadata: Metadata = {
     description: "Private chat for your squad.",
 };
 
-export default function ClanChatPage({ params }: { params: { clanId: string } }) {
+export default async function ClanChatPage({
+  params
+}: {
+  params: Promise<{ clanId: string }>
+}) {
+  const { clanId } = await params;
+
   return (
     <div className="space-y-6">
-      <SquadClanChat clanId={params.clanId} />
+      <SquadClanChat clanId={clanId} />
     </div>
   );
 }
