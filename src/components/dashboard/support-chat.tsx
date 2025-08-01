@@ -85,12 +85,12 @@ const quickActions = [
 
 const faqs = [
   {
-    question: "How long does verification take?",
-    answer: "Account verification typically takes 24-48 hours during business days. You'll receive an email notification once completed."
+    question: "How long does KYC verification take?",
+    answer: "KYC verification typically takes 24-48 hours during business days. You'll receive an email notification once completed."
   },
   {
     question: "What are the withdrawal limits?",
-    answer: "Withdrawal limits depend on your verification level. Verified accounts can withdraw up to $10,000 daily, while unverified accounts have a $500 daily limit."
+    answer: "Withdrawal limits depend on your KYC verification level. KYC verified accounts can withdraw up to $10,000 daily, while unverified accounts have a $500 daily limit."
   },
   {
     question: "How does the trading bot work?",
@@ -224,7 +224,7 @@ export function SupportChat() {
     let response = "";
     switch (action) {
       case "account_status":
-        response = `Your account status: ${wallet?.profile?.verificationStatus === 'verified' ? 'Verified' : 'Pending Verification'}. Balance: $${wallet?.balances?.usdt?.toFixed(2) || '0.00'} USDT`;
+        response = `Your account status: ${wallet?.profile?.verificationStatus === 'verified' ? 'KYC Verified' : 'Pending KYC Verification'}. Balance: $${wallet?.balances?.usdt?.toFixed(2) || '0.00'} USDT`;
         break;
       case "withdrawal_help":
         response = "For withdrawal issues, please ensure: 1) Your account is verified 2) You have sufficient balance 3) Withdrawal address is correct. If issues persist, please contact support.";
