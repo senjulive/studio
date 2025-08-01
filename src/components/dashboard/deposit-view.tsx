@@ -299,15 +299,10 @@ export function DepositView() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Network</label>
-                      <Input value={currentNetwork.name} readOnly className="bg-background/50" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Fee</label>
-                      <Input value={currentNetwork.fee} readOnly className="bg-background/50" />
-                    </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Network</label>
+                    <Input value={currentNetwork.name} readOnly className="bg-background/50" />
+                    <div className="text-sm text-green-600 font-medium">✓ No network fees</div>
                   </div>
                 </div>
 
@@ -328,7 +323,7 @@ export function DepositView() {
                     <p className="text-sm font-medium text-foreground">Important Notice</p>
                     <ul className="text-sm text-muted-foreground space-y-1">
                       <li>• Only send {selectedAsset.symbol} to this address</li>
-                      <li>• Minimum deposit: $100 USD equivalent</li>
+                      <li>�� Minimum deposit: $100 USD equivalent</li>
                       <li>• Deposits are processed after 1-3 confirmations</li>
                       <li>• Wrong network deposits will result in permanent loss</li>
                     </ul>
