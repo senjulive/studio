@@ -461,11 +461,11 @@ export function WithdrawView() {
                                 </div>
                                 <div className="flex justify-between text-sm">
                                   <span className="text-muted-foreground">Fee:</span>
-                                  <span className="font-medium text-red-400">{currentNetwork.fee}</span>
+                                  <span className="font-medium text-green-600">FREE</span>
                                 </div>
                                 <div className="flex justify-between border-t border-primary/20 pt-2">
-                                  <span className="font-medium text-foreground">Net Amount:</span>
-                                  <span className="font-bold text-primary">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
+                                  <span className="font-medium text-foreground">Amount You'll Receive:</span>
+                                  <span className="font-bold text-green-600">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
                                 </div>
                               </div>
                               <div className="flex gap-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
