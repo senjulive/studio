@@ -3,6 +3,10 @@ import { redirect } from 'next/navigation';
 type Credentials = {
     email?: string;
     password?: string;
+    fullName?: string;
+    phoneNumber?: string;
+    country?: string;
+    referralCode?: string;
     options?: any;
 }
 
