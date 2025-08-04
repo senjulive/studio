@@ -372,22 +372,22 @@ export function ProfileView() {
               </CardContent>
             </Card>
 
-            {/* KYC Verification */}
+            {/* Updated KYC */}
             <Card className="hover:bg-accent/50 transition-colors">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ShieldCheck className="h-5 w-5" />
-                  KYC Status
+                  Updated KYC Status
                 </CardTitle>
                 <CardDescription>
-                  {isVerified ? "Your account is fully verified" : "Complete KYC to unlock all features"}
+                  {isVerified ? "Your KYC verification is complete and up to date" : "Update your KYC to unlock all features"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button asChild className="w-full" variant={isVerified ? "outline" : "default"}>
                   <Link href="/dashboard/profile/verify">
                     <ShieldCheck className="mr-2 h-4 w-4" />
-                    {isVerified ? "Update KYC" : "Complete KYC"}
+                    {isVerified ? "Update KYC" : "Update KYC"}
                   </Link>
                 </Button>
               </CardContent>
