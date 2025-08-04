@@ -400,10 +400,20 @@ export function WebPageEditor() {
         <div className="lg:col-span-1">
           <Card className="bg-black/40 backdrop-blur-xl border-border/40">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Layout className="w-5 h-5" />
-                Pages
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Layout className="w-5 h-5" />
+                  Pages
+                </CardTitle>
+                <Button
+                  size="sm"
+                  onClick={() => setShowPageCreator(true)}
+                  className="bg-gradient-to-r from-green-500 to-emerald-600"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  New
+                </Button>
+              </div>
               <div className="pt-2">
                 <Input
                   placeholder="Search pages..."
