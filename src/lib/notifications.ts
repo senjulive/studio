@@ -56,3 +56,7 @@ export async function clearNotifications(userId: string): Promise<void> {
         mockNotifications[userId] = [];
     }
 }
+
+export async function getAllNotifications(): Promise<Record<string, Notification[]>> {
+    return mockNotifications;
+}
