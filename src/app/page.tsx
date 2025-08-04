@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { LearnMoreModal } from '@/components/ui/learn-more-modal';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
+import { AuthFooter } from '@/components/ui/auth-footer';
 import { ArrowRight, Zap, Brain, TrendingUp, Shield, Cpu, Sparkles, Globe, ChevronDown, Play, Star, CheckCircle, Rocket, Atom, Waves, Wifi } from 'lucide-react';
 
 export default function WelcomePage() {
