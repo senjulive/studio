@@ -61,7 +61,9 @@ export function SideNavigation() {
   const [isHovered, setIsHovered] = React.useState(false);
   const [startX, setStartX] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState(false);
+  const [userWallet, setUserWallet] = React.useState<any>(null);
   const pathname = usePathname();
+  const { user } = useUser();
   
   const sideNavRef = React.useRef<HTMLDivElement>(null);
   const timeoutRef = React.useRef<NodeJS.Timeout>();
