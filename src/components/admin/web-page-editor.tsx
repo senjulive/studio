@@ -478,8 +478,9 @@ export function WebPageEditor() {
         {/* Content Editor */}
         <div className="lg:col-span-3">
           <Tabs defaultValue="help" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="help">Help Guide</TabsTrigger>
+              <TabsTrigger value="templates">Templates</TabsTrigger>
               <TabsTrigger value="content">Content</TabsTrigger>
               <TabsTrigger value="settings">Page Settings</TabsTrigger>
               <TabsTrigger value="preview">Preview</TabsTrigger>
