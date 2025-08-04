@@ -721,6 +721,9 @@ URL=${window.location.origin}`;
             </Link>
           ))}
         </nav>
+
+        {/* Enhanced Side Navigation */}
+        <SideNavigation />
       </SidebarProvider>
     </UserProvider>
   );
