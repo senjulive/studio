@@ -149,6 +149,21 @@ export function WebPageEditor() {
     }
   };
 
+  const handleDeletePage = async (pageId: string) => {
+    if (!confirm('Are you sure you want to delete this page? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await deletePage(pageId);
+      if (selectedPage?.id === pageId) {
+        setSelectedPage(pages[0] || null);
+      }
+    } catch (error) {
+      // Error is handled by the hook
+    }
+  };
+
   const renderContentEditor = () => {
     if (!selectedContent) {
       return (
