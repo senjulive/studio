@@ -126,92 +126,118 @@ export function PageCreator({ isOpen, onClose, onPageCreated }: PageCreatorProps
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="page-name">Page Name *</Label>
-              <Input
-                id="page-name"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className="bg-black/20 border-border/40 text-white"
-                placeholder="e.g., Contact Us"
-                required
-              />
-            </div>
+          <Tabs defaultValue="templates" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="templates" className="flex items-center gap-2">
+                <Template className="w-4 h-4" />
+                Templates
+              </TabsTrigger>
+              <TabsTrigger value="custom" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Custom
+              </TabsTrigger>
+            </TabsList>
 
-            <div>
-              <Label htmlFor="page-route">Route *</Label>
-              <Input
-                id="page-route"
-                value={formData.route}
-                onChange={(e) => setFormData(prev => ({ ...prev, route: e.target.value }))}
-                className="bg-black/20 border-border/40 text-white"
-                placeholder="e.g., /contact"
-                required
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Must start with / (e.g., /contact, /about)
-              </p>
-            </div>
+            <TabsContent value="templates" className="space-y-4">
+              <div className="text-center mb-4">
+                <p className="text-sm text-gray-400">
+                  Choose from pre-built page templates
+                </p>
+              </div>
+              <div className="max-h-[500px] overflow-y-auto">
+                <PageTemplates onTemplateSelect={handleTemplateSelect} />
+              </div>
+            </TabsContent>
 
-            <div>
-              <Label htmlFor="page-title">Page Title</Label>
-              <Input
-                id="page-title"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="bg-black/20 border-border/40 text-white"
-                placeholder="e.g., Contact Us - AstralCore"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Used for browser title and SEO
-              </p>
-            </div>
+            <TabsContent value="custom" className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="page-name">Page Name *</Label>
+                  <Input
+                    id="page-name"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="bg-black/20 border-border/40 text-white"
+                    placeholder="e.g., Contact Us"
+                    required
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="page-description">Description</Label>
-              <Textarea
-                id="page-description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="bg-black/20 border-border/40 text-white"
-                placeholder="Brief description of the page content"
-                rows={3}
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Used for meta description and SEO
-              </p>
-            </div>
+                <div>
+                  <Label htmlFor="page-route">Route *</Label>
+                  <Input
+                    id="page-route"
+                    value={formData.route}
+                    onChange={(e) => setFormData(prev => ({ ...prev, route: e.target.value }))}
+                    className="bg-black/20 border-border/40 text-white"
+                    placeholder="e.g., /contact"
+                    required
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Must start with / (e.g., /contact, /about)
+                  </p>
+                </div>
 
-            <div className="flex gap-2 pt-4">
-              <Button
-                type="submit"
-                disabled={isCreating}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 flex-1"
-              >
-                {isCreating ? (
-                  <>
-                    <LoadingSpinner />
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Page
-                  </>
-                )}
-              </Button>
-              
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={isCreating}
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
+                <div>
+                  <Label htmlFor="page-title">Page Title</Label>
+                  <Input
+                    id="page-title"
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    className="bg-black/20 border-border/40 text-white"
+                    placeholder="e.g., Contact Us - AstralCore"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Used for browser title and SEO
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="page-description">Description</Label>
+                  <Textarea
+                    id="page-description"
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    className="bg-black/20 border-border/40 text-white"
+                    placeholder="Brief description of the page content"
+                    rows={3}
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Used for meta description and SEO
+                  </p>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    type="submit"
+                    disabled={isCreating}
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 flex-1"
+                  >
+                    {isCreating ? (
+                      <>
+                        <LoadingSpinner />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Page
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleClose}
+                    disabled={isCreating}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
