@@ -608,7 +608,18 @@ export function WebPageEditor() {
                         </select>
                       </div>
 
-                      <Button className="bg-gradient-to-r from-blue-500 to-purple-600">
+                      <Button
+                        onClick={async () => {
+                          if (selectedPage) {
+                            try {
+                              await updatePage(selectedPage.id, selectedPage);
+                            } catch (error) {
+                              // Error handled by hook
+                            }
+                          }
+                        }}
+                        className="bg-gradient-to-r from-blue-500 to-purple-600"
+                      >
                         <Save className="w-4 h-4 mr-2" />
                         Save Page Settings
                       </Button>
