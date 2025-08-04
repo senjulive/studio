@@ -79,101 +79,62 @@ export function ProTraderView() {
   return (
     <div className="space-y-6">
       {/* Main Trading Controls */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
-          <CardHeader className="relative">
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              CORE Grid Trading
-            </CardTitle>
-            <CardDescription>
-              Automated high-frequency trading with advanced grid algorithms
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="relative space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Status</p>
-                <div className="flex items-center gap-2">
-                  <div className={cn(
-                    "h-2 w-2 rounded-full",
-                    isTrading ? "bg-green-500 animate-pulse" : "bg-gray-400"
-                  )} />
-                  <span className="font-medium">
-                    {isTrading ? "Online" : "Offline"}
-                  </span>
-                </div>
+      <Card className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
+        <CardHeader className="relative">
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            CORE Grid Trading
+          </CardTitle>
+          <CardDescription>
+            Automated high-frequency trading with advanced grid algorithms
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="relative space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Status</p>
+              <div className="flex items-center gap-2">
+                <div className={cn(
+                  "h-2 w-2 rounded-full",
+                  isTrading ? "bg-green-500 animate-pulse" : "bg-gray-400"
+                )} />
+                <span className="font-medium">
+                  {isTrading ? "Online" : "Offline"}
+                </span>
               </div>
-              <Button 
-                onClick={handleTradingToggle}
-                variant={isTrading ? "destructive" : "default"}
-                size="sm"
-              >
-                {isTrading ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-                {isTrading ? "Stop" : "Start"}
-              </Button>
             </div>
+            <Button
+              onClick={handleTradingToggle}
+              variant={isTrading ? "destructive" : "default"}
+              size="sm"
+            >
+              {isTrading ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+              {isTrading ? "Stop" : "Start"}
+            </Button>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Today's Earnings</p>
               <p className="text-2xl font-bold text-green-600">
                 +${dailyEarnings.toFixed(2)}
               </p>
             </div>
-
             {tier && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>VIP CORE Tier</span>
-                  <Badge variant="outline" className="text-xs">
+              <div>
+                <p className="text-sm text-muted-foreground">VIP CORE Tier</p>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-sm">
                     {tier.name}
                   </Badge>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Earnings Rate</span>
-                  <span className="font-medium">{(earningsRate * 100).toFixed(1)}%</span>
+                  <span className="text-sm font-medium">{(earningsRate * 100).toFixed(1)}% rate</span>
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
-              Manual Earnings
-            </CardTitle>
-            <CardDescription>
-              Click to generate instant profits (Limited daily uses)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Clicks Used Today</span>
-                <span>{dailyClicks} / {maxClicks}</span>
-              </div>
-              <Progress value={(dailyClicks / maxClicks) * 100} />
-            </div>
-
-            <Button 
-              onClick={handleManualClick}
-              disabled={clicksLeft <= 0}
-              className="w-full"
-              size="lg"
-            >
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Generate Earnings
-            </Button>
-
-            <p className="text-xs text-muted-foreground text-center">
-              Resets daily at 00:00 UTC
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Trading Animation */}
       <Card>
