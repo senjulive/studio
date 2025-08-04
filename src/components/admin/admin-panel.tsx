@@ -49,6 +49,7 @@ import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
 import { RewardsManager } from './rewards-manager';
+import { SliderImageManager } from './slider-image-manager';
 
 const adminSections = {
     'Dashboard': { component: <AnalyticsManager />, icon: LayoutDashboard },
