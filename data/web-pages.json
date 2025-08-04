@@ -3,7 +3,7 @@
     "id": "welcome",
     "name": "Welcome Page",
     "route": "/",
-    "title": "AstralCore - Quantum Trading Platform",
+    "title": "AstralCore - Hyperdrive Trading Platform",
     "description": "Main landing page with hero section and features",
     "lastModified": "2024-01-15T12:00:00.000Z",
     "status": "published",
@@ -23,7 +23,7 @@
         "pageId": "welcome",
         "section": "hero",
         "type": "text",
-        "content": "Quantum Hyperdrive v5.0",
+        "content": "Hyperdrive v5.0",
         "metadata": {
           "className": "text-xl sm:text-2xl text-indigo-300 font-medium tracking-[0.3em] uppercase"
         }
@@ -33,7 +33,7 @@
         "pageId": "welcome",
         "section": "hero",
         "type": "text",
-        "content": "Experience the next evolution in trading technology. Our Quantum Hyperdrive processes infinite market possibilities to generate autonomous wealth through advanced neural algorithms.",
+        "content": "Experience the next evolution in trading technology. Our Hyperdrive processes infinite market possibilities to generate autonomous wealth through advanced neural algorithms.",
         "metadata": {
           "className": "text-xl sm:text-2xl lg:text-3xl text-gray-200 max-w-4xl mx-auto leading-relaxed"
         }
@@ -64,7 +64,7 @@
         "pageId": "welcome",
         "section": "ai-showcase",
         "type": "text",
-        "content": "Powered by revolutionary quantum algorithms that analyze infinite market dimensions and execute profitable trades across multiple realities simultaneously.",
+        "content": "Powered by revolutionary Hyperdrive algorithms that analyze infinite market dimensions and execute profitable trades across multiple realities simultaneously.",
         "metadata": {
           "className": "text-xl sm:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed"
         }
@@ -74,7 +74,7 @@
         "pageId": "welcome",
         "section": "performance",
         "type": "text",
-        "content": "Quantum Performance Statistics",
+        "content": "Hyperdrive Performance Statistics",
         "metadata": {
           "className": "text-4xl sm:text-5xl font-bold text-white"
         }
