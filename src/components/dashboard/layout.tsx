@@ -226,7 +226,7 @@ URL=${window.location.origin}`;
 
   const bottomNavItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/support', label: 'Customer Support', icon: SupportIcon },
     { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
