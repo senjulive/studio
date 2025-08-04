@@ -86,3 +86,17 @@ export async function sendMessage(
 export async function sendAdminMessage(userId: string, text: string): Promise<void> {
     return createMessage(userId, text, 'admin', false);
 }
+
+// Gets public chat messages from the public chat data file
+export async function getPublicChatMessages(): Promise<any[]> {
+    try {
+        const path = require('path');
+        const fs = require('fs/promises');
+        const filePath = path.join(process.cwd(), 'src/data/public-chat.json');
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.warn('Could not read public chat data:', error);
+        return [];
+    }
+}
