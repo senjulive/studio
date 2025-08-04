@@ -701,6 +701,17 @@ export function WebPageEditor() {
           </Tabs>
         </div>
       </div>
+
+      <PageCreator
+        isOpen={showPageCreator}
+        onClose={() => setShowPageCreator(false)}
+        onPageCreated={() => {
+          // Auto-select the new page when created
+          if (pages.length > 0) {
+            setSelectedPage(pages[pages.length - 1]);
+          }
+        }}
+      />
     </div>
   );
 }
