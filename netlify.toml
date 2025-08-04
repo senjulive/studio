@@ -3,7 +3,7 @@
 
 [build]
   # The command to build the Next.js application.
-  command = "npm run build"
+  command = "npm run build:production"
   # The directory where the built assets are located.
   publish = ".next"
 
