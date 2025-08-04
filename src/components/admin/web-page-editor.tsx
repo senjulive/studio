@@ -618,6 +618,10 @@ export function WebPageEditor() {
               </Card>
             </TabsContent>
 
+            <TabsContent value="help" className="space-y-4">
+              <WebEditorHelp />
+            </TabsContent>
+
             <TabsContent value="preview" className="space-y-4">
               <Card className="bg-black/40 backdrop-blur-xl border-border/40">
                 <CardHeader>
