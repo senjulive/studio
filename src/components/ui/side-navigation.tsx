@@ -49,7 +49,7 @@ const quickNavItems: NavItem[] = [
   { href: "/dashboard/market", label: "Market", icon: TrendingUp, color: "text-green-400" },
   { href: "/dashboard/cards", label: "Cards", icon: CreditCard, color: "text-cyan-400" },
   { href: "/dashboard/rewards", label: "Rewards", icon: Trophy, badge: "NEW", color: "text-yellow-400" },
-  { href: "/dashboard/chat", label: "Chat", icon: MessageSquare, color: "text-pink-400" },
+  { href: "/dashboard/space", label: "Space", icon: MessageSquare, color: "text-pink-400" },
   { href: "/dashboard/squad", label: "Squad", icon: Users, color: "text-green-400" },
   { href: "/dashboard/security", label: "Security", icon: Shield, color: "text-red-400" }
 ];
