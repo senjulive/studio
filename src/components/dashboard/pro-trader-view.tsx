@@ -153,7 +153,7 @@ export function ProTraderView() {
         <TabsList>
           <TabsTrigger value="pairs">Trading Pairs</TabsTrigger>
           <TabsTrigger value="history">Recent Trades</TabsTrigger>
-          <TabsTrigger value="bot">Bot Settings</TabsTrigger>
+          <TabsTrigger value="bot">Grid</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pairs" className="space-y-4">
