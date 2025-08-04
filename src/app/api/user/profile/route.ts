@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { getWalletByUserId } from '@/lib/wallet';
 
 async function getSessionUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('astralcore-session');
   
   if (!sessionCookie) {
