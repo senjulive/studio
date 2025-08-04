@@ -1,4 +1,5 @@
 import { CommunityBlog } from '@/components/dashboard/community-blog';
+import { ChatPageAdmin } from '@/components/admin/chat-page-admin';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 export default function ChatPage() {
   return (
     <div className="space-y-6">
+      <ChatPageAdmin />
       <CommunityBlog />
     </div>
   );
