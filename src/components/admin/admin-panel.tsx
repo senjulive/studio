@@ -72,6 +72,7 @@ const adminSections = {
     'Platform Settings': {
         'General Settings': { component: <SiteSettingsManager />, icon: Settings },
         'Bot & Tier Settings': { component: <BotTierSettingsManager />, icon: Bot },
+        'Bot Management': { component: <BotManagement />, icon: Activity },
         'Squad & Rewards': { component: <SquadRewardSettingsManager />, icon: GitBranch },
     }
 } as const;
