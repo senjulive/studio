@@ -6,11 +6,11 @@ import { useAdminStatus } from '@/hooks/use-admin-status';
 import type { Metadata } from 'next';
 
 export default function ChatPage() {
-  const { isAdmin } = useAdminStatus();
+  const { isAdmin, canModerateChat } = useAdminStatus();
 
   return (
     <div className="space-y-6">
-      {isAdmin && <ChatPageAdmin />}
+      {(isAdmin || canModerateChat) && <ChatPageAdmin />}
       <CommunityBlog />
     </div>
   );
