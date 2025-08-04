@@ -8,20 +8,28 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  username: z.string()
-    .min(3, "Username must be at least 3 characters")
-    .max(20, "Username must be less than 20 characters")
-    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
-  email: z.string().email("Please enter a valid email address"),
+  fullName: z.string()
+    .min(2, "Full name must be at least 2 characters")
+    .max(50, "Full name must be less than 50 characters")
+    .regex(/^[a-zA-Z\s]+$/, "Full name can only contain letters and spaces"),
+  email: z.string()
+    .email("Please enter a valid email address")
+    .max(100, "Email must be less than 100 characters"),
   password: z.string()
     .min(8, "Password must be at least 8 characters")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
+    .max(128, "Password must be less than 128 characters")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])?/, "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
   confirmPassword: z.string(),
   country: z.string().min(1, "Please select your country"),
-  contactNumber: z.string()
-    .min(5, "Contact number must be at least 5 digits")
-    .regex(/^\d+$/, "Contact number can only contain digits"),
+  phoneNumber: z.string()
+    .min(8, "Phone number must be at least 8 digits")
+    .max(20, "Phone number must be less than 20 digits")
+    .regex(/^\+?[\d\s\-\(\)]+$/, "Please enter a valid phone number")
+    .optional(),
   referralCode: z.string().optional(),
+  agreeToTerms: z.boolean().refine(val => val === true, {
+    message: "You must agree to the terms and conditions"
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
