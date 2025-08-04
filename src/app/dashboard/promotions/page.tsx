@@ -6,11 +6,11 @@ import { useAdminStatus } from '@/hooks/use-admin-status';
 import type { Metadata } from 'next';
 
 export default function PromotionsPage() {
-  const { isAdmin } = useAdminStatus();
+  const { isAdmin, canManagePromotions } = useAdminStatus();
 
   return (
     <div className="space-y-6">
-      {isAdmin && <PromotionsPageAdmin />}
+      {(isAdmin || canManagePromotions) && <PromotionsPageAdmin />}
       <PromotionsView />
     </div>
   );
