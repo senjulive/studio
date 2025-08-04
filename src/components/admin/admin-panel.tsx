@@ -76,6 +76,7 @@ const adminSections = {
         'Rewards System': { component: <RewardsManager />, icon: Trophy },
         'Slider Images': { component: <SliderImageManager />, icon: FileText },
         'Squad & Rewards': { component: <SquadRewardSettingsManager />, icon: GitBranch },
+        'Web Page Editor': { component: <WebPageEditor />, icon: Edit },
     },
     'AstralCore Hyperdrive': {
         'Hyperdrive Settings': { component: <BotTierSettingsManager />, icon: Brain },
