@@ -705,6 +705,23 @@ export function WebPageEditor() {
               <WebEditorHelp />
             </TabsContent>
 
+            <TabsContent value="templates" className="space-y-4">
+              <Card className="bg-black/40 backdrop-blur-xl border-border/40">
+                <CardHeader>
+                  <CardTitle className="text-white">Content Templates</CardTitle>
+                  <CardDescription>
+                    {selectedPage ?
+                      `Click any template to add it to "${selectedPage.name}"` :
+                      'Select a page first to use templates'
+                    }
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ContentTemplates onTemplateSelect={handleTemplateSelect} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             <TabsContent value="preview" className="space-y-4">
               <Card className="bg-black/40 backdrop-blur-xl border-border/40">
                 <CardHeader>
