@@ -1,0 +1,186 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { useWebPages } from '@/hooks/use-web-pages';
+import { Plus, X } from 'lucide-react';
+
+interface PageCreatorProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onPageCreated?: () => void;
+}
+
+export function PageCreator({ isOpen, onClose, onPageCreated }: PageCreatorProps) {
+  const [formData, setFormData] = useState({
+    name: '',
+    route: '',
+    title: '',
+    description: ''
+  });
+  const [isCreating, setIsCreating] = useState(false);
+  const { createPage } = useWebPages();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.route) {
+      toast({
+        title: 'Error',
+        description: 'Name and route are required',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!formData.route.startsWith('/')) {
+      setFormData(prev => ({ ...prev, route: `/${prev.route}` }));
+    }
+
+    setIsCreating(true);
+    try {
+      await createPage(formData);
+      setFormData({ name: '', route: '', title: '', description: '' });
+      onClose();
+      onPageCreated?.();
+      toast({
+        title: 'Success',
+        description: 'Page created successfully'
+      });
+    } catch (error) {
+      // Error handled by hook
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleClose = () => {
+    setFormData({ name: '', route: '', title: '', description: '' });
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <Card className="bg-black/80 backdrop-blur-xl border-border/40 w-full max-w-lg">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Plus className="w-5 h-5 text-green-400" />
+                Create New Page
+              </CardTitle>
+              <CardDescription>
+                Add a new page to your website
+              </CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              className="text-gray-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="page-name">Page Name *</Label>
+              <Input
+                id="page-name"
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                className="bg-black/20 border-border/40 text-white"
+                placeholder="e.g., Contact Us"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="page-route">Route *</Label>
+              <Input
+                id="page-route"
+                value={formData.route}
+                onChange={(e) => setFormData(prev => ({ ...prev, route: e.target.value }))}
+                className="bg-black/20 border-border/40 text-white"
+                placeholder="e.g., /contact"
+                required
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Must start with / (e.g., /contact, /about)
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="page-title">Page Title</Label>
+              <Input
+                id="page-title"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                className="bg-black/20 border-border/40 text-white"
+                placeholder="e.g., Contact Us - AstralCore"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Used for browser title and SEO
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="page-description">Description</Label>
+              <Textarea
+                id="page-description"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                className="bg-black/20 border-border/40 text-white"
+                placeholder="Brief description of the page content"
+                rows={3}
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Used for meta description and SEO
+              </p>
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button
+                type="submit"
+                disabled={isCreating}
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 flex-1"
+              >
+                {isCreating ? (
+                  <>
+                    <LoadingSpinner />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Page
+                  </>
+                )}
+              </Button>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={isCreating}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
