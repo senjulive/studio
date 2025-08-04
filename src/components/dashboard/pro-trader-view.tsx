@@ -101,7 +101,7 @@ export function ProTraderView() {
                     isTrading ? "bg-green-500 animate-pulse" : "bg-gray-400"
                   )} />
                   <span className="font-medium">
-                    {isTrading ? "Active" : "Paused"}
+                    {isTrading ? "Online" : "Offline"}
                   </span>
                 </div>
               </div>
