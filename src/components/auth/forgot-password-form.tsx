@@ -57,15 +57,22 @@ export function ForgotPasswordForm() {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: 'Failed to send reset email' };
+        }
+
         toast({
           title: "Error",
-          description: data.error || "Failed to send reset email",
+          description: errorData.error || "Failed to send reset email",
           variant: "destructive",
         });
       } else {
+        const data = await response.json();
         setIsSuccess(true);
         toast({
           title: "Success",
