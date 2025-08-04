@@ -9,7 +9,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "build:production": "NODE_ENV=production npm run type-check && npm run build",
+    "deploy": "npm run build:production",
+    "postbuild": "echo 'Build completed successfully'",
+    "clean": "rm -rf .next && rm -rf out",
+    "analyze": "cross-env ANALYZE=true npm run build"
   },
   "dependencies": {
     "@builder.io/react": "^8.2.6",
