@@ -66,6 +66,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Temporarily disabled for debugging
+    '/((?!api|_next/static|_next/image|favicon.ico|manifest.webmanifest|icons|health|robots.txt|sitemap.xml).*)',
   ],
 };
