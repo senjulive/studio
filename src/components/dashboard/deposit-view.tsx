@@ -381,7 +381,7 @@ export function DepositView() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg text-white flex items-center gap-2">
                   <Coins className="h-5 w-5 text-blue-400" />
-                  Select Quantum Asset
+                  Select Crypto Currencies
                 </CardTitle>
                 <CardDescription>Choose your preferred digital currency</CardDescription>
               </CardHeader>
