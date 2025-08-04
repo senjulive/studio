@@ -469,23 +469,12 @@ URL=${window.location.origin}`;
             ))}
           </nav>
         </SidebarInset>
-        <RightSidebar>
-        <div className="p-4">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Access</h2>
-          <div className="space-y-2">
-            {quickAccessItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center p-2 rounded-lg text-foreground/80 hover:bg-muted/50 hover:text-foreground transition-colors"
-              >
-                <item.icon className="h-5 w-5 mr-3" />
-                <span>{item.label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </RightSidebar>
+
+        {/* Glassmorphic Right Sidebar */}
+        <GlassmorphicRightSidebar
+          isOpen={isRightSidebarOpen}
+          onClose={() => setIsRightSidebarOpen(false)}
+        />
       </SidebarProvider>
     </UserProvider>
   );
