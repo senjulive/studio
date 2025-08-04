@@ -101,11 +101,49 @@ export const botSettingsSchema = z.object({
 
 export const adminUserUpdateSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
   isVerified: z.boolean(),
   isActive: z.boolean(),
   role: z.enum(["user", "moderator", "admin"]),
-  balanceUsdt: z.number().min(0),
-  balanceBtc: z.number().min(0),
-  balanceEth: z.number().min(0),
+  balance: z.number().min(0),
+  tier: z.enum(["recruit", "bronze", "silver", "gold", "platinum", "diamond"]),
+});
+
+// Email verification schema
+export const emailVerificationSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  verificationCode: z.string()
+    .length(6, "Verification code must be 6 characters")
+    .regex(/^[A-Z0-9]+$/, "Verification code can only contain uppercase letters and numbers"),
+});
+
+// Contact form schema
+export const contactFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").max(50, "Name must be less than 50 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  subject: z.string().min(5, "Subject must be at least 5 characters").max(100, "Subject must be less than 100 characters"),
+  message: z.string().min(10, "Message must be at least 10 characters").max(1000, "Message must be less than 1000 characters"),
+});
+
+// Web page content schema
+export const webPageContentSchema = z.object({
+  section: z.string().min(1, "Section is required"),
+  type: z.enum(["text", "image", "link", "badge", "button"]),
+  content: z.string().min(1, "Content is required"),
+  metadata: z.object({
+    className: z.string().optional(),
+    alt: z.string().optional(),
+    href: z.string().optional(),
+    style: z.string().optional(),
+  }).optional(),
+});
+
+// Page creation schema
+export const pageCreationSchema = z.object({
+  name: z.string().min(1, "Page name is required").max(50, "Page name must be less than 50 characters"),
+  route: z.string()
+    .min(1, "Route is required")
+    .regex(/^\/[a-z0-9\-\/]*$/, "Route must start with / and contain only lowercase letters, numbers, hyphens, and slashes"),
+  title: z.string().max(100, "Title must be less than 100 characters").optional(),
+  description: z.string().max(200, "Description must be less than 200 characters").optional(),
 });
