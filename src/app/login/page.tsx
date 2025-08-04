@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AstralLogo } from "@/components/icons/astral-logo";
 import { ImageSlider } from "@/components/auth/image-slider";
+import { AuthFooter } from "@/components/ui/auth-footer";
 import { Brain, Zap, Shield, TrendingUp, Atom, Waves, ChevronDown } from "lucide-react";
 
 export default function LoginPage() {
