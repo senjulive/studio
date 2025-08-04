@@ -47,18 +47,29 @@ export function ForgotPasswordForm() {
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     setIsLoading(true);
     try {
-      const error = await resetPasswordForEmail(values.email);
-      if (error) {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
         toast({
           title: "Error",
-          description: error,
+          description: data.error || "Failed to send reset email",
           variant: "destructive",
         });
       } else {
         setIsSuccess(true);
         toast({
           title: "Success",
-          description: "Password reset instructions have been sent to your email.",
+          description: data.message || "Password reset instructions have been sent to your email.",
         });
       }
     } catch (error) {
