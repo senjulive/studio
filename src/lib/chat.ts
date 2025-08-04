@@ -14,6 +14,8 @@ export type Message = {
   file_url?: string;
 };
 
+export type ChatMessage = Message;
+
 export type ChatHistory = {
   [userId: string]: Message[];
 };
