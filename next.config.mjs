@@ -43,7 +43,6 @@ const nextConfig = {
   // Optimize for deployment
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
   // Enable static exports for better performance
   experimental: {
     optimizeCss: true,
