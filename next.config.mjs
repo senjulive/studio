@@ -20,7 +20,33 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.builder.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
+  },
+  // Optimize for deployment
+  poweredByHeader: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  // Enable static exports for better performance
+  experimental: {
+    optimizeCss: true,
   },
 };
 
