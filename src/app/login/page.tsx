@@ -322,6 +322,9 @@ export default function LoginPage() {
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-30">
         <ChevronDown className="w-5 h-5 text-blue-400 opacity-60" />
       </div>
+
+      {/* Footer */}
+      <AuthFooter />
     </main>
   );
 }
