@@ -30,7 +30,8 @@ import {
   Globe,
   MessageSquare,
   Zap,
-  Brain
+  Brain,
+  Edit
 } from 'lucide-react';
 import { WalletManager } from './wallet-manager';
 import { SupportChatManager } from './support-chat-manager';
