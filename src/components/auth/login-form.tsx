@@ -29,7 +29,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
-import { login } from "@/lib/auth";
 import { AstralLogo } from "../icons/astral-logo";
 import { Separator } from "../ui/separator";
 
