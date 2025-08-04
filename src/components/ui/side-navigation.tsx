@@ -32,6 +32,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
+import { getOrCreateWallet } from "@/lib/wallet";
 
 interface NavItem {
   href: string;
