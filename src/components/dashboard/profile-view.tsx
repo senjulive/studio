@@ -265,9 +265,9 @@ export function ProfileView() {
                   </AvatarUploadDialog>
                   
                   <div className="mt-4 text-center lg:text-left">
-                    <h1 className="text-2xl font-bold text-foreground">
+                    <div className="text-2xl font-bold text-foreground">
                       {isLoading ? <Skeleton className="h-8 w-40" /> : profileDisplayName}
-                    </h1>
+                    </div>
                     <p className="text-muted-foreground">{user?.email}</p>
                     
                     <div className="flex flex-wrap gap-2 mt-3 justify-center lg:justify-start">
