@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RightSidebar as GlassmorphicRightSidebar, RightSidebarTrigger } from '@/components/ui/right-sidebar';
 
 import { HomeIcon } from '@/components/icons/nav/home-icon';
 import { MarketIcon } from '@/components/icons/nav/market-icon';
