@@ -38,8 +38,8 @@ export function ProTraderView() {
     toast({
       title: isTrading ? "Trading Stopped" : "Trading Started",
       description: isTrading 
-        ? "CORE Grid Trading has been paused." 
-        : "CORE Grid Trading is now active and generating profits.",
+        ? "CORE Grid Trading is now offline."
+        : "CORE Grid Trading is now online and generating profits.",
     });
   };
 
