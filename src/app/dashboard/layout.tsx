@@ -66,6 +66,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
 import { RightSidebar } from '@/components/ui/right-sidebar';
+import { SideNavigation } from '@/components/ui/side-navigation';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 
