@@ -1,64 +1,103 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { getWalletByUserId } from '@/lib/wallet';
+import { verifyToken, updateUser, getUserById } from '@/lib/auth';
+import { headers } from 'next/headers';
 
-async function getSessionUser() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get('astralcore-session');
-  
-  if (!sessionCookie) {
-    return null;
-  }
-
+export async function GET(request: Request) {
   try {
-    const session = JSON.parse(sessionCookie.value);
+    const headersList = headers();
+    const authorization = headersList.get('authorization');
     
-    // Check if session is expired
-    const maxAge = 60 * 60 * 24 * 7 * 1000; // 7 days
-    if (Date.now() - session.timestamp > maxAge) {
-      return null;
-    }
-
-    return session;
-  } catch {
-    return null;
-  }
-}
-
-export async function GET() {
-  try {
-    const session = await getSessionUser();
-    
-    if (!session) {
+    if (!authorization?.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Not authenticated' },
+        { error: 'No token provided' },
         { status: 401 }
       );
     }
 
-    // Get user wallet data (contains profile info)
-    const wallet = await getWalletByUserId('mock-user-123'); // In real app, use session.userId
+    const token = authorization.slice(7);
+    const tokenResult = await verifyToken(token);
+
+    if (tokenResult.error) {
+      return NextResponse.json(
+        { error: tokenResult.error },
+        { status: 401 }
+      );
+    }
+
+    const user = await getUserById(tokenResult.user.id);
     
-    if (!wallet) {
+    if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
 
+    // Remove sensitive data
+    const { password, verificationCode, resetPasswordCode, ...userProfile } = user;
+
     return NextResponse.json({
-      user: {
-        email: session.email,
-        role: session.role,
-        profile: wallet.profile,
-        balances: wallet.balances,
-        growth: wallet.growth,
-        squad: wallet.squad,
-        verificationStatus: wallet.profile?.verificationStatus || 'unverified'
-      }
+      success: true,
+      user: userProfile
     });
   } catch (error: any) {
-    console.error('Get profile error:', error);
+    console.error('Profile fetch error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const headersList = headers();
+    const authorization = headersList.get('authorization');
+    
+    if (!authorization?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'No token provided' },
+        { status: 401 }
+      );
+    }
+
+    const token = authorization.slice(7);
+    const tokenResult = await verifyToken(token);
+
+    if (tokenResult.error) {
+      return NextResponse.json(
+        { error: tokenResult.error },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { fullName, phoneNumber, country } = body;
+
+    const updates: any = {};
+    if (fullName) updates.fullName = fullName;
+    if (phoneNumber) updates.phoneNumber = phoneNumber;
+    if (country) updates.country = country;
+
+    const result = await updateUser(tokenResult.user.id, updates);
+
+    if (result.error) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: 400 }
+      );
+    }
+
+    // Remove sensitive data
+    const { password, verificationCode, resetPasswordCode, ...userProfile } = result.user;
+
+    return NextResponse.json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: userProfile
+    });
+  } catch (error: any) {
+    console.error('Profile update error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
