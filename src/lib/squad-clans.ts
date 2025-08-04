@@ -137,14 +137,18 @@ export async function getClanMessages(clanId: string): Promise<ClanChatMessage[]
     const allChats = await readChats();
     const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
     const clanMessages = allChats[clanId] || [];
-    
+
     // Filter out old messages
     const recentMessages = clanMessages.filter(msg => msg.timestamp >= twentyFourHoursAgo);
-    
+
     if (recentMessages.length < clanMessages.length) {
         allChats[clanId] = recentMessages;
         await writeChats(allChats); // Clean up the old messages from the file
     }
 
     return recentMessages;
+}
+
+export async function getAllSquadClans(): Promise<Record<string, Clan>> {
+    return await readClans();
 }
