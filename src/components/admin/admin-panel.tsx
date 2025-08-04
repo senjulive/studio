@@ -50,6 +50,7 @@ import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
 import { RewardsManager } from './rewards-manager';
 import { SliderImageManager } from './slider-image-manager';
+import { DataFetcher } from './data-fetcher';
 
 const adminSections = {
     'Dashboard': { component: <AnalyticsManager />, icon: LayoutDashboard },
