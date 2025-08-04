@@ -54,11 +54,7 @@ const quickNavItems: NavItem[] = [
   { href: "/dashboard/security", label: "Security", icon: Shield, color: "text-red-400" }
 ];
 
-const quickActions = [
-  { label: "Quick Trade", icon: Rocket, color: "from-blue-500 to-purple-600" },
-  { label: "AI Analyze", icon: Brain, color: "from-purple-500 to-pink-600" },
-  { label: "Rewards", icon: Star, color: "from-yellow-500 to-orange-600" }
-];
+// Quick Actions will be dynamic based on user data
 
 export function SideNavigation() {
   const [isVisible, setIsVisible] = React.useState(false);
