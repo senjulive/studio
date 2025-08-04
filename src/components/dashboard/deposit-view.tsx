@@ -236,7 +236,7 @@ export function DepositView() {
               <div className="text-center sm:text-left flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                   <h1 className="text-xl sm:text-2xl font-bold text-white">
-                    Quantum Fund Injection
+                    AstralCore Funds
                   </h1>
                 </div>
                 <p className="text-sm text-gray-400 mb-3">Fuel your AstralCore hyperdrive with digital assets</p>
