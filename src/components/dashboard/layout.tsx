@@ -434,6 +434,7 @@ URL=${window.location.origin}`;
                 </Link>
               </Button>
               <NotificationBell />
+              <RightSidebarTrigger onOpen={() => setIsRightSidebarOpen(true)} />
             </div>
           </header>
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
