@@ -221,7 +221,7 @@ export function WithdrawView() {
             {/* Asset & Network Selection */}
             <Card>
               <CardHeader>
-                <CardTitle>Select Asset & Network</CardTitle>
+                <CardTitle>Select Crypto Currencies & Network</CardTitle>
                 <CardDescription>
                   Choose the cryptocurrency and blockchain network for withdrawal
                 </CardDescription>
