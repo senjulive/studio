@@ -606,6 +606,15 @@ export function WithdrawView() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Security Authentication Dialog */}
+      <SecurityAuth
+        isOpen={showSecurityAuth}
+        onClose={handleSecurityCancel}
+        onSuccess={handleSecuritySuccess}
+        title="Secure Withdrawal Verification"
+        description="For your security, please verify your identity before proceeding with this withdrawal."
+      />
     </div>
   );
 }
