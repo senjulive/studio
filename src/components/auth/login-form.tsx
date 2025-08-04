@@ -65,17 +65,18 @@ export function LoginForm() {
     setIsLoading(true);
 
     try {
+      // Handle localStorage
       if (typeof window !== 'undefined') {
         if (values.rememberMe) {
           localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
         } else {
           localStorage.removeItem(REMEMBERED_EMAIL_KEY);
         }
-        // Store email in session storage to determine role in dashboard layout
         sessionStorage.setItem('loggedInEmail', values.email);
       }
 
-      const response = await fetch('/api/auth/login', {
+      // Create request with proper options
+      const requestOptions: RequestInit = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,50 +85,54 @@ export function LoginForm() {
           email: values.email,
           password: values.password,
         }),
-      });
+      };
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorData;
+      const response = await fetch('/api/auth/login', requestOptions);
+
+      // Handle response based on status
+      if (response.status >= 200 && response.status < 300) {
+        // Success - parse JSON
+        const data = await response.json();
+
+        toast({
+          title: "Login Successful",
+          description: "Welcome to AstralCore!",
+        });
+
+        // Store user role for routing
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('userRole', data.role || 'user');
+        }
+
+        // Redirect based on role
+        if (data.role === 'admin') {
+          router.push('/admin');
+        } else if (data.role === 'moderator') {
+          router.push('/moderator');
+        } else {
+          router.push('/dashboard');
+        }
+      } else {
+        // Error - try to get error message
+        let errorMessage = 'An error occurred during login';
         try {
-          errorData = JSON.parse(errorText);
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
         } catch {
-          errorData = { error: 'An error occurred during login' };
+          // If JSON parsing fails, use default message
         }
 
         toast({
           title: "Login Failed",
-          description: errorData.error || 'An error occurred during login',
+          description: errorMessage,
           variant: "destructive",
         });
-        return;
-      }
-
-      const data = await response.json();
-
-      toast({
-        title: "Login Successful",
-        description: "Welcome to AstralCore!",
-      });
-
-      // Store user role for routing
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('userRole', data.role || 'user');
-      }
-
-      // Redirect based on role
-      if (data.role === 'admin') {
-        router.push('/admin');
-      } else if (data.role === 'moderator') {
-        router.push('/moderator');
-      } else {
-        router.push('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
       toast({
         title: "Login Failed",
-        description: "An unexpected error occurred. Please try again.",
+        description: "Network error. Please check your connection and try again.",
         variant: "destructive",
       });
     } finally {
