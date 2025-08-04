@@ -75,7 +75,7 @@ const pendingDeposits = [
 export function DepositView() {
   const { toast } = useToast();
   const [selectedAsset, setSelectedAsset] = React.useState(cryptoAssets[0]);
-  const [selectedNetwork, setSelectedNetwork] = React.useState(0);
+
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
 
   const form = useForm<DepositFormValues>({
@@ -124,7 +124,7 @@ export function DepositView() {
     }
   };
 
-  const currentNetwork = selectedAsset.networks[selectedNetwork];
+  const currentNetwork = selectedAsset.networks[0];
 
   return (
     <div className="space-y-6">
@@ -196,7 +196,6 @@ export function DepositView() {
                     key={asset.symbol}
                     onClick={() => {
                       setSelectedAsset(asset);
-                      setSelectedNetwork(0);
                       form.setValue("currency", asset.symbol as any);
                     }}
                     className={cn(
@@ -231,40 +230,7 @@ export function DepositView() {
             </CardContent>
           </Card>
 
-          {/* Network Selection */}
-          <Card className="overflow-hidden">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Select Network
-              </CardTitle>
-              <CardDescription>Choose the blockchain network for your {selectedAsset.symbol} deposit</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3">
-                {selectedAsset.networks.map((network, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedNetwork(index)}
-                    className={cn(
-                      "flex items-center justify-between p-4 border rounded-xl text-left transition-all duration-300",
-                      selectedNetwork === index
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/50 hover:bg-accent/50"
-                    )}
-                  >
-                    <div className="space-y-1">
-                      <p className="font-medium text-foreground">{network.name}</p>
-                      <p className="text-sm text-green-600 font-medium">✓ No network fees</p>
-                    </div>
-                    {selectedNetwork === index && (
-                      <CheckCircle className="h-5 w-5 text-primary" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+
 
           {/* Deposit Address */}
           <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
