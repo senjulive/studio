@@ -9,7 +9,9 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useWebPages } from '@/hooks/use-web-pages';
-import { Plus, X } from 'lucide-react';
+import { PageTemplates } from './page-templates';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, X, FileText, Template } from 'lucide-react';
 
 interface PageCreatorProps {
   isOpen: boolean;
