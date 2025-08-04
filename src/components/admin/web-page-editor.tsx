@@ -165,6 +165,35 @@ export function WebPageEditor() {
     }
   };
 
+  const handleTemplateSelect = async (template: any) => {
+    if (!selectedPage) {
+      toast({
+        title: 'No Page Selected',
+        description: 'Please select a page first before adding template content',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const newContent = await addContent(selectedPage.id, template.content);
+
+      // Update selected page and select the new content
+      const updatedPage = pages.find(p => p.id === selectedPage.id);
+      if (updatedPage) {
+        setSelectedPage(updatedPage);
+        setSelectedContent(newContent);
+      }
+
+      toast({
+        title: 'Template Added',
+        description: `${template.name} has been added to your page`
+      });
+    } catch (error) {
+      // Error is handled by the hook
+    }
+  };
+
   const renderContentEditor = () => {
     if (!selectedContent) {
       return (
