@@ -72,6 +72,7 @@ const adminSections = {
     'Content & Engagement': {
         'Promotions': { component: <PromotionManager />, icon: Gift },
         'Rewards System': { component: <RewardsManager />, icon: Trophy },
+        'Slider Images': { component: <SliderImageManager />, icon: FileText },
         'Squad & Rewards': { component: <SquadRewardSettingsManager />, icon: GitBranch },
     },
     'AstralCore Hyperdrive': {
