@@ -68,114 +68,81 @@ export function WebPageEditor() {
 
     setIsSaving(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Update the content in the page
-      const updatedPages = pages.map(page => {
-        if (page.id === selectedPage.id) {
-          return {
-            ...page,
-            content: page.content.map(content =>
-              content.id === selectedContent.id ? selectedContent : content
-            ),
-            lastModified: new Date().toISOString()
-          };
-        }
-        return page;
-      });
-
-      setPages(updatedPages);
-      setSelectedPage(updatedPages.find(p => p.id === selectedPage.id) || null);
-
-      toast({
-        title: 'Content Saved',
-        description: 'Page content has been updated successfully.',
-      });
+      await updateContent(selectedPage.id, selectedContent.id, selectedContent);
+      // Update selected page with the latest data
+      const updatedPage = pages.find(p => p.id === selectedPage.id);
+      if (updatedPage) {
+        setSelectedPage(updatedPage);
+      }
     } catch (error) {
-      toast({
-        title: 'Save Failed',
-        description: 'Failed to save content. Please try again.',
-        variant: 'destructive',
-      });
+      // Error is handled by the hook
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleAddContent = () => {
+  const handleAddContent = async () => {
     if (!selectedPage) return;
 
-    const newContent: PageContent = {
-      id: `content-${Date.now()}`,
-      pageId: selectedPage.id,
-      section: 'new-section',
-      type: 'text',
-      content: 'New content',
-      metadata: {
-        className: 'text-lg text-gray-300'
+    try {
+      const newContent = await addContent(selectedPage.id, {
+        section: 'new-section',
+        type: 'text',
+        content: 'New content',
+        metadata: {
+          className: 'text-lg text-gray-300'
+        }
+      });
+
+      // Update selected page and select the new content
+      const updatedPage = pages.find(p => p.id === selectedPage.id);
+      if (updatedPage) {
+        setSelectedPage(updatedPage);
+        setSelectedContent(newContent);
       }
-    };
-
-    const updatedPage = {
-      ...selectedPage,
-      content: [...selectedPage.content, newContent]
-    };
-
-    const updatedPages = pages.map(page =>
-      page.id === selectedPage.id ? updatedPage : page
-    );
-
-    setPages(updatedPages);
-    setSelectedPage(updatedPage);
-    setSelectedContent(newContent);
-  };
-
-  const handleDeleteContent = (contentId: string) => {
-    if (!selectedPage) return;
-
-    const updatedPage = {
-      ...selectedPage,
-      content: selectedPage.content.filter(content => content.id !== contentId)
-    };
-
-    const updatedPages = pages.map(page =>
-      page.id === selectedPage.id ? updatedPage : page
-    );
-
-    setPages(updatedPages);
-    setSelectedPage(updatedPage);
-    
-    if (selectedContent?.id === contentId) {
-      setSelectedContent(null);
+    } catch (error) {
+      // Error is handled by the hook
     }
-
-    toast({
-      title: 'Content Deleted',
-      description: 'Content item has been removed.',
-    });
   };
 
-  const handleDuplicateContent = (content: PageContent) => {
+  const handleDeleteContent = async (contentId: string) => {
     if (!selectedPage) return;
 
-    const newContent: PageContent = {
-      ...content,
-      id: `content-${Date.now()}`,
-      content: `${content.content} (Copy)`
-    };
+    try {
+      await deleteContent(selectedPage.id, contentId);
 
-    const updatedPage = {
-      ...selectedPage,
-      content: [...selectedPage.content, newContent]
-    };
+      // Update selected page
+      const updatedPage = pages.find(p => p.id === selectedPage.id);
+      if (updatedPage) {
+        setSelectedPage(updatedPage);
+      }
 
-    const updatedPages = pages.map(page =>
-      page.id === selectedPage.id ? updatedPage : page
-    );
+      if (selectedContent?.id === contentId) {
+        setSelectedContent(null);
+      }
+    } catch (error) {
+      // Error is handled by the hook
+    }
+  };
 
-    setPages(updatedPages);
-    setSelectedPage(updatedPage);
+  const handleDuplicateContent = async (content: PageContent) => {
+    if (!selectedPage) return;
+
+    try {
+      const newContent = await addContent(selectedPage.id, {
+        ...content,
+        content: `${content.content} (Copy)`,
+        metadata: content.metadata
+      });
+
+      // Update selected page
+      const updatedPage = pages.find(p => p.id === selectedPage.id);
+      if (updatedPage) {
+        setSelectedPage(updatedPage);
+      }
+    } catch (error) {
+      // Error is handled by the hook
+    }
   };
 
   const renderContentEditor = () => {
