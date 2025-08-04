@@ -3,7 +3,7 @@
 
 [build]
   # The command to build the Next.js application.
-  command = "npm install && npm run build"
+  command = "npm ci && npm run build"
   # The directory where the built assets are located.
   publish = ".next"
 
