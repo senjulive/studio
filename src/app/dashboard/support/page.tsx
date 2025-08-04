@@ -1,16 +1,16 @@
+'use client';
+
 import { SupportChat } from "@/components/dashboard/support-chat";
 import { SupportPageAdmin } from "@/components/admin/support-page-admin";
+import { useAdminStatus } from "@/hooks/use-admin-status";
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-    title: "Support - AstralCore",
-    description: "Contact customer support.",
-};
-
 export default function SupportPage() {
+    const { isAdminOrModerator } = useAdminStatus();
+
     return (
         <div className="space-y-6">
-            <SupportPageAdmin />
+            {isAdminOrModerator && <SupportPageAdmin />}
             <SupportChat />
         </div>
     );
