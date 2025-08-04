@@ -6,11 +6,11 @@ import { useAdminStatus } from "@/hooks/use-admin-status";
 import type { Metadata } from 'next';
 
 export default function SupportPage() {
-    const { isAdminOrModerator } = useAdminStatus();
+    const { isAdmin } = useAdminStatus();
 
     return (
         <div className="space-y-6">
-            {isAdminOrModerator && <SupportPageAdmin />}
+            {isAdmin && <SupportPageAdmin />}
             <SupportChat />
         </div>
     );
