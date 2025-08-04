@@ -234,7 +234,7 @@ export function ProfileView() {
                 <DialogHeader>
                     <DialogTitle>Update Your KYC</DialogTitle>
                     <DialogDescription>
-                        To access all features and ensure your account's security, please complete your profile. KYC verification is quick and helps us protect your assets.
+                        To access all features and ensure your account's security, please update your profile. Updated KYC verification is quick and helps us protect your assets.
                     </DialogDescription>
                 </DialogHeader>
                 <Button asChild onClick={() => setShowVerificationPopup(false)}>
