@@ -190,7 +190,7 @@ URL=${window.location.origin}`;
         items: [
           { href: '/dashboard/promotions', label: 'Promotions', icon: PromotionIcon },
           { href: '/dashboard/trading-info', label: 'Tiers & Ranks', icon: Trophy },
-          { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+          { href: '/dashboard/support', label: 'Customer Support', icon: SupportIcon },
           { href: '/dashboard/about', label: 'About', icon: AboutIcon },
           { href: downloadHref, label: 'Download App', icon: DownloadIcon, download: 'AstralCore.url'},
         ],
