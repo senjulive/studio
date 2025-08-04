@@ -654,7 +654,7 @@ URL=${window.location.origin}`;
                           </Badge>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>VIP CORE Tier</p>
+                        <p>Hyperdrive CORE Tier</p>
                       </TooltipContent>
                     </Tooltip>
                   )}
