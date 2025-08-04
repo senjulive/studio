@@ -215,7 +215,7 @@ function DashboardLoading() {
       <div className="absolute bottom-8 text-center">
         <p className="text-gray-500 flex items-center justify-center gap-2">
           <Zap className="w-4 h-4" />
-          AstralCore Quantum Nexus v4.0
+          AstralCore Hype Drive
           <Waves className="w-4 h-4" />
         </p>
       </div>
@@ -407,7 +407,7 @@ URL=${window.location.origin}`;
                 </span>
                 <span className="text-xs text-sidebar-foreground/60 font-medium flex items-center gap-1">
                   <Atom className="w-3 h-3 animate-spin" />
-                  Quantum Nexus v4.0
+                  Hype Drive
                 </span>
               </div>
             </div>

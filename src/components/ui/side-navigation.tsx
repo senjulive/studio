@@ -405,7 +405,7 @@ export function SideNavigation() {
             <div className="mt-4 pt-4 border-t border-white/10 text-center">
               <p className="text-xs text-gray-500 flex items-center justify-center gap-1">
                 <Atom className="w-3 h-3" />
-                AstralCore v4.0
+                AstralCore Hype Drive
                 <Waves className="w-3 h-3" />
               </p>
             </div>
