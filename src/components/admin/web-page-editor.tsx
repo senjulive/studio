@@ -12,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { useWebPages, type PageContent, type WebPage } from '@/hooks/use-web-pages';
 import { 
   Edit3, 
   Save, 
