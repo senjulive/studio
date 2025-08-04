@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -31,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RightSidebar as GlassmorphicRightSidebar, RightSidebarTrigger } from '@/components/ui/right-sidebar';
 
 import { HomeIcon } from '@/components/icons/nav/home-icon';
 import { MarketIcon } from '@/components/icons/nav/market-icon';
@@ -65,7 +65,6 @@ import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from './profile-view';
-import { RightSidebar } from '../ui/right-sidebar';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -108,13 +107,14 @@ export default function DashboardLayout({
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = React.useState(false);
   const [downloadHref, setDownloadHref] = React.useState('');
 
   const fetchWalletAndTiers = React.useCallback(async (userId: string) => {
     try {
         const [walletData, tiers] = await Promise.all([
             getOrCreateWallet(userId),
-            getBotTierSettings()
+            Promise.resolve(getBotTierSettings())
         ]);
         setWallet(walletData);
         setTierSettings(tiers);
@@ -165,7 +165,7 @@ URL=${window.location.origin}`;
       {
         title: 'Community',
         items: [
-          { href: '/dashboard/chat', label: 'Chat', icon: MessageSquare },
+          { href: '/dashboard/chat', label: 'Community', icon: MessageSquare },
           { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
           { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
           { href: '/dashboard/rewards', label: 'Rewards', icon: Trophy },
@@ -191,7 +191,7 @@ URL=${window.location.origin}`;
         items: [
           { href: '/dashboard/promotions', label: 'Promotions', icon: PromotionIcon },
           { href: '/dashboard/trading-info', label: 'Tiers & Ranks', icon: Trophy },
-          { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+          { href: '/dashboard/support', label: 'Customer Support', icon: SupportIcon },
           { href: '/dashboard/about', label: 'About', icon: AboutIcon },
           { href: downloadHref, label: 'Download App', icon: DownloadIcon, download: 'AstralCore.url'},
         ],
@@ -227,7 +227,7 @@ URL=${window.location.origin}`;
 
   const bottomNavItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/support', label: 'Customer Support', icon: SupportIcon },
     { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
@@ -261,7 +261,7 @@ URL=${window.location.origin}`;
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
     { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/support', label: 'Customer Support', icon: SupportIcon },
     { href: '/dashboard/security', label: 'Settings', icon: SettingsIcon },
   ];
 
@@ -434,6 +434,7 @@ URL=${window.location.origin}`;
                 </Link>
               </Button>
               <NotificationBell />
+              <RightSidebarTrigger onOpen={() => setIsRightSidebarOpen(true)} />
             </div>
           </header>
           <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
@@ -468,23 +469,12 @@ URL=${window.location.origin}`;
             ))}
           </nav>
         </SidebarInset>
-        <RightSidebar>
-        <div className="p-4">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Access</h2>
-          <div className="space-y-2">
-            {quickAccessItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center p-2 rounded-lg text-foreground/80 hover:bg-muted/50 hover:text-foreground transition-colors"
-              >
-                <item.icon className="h-5 w-5 mr-3" />
-                <span>{item.label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </RightSidebar>
+
+        {/* Glassmorphic Right Sidebar */}
+        <GlassmorphicRightSidebar
+          isOpen={isRightSidebarOpen}
+          onClose={() => setIsRightSidebarOpen(false)}
+        />
       </SidebarProvider>
     </UserProvider>
   );

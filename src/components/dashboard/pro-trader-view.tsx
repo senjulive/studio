@@ -1,439 +1,362 @@
+"use client";
 
-'use client';
-
-import * as React from 'react';
-import type { SVGProps } from 'react';
-import { cn } from '@/lib/utils';
-import { SlidersHorizontal, PlayCircle, Bot, Lock, Trophy, Wallet } from 'lucide-react';
-import { Button } from '../ui/button';
-import { useTradingBot } from '@/hooks/use-trading-bot';
-import { getOrCreateWallet, updateWallet, type WalletData } from '@/lib/wallet';
-import { useUser } from '@/contexts/UserContext';
-import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
-import { getCurrentTier } from '@/lib/ranks';
-import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '../ui/skeleton';
-import { UsdtLogoIcon } from '../icons/usdt-logo';
-import { format } from 'date-fns';
-import { Badge } from '../ui/badge';
-import { getUserRank } from '@/lib/ranks';
-import { tierIcons, tierClassNames } from '@/lib/settings';
-import { GridTradingAnimation } from './grid-trading-animation';
-import Link from 'next/link';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-
-// Import rank icons
-import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
-import { BronzeRankIcon } from '@/components/icons/ranks/bronze-rank-icon';
-import { SilverRankIcon } from '@/components/icons/ranks/silver-rank-icon';
-import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
-import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
-import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
-
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
-
-const rankIcons: Record<string, IconComponent> = {
-    RecruitRankIcon,
-    BronzeRankIcon,
-    SilverRankIcon,
-    GoldRankIcon,
-    PlatinumRankIcon,
-    DiamondRankIcon,
-    Lock,
-};
-
-const useAnimatedCounter = (endValue: number, duration = 1000) => {
-    const [count, setCount] = React.useState(0);
-    const frameRate = 1000 / 60;
-    const totalFrames = Math.round(duration / frameRate);
-
-    React.useEffect(() => {
-        let frame = 0;
-        const startValue = count;
-        // Check if endValue is a valid number, otherwise default to startValue
-        const validEndValue = isNaN(endValue) ? startValue : endValue;
-        const increment = (validEndValue - startValue) / totalFrames;
-
-        if (isNaN(increment)) {
-            setCount(validEndValue);
-            return;
-        }
-
-        const counter = setInterval(() => {
-            frame++;
-            const newCount = startValue + increment * frame;
-            if (frame === totalFrames) {
-                setCount(validEndValue);
-                clearInterval(counter);
-            } else {
-                setCount(newCount);
-            }
-        }, frameRate);
-
-        return () => clearInterval(counter);
-    }, [endValue, duration, frameRate, totalFrames, count]);
-
-
-    return count;
-};
-
-
-const StatCard = ({ label, value, valueIcon: ValueIcon, className, change }: { label: string; value: string; valueIcon?: React.ElementType, className?: string; change?: string }) => (
-    <div className="stat-card">
-        <div className="stat-label">{label}</div>
-        <div className={cn("stat-value flex items-center gap-2", className)}>
-            {ValueIcon && <ValueIcon className="h-5 w-5" />}
-            <span>{value}</span>
-            {change && <span className={cn("text-xs ml-2", change.startsWith('+') ? 'text-green-400' : 'text-red-400')}>{change}</span>}
-        </div>
-    </div>
-);
-
-const HistoryItem = ({ log, time, amount }: { log: string; time: string, amount?: number }) => (
-    <div className="order-item">
-        <div className="flex-1 text-white flex items-center gap-2">{log}</div>
-        {amount && (
-             <div className="flex items-center gap-1.5 font-bold [text-shadow:0_0_8px_rgba(16,185,129,0.3)] text-emerald-400">
-                <UsdtLogoIcon className="h-4 w-4" />
-                <span>+${amount.toFixed(2)}</span>
-            </div>
-        )}
-        <div className="order-time">{time}</div>
-    </div>
-);
-
-const PerformanceItem = ({ label, value, className }: { label: string; value: string; className?: string }) => (
-    <div className="performance-item">
-        <div className="performance-label">{label}</div>
-        <div className={cn("performance-value", className)}>{value}</div>
-    </div>
-)
-
-const formatCurrency = (value: number) => {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-}
-
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+import { useUser } from "@/contexts/UserContext";
+import { Play, Pause, Activity, TrendingUp, BarChart3, Settings, Shield, Lock, AlertTriangle, CheckCircle } from "lucide-react";
+import { GridTradingAnimation } from "./grid-trading-animation";
+import { useToast } from "@/hooks/use-toast";
+import { TradingBotCard } from "../trading-bot-card";
+import Link from "next/link";
 
 export function ProTraderView() {
-    const [walletData, setWalletData] = React.useState<WalletData | null>(null);
-    const [currentTier, setCurrentTier] = React.useState<TierData | null>(null);
-    const [isAnimating, setIsAnimating] = React.useState(false);
-    const [progress, setProgress] = React.useState(0);
-    const [displayBalance, setDisplayBalance] = React.useState(0);
-    const { user } = useUser();
-    const { toast } = useToast();
-    const { state: simState, setBotLog } = useTradingBot({ initialPrice: 68000 });
-    const [minGridBalance, setMinGridBalance] = React.useState(0);
-    
-    const progressIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const { wallet, tier, rank, user } = useUser();
+  const { toast } = useToast();
+  const [isTrading, setIsTrading] = React.useState(false);
 
-    const animatedBalance = useAnimatedCounter(displayBalance);
-    const animatedDailyEarnings = useAnimatedCounter(walletData?.growth?.dailyEarnings ?? 0);
-    
-    React.useEffect(() => {
-        async function fetchBotSettings() {
-          try {
-            const response = await fetch('/api/public-settings?key=botSettings');
-            if (response.ok) {
-              const data = await response.json();
-              if (data && data.minGridBalance !== undefined) {
-                setMinGridBalance(data.minGridBalance);
-              }
-            }
-          } catch (error) {
-            console.error("Could not fetch bot settings, using default.", error);
-          }
-        }
-        fetchBotSettings();
-    }, []);
+  // Calculate proper daily earnings based on tier and rank
+  const balances = wallet?.balances as any;
+  const totalBalance = React.useMemo(() => {
+    if (!balances) return 0;
+    const btcPrice = 68000;
+    const ethPrice = 3500;
+    return balances.usdt + (balances.btc * btcPrice) + (balances.eth * ethPrice);
+  }, [balances]);
 
-    const fetchAndSetData = React.useCallback(async () => {
-        if (user) {
-            const [wallet, tiers] = await Promise.all([getOrCreateWallet(), getBotTierSettings()]);
-            setWalletData(wallet);
-            if (!isAnimating) {
-                setDisplayBalance(wallet.balances?.usdt ?? 0);
-            }
-            const tier = getCurrentTier(wallet.balances?.usdt ?? 0, tiers);
-            setCurrentTier(tier);
-        }
-    }, [user, isAnimating]);
+  // Get rank multiplier
+  const getRankMultiplier = () => {
+    if (!rank) return 1;
+    switch (rank.name) {
+      case 'Recruit': return 1.0;
+      case 'Bronze': return 1.1;
+      case 'Silver': return 1.2;
+      case 'Gold': return 1.3;
+      case 'Platinum': return 1.4;
+      case 'Diamond': return 1.5;
+      default: return 1.0;
+    }
+  };
 
-    React.useEffect(() => {
-        fetchAndSetData();
-    }, [fetchAndSetData]);
-    
-    const handleWalletUpdate = async (newData: WalletData) => {
-        if (user?.id) {
-            const updatedWallet = await updateWallet(newData);
-            if (updatedWallet) {
-                setWalletData(updatedWallet);
-            }
-            return updatedWallet;
-        }
-        return null;
-    };
-    
-    const totalBalance = walletData?.balances?.usdt ?? 0;
-    const totalTrades = walletData?.growth?.earningsHistory?.length ?? 0;
-    
-    const rank = getUserRank(totalBalance);
-    const RankIcon = rankIcons[rank.Icon] || Lock;
-    const TierIcon = currentTier ? tierIcons[currentTier.id] : null;
-    const tierClassName = currentTier ? tierClassNames[currentTier.id] : null;
+  // Calculate daily earnings: balance * tier.dailyProfit * rankMultiplier
+  const dailyEarnings = React.useMemo(() => {
+    if (!tier || !totalBalance) return 0;
+    const baseEarnings = totalBalance * tier.dailyProfit;
+    const rankMultiplier = getRankMultiplier();
+    return baseEarnings * rankMultiplier;
+  }, [totalBalance, tier, rank]);
 
-    const profitPerTrade = React.useMemo(() => {
-        if (!currentTier) return 0;
-        if (totalBalance > 0) {
-            return (totalBalance * currentTier.dailyProfit) / currentTier.clicks;
-        }
-        return 0.05; 
-    }, [totalBalance, currentTier]);
-      
-    const profitPercentagePerTrade = React.useMemo(() => {
-        if (!currentTier) return 0;
-        if (totalBalance > 0) {
-            return (currentTier.dailyProfit / currentTier.clicks) * 100
-        }
-        return 0;
-    }, [totalBalance, currentTier]);
-    
-    const gridsRemaining = walletData?.growth?.clicksLeft ?? 0;
-    const canStart = gridsRemaining > 0 && !isAnimating && totalBalance >= minGridBalance;
+  // Check if user can start trading
+  const canStartTrading = React.useMemo(() => {
+    const hasRequiredBalance = tier && totalBalance >= tier.balanceThreshold;
+    const isVerified = wallet?.profile?.verificationStatus === 'verified';
+    return hasRequiredBalance && isVerified;
+  }, [tier, totalBalance, wallet?.profile?.verificationStatus]);
 
-    const handleStartBot = async () => {
-        if (!walletData) return;
+  const getRequiredAmount = () => {
+    if (!tier) return 100; // Default minimum for tier 1
+    return tier.balanceThreshold;
+  };
 
-        if (totalBalance < minGridBalance) {
-            // This case will be handled by the alert, but as a safeguard.
-            return;
-        }
-    
-        if (gridsRemaining <= 0 || isAnimating) {
-          toast({
-            title: isAnimating ? "Bot is already running" : "Limit Reached",
-            description: gridsRemaining <= 0 ? "You have no grids remaining for today." : "Please wait for the current session to complete.",
-            variant: "destructive"
-          });
-          return;
-        }
+  const isVerified = wallet?.profile?.verificationStatus === 'verified';
 
-        if (!currentTier) {
-            toast({
-                title: "Tier Not Found",
-                description: "Could not determine your trading tier.",
-                variant: "destructive"
-            });
-            return;
-        }
-    
-        setIsAnimating(true);
-        setBotLog([]);
-        setProgress(0);
-        setDisplayBalance(0);
-
-        const animationDuration = 60000;
-        const updateInterval = 100;
-        const progressIncrement = 100 / (animationDuration / updateInterval);
-        
-        progressIntervalRef.current = setInterval(() => {
-            setProgress(prev => Math.min(prev + progressIncrement, 100));
-        }, updateInterval);
-
-        setTimeout(async () => {
-            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-            const usdtEarnings = profitPerTrade;
-            const newEarning = { amount: usdtEarnings, timestamp: Date.now() };
-    
-            const newWalletData: WalletData = {
-              ...walletData,
-              balances: {
-                ...walletData.balances,
-                usdt: totalBalance + usdtEarnings,
-              },
-              growth: {
-                ...walletData.growth,
-                clicksLeft: gridsRemaining - 1,
-                dailyEarnings: (walletData.growth.dailyEarnings || 0) + usdtEarnings,
-                earningsHistory: [...(walletData.growth.earningsHistory || []), newEarning],
-              },
-            };
-    
-            const updatedWallet = await handleWalletUpdate(newWalletData);
-    
-            toast({
-              title: "Trade Successful!",
-              description: `You've earned ${formatCurrency(usdtEarnings)}.`,
-            });
-            
-            setBotLog(prev => [...prev, { message: `Profit`, time: new Date() }]);
-            if(updatedWallet) {
-                setDisplayBalance(updatedWallet.balances.usdt);
-            }
-            setIsAnimating(false);
-            setProgress(0);
-        }, animationDuration);
-    };
-    
-    if (!walletData) {
-        return (
-             <div className="trading-card">
-                 <Skeleton className="h-full w-full" />
-             </div>
-        )
+  const handleTradingToggle = () => {
+    if (!canStartTrading) {
+      if (!tier || totalBalance < getRequiredAmount()) {
+        toast({
+          title: "Insufficient Balance",
+          description: `You need at least $${getRequiredAmount()} to start trading.`,
+          variant: "destructive"
+        });
+      } else if (!isVerified) {
+        toast({
+          title: "Verification Required", 
+          description: "Please complete your KYC verification to start trading.",
+          variant: "destructive"
+        });
+      }
+      return;
     }
 
-    const totalGrids = currentTier?.clicks ?? 0;
-    const executedGrids = totalGrids - gridsRemaining;
+    setIsTrading(!isTrading);
+    toast({
+      title: isTrading ? "Trading Stopped" : "Trading Started",
+      description: isTrading 
+        ? "CORE Grid Trading is now offline." 
+        : "CORE Grid Trading is now online and generating profits.",
+    });
+  };
 
-    return (
-        <div className="trading-card">
-            <header className="header">
-                <div className="logo flex-col !items-start">
-                    CORE Nexus Quantum v3.76
-                    <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className={cn("text-base py-1 px-2 flex items-center gap-1.5", rank.className)}>
-                          <RankIcon className="h-5 w-5" />
-                          <span>{rank.name}</span>
-                        </Badge>
-                        {currentTier && TierIcon && tierClassName && (
-                          <Badge variant="outline" className={cn("text-base py-1 px-2 flex items-center gap-1.5", tierClassName)}>
-                            <TierIcon className="h-5 w-5" />
-                            <span>{currentTier.name}</span>
-                          </Badge>
-                        )}
-                        <Button asChild variant="ghost" size="sm" className="text-slate-400 hover:bg-slate-700 hover:text-white -ml-2">
-                           <Link href="/dashboard/trading-info">
-                              <Trophy className="h-4 w-4 mr-2"/>
-                              Tiers & Ranks
-                           </Link>
-                        </Button>
-                    </div>
+  const tradingPairs = [
+    { pair: "BTC/USDT", profit: "+2.45%", volume: "$45.2M", status: isTrading ? "active" : "offline" },
+    { pair: "ETH/USDT", profit: "+1.87%", volume: "$32.1M", status: isTrading ? "active" : "offline" },
+    { pair: "SOL/USDT", profit: "+3.21%", volume: "$18.7M", status: "paused" },
+    { pair: "ADA/USDT", profit: "+0.94%", volume: "$12.3M", status: isTrading ? "active" : "offline" },
+  ];
+
+  const recentTrades = [
+    { time: "2 min ago", pair: "BTC/USDT", type: "BUY", amount: "$125.50", profit: "+$2.45" },
+    { time: "5 min ago", pair: "ETH/USDT", type: "SELL", amount: "$89.20", profit: "+$1.87" },
+    { time: "8 min ago", pair: "SOL/USDT", type: "BUY", amount: "$67.80", profit: "+$1.23" },
+    { time: "12 min ago", pair: "BTC/USDT", type: "SELL", amount: "$156.70", profit: "+$3.21" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Requirements Status */}
+      {!canStartTrading && (
+        <Card className="border-yellow-500/20 bg-yellow-500/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-yellow-600">
+              <AlertTriangle className="h-5 w-5" />
+              Trading Requirements
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3">
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-background/50">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "h-2 w-2 rounded-full",
+                    totalBalance >= getRequiredAmount() ? "bg-green-500" : "bg-red-500"
+                  )} />
+                  <span className="text-sm">Minimum Balance: ${getRequiredAmount()}</span>
                 </div>
-                 <Button onClick={handleStartBot} disabled={!canStart} size="lg" className={cn(!canStart && 'bg-gray-500 hover:bg-gray-500', canStart && 'bg-green-600 hover:bg-green-700')}>
-                    {isAnimating ? (
-                        <>
-                            <Bot className="h-5 w-5 mr-2 animate-pulse"/>
-                            <span>Bot is Running...</span>
-                        </>
-                    ) : canStart ? (
-                        <>
-                            <PlayCircle className="h-5 w-5 mr-2" />
-                            <span>Start Bot</span>
-                        </>
-                    ) : (
-                         <>
-                            <Lock className="h-5 w-5 mr-2"/>
-                            <span>Offline</span>
-                         </>
-                    )}
-                </Button>
-            </header>
-
-            {totalBalance < minGridBalance && (
-                <Alert className="mb-6">
-                    <Wallet className="h-4 w-4" />
-                    <AlertTitle>Insufficient Balance</AlertTitle>
-                    <AlertDescription className="flex items-center justify-between">
-                        <div>
-                           You need at least {formatCurrency(minGridBalance)} to start the bot.
-                        </div>
-                        <Button asChild size="sm">
-                            <Link href="/dashboard/deposit">Deposit Funds</Link>
-                        </Button>
-                    </AlertDescription>
-                </Alert>
-            )}
-
-            <section className="content-grid">
-                <div className="chart-section">
-                    <div className="flex justify-between items-center mb-4">
-                         {isAnimating ? (
-                            <div className="flex items-center gap-2 text-emerald-400">
-                                <div className="status-indicator bg-green-400 animate-pulse"></div>
-                                🤖 ONLINE
-                                <span className="text-xs tabular-nums">({progress.toFixed(0)}%)</span>
-                            </div>
-                        ) : (
-                             <div className={cn("flex items-center gap-2 text-sm", gridsRemaining > 0 ? "text-slate-400" : "text-red-400")}>
-                                <div className={cn("status-indicator", gridsRemaining > 0 ? "bg-slate-400" : "bg-red-400 animate-pulse")}></div>
-                                🤖 OFFLINE
-                            </div>
-                        )}
-                        <Button variant="ghost" size="sm" className="text-slate-400 hover:bg-slate-700 hover:text-white">
-                            <SlidersHorizontal className="h-4 w-4 mr-2"/>
-                            Indicators
-                        </Button>
-                    </div>
-                    <div className="chart-container">
-                        <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} setBotLog={setBotLog} isAnimating={isAnimating} candlestickData={simState.candlestickData} currentPrice={simState.currentPrice} />
-                    </div>
-                     <div className="price-display">
-                        <div className="price-info">
-                             <UsdtLogoIcon className="h-8 w-8" />
-                            <div className="price-value">{formatCurrency(animatedBalance)}</div>
-                        </div>
-                        <div className="volume-info">
-                            Vol: {simState.volume24h.toLocaleString()}M
-                        </div>
-                    </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">
+                    ${totalBalance.toFixed(2)}
+                  </span>
+                  {totalBalance >= getRequiredAmount() ? (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Lock className="h-4 w-4 text-red-500" />
+                  )}
                 </div>
-
-                <div className="stats-section">
-                    <div className="stats-grid">
-                        <StatCard label="Balance" value={formatCurrency(animatedBalance)} valueIcon={UsdtLogoIcon}/>
-                        <StatCard label="Today's Earnings" value={`${animatedDailyEarnings >= 0 ? '+' : ''}${formatCurrency(animatedDailyEarnings)}`} className={animatedDailyEarnings >= 0 ? "profit" : "loss"} />
-                        <StatCard label="Grids Remaining" value={`${gridsRemaining}/${totalGrids}`} />
-                        <StatCard label="Profit per Grid" value={`~${profitPercentagePerTrade.toFixed(4)}%`} />
-                    </div>
-                    <div className="performance-section">
-                        <h3 className="section-header">🤖 Quantum Operation v3.76</h3>
-                        <div className="performance-grid">
-                            <PerformanceItem label="Win Rate" value={`${simState.winRate.toFixed(1)}%`} className="text-green-400"/>
-                            <PerformanceItem label="Total Trades" value={totalTrades.toString()} />
-                            <PerformanceItem label="Avg Trade" value={formatCurrency(profitPerTrade)} />
-                            <PerformanceItem label="Max Drawdown" value={`${simState.maxDrawdown.toFixed(2)}%`} className="text-red-400"/>
-                        </div>
-                    </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-background/50">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "h-2 w-2 rounded-full",
+                    isVerified ? "bg-green-500" : "bg-red-500"
+                  )} />
+                  <span className="text-sm">Updated KYC Verification</span>
                 </div>
-            </section>
-
-            <div className="bottom-stats">
-                 <div className="order-history">
-                    <h3 className="section-header">History</h3>
-                     <div className="order-list">
-                         {isAnimating ? (
-                            simState.botLog.map((log, index) => (
-                                <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
-                            ))
-                         ) : (
-                             walletData.growth.earningsHistory.slice(-10).reverse().map((trade, index) => (
-                                 <HistoryItem key={trade.timestamp} log={`Grid Profit`} time={format(new Date(trade.timestamp), 'HH:mm:ss')} amount={trade.amount}/>
-                             ))
-                         )}
-                     </div>
-                 </div>
-                 <div className="order-history">
-                     <h3 className="section-header">Operation Status</h3>
-                     <div className="order-list">
-                        {[...Array(totalGrids)].map((_, i) => (
-                           <div className="order-item" key={i}>
-                                <div className={cn("font-bold text-white")}>
-                                    Operation status 🤖 {i + 1}
-                                </div>
-                                <Badge variant={i < executedGrids ? "default" : "secondary"} className={cn(i < executedGrids ? "bg-green-600/80" : "bg-slate-600/80")}>
-                                    {i < executedGrids ? 'Executed' : 'Pending'}
-                                </Badge>
-                                <div className="order-time">
-                                    { i < executedGrids && walletData.growth.earningsHistory[i] ? format(new Date(walletData.growth.earningsHistory[i].timestamp), 'HH:mm:ss') : '--:--:--'}
-                                </div>
-                           </div>
-                        ))}
-                     </div>
-                 </div>
+                <div className="flex items-center gap-2">
+                  {isVerified ? (
+                    <>
+                      <span className="text-sm font-medium text-green-600">Verified</span>
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    </>
+                  ) : (
+                    <>
+                      <Button asChild variant="outline" size="sm">
+                        <Link href="/dashboard/profile/verify">Update KYC</Link>
+                      </Button>
+                      <Lock className="h-4 w-4 text-red-500" />
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
-        </div>
-    );
-}
+          </CardContent>
+        </Card>
+      )}
 
-    
+      {/* Main Trading Controls */}
+      <Card className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
+        <CardHeader className="relative">
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            CORE Grid Trading
+          </CardTitle>
+          <CardDescription>
+            Automated high-frequency trading with advanced grid algorithms
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="relative space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Status</p>
+              <div className="flex items-center gap-2">
+                <div className={cn(
+                  "h-2 w-2 rounded-full",
+                  isTrading ? "bg-green-500 animate-pulse" : "bg-gray-400"
+                )} />
+                <span className="font-medium">
+                  {isTrading ? "Online" : "Offline"}
+                </span>
+              </div>
+            </div>
+            <Button 
+              onClick={handleTradingToggle}
+              variant={isTrading ? "destructive" : "default"}
+              size="sm"
+              disabled={!canStartTrading && !isTrading}
+              className={cn(!canStartTrading && !isTrading && "opacity-50 cursor-not-allowed")}
+            >
+              {!canStartTrading && !isTrading ? (
+                <>
+                  <Lock className="h-4 w-4 mr-2" />
+                  Locked
+                </>
+              ) : (
+                <>
+                  {isTrading ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                  {isTrading ? "Stop" : "Start"}
+                </>
+              )}
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Today's Earnings</p>
+              <p className="text-2xl font-bold text-green-600">
+                +${dailyEarnings.toFixed(2)}
+              </p>
+            </div>
+            
+            <div>
+              <p className="text-sm text-muted-foreground">Total Balance</p>
+              <p className="text-xl font-bold text-foreground">
+                ${totalBalance.toFixed(2)}
+              </p>
+            </div>
+            
+            {tier && (
+              <div>
+                <p className="text-sm text-muted-foreground">VIP CORE Tier</p>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-sm">
+                    {tier.name}
+                  </Badge>
+                  <span className="text-sm font-medium">{(tier.dailyProfit * 100).toFixed(1)}% daily</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {rank && (
+            <div className="pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Rank Multiplier</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {rank.name} - {(getRankMultiplier() * 100).toFixed(0)}% bonus
+                  </p>
+                </div>
+                <Badge variant="outline" className={cn("text-sm", rank.className)}>
+                  x{getRankMultiplier().toFixed(1)}
+                </Badge>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Trading Animation */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Live Trading Visualization</CardTitle>
+          <CardDescription>
+            Real-time view of your automated trading activity
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <GridTradingAnimation isActive={isTrading} />
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="pairs" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="pairs">Trading Pairs</TabsTrigger>
+          <TabsTrigger value="history">Recent Trades</TabsTrigger>
+          <TabsTrigger value="bot">Grid</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pairs" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Trading Pairs</CardTitle>
+              <CardDescription>
+                Cryptocurrency pairs currently being traded by your bot
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {tradingPairs.map((pair) => (
+                  <div key={pair.pair} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "h-2 w-2 rounded-full",
+                        pair.status === "active" ? "bg-green-500" : 
+                        pair.status === "paused" ? "bg-yellow-500" : "bg-gray-400"
+                      )} />
+                      <div>
+                        <p className="font-medium">{pair.pair}</p>
+                        <p className="text-sm text-muted-foreground">24h Volume: {pair.volume}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-green-600">{pair.profit}</p>
+                      <p className="text-sm text-muted-foreground capitalize">{pair.status}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Trades</CardTitle>
+              <CardDescription>
+                Your latest automated trading activity
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isTrading ? (
+                <div className="space-y-3">
+                  {recentTrades.map((trade, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">{trade.pair}</p>
+                        <p className="text-sm text-muted-foreground">{trade.time}</p>
+                      </div>
+                      <div className="text-center">
+                        <Badge variant={trade.type === "BUY" ? "default" : "secondary"}>
+                          {trade.type}
+                        </Badge>
+                        <p className="text-sm mt-1">{trade.amount}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-green-600">{trade.profit}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No trading activity</p>
+                  <p className="text-sm">Start trading to see your trade history</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="bot" className="space-y-4">
+          <TradingBotCard />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

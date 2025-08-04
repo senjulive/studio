@@ -1,8 +1,7 @@
-
 import { NextResponse } from 'next/server';
 import { getUserRank } from '@/lib/ranks';
 import { getCurrentTier } from '@/lib/tiers';
-import { getBotTierSettings } from '@/lib/tiers';
+import { getBotTierSettingsServer } from '@/lib/tiers-server';
 
 const MOCK_USER_ID = 'mock-user-123';
 
@@ -16,7 +15,7 @@ export type SquadMember = {
 
 export async function GET(request: Request) {
     try {
-        const tierSettings = await getBotTierSettings();
+        const tierSettings = await getBotTierSettingsServer();
 
         // This is mock data and would be replaced by a database query in a real app
         const mockSquad: Omit<SquadMember, 'rank' | 'tier'>[] = [

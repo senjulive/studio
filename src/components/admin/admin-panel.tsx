@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -25,6 +24,8 @@ import {
   ArrowUpFromLine,
   GitBranch,
   UserPlus,
+  Trophy,
+  TrendingUp,
 } from 'lucide-react';
 import { WalletManager } from './wallet-manager';
 import { SupportChatManager } from './support-chat-manager';
@@ -42,6 +43,9 @@ import { WithdrawalManager } from './withdrawal-manager';
 import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
+import { RewardsManager } from './rewards-manager';
+import { MarketingManager } from './marketing-manager';
+import { BotManagement } from './bot-management';
 
 
 const adminSections = {
@@ -62,10 +66,13 @@ const adminSections = {
     'Content & Engagement': {
         'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
         'Promotions': { component: <PromotionManager />, icon: Gift },
+        'Rewards': { component: <RewardsManager />, icon: Trophy },
+        'Marketing': { component: <MarketingManager />, icon: TrendingUp },
     },
     'Platform Settings': {
         'General Settings': { component: <SiteSettingsManager />, icon: Settings },
         'Bot & Tier Settings': { component: <BotTierSettingsManager />, icon: Bot },
+        'Bot Management': { component: <BotManagement />, icon: Activity },
         'Squad & Rewards': { component: <SquadRewardSettingsManager />, icon: GitBranch },
     }
 } as const;

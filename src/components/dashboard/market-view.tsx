@@ -1,382 +1,449 @@
-
-"use client";
+'use client';
 
 import * as React from "react";
 import Image from "next/image";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { LineChart, Line, ResponsiveContainer } from "recharts";
-import { cn } from "@/lib/utils";
-import { Skeleton } from "../ui/skeleton";
-import { LiveTradingChart } from "./live-trading-chart";
-import { Button } from "../ui/button";
-import { BrainCircuit, Loader2 } from "lucide-react";
-import type { MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Scale, Landmark, Bitcoin } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, TrendingUp, TrendingDown, Activity, DollarSign, BarChart3 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { AllAssetsChart } from "./all-assets-chart";
 
-type GenericAsset = {
+type MarketData = {
   id: string;
   name: string;
-  ticker: string;
-  iconUrl?: string;
-  price: number;
-  change24h: number;
+  symbol: string;
+  iconUrl: string;
+  currentPrice: number;
+  priceChange24h: number;
+  priceChangePercentage24h: number;
+  marketCap: number;
   volume24h: number;
-  marketCap?: number;
-  priceHistory: { value: number }[];
+  circulatingSupply: number;
+  totalSupply: number;
+  rank: number;
 };
 
-const initialCryptoData: GenericAsset[] = [
+const initialMarketData: MarketData[] = [
   {
     id: "bitcoin",
     name: "Bitcoin",
-    ticker: "BTC",
+    symbol: "BTC",
     iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
-    price: 68000.0,
-    change24h: 2.5,
-    volume24h: 45000000000,
-    marketCap: 1300000000000,
-    priceHistory: Array.from({ length: 20 }, () => ({ value: 68000 + (Math.random() - 0.5) * 2000 })),
+    currentPrice: 67842.50,
+    priceChange24h: 1687.25,
+    priceChangePercentage24h: 2.55,
+    marketCap: 1340000000000,
+    volume24h: 35000000000,
+    circulatingSupply: 19745000,
+    totalSupply: 21000000,
+    rank: 1
   },
   {
     id: "ethereum",
     name: "Ethereum",
-    ticker: "ETH",
+    symbol: "ETH",
     iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
-    price: 3500.0,
-    change24h: -1.2,
-    volume24h: 25000000000,
+    currentPrice: 3487.90,
+    priceChange24h: -42.10,
+    priceChangePercentage24h: -1.19,
     marketCap: 420000000000,
-    priceHistory: Array.from({ length: 20 }, () => ({ value: 3500 + (Math.random() - 0.5) * 200 })),
+    volume24h: 18000000000,
+    circulatingSupply: 120400000,
+    totalSupply: 120400000,
+    rank: 2
   },
   {
     id: "tether",
     name: "Tether",
-    ticker: "USDT",
+    symbol: "USDT",
     iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
-    price: 1.0,
-    change24h: 0.01,
-    volume24h: 80000000000,
-    marketCap: 110000000000,
-    priceHistory: Array.from({ length: 20 }, () => ({ value: 1 + (Math.random() - 0.5) * 0.01 })),
+    currentPrice: 1.0005,
+    priceChange24h: 0.0003,
+    priceChangePercentage24h: 0.03,
+    marketCap: 119000000000,
+    volume24h: 85000000000,
+    circulatingSupply: 119000000000,
+    totalSupply: 119000000000,
+    rank: 3
+  },
+  {
+    id: "binancecoin",
+    name: "BNB",
+    symbol: "BNB",
+    iconUrl: "https://assets.coincap.io/assets/icons/bnb@2x.png",
+    currentPrice: 621.45,
+    priceChange24h: 15.87,
+    priceChangePercentage24h: 2.62,
+    marketCap: 90000000000,
+    volume24h: 2800000000,
+    circulatingSupply: 145000000,
+    totalSupply: 145000000,
+    rank: 4
   },
   {
     id: "solana",
     name: "Solana",
-    ticker: "SOL",
+    symbol: "SOL",
     iconUrl: "https://assets.coincap.io/assets/icons/sol@2x.png",
-    price: 150.0,
-    change24h: 5.8,
-    volume24h: 5000000000,
-    marketCap: 70000000000,
-    priceHistory: Array.from({ length: 20 }, () => ({ value: 150 + (Math.random() - 0.5) * 15 })),
+    currentPrice: 154.32,
+    priceChange24h: 8.94,
+    priceChangePercentage24h: 6.15,
+    marketCap: 73000000000,
+    volume24h: 5200000000,
+    circulatingSupply: 473000000,
+    totalSupply: 588000000,
+    rank: 5
   },
+  {
+    id: "ripple",
+    name: "XRP",
+    symbol: "XRP",
+    iconUrl: "https://assets.coincap.io/assets/icons/xrp@2x.png",
+    currentPrice: 0.518,
+    priceChange24h: -0.012,
+    priceChangePercentage24h: -2.26,
+    marketCap: 29000000000,
+    volume24h: 1600000000,
+    circulatingSupply: 56000000000,
+    totalSupply: 100000000000,
+    rank: 6
+  },
+  {
+    id: "dogecoin",
+    name: "Dogecoin",
+    symbol: "DOGE",
+    iconUrl: "https://assets.coincap.io/assets/icons/doge@2x.png",
+    currentPrice: 0.087,
+    priceChange24h: 0.003,
+    priceChangePercentage24h: 3.57,
+    marketCap: 12800000000,
+    volume24h: 980000000,
+    circulatingSupply: 147000000000,
+    totalSupply: 147000000000,
+    rank: 7
+  },
+  {
+    id: "cardano",
+    name: "Cardano",
+    symbol: "ADA",
+    iconUrl: "https://assets.coincap.io/assets/icons/ada@2x.png",
+    currentPrice: 0.365,
+    priceChange24h: -0.008,
+    priceChangePercentage24h: -2.14,
+    marketCap: 12700000000,
+    volume24h: 420000000,
+    circulatingSupply: 35000000000,
+    totalSupply: 45000000000,
+    rank: 8
+  }
 ];
 
-const initialStockData: GenericAsset[] = [
-    { id: 'aapl', name: 'Apple Inc.', ticker: 'AAPL', price: 172.25, change24h: 1.5, volume24h: 90000000, marketCap: 2800000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 172.25 + (Math.random() - 0.5) * 5 })) },
-    { id: 'googl', name: 'Alphabet Inc.', ticker: 'GOOGL', price: 139.74, change24h: -0.8, volume24h: 25000000, marketCap: 1700000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 139.74 + (Math.random() - 0.5) * 4 })) },
-    { id: 'tsla', name: 'Tesla, Inc.', ticker: 'TSLA', price: 250.50, change24h: 3.2, volume24h: 120000000, marketCap: 800000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 250.50 + (Math.random() - 0.5) * 10 })) },
-];
+const formatCurrency = (amount: number) => {
+  if (amount >= 1e12) return `$${(amount / 1e12).toFixed(2)}T`;
+  if (amount >= 1e9) return `$${(amount / 1e9).toFixed(2)}B`;
+  if (amount >= 1e6) return `$${(amount / 1e6).toFixed(2)}M`;
+  if (amount >= 1e3) return `$${(amount / 1e3).toFixed(2)}K`;
+  return `$${amount.toFixed(2)}`;
+};
 
-const initialCommodityData: GenericAsset[] = [
-    { id: 'gold', name: 'Gold', ticker: 'XAU/USD', price: 2350.50, change24h: 0.5, volume24h: 20000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 2350.50 + (Math.random() - 0.5) * 20 })) },
-    { id: 'silver', name: 'Silver', ticker: 'XAG/USD', price: 28.75, change24h: 1.2, volume24h: 5000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 28.75 + (Math.random() - 0.5) * 1 })) },
-];
-
-const initialForexData: GenericAsset[] = [
-    { id: 'eurusd', name: 'Euro to US Dollar', ticker: 'EUR/USD', price: 1.0850, change24h: -0.2, volume24h: 500000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 1.0850 + (Math.random() - 0.5) * 0.01 })) },
-    { id: 'gbpusd', name: 'British Pound to US Dollar', ticker: 'GBP/USD', price: 1.2750, change24h: 0.1, volume24h: 300000000000, priceHistory: Array.from({ length: 20 }, () => ({ value: 1.2750 + (Math.random() - 0.5) * 0.01 })) },
-];
-
+const formatSupply = (amount: number) => {
+  if (amount >= 1e9) return `${(amount / 1e9).toFixed(2)}B`;
+  if (amount >= 1e6) return `${(amount / 1e6).toFixed(2)}M`;
+  if (amount >= 1e3) return `${(amount / 1e3).toFixed(2)}K`;
+  return amount.toLocaleString();
+};
 
 export function MarketView() {
-  const [data, setData] = React.useState<GenericAsset[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [selectedAsset, setSelectedAsset] = React.useState<GenericAsset | null>(null);
-  const [summary, setSummary] = React.useState<MarketSummaryOutput | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  
+  const [marketData, setMarketData] = React.useState<MarketData[]>(initialMarketData);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [sortBy, setSortBy] = React.useState<"rank" | "price" | "change" | "volume">("rank");
+
   React.useEffect(() => {
-    setData(initialCryptoData);
-    setSelectedAsset(initialCryptoData.find(c => c.ticker === 'BTC') || initialCryptoData[0]);
-    setIsLoading(false);
+    const interval = setInterval(() => {
+      setMarketData(prevData =>
+        prevData.map(coin => {
+          const changeFactor = (Math.random() - 0.5) * 0.02; // ±1% change
+          const newPrice = coin.currentPrice * (1 + changeFactor);
+          const priceChange = newPrice - coin.currentPrice;
+          const priceChangePercentage = (priceChange / coin.currentPrice) * 100;
+          
+          return {
+            ...coin,
+            currentPrice: newPrice,
+            priceChange24h: priceChange,
+            priceChangePercentage24h: priceChangePercentage,
+          };
+        })
+      );
+    }, 3000);
 
-    const timer = setTimeout(() => {
-        const allData = {
-            crypto: initialCryptoData,
-            stocks: initialStockData,
-            commodities: initialCommodityData,
-            forex: initialForexData,
-        };
-        
-        setData(allData.crypto);
-        setSelectedAsset(allData.crypto[0]);
-        setIsLoading(false);
-    }, 1500);
-
-
-    return () => {
-      clearTimeout(timer);
-    };
-    
+    return () => clearInterval(interval);
   }, []);
 
-  const handleTabChange = (tab: string) => {
-    let newDataSet: GenericAsset[] = [];
-    switch(tab) {
-        case 'crypto': newDataSet = initialCryptoData; break;
-        case 'stocks': newDataSet = initialStockData; break;
-        case 'commodities': newDataSet = initialCommodityData; break;
-        case 'forex': newDataSet = initialForexData; break;
-    }
-    setData(newDataSet);
-    setSelectedAsset(newDataSet[0]);
-  }
-  
-  const handleAnalyzeMarket = async () => {
-    if (!data.length) return;
-    setIsAnalyzing(true);
-    setSummary(null);
-    
-    try {
-        const analysisInput = {
-            coins: data.map(c => ({
-                name: c.name,
-                ticker: c.ticker,
-                price: c.price,
-                change24h: c.change24h,
-            }))
-        };
-        const response = await fetch('/api/market-summary', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(analysisInput),
-        });
-        if (!response.ok) throw new Error('Failed to get market analysis.');
-        const result: MarketSummaryOutput = await response.json();
-        setSummary(result);
-    } catch (error) {
-        console.error(error);
-        setSummary({ summary: 'Could not retrieve market analysis at this time.' });
-    } finally {
-        setIsAnalyzing(false);
-    }
-  };
+  const filteredData = React.useMemo(() => {
+    let filtered = marketData.filter(coin =>
+      coin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      coin.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-
-  const formatCurrency = (value: number, decimals = 2) =>
-    `$${value.toLocaleString(undefined, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    })}`;
-  
-  const formatMarketCap = (value: number) => {
-    if (value >= 1_000_000_000_000) return `$${(value / 1_000_000_000_000).toFixed(2)}T`;
-    if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
-    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
-    return `$${value.toFixed(2)}`;
-  }
-
-  const renderRows = (currentData: GenericAsset[]) => {
-    if (isLoading) {
-      return Array.from({ length: 5 }).map((_, index) => (
-        <TableRow key={index}>
-          <TableCell>
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-8 w-8 rounded-full" />
-              <div className="space-y-1">
-                 <Skeleton className="h-4 w-20" />
-                 <Skeleton className="h-3 w-10" />
-              </div>
-            </div>
-          </TableCell>
-          <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-28" /></TableCell>
-          {currentData[0]?.marketCap !== undefined && <TableCell><Skeleton className="h-5 w-24" /></TableCell>}
-          <TableCell><Skeleton className="h-8 w-32" /></TableCell>
-        </TableRow>
-      ));
+    switch (sortBy) {
+      case "price":
+        filtered.sort((a, b) => b.currentPrice - a.currentPrice);
+        break;
+      case "change":
+        filtered.sort((a, b) => b.priceChangePercentage24h - a.priceChangePercentage24h);
+        break;
+      case "volume":
+        filtered.sort((a, b) => b.volume24h - a.volume24h);
+        break;
+      default:
+        filtered.sort((a, b) => a.rank - b.rank);
     }
 
-    return currentData.map((asset) => (
-      <TableRow 
-        key={asset.id}
-        onClick={() => setSelectedAsset(asset)}
-        className={cn(
-          "cursor-pointer",
-          selectedAsset?.id === asset.id && "bg-muted/50 hover:bg-muted/60"
-        )}
-      >
-        <TableCell>
-          <div className="flex items-center gap-3">
-            {asset.iconUrl && <Image
-              src={asset.iconUrl}
-              alt={`${asset.name} logo`}
-              width={32}
-              height={32}
-              className="rounded-full"
-            />}
-            <div>
-              <div className="font-medium">{asset.name}</div>
-              <div className="text-xs text-muted-foreground">{asset.ticker}</div>
-            </div>
-          </div>
-        </TableCell>
-        <TableCell className="font-mono text-right">{formatCurrency(asset.price, asset.price < 1 ? 4 : 2)}</TableCell>
-        <TableCell
-          className={cn(
-            "text-right",
-            asset.change24h >= 0 ? "text-green-600" : "text-red-600"
-          )}
-        >
-          {asset.change24h >= 0 ? "+" : ""}
-          {asset.change24h.toFixed(2)}%
-        </TableCell>
-        <TableCell className="text-right">{formatMarketCap(asset.volume24h)}</TableCell>
-        {asset.marketCap !== undefined && <TableCell className="text-right">{formatMarketCap(asset.marketCap)}</TableCell>}
-        <TableCell>
-          <div className="h-8 w-32">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={asset.priceHistory}>
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke={asset.change24h >= 0 ? "hsl(var(--chart-2))" : "hsl(var(--destructive))"}
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </TableCell>
-      </TableRow>
-    ));
-  };
+    return filtered;
+  }, [marketData, searchQuery, sortBy]);
 
+  const totalMarketCap = React.useMemo(() => 
+    marketData.reduce((sum, coin) => sum + coin.marketCap, 0), [marketData]
+  );
+
+  const totalVolume = React.useMemo(() => 
+    marketData.reduce((sum, coin) => sum + coin.volume24h, 0), [marketData]
+  );
+
+  const gainers = React.useMemo(() => 
+    [...marketData].sort((a, b) => b.priceChangePercentage24h - a.priceChangePercentage24h).slice(0, 3),
+    [marketData]
+  );
+
+  const losers = React.useMemo(() => 
+    [...marketData].sort((a, b) => a.priceChangePercentage24h - b.priceChangePercentage24h).slice(0, 3),
+    [marketData]
+  );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-          {isLoading ? (
-              <Skeleton className="h-[480px] w-full rounded-lg" />
-          ) : (
-              <LiveTradingChart coin={selectedAsset} />
-          )}
-          <Tabs defaultValue="crypto" className="w-full" onValueChange={handleTabChange}>
-            <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="crypto"><Bitcoin className="mr-2"/>Crypto</TabsTrigger>
-                <TabsTrigger value="stocks"><TrendingUp className="mr-2"/>Stocks</TabsTrigger>
-                <TabsTrigger value="commodities"><Scale className="mr-2"/>Commodities</TabsTrigger>
-                <TabsTrigger value="forex"><Landmark className="mr-2"/>Forex</TabsTrigger>
-            </TabsList>
-            <TabsContent value="crypto">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Live Crypto Market</CardTitle>
-                    <CardDescription>Select a cryptocurrency to view its live chart.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead className="text-right">Market Cap</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
-                        <TableBody>{renderRows(data)}</TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-            </TabsContent>
-            <TabsContent value="stocks">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Stock Market</CardTitle>
-                    <CardDescription>Select a stock to view its live chart.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead className="text-right">Market Cap</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
-                        <TableBody>{renderRows(data)}</TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-            </TabsContent>
-             <TabsContent value="commodities">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Commodities Market</CardTitle>
-                    <CardDescription>Select a commodity to view its live chart.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
-                        <TableBody>{renderRows(data)}</TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-            </TabsContent>
-             <TabsContent value="forex">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Forex Market</CardTitle>
-                    <CardDescription>Select a currency pair to view its live chart.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                        <TableHeader><TableRow><TableHead>Asset</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">24h Change</TableHead><TableHead className="text-right">24h Volume</TableHead><TableHead>Last 7 Days</TableHead></TableRow></TableHeader>
-                        <TableBody>{renderRows(data)}</TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-            </TabsContent>
-          </Tabs>
-      </div>
-      <div className="lg:col-span-1 space-y-6">
+    <div className="space-y-6">
+      {/* Market Overview */}
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
-          <CardHeader>
-            <CardTitle>AI Market Summary</CardTitle>
-            <CardDescription>Get an AI-generated snapshot of the market.</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Market Cap</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {isAnalyzing ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ) : summary ? (
-              <p className="text-sm text-muted-foreground">{summary.summary}</p>
-            ) : (
-                <Alert>
-                    <BrainCircuit className="h-4 w-4" />
-                    <AlertTitle>Ready for analysis</AlertTitle>
-                    <AlertDescription>
-                        Click the button below to get a real-time market summary from our AI analyst.
-                    </AlertDescription>
-                </Alert>
-            )}
+            <div className="text-2xl font-bold">{formatCurrency(totalMarketCap)}</div>
+            <p className="text-xs text-muted-foreground">
+              Global cryptocurrency market capitalization
+            </p>
           </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">24h Trading Volume</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
           <CardContent>
-            <Button onClick={handleAnalyzeMarket} disabled={isAnalyzing || isLoading} className="w-full">
-                {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
-                {summary ? 'Regenerate Summary' : 'Analyze Market'}
-            </Button>
+            <div className="text-2xl font-bold">{formatCurrency(totalVolume)}</div>
+            <p className="text-xs text-muted-foreground">
+              Total trading volume across all markets
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">BTC Dominance</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">54.8%</div>
+            <p className="text-xs text-muted-foreground">
+              Bitcoin's share of total market cap
+            </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Top Gainers & Losers */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              Top Gainers (24h)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {gainers.map((coin) => (
+                <div key={coin.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Image src={coin.iconUrl} alt={coin.symbol} width={24} height={24} className="rounded-full" />
+                    <div>
+                      <p className="font-medium">{coin.symbol}</p>
+                      <p className="text-sm text-muted-foreground">{coin.name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">${coin.currentPrice.toFixed(2)}</p>
+                    <p className="text-sm text-green-600">
+                      +{coin.priceChangePercentage24h.toFixed(2)}%
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingDown className="h-5 w-5 text-red-600" />
+              Top Losers (24h)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {losers.map((coin) => (
+                <div key={coin.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Image src={coin.iconUrl} alt={coin.symbol} width={24} height={24} className="rounded-full" />
+                    <div>
+                      <p className="font-medium">{coin.symbol}</p>
+                      <p className="text-sm text-muted-foreground">{coin.name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">${coin.currentPrice.toFixed(2)}</p>
+                    <p className="text-sm text-red-600">
+                      {coin.priceChangePercentage24h.toFixed(2)}%
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Key Asset Performance Chart */}
+      <AllAssetsChart coins={marketData.map(coin => ({
+        id: coin.id,
+        name: coin.name,
+        ticker: coin.symbol,
+        iconUrl: coin.iconUrl,
+        price: coin.currentPrice,
+        change24h: coin.priceChangePercentage24h,
+        volume24h: coin.volume24h,
+        marketCap: coin.marketCap,
+        priceHistory: Array.from({ length: 50 }, () => ({ value: coin.currentPrice + (Math.random() - 0.5) * coin.currentPrice * 0.1 }))
+      }))} />
+
+      {/* Market Data Table */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>Cryptocurrency Prices</CardTitle>
+              <CardDescription>Real-time cryptocurrency market data</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search cryptocurrencies..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8 w-64"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSortBy(sortBy === "rank" ? "change" : "rank")}
+              >
+                Sort by {sortBy === "rank" ? "Change" : "Rank"}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Header */}
+            <div className="grid grid-cols-12 gap-4 text-sm font-medium text-muted-foreground border-b pb-2">
+              <div className="col-span-1">#</div>
+              <div className="col-span-3">Name</div>
+              <div className="col-span-2 text-right">Price</div>
+              <div className="col-span-2 text-right">24h Change</div>
+              <div className="col-span-2 text-right">Market Cap</div>
+              <div className="col-span-2 text-right">Volume (24h)</div>
+            </div>
+
+            {/* Data Rows */}
+            <div className="space-y-2">
+              {filteredData.map((coin) => (
+                <div key={coin.id} className="grid grid-cols-12 gap-4 items-center py-3 border-b border-border/50 hover:bg-muted/50 rounded-lg px-2">
+                  <div className="col-span-1">
+                    <span className="text-sm font-medium">{coin.rank}</span>
+                  </div>
+                  
+                  <div className="col-span-3 flex items-center gap-3">
+                    <Image 
+                      src={coin.iconUrl} 
+                      alt={coin.symbol} 
+                      width={32} 
+                      height={32} 
+                      className="rounded-full"
+                    />
+                    <div>
+                      <p className="font-medium">{coin.name}</p>
+                      <p className="text-sm text-muted-foreground">{coin.symbol}</p>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2 text-right">
+                    <p className="font-medium">
+                      ${coin.currentPrice < 1 
+                        ? coin.currentPrice.toFixed(6) 
+                        : coin.currentPrice.toFixed(2)
+                      }
+                    </p>
+                  </div>
+
+                  <div className="col-span-2 text-right">
+                    <div className={cn(
+                      "inline-flex items-center gap-1 px-2 py-1 rounded text-sm font-medium",
+                      coin.priceChangePercentage24h >= 0 
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                        : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                    )}>
+                      {coin.priceChangePercentage24h >= 0 ? (
+                        <TrendingUp className="h-3 w-3" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3" />
+                      )}
+                      {coin.priceChangePercentage24h.toFixed(2)}%
+                    </div>
+                  </div>
+
+                  <div className="col-span-2 text-right">
+                    <p className="font-medium">{formatCurrency(coin.marketCap)}</p>
+                  </div>
+
+                  <div className="col-span-2 text-right">
+                    <p className="font-medium">{formatCurrency(coin.volume24h)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

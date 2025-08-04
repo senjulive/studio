@@ -1,15 +1,17 @@
-import { PublicChatView } from '@/components/dashboard/public-chat-view';
+'use client';
+
+import { CommunityBlog } from '@/components/dashboard/community-blog';
+import { ChatPageAdmin } from '@/components/admin/chat-page-admin';
+import { useAdminStatus } from '@/hooks/use-admin-status';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-    title: "Public Chat - AstralCore",
-    description: "Engage with the AstralCore community in the public chat.",
-};
-
 export default function ChatPage() {
+  const { isAdmin, canModerateChat } = useAdminStatus();
+
   return (
     <div className="space-y-6">
-      <PublicChatView />
+      {(isAdmin || canModerateChat) && <ChatPageAdmin />}
+      <CommunityBlog />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { X, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { PublicChatView } from "./public-chat-view"
+import { CommunityBlog } from "./community-blog"
 import { AnimatePresence, motion } from "framer-motion"
 import { AstralLogo } from "../icons/astral-logo"
 
@@ -66,7 +66,7 @@ export function FloatingChat() {
                 }}
                 className="flex justify-between items-center p-2 rounded-t-lg border-b border-border cursor-grab"
             >
-                <h3 className="font-semibold ml-2 text-foreground">Public Chat</h3>
+                <h3 className="font-semibold ml-2 text-foreground">Community Blog</h3>
                 <div>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleMinimize}>
                         <Minus className="h-4 w-4" />
@@ -77,7 +77,7 @@ export function FloatingChat() {
                 </div>
             </motion.div>
             <div className="flex-1 overflow-hidden rounded-b-lg">
-                <PublicChatView isFloating />
+                <CommunityBlog isFloating />
             </div>
           </motion.div>
         )}

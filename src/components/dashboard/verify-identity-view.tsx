@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -186,8 +185,8 @@ export function VerifyIdentityView() {
       });
 
       await addNotification(user.id, {
-        title: "Verification in Progress",
-        content: "Your profile information has been submitted for verification.",
+        title: "KYC Update in Progress",
+        content: "Your profile information has been submitted for KYC review.",
         href: "/dashboard/profile"
       });
       
@@ -210,10 +209,10 @@ export function VerifyIdentityView() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-primary"/>
-            <span>Identity Verification</span>
+            <span>KYC Update</span>
         </CardTitle>
         <CardDescription>
-          Please provide your details and upload photos of your ID to complete verification.
+          Please provide your details and upload photos of your ID to complete KYC verification.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -311,7 +310,7 @@ export function VerifyIdentityView() {
               ) : (
                 <Save className="mr-2 h-4 w-4" />
               )}
-              Submit for Verification
+              Submit KYC Update
             </Button>
           </CardFooter>
         </form>
