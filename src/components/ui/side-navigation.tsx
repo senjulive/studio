@@ -261,26 +261,71 @@ export function SideNavigation() {
               </Button>
             </div>
 
-            {/* Quick Actions */}
+            {/* User Status Dashboard */}
             <div className="mb-6">
               <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Sparkles className="w-3 h-3" />
-                Quick Actions
+                <Activity className="w-3 h-3" />
+                Hyperdrive Status
               </div>
               <div className="grid grid-cols-1 gap-2">
-                {quickActions.map((action, index) => (
-                  <Button
-                    key={index}
-                    className={cn(
-                      "justify-start bg-gradient-to-r hover:scale-105 transition-all duration-300 border border-white/10 backdrop-blur-xl",
-                      action.color
-                    )}
-                    onClick={() => setIsVisible(false)}
-                  >
-                    <action.icon className="h-4 w-4 mr-3" />
-                    {action.label}
-                  </Button>
-                ))}
+                {/* User Balance */}
+                <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/10 p-3 rounded-lg border border-white/10 backdrop-blur-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Wallet className="h-4 w-4 text-blue-400" />
+                      <span className="text-xs text-gray-300">Balance</span>
+                    </div>
+                    <span className="text-sm font-bold text-blue-400">
+                      ${userWallet?.balances?.usdt?.toLocaleString() || '0.00'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Daily Earnings */}
+                <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/10 p-3 rounded-lg border border-white/10 backdrop-blur-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-green-400" />
+                      <span className="text-xs text-gray-300">Daily Earnings</span>
+                    </div>
+                    <span className="text-sm font-bold text-green-400">
+                      +${userWallet?.dailyEarnings || '0.00'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Remaining Grid */}
+                <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/10 p-3 rounded-lg border border-white/10 backdrop-blur-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Grid3x3 className="h-4 w-4 text-yellow-400" />
+                      <span className="text-xs text-gray-300">Grid Trades</span>
+                    </div>
+                    <span className="text-sm font-bold text-yellow-400">
+                      {userWallet?.remainingGrids || '0'}/24
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bot Status */}
+                <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/10 p-3 rounded-lg border border-white/10 backdrop-blur-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Brain className="h-4 w-4 text-purple-400" />
+                      <span className="text-xs text-gray-300">Neural Bot</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {userWallet?.botStatus === 'active' ? (
+                        <Play className="h-3 w-3 text-green-400" />
+                      ) : (
+                        <Pause className="h-3 w-3 text-red-400" />
+                      )}
+                      <span className="text-sm font-bold text-purple-400">
+                        {userWallet?.botStatus === 'active' ? 'Active' : 'Paused'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
