@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useWebPages, type PageContent, type WebPage } from '@/hooks/use-web-pages';
 import { WebEditorHelp } from './web-editor-help';
+import { PageCreator } from './page-creator';
 import { 
   Edit3, 
   Save, 
