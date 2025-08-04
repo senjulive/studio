@@ -86,6 +86,23 @@ export function LoginForm() {
         }),
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: 'An error occurred during login' };
+        }
+
+        toast({
+          title: "Login Failed",
+          description: errorData.error || 'An error occurred during login',
+          variant: "destructive",
+        });
+        return;
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
