@@ -85,6 +85,7 @@ const adminSections = {
         'General Settings': { component: <SiteSettingsManager />, icon: Settings },
         'Action Logs': { component: <ActionLogViewer />, icon: Activity },
         'Platform Analytics': { component: <AnalyticsManager />, icon: LayoutDashboard },
+        'Data Management': { component: <DataFetcher />, icon: Globe },
     }
 } as const;
 
