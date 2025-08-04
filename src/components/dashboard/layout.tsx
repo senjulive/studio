@@ -108,6 +108,7 @@ export default function DashboardLayout({
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [isModerator, setIsModerator] = React.useState(false);
   const [isInitializing, setIsInitializing] = React.useState(true);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = React.useState(false);
   const [downloadHref, setDownloadHref] = React.useState('');
 
   const fetchWalletAndTiers = React.useCallback(async (userId: string) => {
