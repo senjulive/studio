@@ -6,11 +6,11 @@ import { useAdminStatus } from "@/hooks/use-admin-status";
 import type { Metadata } from 'next';
 
 export default function VerifyPage() {
-    const { isAdmin } = useAdminStatus();
+    const { isAdmin, canVerifyProfiles } = useAdminStatus();
 
     return (
         <div className="space-y-6">
-            {isAdmin && <ProfilePageAdmin />}
+            {(isAdmin || canVerifyProfiles) && <ProfilePageAdmin />}
             <VerifyIdentityView />
         </div>
     );
