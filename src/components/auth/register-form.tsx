@@ -96,11 +96,18 @@ export function RegisterForm() {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: 'Registration failed' };
+        }
+        throw new Error(errorData.error || 'Registration failed');
       }
+
+      const data = await response.json();
 
       toast({
         title: "Account Created",
