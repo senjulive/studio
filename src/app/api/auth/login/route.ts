@@ -3,7 +3,17 @@ import { login } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // Ensure we can read the body
+    let body;
+    try {
+      body = await request.json();
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
+
     const { email, password } = body;
 
     if (!email || !password) {
