@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -82,29 +81,36 @@ export function RegisterForm() {
     const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      const { error } = await register({
-        email: values.email,
-        password: values.password,
-        options: {
-            data: {
-                username: values.username,
-                contact_number: fullContactNumber,
-                country: countryInfo.name,
-                referral_code: values.referralCode,
-            }
-        }
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+          fullName: values.username,
+          phoneNumber: fullContactNumber,
+          country: countryInfo.name,
+          referralCode: values.referralCode,
+        }),
       });
-      
-      if (error) {
-        throw new Error(error);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
       }
-      
+
       toast({
         title: "Account Created",
-        description: "Your account has been created successfully. You can now log in.",
+        description: data.message || "Your account has been created successfully. Please check your email for verification.",
       });
-      router.push("/dashboard");
+
+      // Redirect to login page for email verification
+      router.push("/login");
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
         description: error.message || "An unexpected error occurred.",
