@@ -1,4 +1,5 @@
 import { ProfileView } from "@/components/dashboard/profile-view";
+import { ProfilePageAdmin } from "@/components/admin/profile-page-admin";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,6 +9,9 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
     return (
-        <ProfileView />
+        <div className="space-y-6">
+            <ProfilePageAdmin />
+            <ProfileView />
+        </div>
     );
 }
