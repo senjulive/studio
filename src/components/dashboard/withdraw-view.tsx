@@ -18,6 +18,7 @@ import { useUser } from "@/contexts/UserContext";
 import { Send, Wallet, AlertCircle, CheckCircle, Clock, Shield, ArrowUpRight, TrendingUp, Zap, Calculator } from "lucide-react";
 import { withdrawRequestSchema } from "@/lib/validators";
 import { cn } from "@/lib/utils";
+import { SecurityAuth } from "@/components/ui/security-auth";
 
 type WithdrawFormValues = z.infer<typeof withdrawRequestSchema>;
 
