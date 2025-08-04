@@ -260,7 +260,7 @@ URL=${window.location.origin}`;
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
     { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
-    { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
+    { href: '/dashboard/support', label: 'Customer Support', icon: SupportIcon },
     { href: '/dashboard/security', label: 'Settings', icon: SettingsIcon },
   ];
 
