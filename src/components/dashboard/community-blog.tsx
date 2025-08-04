@@ -472,37 +472,7 @@ export function CommunityBlog({ isFloating = false }: { isFloating?: boolean }) 
             </CardContent>
           </Card>
 
-          {/* Active Users */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Squad Members Online
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {squadMembers.slice(0, 5).map((member: any, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div className="relative">
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-xs">
-                          {member.username?.[0]?.toUpperCase() || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="absolute -bottom-0.5 -right-0.5 h-2 w-2 bg-green-500 rounded-full border border-background" />
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {member.username || `User ${index + 1}`}
-                    </span>
-                  </div>
-                ))}
-                {squadMembers.length === 0 && (
-                  <p className="text-xs text-muted-foreground">No squad members yet</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+
         </div>
       )}
 
