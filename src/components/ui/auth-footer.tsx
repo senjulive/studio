@@ -102,7 +102,7 @@ export function AuthFooter() {
               </div>
               <div>
                 <span className="text-white font-bold text-sm">AstralCore</span>
-                <div className="text-gray-500 text-xs">Quantum Nexus v4.0</div>
+                <div className="text-gray-500 text-xs">Hype Drive</div>
               </div>
             </div>
 
