@@ -1,4 +1,5 @@
 import { SupportChat } from "@/components/dashboard/support-chat";
+import { SupportPageAdmin } from "@/components/admin/support-page-admin";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,6 +9,9 @@ export const metadata: Metadata = {
 
 export default function SupportPage() {
     return (
-        <SupportChat />
+        <div className="space-y-6">
+            <SupportPageAdmin />
+            <SupportChat />
+        </div>
     );
 }
