@@ -68,6 +68,13 @@ export function SideNavigation() {
   const sideNavRef = React.useRef<HTMLDivElement>(null);
   const timeoutRef = React.useRef<NodeJS.Timeout>();
 
+  // Fetch user wallet data
+  React.useEffect(() => {
+    if (user?.id) {
+      getOrCreateWallet(user.id).then(setUserWallet);
+    }
+  }, [user]);
+
   // Auto-hide functionality
   React.useEffect(() => {
     if (isVisible && !isHovered && !isDragging) {
