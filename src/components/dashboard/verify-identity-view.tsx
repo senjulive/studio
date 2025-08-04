@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -210,7 +209,7 @@ export function VerifyIdentityView() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-primary"/>
-            <span>Identity Verification</span>
+            <span>KYC / UPDATE</span>
         </CardTitle>
         <CardDescription>
           Please provide your details and upload photos of your ID to complete verification.
