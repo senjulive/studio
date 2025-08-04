@@ -44,7 +44,8 @@ export function WebPageEditor() {
     updateContent,
     addContent,
     deleteContent,
-    updatePage
+    updatePage,
+    deletePage
   } = useWebPages();
 
   const [selectedPage, setSelectedPage] = useState<WebPage | null>(null);
@@ -52,6 +53,7 @@ export function WebPageEditor() {
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [showPageCreator, setShowPageCreator] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
