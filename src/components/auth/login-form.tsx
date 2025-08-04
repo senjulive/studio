@@ -105,31 +105,23 @@ export function LoginForm() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        toast({
-          title: "Login Failed",
-          description: data.error || 'An error occurred during login',
-          variant: "destructive",
-        });
+      toast({
+        title: "Login Successful",
+        description: "Welcome to AstralCore!",
+      });
+
+      // Store user role for routing
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('userRole', data.role || 'user');
+      }
+
+      // Redirect based on role
+      if (data.role === 'admin') {
+        router.push('/admin');
+      } else if (data.role === 'moderator') {
+        router.push('/moderator');
       } else {
-        toast({
-          title: "Login Successful",
-          description: "Welcome to AstralCore!",
-        });
-
-        // Store user role for routing
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('userRole', data.role || 'user');
-        }
-
-        // Redirect based on role
-        if (data.role === 'admin') {
-          router.push('/admin');
-        } else if (data.role === 'moderator') {
-          router.push('/moderator');
-        } else {
-          router.push('/dashboard');
-        }
+        router.push('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
