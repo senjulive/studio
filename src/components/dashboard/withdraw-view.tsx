@@ -78,6 +78,8 @@ export function WithdrawView() {
   const [selectedAsset, setSelectedAsset] = React.useState(cryptoAssets[0]);
   const [selectedNetwork, setSelectedNetwork] = React.useState(0);
   const [isConfirming, setIsConfirming] = React.useState(false);
+  const [showSecurityAuth, setShowSecurityAuth] = React.useState(false);
+  const [pendingWithdrawalData, setPendingWithdrawalData] = React.useState<any>(null);
 
   const form = useForm<WithdrawFormValues>({
     resolver: zodResolver(withdrawRequestSchema),
