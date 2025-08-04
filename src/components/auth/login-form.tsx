@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -65,34 +64,67 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    
-    if (typeof window !== 'undefined') {
+
+    try {
+      if (typeof window !== 'undefined') {
         if (values.rememberMe) {
-            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
+          localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
         } else {
-            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+          localStorage.removeItem(REMEMBERED_EMAIL_KEY);
         }
         // Store email in session storage to determine role in dashboard layout
         sessionStorage.setItem('loggedInEmail', values.email);
-    }
-    
-    const { error } = await login(values);
+      }
 
-    if (error) {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
         toast({
-            title: "Login Failed",
-            description: error,
-            variant: "destructive",
+          title: "Login Failed",
+          description: data.error || 'An error occurred during login',
+          variant: "destructive",
         });
-    } else {
+      } else {
         toast({
           title: "Login Successful",
           description: "Welcome to AstralCore!",
         });
-        router.push('/dashboard');
+
+        // Store user role for routing
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('userRole', data.role || 'user');
+        }
+
+        // Redirect based on role
+        if (data.role === 'admin') {
+          router.push('/admin');
+        } else if (data.role === 'moderator') {
+          router.push('/moderator');
+        } else {
+          router.push('/dashboard');
+        }
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login Failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleGoogleSignIn = () => {
