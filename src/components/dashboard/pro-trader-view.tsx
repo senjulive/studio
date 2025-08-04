@@ -17,11 +17,8 @@ export function ProTraderView() {
   const { wallet, tier, rank } = useUser();
   const { toast } = useToast();
   const [isTrading, setIsTrading] = React.useState(false);
-  const [dailyClicks, setDailyClicks] = React.useState(0);
 
   const dailyEarnings = (wallet?.growth as any)?.dailyEarnings ?? 0;
-  const clicksLeft = (wallet?.growth as any)?.clicksLeft ?? (tier?.clicks || 5);
-  const maxClicks = tier?.clicks || 5;
   const earningsRate = tier?.earningsRate || 0.05;
 
   const handleTradingToggle = () => {
