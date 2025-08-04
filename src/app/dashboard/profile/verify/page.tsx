@@ -1,4 +1,5 @@
 import { VerifyIdentityView } from "@/components/dashboard/verify-identity-view";
+import { ProfilePageAdmin } from "@/components/admin/profile-page-admin";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,6 +9,9 @@ export const metadata: Metadata = {
 
 export default function VerifyPage() {
     return (
-        <VerifyIdentityView />
+        <div className="space-y-6">
+            <ProfilePageAdmin />
+            <VerifyIdentityView />
+        </div>
     );
 }
