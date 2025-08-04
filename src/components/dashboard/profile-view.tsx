@@ -296,9 +296,9 @@ export function ProfileView() {
                       <Wallet className="h-4 w-4" />
                       <span className="text-sm">Total Balance</span>
                     </div>
-                    <p className="text-xl sm:text-2xl font-bold text-foreground">
+                    <div className="text-xl sm:text-2xl font-bold text-foreground">
                       {isLoading ? <Skeleton className="h-8 w-20" /> : `$${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                    </p>
+                    </div>
                   </div>
 
                   <div className="bg-background/60 rounded-lg p-3 sm:p-4 border border-border/50">
@@ -306,9 +306,9 @@ export function ProfileView() {
                       <Users className="h-4 w-4" />
                       <span className="text-sm">Squad Members</span>
                     </div>
-                    <p className="text-xl sm:text-2xl font-bold text-foreground">
+                    <div className="text-xl sm:text-2xl font-bold text-foreground">
                       {isLoading ? <Skeleton className="h-8 w-8" /> : squadSize}
-                    </p>
+                    </div>
                   </div>
 
                   <div className="bg-background/60 rounded-lg p-3 sm:p-4 border border-border/50">
@@ -316,9 +316,9 @@ export function ProfileView() {
                       <Award className="h-4 w-4" />
                       <span className="text-sm">Rank</span>
                     </div>
-                    <p className="text-lg font-semibold text-foreground">
+                    <div className="text-lg font-semibold text-foreground">
                       {isLoading ? <Skeleton className="h-6 w-16" /> : rank.name}
-                    </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -414,21 +414,21 @@ export function ProfileView() {
                   <div className="space-y-3">
                     <div>
                       <Label className="text-xs text-muted-foreground">Username</Label>
-                      <p className="text-sm font-medium text-foreground mt-1">
+                      <div className="text-sm font-medium text-foreground mt-1">
                         {isLoading ? <Skeleton className="h-4 w-24" /> : (profile?.username || "Not set")}
-                      </p>
+                      </div>
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Full Name</Label>
-                      <p className="text-sm font-medium text-foreground mt-1">
+                      <div className="text-sm font-medium text-foreground mt-1">
                         {isLoading ? <Skeleton className="h-4 w-32" /> : (profile?.fullName || "Not set")}
-                      </p>
+                      </div>
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Email</Label>
-                      <p className="text-sm font-medium text-foreground mt-1">
+                      <div className="text-sm font-medium text-foreground mt-1">
                         {isLoading ? <Skeleton className="h-4 w-40" /> : (user?.email || "Not set")}
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -442,21 +442,21 @@ export function ProfileView() {
                   <div className="space-y-3">
                     <div>
                       <Label className="text-xs text-muted-foreground">Phone Number</Label>
-                      <p className="text-sm font-medium text-foreground mt-1">
+                      <div className="text-sm font-medium text-foreground mt-1">
                         {isLoading ? <Skeleton className="h-4 w-28" /> : (profile?.contactNumber || "Not set")}
-                      </p>
+                      </div>
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Country</Label>
-                      <p className="text-sm font-medium text-foreground mt-1">
+                      <div className="text-sm font-medium text-foreground mt-1">
                         {isLoading ? <Skeleton className="h-4 w-24" /> : (profile?.country || "Not set")}
-                      </p>
+                      </div>
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">ID Card Number</Label>
-                      <p className="text-sm font-medium text-foreground mt-1">
+                      <div className="text-sm font-medium text-foreground mt-1">
                         {isLoading ? <Skeleton className="h-4 w-32" /> : (profile?.idCardNo || "Not set")}
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -472,15 +472,15 @@ export function ProfileView() {
                       <div className="space-y-3">
                         <div>
                           <Label className="text-xs text-muted-foreground">Address</Label>
-                          <p className="text-sm font-medium text-foreground mt-1">
+                          <div className="text-sm font-medium text-foreground mt-1">
                             {isLoading ? <Skeleton className="h-4 w-48" /> : (profile?.address || "Not set")}
-                          </p>
+                          </div>
                         </div>
                         <div>
                           <Label className="text-xs text-muted-foreground">Date of Birth</Label>
-                          <p className="text-sm font-medium text-foreground mt-1">
+                          <div className="text-sm font-medium text-foreground mt-1">
                             {isLoading ? <Skeleton className="h-4 w-24" /> : (profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set')}
-                          </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -493,9 +493,9 @@ export function ProfileView() {
                       <div className="space-y-3">
                         <div>
                           <Label className="text-xs text-muted-foreground">Squad Members</Label>
-                          <p className="text-sm font-medium text-foreground mt-1">
+                          <div className="text-sm font-medium text-foreground mt-1">
                             {isLoading ? <Skeleton className="h-4 w-16" /> : `${squadSize} member${squadSize !== 1 ? 's' : ''}`}
-                          </p>
+                          </div>
                         </div>
                       </div>
                     </div>
