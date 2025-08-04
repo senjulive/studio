@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { MainNav } from '@/components/navigation/main-nav';
 import { type WebPage, type PageContent } from '@/hooks/use-web-pages';
 
 interface DynamicPageProps {
