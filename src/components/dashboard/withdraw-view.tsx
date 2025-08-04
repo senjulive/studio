@@ -375,13 +375,13 @@ export function WithdrawView() {
 
                     <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
                       <AlertDialogTrigger asChild>
-                        <Button 
-                          type="submit" 
+                        <Button
+                          type="submit"
                           className="w-full"
                           disabled={availableBalance === 0 || watchedAmount <= 0}
                         >
                           <Send className="h-4 w-4 mr-2" />
-                          Request Withdrawal
+                          Confirm Withdrawal
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
