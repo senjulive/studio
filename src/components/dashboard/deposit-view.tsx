@@ -554,7 +554,7 @@ export function DepositView() {
 
                   <Button type="submit" className="w-full bg-gradient-to-r from-green-500 to-blue-600">
                     <Upload className="h-4 w-4 mr-2" />
-                    Submit Quantum Deposit
+                    Confirm Deposit
                   </Button>
                 </form>
               </Form>
