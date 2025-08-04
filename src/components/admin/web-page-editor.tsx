@@ -438,16 +438,29 @@ export function WebPageEditor() {
                     >
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium text-white text-sm">{page.name}</h4>
-                        <Badge 
-                          variant="outline" 
-                          className={
-                            page.status === 'published' ? 'border-green-400/50 text-green-300' :
-                            page.status === 'draft' ? 'border-yellow-400/50 text-yellow-300' :
-                            'border-gray-400/50 text-gray-300'
-                          }
-                        >
-                          {page.status}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className={
+                              page.status === 'published' ? 'border-green-400/50 text-green-300' :
+                              page.status === 'draft' ? 'border-yellow-400/50 text-yellow-300' :
+                              'border-gray-400/50 text-gray-300'
+                            }
+                          >
+                            {page.status}
+                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeletePage(page.id);
+                            }}
+                            className="text-red-400 hover:text-red-300 h-6 w-6 p-0"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{page.route}</p>
                       <p className="text-xs text-muted-foreground mt-1">
