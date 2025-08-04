@@ -65,7 +65,6 @@ import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from './profile-view';
-import { RightSidebar } from '../ui/right-sidebar';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
