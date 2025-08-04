@@ -5,16 +5,16 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Home, 
-  TrendingUp, 
-  Brain, 
-  Zap, 
-  Shield, 
-  Star, 
-  Users, 
-  MessageSquare, 
-  Settings, 
+import {
+  Home,
+  TrendingUp,
+  Brain,
+  Zap,
+  Shield,
+  Star,
+  Users,
+  MessageSquare,
+  Settings,
   ChevronLeft,
   ChevronRight,
   Waves,
@@ -22,7 +22,13 @@ import {
   Sparkles,
   CreditCard,
   Trophy,
-  Rocket
+  Rocket,
+  Wallet,
+  Activity,
+  DollarSign,
+  Grid3x3,
+  Play,
+  Pause
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
