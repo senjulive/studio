@@ -120,31 +120,42 @@ export function WithdrawView() {
   };
 
   const confirmWithdrawal = async () => {
+    const withdrawalData = {
+      ...form.getValues(),
+      currency: selectedAsset.symbol,
+      network: currentNetwork.name,
+      netAmount
+    };
+
+    setPendingWithdrawalData(withdrawalData);
+    setIsConfirming(false);
+    setShowSecurityAuth(true);
+  };
+
+  const handleSecuritySuccess = async () => {
     try {
-      const withdrawalData = {
-        ...form.getValues(),
-        currency: selectedAsset.symbol,
-        network: currentNetwork.name,
-        netAmount
-      };
-      
-      console.log("Withdrawal request:", withdrawalData);
-      
+      console.log("Withdrawal request:", pendingWithdrawalData);
+
       toast({
         title: "Withdrawal Requested",
         description: "Your withdrawal request has been submitted and will be processed within 24 hours.",
       });
 
       form.reset();
-      setIsConfirming(false);
+      setShowSecurityAuth(false);
+      setPendingWithdrawalData(null);
     } catch (error) {
       toast({
         title: "Withdrawal Failed",
         description: "Failed to submit withdrawal request. Please try again.",
         variant: "destructive"
       });
-      setIsConfirming(false);
     }
+  };
+
+  const handleSecurityCancel = () => {
+    setShowSecurityAuth(false);
+    setPendingWithdrawalData(null);
   };
 
   const setMaxAmount = () => {
