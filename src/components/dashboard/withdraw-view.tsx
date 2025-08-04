@@ -76,7 +76,7 @@ export function WithdrawView() {
   const { wallet } = useUser();
   const { toast } = useToast();
   const [selectedAsset, setSelectedAsset] = React.useState(cryptoAssets[0]);
-  const [selectedNetwork, setSelectedNetwork] = React.useState(0);
+
   const [isConfirming, setIsConfirming] = React.useState(false);
   const [showSecurityAuth, setShowSecurityAuth] = React.useState(false);
   const [pendingWithdrawalData, setPendingWithdrawalData] = React.useState<any>(null);
@@ -92,7 +92,7 @@ export function WithdrawView() {
   });
 
   const watchedAmount = form.watch("amount");
-  const currentNetwork = selectedAsset.networks[selectedNetwork];
+  const currentNetwork = selectedAsset.networks[0];
   const balances = wallet?.balances as any;
   const availableBalance = balances?.[selectedAsset.symbol.toLowerCase()] || 0;
   const netAmount = watchedAmount;
@@ -287,7 +287,6 @@ export function WithdrawView() {
                         key={asset.symbol}
                         onClick={() => {
                           setSelectedAsset(asset);
-                          setSelectedNetwork(0);
                           form.setValue("currency", asset.symbol as any);
                         }}
                         className={cn(
@@ -314,33 +313,14 @@ export function WithdrawView() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-foreground">Choose Network</label>
-                  <div className="grid gap-2">
-                    {selectedAsset.networks.map((network, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          setSelectedNetwork(index);
-                          form.setValue("network", network.name);
-                        }}
-                        className={cn(
-                          "flex items-center justify-between p-3 border rounded-lg text-left transition-colors",
-                          selectedNetwork === index
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50 hover:bg-accent/50"
-                        )}
-                      >
-                        <div className="space-y-1">
-                          <p className="font-medium text-foreground">{network.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Min: {network.minWithdraw} {selectedAsset.symbol} • <span className="text-green-600 font-medium">No fees</span>
-                          </p>
-                        </div>
-                        {selectedNetwork === index && (
-                          <CheckCircle className="h-4 w-4 text-primary" />
-                        )}
-                      </button>
-                    ))}
+                  <label className="text-sm font-medium text-foreground">Network</label>
+                  <div className="p-4 border rounded-lg bg-primary/5 border-primary">
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">{currentNetwork.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Min: {currentNetwork.minWithdraw} {selectedAsset.symbol} • <span className="text-green-600 font-medium">No fees</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
