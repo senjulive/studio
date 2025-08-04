@@ -40,24 +40,7 @@ export function ProTraderView() {
     });
   };
 
-  const handleManualClick = () => {
-    if (clicksLeft <= 0) {
-      toast({
-        title: "Daily Limit Reached",
-        description: "You've used all your manual earnings for today. Wait 24 hours for reset.",
-        variant: "destructive"
-      });
-      return;
-    }
 
-    const earnAmount = Math.random() * earningsRate + 0.01;
-    setDailyClicks(prev => prev + 1);
-    
-    toast({
-      title: "Manual Earnings Generated!",
-      description: `+$${earnAmount.toFixed(2)} added to your balance`,
-    });
-  };
 
   const tradingPairs = [
     { pair: "BTC/USDT", profit: "+2.45%", volume: "$45.2M", status: "active" },
