@@ -424,7 +424,7 @@ export function DepositView() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg text-white flex items-center gap-2">
                   <Network className="h-5 w-5 text-purple-400" />
-                  Neural Network
+                  Blockchain Network
                 </CardTitle>
                 <CardDescription>Choose blockchain network pathway</CardDescription>
               </CardHeader>
