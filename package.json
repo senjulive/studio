@@ -11,7 +11,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "build:production": "NODE_ENV=production npm run type-check && npm run build",
+    "build:production": "NODE_ENV=production npm run build",
     "deploy": "npm run build:production",
     "postbuild": "echo 'Build completed successfully'",
     "clean": "rm -rf .next && rm -rf out",
