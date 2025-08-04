@@ -642,7 +642,7 @@ URL=${window.location.origin}`;
                        </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Account Rank</p>
+                      <p>Hyperdrive Rank</p>
                     </TooltipContent>
                   </Tooltip>
                    {tier && TierIcon && tierClassName && (
