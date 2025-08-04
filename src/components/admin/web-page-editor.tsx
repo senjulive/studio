@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useWebPages, type PageContent, type WebPage } from '@/hooks/use-web-pages';
+import { WebEditorHelp } from './web-editor-help';
 import { 
   Edit3, 
   Save, 
