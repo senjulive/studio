@@ -193,7 +193,7 @@ export default function WelcomePage() {
           <div className="flex items-center justify-center gap-3 mb-6">
             <Atom className="w-6 h-6 text-indigo-400 animate-hyperdrive-spin" />
             <p className="text-xl sm:text-2xl text-indigo-300 font-medium tracking-[0.3em] uppercase bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">
-              Quantum Hyperdrive v5.0
+              Hyperdrive v5.0
             </p>
             <Infinity className="w-6 h-6 text-violet-400 animate-hyperdrive-spin" style={{animationDirection: 'reverse'}} />
           </div>
