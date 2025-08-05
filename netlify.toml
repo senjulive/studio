@@ -31,7 +31,7 @@
 # Deploy preview environment
 [context.deploy-preview.environment]
   NODE_ENV = "production"
-  NEXT_PUBLIC_APP_URL = "https://deploy-preview-BRANCH--astralcore-quantum.netlify.app"
+  NEXT_PUBLIC_APP_URL = "https://deploy-preview-BRANCH--astralcore-hyperdrive.netlify.app"
 
 # Branch deploy environment
 [context.branch-deploy.environment]
