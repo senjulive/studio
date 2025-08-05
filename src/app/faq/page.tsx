@@ -37,7 +37,7 @@ const faqs = [
     answer: "The minimum deposit varies by account tier. Recruit tier starts at $100, while higher tiers like Diamond require $10,000 or more."
   },
   {
-    question: "How does the quantum algorithm work?",
+    question: "How does the hyperdrive algorithm work?",
     answer: "Our proprietary quantum algorithm processes infinite market possibilities in parallel universes, identifying profitable patterns that traditional systems cannot detect."
   },
   {
