@@ -240,7 +240,7 @@ export default function LoginPage() {
                       <Brain className="w-4 h-4 text-blue-400" />
                     </div>
                   </div>
-                  <p className="text-xs text-blue-300 font-medium">Quantum AI</p>
+                  <p className="text-xs text-blue-300 font-medium">Hyperdrive AI</p>
                 </CardContent>
               </Card>
 
