@@ -194,7 +194,7 @@ export default function LoginPage() {
                     <div className="absolute bottom-3 left-3 right-3">
                       <h4 className="text-sm font-bold text-white mb-1 flex items-center gap-1">
                         <Shield className="w-3 h-3 text-cyan-400" />
-                        Quantum Vault
+                        Hyperdrive Vault
                       </h4>
                       <p className="text-cyan-300 text-xs">Military-grade encryption</p>
                     </div>
