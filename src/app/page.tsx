@@ -483,7 +483,7 @@ export default function WelcomePage() {
                     <Rocket className="w-8 h-8 sm:w-12 sm:h-12 animate-pulse" />
                     0.3ms
                   </div>
-                  <div className="text-gray-200 text-lg font-semibold">Quantum Speed</div>
+                  <div className="text-gray-200 text-lg font-semibold">Hyperdrive Speed</div>
                 </div>
               </div>
             </div>
