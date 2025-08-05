@@ -310,7 +310,7 @@ export default function WelcomePage() {
                       <Brain className="w-7 h-7 text-indigo-400" />
                       Hyperdrive Neural Core
                     </h3>
-                    <p className="text-indigo-200 leading-relaxed">Advanced pattern recognition with quantum-enhanced prediction algorithms that process infinite market possibilities</p>
+                    <p className="text-indigo-200 leading-relaxed">Advanced pattern recognition with hyperdrive-enhanced prediction algorithms that process infinite market possibilities</p>
                   </div>
                 </div>
               </CardContent>
