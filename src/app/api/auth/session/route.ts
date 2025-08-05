@@ -8,8 +8,8 @@ export async function GET() {
 
     if (!sessionCookie) {
       return NextResponse.json(
-        { authenticated: false, error: 'No session found' },
-        { status: 401 }
+        { authenticated: false, user: null },
+        { status: 200 }
       );
     }
 
@@ -19,10 +19,13 @@ export async function GET() {
       // Check if session is expired (7 days)
       const maxAge = 60 * 60 * 24 * 7 * 1000; // 7 days in milliseconds
       if (Date.now() - session.timestamp > maxAge) {
-        return NextResponse.json(
-          { authenticated: false, error: 'Session expired' },
-          { status: 401 }
+        // Clear expired session cookie
+        const response = NextResponse.json(
+          { authenticated: false, user: null },
+          { status: 200 }
         );
+        response.cookies.delete('astralcore-session');
+        return response;
       }
 
       return NextResponse.json({
@@ -33,10 +36,13 @@ export async function GET() {
         }
       });
     } catch (parseError) {
-      return NextResponse.json(
-        { authenticated: false, error: 'Invalid session' },
-        { status: 401 }
+      // Clear invalid session cookie
+      const response = NextResponse.json(
+        { authenticated: false, user: null },
+        { status: 200 }
       );
+      response.cookies.delete('astralcore-session');
+      return response;
     }
   } catch (error: any) {
     console.error('Session validation error:', error);
