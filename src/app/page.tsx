@@ -412,7 +412,7 @@ export default function WelcomePage() {
                     <Shield className="w-8 h-8 text-cyan-400" />
                   </div>
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-3">Quantum Security</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-3">Hyperdrive Security</h3>
                 <p className="text-gray-300 text-sm leading-relaxed">Military-grade encryption with quantum-resistant portfolio protection</p>
               </CardContent>
             </Card>
