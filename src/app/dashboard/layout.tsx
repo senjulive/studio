@@ -163,7 +163,7 @@ function DashboardLoading() {
           <div className="space-y-3">
             <p className="text-2xl text-gray-300 font-medium flex items-center justify-center gap-3">
               <Brain className="w-6 h-6 text-blue-400 animate-pulse" />
-              Quantum Neural Networks
+              Hyperdrive Neural Networks
               <Atom className="w-6 h-6 text-purple-400 animate-spin" />
             </p>
             <p className="text-gray-400 text-lg">Synchronizing market algorithms...</p>
