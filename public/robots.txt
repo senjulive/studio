@@ -16,4 +16,4 @@ Disallow: /dashboard
 Disallow: /api
 
 # Sitemap
-Sitemap: https://astralcore-quantum.netlify.app/sitemap.xml
+Sitemap: https://astralcore-hyperdrive.netlify.app/sitemap.xml
