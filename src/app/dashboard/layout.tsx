@@ -70,7 +70,7 @@ import { SideNavigation } from '@/components/ui/side-navigation';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ComponentType<{ className?: string }>;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,
