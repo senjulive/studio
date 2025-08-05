@@ -156,7 +156,7 @@ export function ForgotPasswordForm() {
           Password Recovery
         </CardTitle>
         <CardDescription className="text-gray-300">
-          Enter your email address and we'll send you quantum-encrypted recovery instructions.
+          Enter your email address and we'll send you hyperdrive-encrypted recovery instructions.
         </CardDescription>
       </CardHeader>
       
