@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     question: "How do I get started?",
-    answer: "Simply register for an account, complete the verification process, and fund your wallet. Our quantum AI will guide you through the setup process."
+    answer: "Simply register for an account, complete the verification process, and fund your wallet. Our hyperdrive AI will guide you through the setup process."
   },
   {
     question: "Is my money safe?",
