@@ -144,7 +144,7 @@ export default {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100vw)' },
         },
-        'quantum-spin': {
+        'hyperdrive-spin': {
           '0%': { transform: 'rotate(0deg) scale(1)' },
           '50%': { transform: 'rotate(180deg) scale(1.1)' },
           '100%': { transform: 'rotate(360deg) scale(1)' },
@@ -163,7 +163,7 @@ export default {
         'hyperdrive-float': 'quantum-float 6s ease-in-out infinite',
         'hologram-flicker': 'hologram-flicker 2s ease-in-out infinite',
         'data-stream': 'data-stream 3s linear infinite',
-        'quantum-spin': 'quantum-spin 4s ease-in-out infinite',
+        'hyperdrive-spin': 'quantum-spin 4s ease-in-out infinite',
       },
     },
   },
