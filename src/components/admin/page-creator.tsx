@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useWebPages } from '@/hooks/use-web-pages';
-import { PageTemplates } from './page-templates';
+import { PageLayouts } from './page-templates';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, X, FileText, Layout } from 'lucide-react';
 
@@ -63,7 +63,7 @@ export function PageCreator({ isOpen, onClose, onPageCreated }: PageCreatorProps
     }
   };
 
-  const handleTemplateSelect = async (template: any) => {
+  const handleLayoutSelect = async (template: any) => {
     setIsCreating(true);
     try {
       const pageData = {
@@ -129,8 +129,8 @@ export function PageCreator({ isOpen, onClose, onPageCreated }: PageCreatorProps
           <Tabs defaultValue="templates" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="templates" className="flex items-center gap-2">
-                <Template className="w-4 h-4" />
-                Templates
+                <Layout className="w-4 h-4" />
+                Layouts
               </TabsTrigger>
               <TabsTrigger value="custom" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
@@ -145,7 +145,7 @@ export function PageCreator({ isOpen, onClose, onPageCreated }: PageCreatorProps
                 </p>
               </div>
               <div className="max-h-[500px] overflow-y-auto">
-                <PageTemplates onTemplateSelect={handleTemplateSelect} />
+                <PageLayouts onLayoutSelect={handleLayoutSelect} />
               </div>
             </TabsContent>
 
