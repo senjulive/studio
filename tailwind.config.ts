@@ -129,7 +129,7 @@ export default {
             transform: 'scale(1.05)'
           },
         },
-        'quantum-float': {
+        'hyperdrive-float': {
           '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
           '33%': { transform: 'translateY(-10px) rotate(120deg)' },
           '66%': { transform: 'translateY(5px) rotate(240deg)' },
@@ -160,7 +160,7 @@ export default {
         'flash-red': 'flashRed 0.8s ease-in-out',
         'floatUp': 'floatUp 3s forwards',
         'neural-pulse': 'neural-pulse 3s ease-in-out infinite',
-        'quantum-float': 'quantum-float 6s ease-in-out infinite',
+        'hyperdrive-float': 'quantum-float 6s ease-in-out infinite',
         'hologram-flicker': 'hologram-flicker 2s ease-in-out infinite',
         'data-stream': 'data-stream 3s linear infinite',
         'quantum-spin': 'quantum-spin 4s ease-in-out infinite',
