@@ -96,7 +96,7 @@ function DashboardLoading() {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950/90 via-purple-950/80 to-cyan-950/70 animate-pulse" 
              style={{animationDuration: '3s'}} />
         
-        {/* Quantum particles */}
+        {/* Hyperdrive particles */}
         {[...Array(30)].map((_, i) => (
           <div
             key={i}
