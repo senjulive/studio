@@ -245,7 +245,7 @@ export default function WelcomePage() {
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative flex items-center justify-center">
                 <Brain className="mr-3 h-6 w-6 group-hover:animate-pulse" />
-                Explore Quantum AI
+                Explore Hyperdrive AI
                 <Sparkles className="ml-3 h-6 w-6 group-hover:animate-pulse" />
               </div>
             </Button>
