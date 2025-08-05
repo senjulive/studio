@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
       }
     } catch (error) {
-      console.error('Session check failed:', error);
+      // Silently handle session check failures
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -79,8 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: data.error };
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      return { success: false, error: 'An unexpected error occurred' };
+      return { success: false, error: 'Network error. Please try again.' };
     }
   };
 
@@ -88,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch (error) {
-      console.error('Logout failed:', error);
+      // Silently handle logout errors
     } finally {
       setUser(null);
       router.push('/');
