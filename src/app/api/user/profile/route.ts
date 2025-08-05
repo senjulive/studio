@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyToken, updateUser, getUserById } from '@/lib/auth';
+import { verifyToken, updateUser, getUserById } from '@/lib/auth-server';
 import { headers } from 'next/headers';
 
 export async function GET(request: Request) {
