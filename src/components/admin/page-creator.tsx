@@ -11,7 +11,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useWebPages } from '@/hooks/use-web-pages';
 import { PageTemplates } from './page-templates';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, X, FileText, Template } from 'lucide-react';
+import { Plus, X, FileText, Layout } from 'lucide-react';
 
 interface PageCreatorProps {
   isOpen: boolean;
