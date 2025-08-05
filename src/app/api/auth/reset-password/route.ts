@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { resetPassword } from '@/lib/auth';
+import { resetPassword } from '@/lib/auth-server';
 
 export async function POST(request: Request) {
   try {
