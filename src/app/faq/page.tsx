@@ -30,7 +30,7 @@ const faqs = [
   },
   {
     question: "Is my money safe?",
-    answer: "Yes, we use bank-level encryption and quantum security protocols to protect your funds. All transactions are secured using advanced blockchain technology."
+    answer: "Yes, we use bank-level encryption and hyperdrive security protocols to protect your funds. All transactions are secured using advanced blockchain technology."
   },
   {
     question: "What are the minimum deposit requirements?",
