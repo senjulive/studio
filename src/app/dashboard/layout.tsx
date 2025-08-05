@@ -362,8 +362,7 @@ URL=${window.location.origin}`;
   ];
 
   const getPageTitle = () => {
-    const currentPath = pathname;
-    if (!currentPath) return 'Dashboard';
+    const currentPath = pathname || '/dashboard';
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
