@@ -34,7 +34,7 @@ const defaultImages: SlideImage[] = [
     url: 'https://cdn.builder.io/api/v1/image/assets%2F4b279aceeead46d4bb4166202e68dc54%2Faa19381a004d49dabf38b45dce30fd13?format=webp&width=800',
     alt: 'Hyperdrive Security Matrix',
     title: 'Hyperdrive Security Matrix',
-    description: 'Military-grade encryption protecting your digital assets with quantum technology'
+    description: 'Military-grade encryption protecting your digital assets with hyperdrive technology'
   }
 ];
 
