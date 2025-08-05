@@ -19,7 +19,7 @@ const defaultImages: SlideImage[] = [
     id: '1',
     url: 'https://cdn.builder.io/api/v1/image/assets%2F4b279aceeead46d4bb4166202e68dc54%2F455981bebcca4f578c6e51a508f1d4e7?format=webp&width=1920',
     alt: 'Hyperdrive AI Neural Network',
-    title: 'Quantum Neural Processing',
+    title: 'Hyperdrive Neural Processing',
     description: 'Advanced AI algorithms powering next-generation trading strategies'
   },
   {
