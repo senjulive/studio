@@ -27,7 +27,7 @@ const defaultImages: SlideImage[] = [
     url: 'https://cdn.builder.io/api/v1/image/assets%2F4b279aceeead46d4bb4166202e68dc54%2F15d29863e19d4693b48a94b86f8336da?format=webp&width=1920',
     alt: 'AstralCore Hyperdrive System',
     title: 'Hyperdrive Trading Engine',
-    description: 'Real-time market analysis with quantum-enhanced prediction models'
+    description: 'Real-time market analysis with hyperdrive-enhanced prediction models'
   },
   {
     id: '3',
