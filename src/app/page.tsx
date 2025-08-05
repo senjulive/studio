@@ -277,7 +277,7 @@ export default function WelcomePage() {
               Meet Your <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-violet-400 bg-clip-text text-transparent">Hyperdrive AI</span>
             </h2>
             <p className="text-xl sm:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Powered by revolutionary quantum algorithms that analyze infinite market dimensions 
+              Powered by revolutionary hyperdrive algorithms that analyze infinite market dimensions 
               and execute profitable trades across multiple realities simultaneously.
             </p>
           </div>
