@@ -69,18 +69,18 @@ export default function WelcomePage() {
           
           {/* Complex neural pathways */}
           <path d="M50,150 Q200,50 400,150 T750,100 Q950,120 1150,180" 
-                stroke="url(#quantumGrad1)" strokeWidth="2" className="animate-pulse" fill="none" filter="url(#glow)"/>
+                stroke="url(#hyperdriveGrad1)" strokeWidth="2" className="animate-pulse" fill="none" filter="url(#glow)"/>
           <path d="M100,250 Q300,150 500,250 T850,200 Q1050,220 1100,280" 
                 stroke="url(#quantumGrad2)" strokeWidth="1.5" className="animate-pulse" fill="none" filter="url(#glow)" 
                 style={{animationDelay: '1s'}}/>
           <path d="M0,350 Q150,280 350,380 T700,320 Q900,340 1200,400" 
-                stroke="url(#quantumGrad1)" strokeWidth="2.5" className="animate-pulse" fill="none" filter="url(#glow)" 
+                stroke="url(#hyperdriveGrad1)" strokeWidth="2.5" className="animate-pulse" fill="none" filter="url(#glow)" 
                 style={{animationDelay: '0.5s'}}/>
           <path d="M80,450 Q280,380 480,450 T820,420 Q1020,440 1120,500" 
                 stroke="url(#quantumGrad2)" strokeWidth="1.8" className="animate-pulse" fill="none" filter="url(#glow)" 
                 style={{animationDelay: '1.5s'}}/>
           <path d="M30,550 Q230,480 430,550 T780,520 Q980,540 1170,600" 
-                stroke="url(#quantumGrad1)" strokeWidth="2.2" className="animate-pulse" fill="none" filter="url(#glow)" 
+                stroke="url(#hyperdriveGrad1)" strokeWidth="2.2" className="animate-pulse" fill="none" filter="url(#glow)" 
                 style={{animationDelay: '2s'}}/>
           <path d="M120,650 Q320,580 520,650 T880,620 Q1080,640 1150,700" 
                 stroke="url(#quantumGrad2)" strokeWidth="1.6" className="animate-pulse" fill="none" filter="url(#glow)" 
