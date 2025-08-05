@@ -22,7 +22,7 @@ async function getPageData(): Promise<WebPage | null> {
 const faqs = [
   {
     question: "What is AstralCore Hyperdrive Trading?",
-    answer: "AstralCore is an advanced quantum trading platform that uses cutting-edge algorithms to analyze market patterns and execute profitable trades across multiple dimensions simultaneously."
+    answer: "AstralCore is an advanced hyperdrive trading platform that uses cutting-edge algorithms to analyze market patterns and execute profitable trades across multiple dimensions simultaneously."
   },
   {
     question: "How do I get started?",
