@@ -144,7 +144,7 @@ export default function WelcomePage() {
         <div className="relative mb-8 sm:mb-12">
           {/* Multi-layer energy rings */}
           <div className="absolute inset-0 w-40 h-40 sm:w-48 sm:h-48">
-            {/* Outer ring with quantum particles */}
+            {/* Outer ring with hyperdrive particles */}
             <div className="absolute inset-0 border-2 border-indigo-400/40 rounded-full animate-spin" style={{animationDuration: '12s'}}>
               <div className="absolute -top-1 left-1/2 w-2 h-2 bg-indigo-400 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
               <div className="absolute top-1/2 -right-1 w-2 h-2 bg-purple-400 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.8)]" />
