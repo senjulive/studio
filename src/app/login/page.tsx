@@ -126,7 +126,7 @@ export default function LoginPage() {
           </Badge>
           <Badge variant="outline" className="border-cyan-400/50 text-cyan-300 bg-cyan-400/10 px-3 py-1">
             <Shield className="w-3 h-3 mr-1" />
-            Quantum Security
+            Hyperdrive Security
           </Badge>
         </div>
       </section>
