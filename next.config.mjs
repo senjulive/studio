@@ -1,9 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use App Router only - disable Pages Router
+  // Enable optimizations
   experimental: {
     optimizeCss: true,
-    appDir: true,
   },
 
   images: {
