@@ -95,7 +95,7 @@ export default function WelcomePage() {
           <circle cx="950" cy="280" r="5" fill="rgb(59,130,246)" className="animate-pulse" opacity="0.9" style={{animationDelay: '0.4s'}} filter="url(#glow)"/>
         </svg>
 
-        {/* Quantum grid overlay */}
+        {/* Hyperdrive grid overlay */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.1)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
         </div>
