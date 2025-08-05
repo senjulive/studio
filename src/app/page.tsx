@@ -386,7 +386,7 @@ export default function WelcomePage() {
                     <Database className="w-8 h-8 text-indigo-400" />
                   </div>
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-3">Quantum Processing</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-3">Hyperdrive Processing</h3>
                 <p className="text-gray-300 text-sm leading-relaxed">100M+ data points per second with quantum-enhanced neural networks</p>
               </CardContent>
             </Card>
