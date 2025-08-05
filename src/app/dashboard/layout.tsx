@@ -24,7 +24,7 @@ import {
   SidebarInset,
 }
 from '@/components/ui/sidebar';
-import { logout } from '@/lib/auth';
+import { logout } from '@/lib/auth-client';
 import * as React from 'react';
 import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
