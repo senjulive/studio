@@ -112,7 +112,7 @@ export function ForgotPasswordForm() {
             <div className="flex items-start gap-3">
               <Shield className="h-5 w-5 text-green-400 mt-0.5" />
               <div>
-                <h4 className="text-sm font-semibold text-green-400 mb-1">Quantum Security Active</h4>
+                <h4 className="text-sm font-semibold text-green-400 mb-1">Hyperdrive Security Active</h4>
                 <p className="text-xs text-gray-300">Your recovery link is encrypted and will expire in 24 hours for maximum security.</p>
               </div>
             </div>
