@@ -102,9 +102,9 @@ export default function WelcomePage() {
 
         {/* Floating geometric shapes */}
         <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-20 h-20 border border-blue-400/30 rotate-45 animate-quantum-spin" style={{animationDelay: '0s'}} />
-          <div className="absolute top-3/4 right-1/4 w-16 h-16 border border-purple-400/20 rotate-12 animate-quantum-spin" style={{animationDelay: '2s'}} />
-          <div className="absolute top-1/2 left-3/4 w-12 h-12 border border-cyan-400/25 -rotate-30 animate-quantum-spin" style={{animationDelay: '4s'}} />
+          <div className="absolute top-1/4 left-1/4 w-20 h-20 border border-blue-400/30 rotate-45 animate-hyperdrive-spin" style={{animationDelay: '0s'}} />
+          <div className="absolute top-3/4 right-1/4 w-16 h-16 border border-purple-400/20 rotate-12 animate-hyperdrive-spin" style={{animationDelay: '2s'}} />
+          <div className="absolute top-1/2 left-3/4 w-12 h-12 border border-cyan-400/25 -rotate-30 animate-hyperdrive-spin" style={{animationDelay: '4s'}} />
         </div>
       </div>
 
@@ -191,11 +191,11 @@ export default function WelcomePage() {
             AstralCore
           </h1>
           <div className="flex items-center justify-center gap-3 mb-6">
-            <Atom className="w-6 h-6 text-indigo-400 animate-quantum-spin" />
+            <Atom className="w-6 h-6 text-indigo-400 animate-hyperdrive-spin" />
             <p className="text-xl sm:text-2xl text-indigo-300 font-medium tracking-[0.3em] uppercase bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">
               Quantum Hyperdrive v5.0
             </p>
-            <Infinity className="w-6 h-6 text-violet-400 animate-quantum-spin" style={{animationDirection: 'reverse'}} />
+            <Infinity className="w-6 h-6 text-violet-400 animate-hyperdrive-spin" style={{animationDirection: 'reverse'}} />
           </div>
         </div>
 
