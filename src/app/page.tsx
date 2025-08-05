@@ -222,7 +222,7 @@ export default function WelcomePage() {
         {/* Enhanced Description */}
         <p className="text-xl sm:text-2xl lg:text-3xl text-gray-200 max-w-4xl mx-auto mb-10 sm:mb-12 leading-relaxed px-4">
           Experience the <span className="text-indigo-400 font-bold">next evolution</span> in trading technology. Our 
-          <span className="text-purple-400 font-bold"> Quantum Hyperdrive</span> processes 
+          <span className="text-purple-400 font-bold"> Hyperdrive</span> processes 
           <span className="text-cyan-400 font-bold"> infinite market possibilities</span> to generate 
           <span className="text-violet-400 font-bold"> autonomous wealth</span> through advanced neural algorithms.
         </p>
