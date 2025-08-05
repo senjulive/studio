@@ -345,7 +345,7 @@ export default function WelcomePage() {
               </CardContent>
             </Card>
 
-            {/* Quantum Security Matrix */}
+            {/* Hyperdrive Security Matrix */}
             <Card className="group relative overflow-hidden border-cyan-400/30 bg-gradient-to-br from-cyan-900/30 to-blue-900/20 backdrop-blur-2xl hover:border-cyan-400/60 transition-all duration-700 hover:shadow-[0_25px_50px_rgba(6,182,212,0.3)] hover:scale-105 hover:-translate-y-2">
               <CardContent className="p-0">
                 <div className="relative aspect-[4/3] overflow-hidden">
