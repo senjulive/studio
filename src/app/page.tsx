@@ -308,7 +308,7 @@ export default function WelcomePage() {
                   <div className="absolute bottom-6 left-6 right-6">
                     <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 flex items-center gap-3">
                       <Brain className="w-7 h-7 text-indigo-400" />
-                      Quantum Neural Core
+                      Hyperdrive Neural Core
                     </h3>
                     <p className="text-indigo-200 leading-relaxed">Advanced pattern recognition with quantum-enhanced prediction algorithms that process infinite market possibilities</p>
                   </div>
