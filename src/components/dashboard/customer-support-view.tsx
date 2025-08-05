@@ -325,7 +325,7 @@ export function CustomerSupportView() {
               </div>
             </div>
             <p className="text-xs font-medium text-white">Response Time</p>
-            <p className="text-xs text-green-400">< 15 min</p>
+            <p className="text-xs text-green-400">&lt; 15 min</p>
           </CardContent>
         </Card>
         
