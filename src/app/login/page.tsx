@@ -165,7 +165,7 @@ export default function LoginPage() {
                   <div className="absolute bottom-4 left-4 right-4">
                     <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
                       <Brain className="w-5 h-5 text-blue-400" />
-                      Quantum AI Assistant
+                      Hyperdrive AI Assistant
                     </h3>
                     <p className="text-blue-300 text-sm leading-relaxed">Advanced neural networks analyzing market patterns in real-time</p>
                   </div>
