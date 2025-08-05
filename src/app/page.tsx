@@ -178,7 +178,7 @@ export default function WelcomePage() {
             <AstralLogo className="h-20 w-20 sm:h-24 sm:w-24 text-indigo-400 drop-shadow-[0_0_30px_rgba(99,102,241,0.9)] animate-neural-pulse" />
           </div>
           
-          {/* Orbital quantum elements */}
+          {/* Orbital hyperdrive elements */}
           <div className="absolute top-2 left-1/2 w-3 h-3 bg-indigo-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(99,102,241,0.8)]" style={{animationDelay: '0s'}} />
           <div className="absolute top-1/2 right-2 w-2.5 h-2.5 bg-purple-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(139,92,246,0.8)]" style={{animationDelay: '1s'}} />
           <div className="absolute bottom-2 left-1/2 w-3 h-3 bg-cyan-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(6,182,212,0.8)]" style={{animationDelay: '2s'}} />
