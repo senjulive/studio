@@ -34,6 +34,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import { getOrCreateWallet } from "@/lib/wallet";
+import { QuickThemeToggle } from "./theme-toggle";
 
 interface NavItem {
   href: string;
