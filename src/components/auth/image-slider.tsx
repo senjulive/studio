@@ -103,7 +103,7 @@ export function ImageSlider() {
         <Card className="relative overflow-hidden border-blue-400/20 bg-gradient-to-br from-blue-900/20 to-purple-900/20 backdrop-blur-xl">
           <CardContent className="p-0">
             <div className="relative h-48 sm:h-64 bg-black/20 animate-pulse flex items-center justify-center">
-              <div className="text-blue-400">Loading quantum imagery...</div>
+              <div className="text-blue-400">Loading hyperdrive imagery...</div>
             </div>
           </CardContent>
         </Card>
