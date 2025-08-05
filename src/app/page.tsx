@@ -351,7 +351,7 @@ export default function WelcomePage() {
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
                     src="https://cdn.builder.io/api/v1/image/assets%2F4b279aceeead46d4bb4166202e68dc54%2F52f48e5632374229b8d5254907e7dc34?format=webp&width=800"
-                    alt="Quantum Security Matrix"
+                    alt="Hyperdrive Security Matrix"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                   />
                   
