@@ -215,7 +215,7 @@ export default function WelcomePage() {
           </Badge>
           <Badge variant="outline" className="border-violet-400/60 text-violet-200 bg-violet-400/15 px-4 py-2 text-sm backdrop-blur-xl hover:bg-violet-400/25 transition-all duration-300">
             <Shield className="w-4 h-4 mr-2" />
-            Quantum Security
+            Hyperdrive Security
           </Badge>
         </div>
 
