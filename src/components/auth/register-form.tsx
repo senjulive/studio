@@ -36,7 +36,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { AstralLogo } from "../icons/astral-logo";
-import { register } from "@/lib/auth";
+import { clientRegister as register } from "@/lib/auth-client";
 import { countries } from "@/lib/countries";
 
 const MALDIVES_COUNTRY = countries.find(c => c.code === "MV")!;
