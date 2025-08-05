@@ -252,14 +252,17 @@ export function SideNavigation() {
                 </div>
               </div>
               
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsVisible(false)}
-                className="h-8 w-8 rounded-full bg-black/20 hover:bg-black/40 border border-white/10"
-              >
-                <ChevronRight className="h-4 w-4 text-white" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <QuickThemeToggle />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsVisible(false)}
+                  className="h-8 w-8 rounded-full bg-black/20 hover:bg-black/40 border border-white/10"
+                >
+                  <ChevronRight className="h-4 w-4 text-white" />
+                </Button>
+              </div>
             </div>
 
             {/* User Status Dashboard */}
