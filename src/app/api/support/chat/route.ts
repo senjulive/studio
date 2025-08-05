@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getChatHistoryForUser, sendMessage, sendAdminMessage, getAllChats } from '@/lib/chat';
-import { type Message } from '@/lib/chat';
+import { getChatHistoryForUser, sendMessage, sendAdminMessage, getAllChats } from '@/lib/chat-server';
+import { type Message } from '@/lib/chat-server';
 
 // This file acts as a proxy to the file-based chat system in lib/chat.ts
 // It adds the 24-hour filtering logic.
