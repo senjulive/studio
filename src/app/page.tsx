@@ -387,7 +387,7 @@ export default function WelcomePage() {
                   </div>
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold text-white mb-3">Hyperdrive Processing</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">100M+ data points per second with quantum-enhanced neural networks</p>
+                <p className="text-gray-300 text-sm leading-relaxed">100M+ data points per second with hyperdrive-enhanced neural networks</p>
               </CardContent>
             </Card>
 
