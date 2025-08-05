@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'astralcore-secret-key-quantum-hyperdrive-v5';
+const JWT_SECRET = process.env.JWT_SECRET || 'astralcore-secret-key-hyperdrive-v5';
 const USERS_FILE = path.join(process.cwd(), 'data', 'users.json');
 
 // Mock admin credentials
