@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { login } from "@/lib/auth";
+import { clientLogin as login } from "@/lib/auth-client";
 
 const moderatorLoginSchema = z.object({
   email: z.string().email(),
