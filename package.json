@@ -20,7 +20,7 @@
     "analyze": "cross-env ANALYZE=true npm run build"
   },
   "dependencies": {
-    "@builder.io/react": "^8.2.6",
+
     "@genkit-ai/firebase": "^1.15.5",
     "@genkit-ai/googleai": "^1.13.0",
     "@genkit-ai/next": "^1.13.0",
