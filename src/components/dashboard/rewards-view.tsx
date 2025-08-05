@@ -53,7 +53,7 @@ import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import type { SVGProps } from 'react';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ComponentType<{ className?: string }>;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,
