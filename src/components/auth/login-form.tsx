@@ -156,7 +156,7 @@ export function LoginForm() {
         <AstralLogo className="mx-auto h-28 w-28" />
         <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
         <CardDescription>
-          Access the highly intelligent CORE Nexus Quantum v3.76 trading bot.
+          Access your Hyperdrive trading intelligence platform.
         </CardDescription>
       </CardHeader>
       <CardContent>
