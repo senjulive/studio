@@ -302,7 +302,7 @@ export default function WelcomePage() {
                   {/* Floating hyperdrive indicators */}
                   <div className="absolute top-6 right-6 flex items-center gap-3">
                     <div className="w-3 h-3 bg-indigo-400 rounded-full animate-pulse shadow-[0_0_15px_rgba(99,102,241,0.8)]" />
-                    <span className="text-indigo-300 text-sm font-bold tracking-wider">QUANTUM</span>
+                    <span className="text-indigo-300 text-sm font-bold tracking-wider">HYPERDRIVE</span>
                   </div>
                   
                   <div className="absolute bottom-6 left-6 right-6">
