@@ -413,7 +413,7 @@ export default function WelcomePage() {
                   </div>
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold text-white mb-3">Hyperdrive Security</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">Military-grade encryption with quantum-resistant portfolio protection</p>
+                <p className="text-gray-300 text-sm leading-relaxed">Military-grade encryption with hyperdrive-resistant portfolio protection</p>
               </CardContent>
             </Card>
 
