@@ -191,7 +191,7 @@ export function ForgotPasswordForm() {
                 <Shield className="h-4 w-4 text-orange-400 mt-0.5" />
                 <div>
                   <p className="text-xs text-gray-300">
-                    Recovery links are secured with quantum encryption and expire automatically for your protection.
+                    Recovery links are secured with hyperdrive encryption and expire automatically for your protection.
                   </p>
                 </div>
               </div>
