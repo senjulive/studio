@@ -285,7 +285,7 @@ export default function WelcomePage() {
           {/* Revolutionary AI Feature Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10 mb-16 sm:mb-20">
             
-            {/* Quantum Neural Core */}
+            {/* Hyperdrive Neural Core */}
             <Card className="group relative overflow-hidden border-indigo-400/30 bg-gradient-to-br from-indigo-900/30 to-purple-900/20 backdrop-blur-2xl hover:border-indigo-400/60 transition-all duration-700 hover:shadow-[0_25px_50px_rgba(99,102,241,0.3)] hover:scale-105 hover:-translate-y-2">
               <CardContent className="p-0">
                 <div className="relative aspect-[4/3] overflow-hidden">
