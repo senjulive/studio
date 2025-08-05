@@ -368,7 +368,7 @@ export default function WelcomePage() {
                       <Lock className="w-7 h-7 text-cyan-400" />
                       Security Matrix
                     </h3>
-                    <p className="text-cyan-200 leading-relaxed">Quantum-encrypted portfolio protection with multi-dimensional risk management across all realities</p>
+                    <p className="text-cyan-200 leading-relaxed">Hyperdrive-encrypted portfolio protection with multi-dimensional risk management across all realities</p>
                   </div>
                 </div>
               </CardContent>
