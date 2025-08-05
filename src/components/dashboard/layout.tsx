@@ -66,7 +66,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AvatarUploadDialog } from './profile-view';
 import { RightSidebar } from '../ui/right-sidebar';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ComponentType<{ className?: string }>;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,
