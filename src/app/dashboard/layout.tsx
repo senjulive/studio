@@ -148,7 +148,7 @@ function DashboardLoading() {
             <AstralLogo className="h-20 w-20 text-blue-400 drop-shadow-[0_0_30px_rgba(59,130,246,0.8)] animate-hologram-flicker" />
           </div>
 
-          {/* Orbiting quantum particles */}
+          {/* Orbiting hyperdrive particles */}
           <div className="absolute top-6 left-1/2 w-3 h-3 bg-blue-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
           <div className="absolute top-1/2 right-6 w-3 h-3 bg-purple-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(147,51,234,0.8)]" style={{animationDelay: '0.5s'}} />
           <div className="absolute bottom-6 left-1/2 w-3 h-3 bg-cyan-400 rounded-full animate-quantum-float shadow-[0_0_15px_rgba(6,182,212,0.8)]" style={{animationDelay: '1s'}} />
