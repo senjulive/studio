@@ -140,7 +140,7 @@ export default function WelcomePage() {
       {/* Revolutionary Hero Section */}
       <section className="relative z-40 flex flex-col items-center justify-center min-h-[calc(100vh-100px)] px-4 text-center">
         
-        {/* Quantum Core Logo with Advanced Animation */}
+        {/* Hyperdrive Core Logo with Advanced Animation */}
         <div className="relative mb-8 sm:mb-12">
           {/* Multi-layer energy rings */}
           <div className="absolute inset-0 w-40 h-40 sm:w-48 sm:h-48">
