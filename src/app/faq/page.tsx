@@ -38,7 +38,7 @@ const faqs = [
   },
   {
     question: "How does the hyperdrive algorithm work?",
-    answer: "Our proprietary quantum algorithm processes infinite market possibilities in parallel universes, identifying profitable patterns that traditional systems cannot detect."
+    answer: "Our proprietary hyperdrive algorithm processes infinite market possibilities in parallel universes, identifying profitable patterns that traditional systems cannot detect."
   },
   {
     question: "Can I withdraw my funds anytime?",
