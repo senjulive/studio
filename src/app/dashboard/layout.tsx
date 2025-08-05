@@ -136,10 +136,10 @@ function DashboardLoading() {
         <div className="relative">
           {/* Multi-layer rotating energy rings */}
           <div className="absolute inset-0 w-56 h-56">
-            <div className="absolute inset-0 border-2 border-blue-400/40 rounded-full animate-quantum-spin"></div>
-            <div className="absolute inset-3 border-2 border-purple-400/50 rounded-full animate-quantum-spin" style={{animationDirection: 'reverse', animationDuration: '5s'}}></div>
-            <div className="absolute inset-6 border-2 border-cyan-400/60 rounded-full animate-quantum-spin" style={{animationDuration: '3s'}}></div>
-            <div className="absolute inset-9 border border-pink-400/40 rounded-full animate-quantum-spin" style={{animationDirection: 'reverse', animationDuration: '7s'}}></div>
+            <div className="absolute inset-0 border-2 border-blue-400/40 rounded-full animate-hyperdrive-spin"></div>
+            <div className="absolute inset-3 border-2 border-purple-400/50 rounded-full animate-hyperdrive-spin" style={{animationDirection: 'reverse', animationDuration: '5s'}}></div>
+            <div className="absolute inset-6 border-2 border-cyan-400/60 rounded-full animate-hyperdrive-spin" style={{animationDuration: '3s'}}></div>
+            <div className="absolute inset-9 border border-pink-400/40 rounded-full animate-hyperdrive-spin" style={{animationDirection: 'reverse', animationDuration: '7s'}}></div>
           </div>
 
           {/* Pulsing energy core */}
