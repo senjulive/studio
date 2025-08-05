@@ -51,9 +51,6 @@ const nextConfig = {
   // Enable static exports for better performance
   experimental: {
     optimizeCss: true,
-    turbo: {
-      root: '.',
-    },
   },
   // Performance optimizations
   compress: true,
