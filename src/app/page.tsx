@@ -443,7 +443,7 @@ export default function WelcomePage() {
               <span className="text-violet-300 font-semibold">Hyperdrive Metrics</span>
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Quantum Performance Statistics
+              Hyperdrive Performance Statistics
             </h2>
           </div>
           
