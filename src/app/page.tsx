@@ -299,7 +299,7 @@ export default function WelcomePage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-indigo-500/15 to-transparent" />
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.3),transparent_70%)] group-hover:opacity-100 opacity-60 transition-opacity duration-700" />
                   
-                  {/* Floating quantum indicators */}
+                  {/* Floating hyperdrive indicators */}
                   <div className="absolute top-6 right-6 flex items-center gap-3">
                     <div className="w-3 h-3 bg-indigo-400 rounded-full animate-pulse shadow-[0_0_15px_rgba(99,102,241,0.8)]" />
                     <span className="text-indigo-300 text-sm font-bold tracking-wider">QUANTUM</span>
