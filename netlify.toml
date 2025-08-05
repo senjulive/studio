@@ -19,7 +19,7 @@
 # Production environment variables
 [context.production.environment]
   NODE_ENV = "production"
-  NEXT_PUBLIC_APP_URL = "https://astralcore-quantum.netlify.app"
+  NEXT_PUBLIC_APP_URL = "https://astralcore-hyperdrive.netlify.app"
   JWT_SECRET = "REPLACE_WITH_SECURE_PRODUCTION_SECRET"
   NEXT_PUBLIC_APP_NAME = "AstralCore"
   NEXT_PUBLIC_APP_VERSION = "5.0"
