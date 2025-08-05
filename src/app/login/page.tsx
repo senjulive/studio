@@ -109,7 +109,7 @@ export default function LoginPage() {
         <div className="flex items-center justify-center gap-2 mb-4">
           <Atom className="w-4 h-4 text-blue-400 animate-spin" style={{animationDuration: '3s'}} />
           <p className="text-lg text-gray-300 font-light tracking-wide">
-            Access Your Quantum Trading Intelligence
+            Access Your Hyperdrive Trading Intelligence
           </p>
           <Atom className="w-4 h-4 text-purple-400 animate-spin" style={{animationDuration: '3s', animationDirection: 'reverse'}} />
         </div>
