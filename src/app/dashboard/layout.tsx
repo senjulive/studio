@@ -132,7 +132,7 @@ function DashboardLoading() {
       {/* Enhanced Loading Content */}
       <div className="relative z-10 flex flex-col items-center space-y-8 animate-in fade-in-50 duration-1000">
         
-        {/* Quantum Core with Enhanced Rings */}
+        {/* Hyperdrive Core with Enhanced Rings */}
         <div className="relative">
           {/* Multi-layer rotating energy rings */}
           <div className="absolute inset-0 w-56 h-56">
