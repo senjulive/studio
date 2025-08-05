@@ -69,7 +69,7 @@ const rankIcons: Record<string, IconComponent> = {
 };
 
 type TierSetting = TierSettingData & {
-  Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  Icon: React.ComponentType<{ className?: string }>;
   className: string;
 };
 
