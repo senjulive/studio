@@ -52,7 +52,7 @@ export default function WelcomePage() {
               <stop offset="66%" stopColor="rgb(59,130,246)" stopOpacity="0.8"/>
               <stop offset="100%" stopColor="rgb(6,182,212)" stopOpacity="0.6"/>
             </linearGradient>
-            <linearGradient id="quantumGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <linearGradient id="hyperdriveGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="rgb(236,72,153)" stopOpacity="0.8"/>
               <stop offset="50%" stopColor="rgb(147,51,234)" stopOpacity="0.6"/>
               <stop offset="100%" stopColor="rgb(79,70,229)" stopOpacity="0.7"/>
