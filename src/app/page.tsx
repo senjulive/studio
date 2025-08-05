@@ -203,7 +203,7 @@ export default function WelcomePage() {
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-10 max-w-2xl">
           <Badge variant="outline" className="border-indigo-400/60 text-indigo-200 bg-indigo-400/15 px-4 py-2 text-sm backdrop-blur-xl hover:bg-indigo-400/25 transition-all duration-300">
             <Brain className="w-4 h-4 mr-2" />
-            Quantum Neural AI
+            Hyperdrive Neural AI
           </Badge>
           <Badge variant="outline" className="border-purple-400/60 text-purple-200 bg-purple-400/15 px-4 py-2 text-sm backdrop-blur-xl hover:bg-purple-400/25 transition-all duration-300">
             <Target className="w-4 h-4 mr-2" />
