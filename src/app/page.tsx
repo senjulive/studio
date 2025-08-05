@@ -118,7 +118,7 @@ export default function WelcomePage() {
                 <div className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(99,102,241,0.8)]" />
                 <div className="absolute inset-0 w-3 h-3 bg-indigo-400 rounded-full animate-ping" />
               </div>
-              <span className="text-indigo-300 font-bold text-xs sm:text-sm tracking-wider">● QUANTUM HYPERDRIVE ACTIVE</span>
+              <span className="text-indigo-300 font-bold text-xs sm:text-sm tracking-wider">● HYPERDRIVE ACTIVE</span>
             </div>
           </div>
           
