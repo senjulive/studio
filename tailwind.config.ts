@@ -160,7 +160,7 @@ export default {
         'flash-red': 'flashRed 0.8s ease-in-out',
         'floatUp': 'floatUp 3s forwards',
         'neural-pulse': 'neural-pulse 3s ease-in-out infinite',
-        'hyperdrive-float': 'quantum-float 6s ease-in-out infinite',
+        'hyperdrive-float': 'hyperdrive-float 6s ease-in-out infinite',
         'hologram-flicker': 'hologram-flicker 2s ease-in-out infinite',
         'data-stream': 'data-stream 3s linear infinite',
         'hyperdrive-spin': 'quantum-spin 4s ease-in-out infinite',
