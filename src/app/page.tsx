@@ -37,7 +37,7 @@ export default function WelcomePage() {
                 top: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 8}s`,
                 animationDuration: `${4 + Math.random() * 6}s`,
-                animation: i % 2 === 0 ? 'quantum-float 8s ease-in-out infinite' : 'hologram-flicker 6s ease-in-out infinite'
+                animation: i % 2 === 0 ? 'hyperdrive-float 8s ease-in-out infinite' : 'hologram-flicker 6s ease-in-out infinite'
               }}
             />
           ))}
