@@ -132,5 +132,5 @@ export default async function FAQPage() {
 
 export const metadata = {
   title: 'FAQ - AstralCore',
-  description: 'Frequently asked questions about AstralCore quantum trading platform.',
+  description: 'Frequently asked questions about AstralCore hyperdrive trading platform.',
 };
