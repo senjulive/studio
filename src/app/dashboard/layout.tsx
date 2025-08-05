@@ -201,7 +201,7 @@ function DashboardLoading() {
           </div>
           <div className="flex items-center space-x-3 px-6 py-3 bg-black/40 backdrop-blur-xl rounded-2xl border border-cyan-400/30">
             <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(6,182,212,0.8)]" style={{animationDelay: '1s'}} />
-            <span className="text-cyan-300 font-medium">Quantum Core: Syncing</span>
+            <span className="text-cyan-300 font-medium">Hyperdrive Core: Syncing</span>
           </div>
         </div>
 
