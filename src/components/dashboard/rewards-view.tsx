@@ -632,15 +632,20 @@ export function RewardsView() {
                       )}
                     >
                       <div className="text-xs font-bold mb-1">Day {reward.day}</div>
-                      <div className="text-lg mb-1">
-                        {reward.day === 7 ? "🎁" : "💰"}
+                      <div className="text-lg mb-1 flex justify-center">
+                        {reward.day === 7 ? (
+                          <Gift className="h-5 w-5 text-purple-400" />
+                        ) : (
+                          <Coins className="h-5 w-5 text-yellow-400" />
+                        )}
                       </div>
                       <div className="text-xs font-medium text-white">
                         ${reward.reward}
                       </div>
                       {isPast && (
-                        <Badge variant="default" className="mt-1 text-xs bg-green-500/20 text-green-400">
-                          ✓
+                        <Badge variant="default" className="mt-1 text-xs bg-green-500/20 text-green-400 flex items-center gap-1">
+                          <Check className="h-3 w-3" />
+                          Claimed
                         </Badge>
                       )}
                       {isToday && (
