@@ -11,7 +11,7 @@ import { ArrowRight, Zap, Brain, TrendingUp, Shield, Cpu, Sparkles, Globe, Chevr
 export default function WelcomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-black">
-      {/* Enhanced Quantum Background */}
+      {/* Enhanced Hyperdrive Background */}
       <div className="fixed inset-0 z-0">
         {/* Multi-layer animated gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/95 via-purple-950/90 to-blue-950/85 animate-pulse" 
