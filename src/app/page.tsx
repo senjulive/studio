@@ -271,7 +271,7 @@ export default function WelcomePage() {
           <div className="text-center mb-16 sm:mb-20">
             <div className="inline-flex items-center gap-3 px-6 py-3 bg-indigo-500/10 border border-indigo-400/30 rounded-full mb-6 backdrop-blur-xl">
               <Brain className="w-6 h-6 text-indigo-400" />
-              <span className="text-indigo-300 font-semibold">Quantum Intelligence</span>
+              <span className="text-indigo-300 font-semibold">Hyperdrive Intelligence</span>
             </div>
             <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 sm:mb-8">
               Meet Your <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-violet-400 bg-clip-text text-transparent">Hyperdrive AI</span>
