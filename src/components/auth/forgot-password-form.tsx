@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { forgotPasswordSchema } from "@/lib/validators";
-import { resetPasswordForEmail } from "@/lib/auth";
+import { clientForgotPassword as resetPasswordForEmail } from "@/lib/auth-client";
 import { AstralLogo } from "../icons/astral-logo";
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
