@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Use App Router only - disable Pages Router
+  experimental: {
+    optimizeCss: true,
+    appDir: true,
+  },
+
   images: {
     remotePatterns: [
       {
@@ -40,21 +46,23 @@ const nextConfig = {
       },
     ],
   },
+
   // Fix cross-origin requests from Fly.dev
   allowedDevOrigins: [
     '671c6c4de455457b9c50e4ec2b409e8f-35098d46dde94f41bef22b611.fly.dev',
     'localhost:3000',
   ],
+
   // Optimize for deployment
   poweredByHeader: false,
   reactStrictMode: true,
-  // Enable static exports for better performance
-  experimental: {
-    optimizeCss: true,
-  },
+
   // Performance optimizations
   compress: true,
   generateEtags: true,
+
+  // Ensure we're using App Router only
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
 };
 
 export default nextConfig;
