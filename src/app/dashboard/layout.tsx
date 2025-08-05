@@ -100,7 +100,7 @@ function DashboardLoading() {
         {[...Array(30)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-blue-400/80 rounded-full animate-quantum-float"
+            className="absolute w-1 h-1 bg-blue-400/80 rounded-full animate-hyperdrive-float"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
