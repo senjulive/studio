@@ -46,7 +46,7 @@ export default function WelcomePage() {
         {/* Advanced neural network visualization */}
         <svg className="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 1200 800">
           <defs>
-            <linearGradient id="quantumGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="hyperdriveGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="rgb(99,102,241)" stopOpacity="0.9"/>
               <stop offset="33%" stopColor="rgb(139,92,246)" stopOpacity="0.7"/>
               <stop offset="66%" stopColor="rgb(59,130,246)" stopOpacity="0.8"/>
