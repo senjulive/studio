@@ -168,7 +168,7 @@ export default function WelcomePage() {
               <div className="absolute top-1/2 -left-0.5 w-1 h-1 bg-violet-400 rounded-full" />
             </div>
             
-            {/* Quantum core energy */}
+            {/* Hyperdrive core energy */}
             <div className="absolute inset-8 bg-gradient-radial from-indigo-500/30 via-purple-500/20 to-transparent rounded-full animate-neural-pulse" />
           </div>
           
