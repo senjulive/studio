@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getClientIP, globalRateLimiter, RateLimitError } from '@/lib/error-handler';
 
 // Security headers
 const securityHeaders = {
