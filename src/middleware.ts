@@ -171,7 +171,7 @@ export async function middleware(request: NextRequest) {
       const maxRequests = isApiRoute(pathname) ? 30 : 100;
       const windowMs = 60000; // 1 minute
       
-      const customRateLimiter = new (await import('@/lib/error-handler')).RateLimiter(maxRequests, windowMs);
+      const customRateLimiter = new SimpleRateLimiter(maxRequests, windowMs);
       
       if (customRateLimiter.isRateLimited(rateLimitKey)) {
         const resetTime = customRateLimiter.getResetTime(rateLimitKey);
