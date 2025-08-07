@@ -70,6 +70,58 @@ function shouldRateLimit(pathname: string): boolean {
   return false;
 }
 
+// Simple rate limiter for middleware (edge-runtime compatible)
+class SimpleRateLimiter {
+  private requests: Map<string, { count: number; resetTime: number }> = new Map();
+
+  constructor(private maxRequests: number = 100, private windowMs: number = 60000) {}
+
+  isRateLimited(key: string): boolean {
+    const now = Date.now();
+    const record = this.requests.get(key);
+
+    if (!record || now > record.resetTime) {
+      this.requests.set(key, { count: 1, resetTime: now + this.windowMs });
+      return false;
+    }
+
+    if (record.count >= this.maxRequests) {
+      return true;
+    }
+
+    record.count += 1;
+    return false;
+  }
+
+  getRemainingRequests(key: string): number {
+    const record = this.requests.get(key);
+    if (!record) return this.maxRequests;
+    return Math.max(0, this.maxRequests - record.count);
+  }
+
+  getResetTime(key: string): Date {
+    const record = this.requests.get(key);
+    if (!record) return new Date(Date.now() + this.windowMs);
+    return new Date(record.resetTime);
+  }
+}
+
+// Helper to get client IP
+function getClientIP(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  const realIP = request.headers.get('x-real-ip');
+
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+
+  if (realIP) {
+    return realIP;
+  }
+
+  return request.ip || 'unknown';
+}
+
 async function validateAuth(request: NextRequest): Promise<boolean> {
   // For demo purposes, we'll check for a simple session token
   // In production, implement proper JWT validation or session management
