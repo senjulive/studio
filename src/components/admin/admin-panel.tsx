@@ -43,28 +43,44 @@ import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
 import { SlideshowImageManager } from './slideshow-image-manager';
 import { RewardsAdminManager } from './rewards-admin-manager';
-
+import { NotificationsAdminManager } from './notifications-admin-manager';
+import { DepositsAdminManager } from './deposits-admin-manager';
+import { WithdrawalsAdminManager } from './withdrawals-admin-manager';
+import {
+  Bell,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  CreditCard,
+  TrendingUp,
+  PieChart,
+  FileText
+} from 'lucide-react';
 
 const adminSections = {
     'Dashboard': { component: <AnalyticsManager />, icon: LayoutDashboard },
     'User Management': {
         'Users': { component: <UserManager />, icon: UserPlus },
         'Wallets': { component: <WalletManager />, icon: WalletCards },
-        'Verifications': { component: <VerificationManager />, icon: () => <span className="text-xl">🪪</span> },
+        'Verifications': { component: <VerificationManager />, icon: Shield },
         'Moderators': { component: <ModeratorManager />, icon: Users },
     },
-    'Platform Activity': {
-        'Deposits': { component: <DepositApprovalManager />, icon: Banknote },
-        'Withdrawals': { component: <WithdrawalManager />, icon: ArrowUpFromLine },
+    'Financial Operations': {
+        'Deposits Manager': { component: <DepositsAdminManager />, icon: ArrowDownCircle },
+        'Withdrawals Manager': { component: <WithdrawalsAdminManager />, icon: ArrowUpCircle },
+        'Legacy Deposits': { component: <DepositApprovalManager />, icon: Banknote },
+        'Legacy Withdrawals': { component: <WithdrawalManager />, icon: ArrowUpFromLine },
+    },
+    'Communications': {
+        'Notifications Manager': { component: <NotificationsAdminManager />, icon: Bell },
         'Support Messages': { component: <SupportChatManager />, icon: Mail },
         'Public Chat': { component: <PublicChatManager />, icon: Users },
-        'Action Log': { component: <ActionLogViewer />, icon: Activity },
+        'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
     },
     'Content & Engagement': {
-        'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
         'Promotions': { component: <PromotionManager />, icon: Gift },
-        'Rewards System': { component: <RewardsAdminManager />, icon: () => <span className="text-xl">🏆</span> },
-        'Slideshow Images': { component: <SlideshowImageManager />, icon: () => <span className="text-xl">🖼️</span> },
+        'Rewards System': { component: <RewardsAdminManager />, icon: TrendingUp },
+        'Slideshow Images': { component: <SlideshowImageManager />, icon: FileText },
+        'Action Log': { component: <ActionLogViewer />, icon: Activity },
     },
     'Platform Settings': {
         'General Settings': { component: <SiteSettingsManager />, icon: Settings },
