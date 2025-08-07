@@ -27,7 +27,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
-import { register } from "@/lib/auth";
 import { countries } from "@/lib/countries";
 
 const MALDIVES_COUNTRY = countries.find(c => c.code === "MV")!;
