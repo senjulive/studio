@@ -237,7 +237,8 @@ export default function DashboardLayout({
 
   const bottomNavItems = [
     { href: '/dashboard', label: 'Home', icon: Home },
-    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+    { href: '/dashboard/market', label: 'Market', icon: TrendingUp },
+    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo, isCenter: true },
     { href: '/dashboard/rewards', label: 'Rewards', icon: Trophy },
     { href: '/dashboard/profile', label: 'Profile', icon: User },
   ];
