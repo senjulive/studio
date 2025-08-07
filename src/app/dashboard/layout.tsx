@@ -527,7 +527,7 @@ export default function DashboardLayout({
           </header>
 
           {/* Main Content Area */}
-          <main className="p-6 pb-28 lg:pb-6 min-h-[calc(100vh-4rem)]">
+          <main className="p-4 pb-24 lg:pb-6 min-h-[calc(100vh-4rem)]">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
