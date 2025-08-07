@@ -1,0 +1,247 @@
+{
+  "activePromotions": [
+    {
+      "id": "welcome-bonus-2024",
+      "title": "🎉 Welcome Bonus",
+      "description": "Get a $25 bonus when you make your first deposit of $100 or more",
+      "type": "welcome",
+      "status": "active",
+      "startDate": "2024-01-01T00:00:00.000Z",
+      "endDate": "2024-12-31T23:59:59.000Z",
+      "requirements": {
+        "minDeposit": 100,
+        "newUsersOnly": true,
+        "kycRequired": true
+      },
+      "reward": {
+        "type": "bonus",
+        "amount": 25,
+        "currency": "USDT"
+      },
+      "termsAndConditions": [
+        "Offer valid for new users only",
+        "Minimum deposit of $100 required",
+        "KYC verification must be completed",
+        "Bonus will be credited within 24 hours",
+        "Bonus cannot be withdrawn directly"
+      ],
+      "image": "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2F123-welcome-bonus.jpg",
+      "priority": 1,
+      "eligible": true,
+      "claimed": false
+    },
+    {
+      "id": "refer-friend-q4",
+      "title": "🤝 Refer & Earn",
+      "description": "Earn $15 for each friend you refer who makes a deposit",
+      "type": "referral",
+      "status": "active",
+      "startDate": "2024-10-01T00:00:00.000Z",
+      "endDate": "2024-12-31T23:59:59.000Z",
+      "requirements": {
+        "friendMinDeposit": 50,
+        "maxReferrals": 10,
+        "kycRequired": true
+      },
+      "reward": {
+        "type": "bonus",
+        "amount": 15,
+        "currency": "USDT",
+        "perReferral": true
+      },
+      "termsAndConditions": [
+        "Your friend must make a minimum deposit of $50",
+        "Maximum 10 referrals per user",
+        "Both you and your friend must complete KYC",
+        "Reward credited after friend's successful deposit",
+        "Referral link must be used for signup"
+      ],
+      "image": "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2F456-refer-friend.jpg",
+      "priority": 2,
+      "eligible": true,
+      "claimed": false,
+      "currentReferrals": 3,
+      "maxReferrals": 10
+    },
+    {
+      "id": "vip-tier-upgrade",
+      "title": "⭐ VIP Tier Bonus",
+      "description": "Unlock exclusive rewards by upgrading to VIP Core tiers",
+      "type": "tier",
+      "status": "active",
+      "startDate": "2024-01-01T00:00:00.000Z",
+      "endDate": "2025-12-31T23:59:59.000Z",
+      "requirements": {
+        "minBalance": 500,
+        "tierUpgrade": true
+      },
+      "reward": {
+        "type": "percentage",
+        "amount": 5,
+        "description": "5% bonus on all grid trading profits"
+      },
+      "termsAndConditions": [
+        "Minimum balance of $500 required",
+        "Must maintain tier status for full month",
+        "Bonus applied to grid trading only",
+        "Calculated and paid monthly",
+        "Tier must be Core I or higher"
+      ],
+      "image": "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2F789-vip-tier.jpg",
+      "priority": 3,
+      "eligible": false,
+      "claimed": false,
+      "reason": "Insufficient balance"
+    },
+    {
+      "id": "holiday-special-2024",
+      "title": "🎄 Holiday Special",
+      "description": "Double rewards on all deposits during the holiday season",
+      "type": "seasonal",
+      "status": "active",
+      "startDate": "2024-12-20T00:00:00.000Z",
+      "endDate": "2025-01-02T23:59:59.000Z",
+      "requirements": {
+        "minDeposit": 100,
+        "maxBonus": 200
+      },
+      "reward": {
+        "type": "multiplier",
+        "amount": 2,
+        "description": "2x rewards on deposits"
+      },
+      "termsAndConditions": [
+        "Valid from Dec 20, 2024 to Jan 2, 2025",
+        "Minimum deposit of $100 required",
+        "Maximum bonus of $200 per user",
+        "Applies to first 3 deposits during period",
+        "Standard withdrawal terms apply"
+      ],
+      "image": "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2F101-holiday-special.jpg",
+      "priority": 4,
+      "eligible": true,
+      "claimed": false,
+      "remainingDeposits": 3
+    },
+    {
+      "id": "trading-champion",
+      "title": "🏆 Trading Champion",
+      "description": "Complete 50 successful trades to earn champion status",
+      "type": "achievement",
+      "status": "active",
+      "startDate": "2024-01-01T00:00:00.000Z",
+      "endDate": "2024-12-31T23:59:59.000Z",
+      "requirements": {
+        "successfulTrades": 50,
+        "winRate": 70
+      },
+      "reward": {
+        "type": "badge",
+        "amount": 0,
+        "description": "Champion badge + reduced trading fees"
+      },
+      "termsAndConditions": [
+        "Must complete 50 successful trades",
+        "Minimum 70% win rate required",
+        "Badge grants 10% fee reduction",
+        "Valid for lifetime once earned",
+        "Progress resets annually"
+      ],
+      "image": "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2F202-trading-champion.jpg",
+      "priority": 5,
+      "eligible": true,
+      "claimed": false,
+      "progress": {
+        "current": 23,
+        "required": 50,
+        "percentage": 46
+      }
+    }
+  ],
+  "expiredPromotions": [
+    {
+      "id": "black-friday-2024",
+      "title": "🛍️ Black Friday Special",
+      "description": "Triple rewards on all activities during Black Friday weekend",
+      "type": "seasonal",
+      "status": "expired",
+      "startDate": "2024-11-29T00:00:00.000Z",
+      "endDate": "2024-12-02T23:59:59.000Z",
+      "participantCount": 2456,
+      "totalRewards": 78901.23
+    },
+    {
+      "id": "summer-boost-2024",
+      "title": "☀️ Summer Boost",
+      "description": "Extra rewards for summer trading activity",
+      "type": "seasonal",
+      "status": "expired",
+      "startDate": "2024-06-01T00:00:00.000Z",
+      "endDate": "2024-08-31T23:59:59.000Z",
+      "participantCount": 3456,
+      "totalRewards": 123456.78
+    }
+  ],
+  "upcomingPromotions": [
+    {
+      "id": "new-year-2025",
+      "title": "🎊 New Year Blast",
+      "description": "Start 2025 with exclusive bonuses and rewards",
+      "type": "seasonal",
+      "status": "upcoming",
+      "startDate": "2025-01-01T00:00:00.000Z",
+      "endDate": "2025-01-15T23:59:59.000Z",
+      "preview": true
+    }
+  ],
+  "promotionCategories": [
+    {
+      "id": "welcome",
+      "name": "Welcome Offers",
+      "description": "Special bonuses for new users",
+      "icon": "🎉",
+      "count": 1
+    },
+    {
+      "id": "referral",
+      "name": "Referral Program",
+      "description": "Earn by inviting friends",
+      "icon": "🤝",
+      "count": 1
+    },
+    {
+      "id": "tier",
+      "name": "VIP Rewards",
+      "description": "Exclusive benefits for VIP users",
+      "icon": "⭐",
+      "count": 1
+    },
+    {
+      "id": "seasonal",
+      "name": "Seasonal Offers",
+      "description": "Limited-time special events",
+      "icon": "🎄",
+      "count": 1
+    },
+    {
+      "id": "achievement",
+      "name": "Achievements",
+      "description": "Unlock rewards through milestones",
+      "icon": "🏆",
+      "count": 1
+    }
+  ],
+  "userStats": {
+    "totalPromotionsJoined": 8,
+    "totalRewardsEarned": 156.78,
+    "currentActivePromotions": 5,
+    "completedAchievements": 3,
+    "referralCount": 3,
+    "nextMilestone": {
+      "type": "trading_volume",
+      "current": 23456.78,
+      "required": 50000,
+      "reward": "VIP Core II Upgrade"
+    }
+  }
+}
