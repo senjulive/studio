@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "description": "Modern UI/UX Crypto Management Platform with Builder.io Integration",
-  "keywords": ["crypto", "trading", "blockchain", "next.js", "builder.io"],
+  "keywords": [
+    "crypto",
+    "trading",
+    "blockchain",
+    "next.js",
+    "builder.io"
+  ],
   "author": "AstralCore Team",
   "license": "MIT",
   "homepage": "https://astralcore.app",

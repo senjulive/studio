@@ -29,12 +29,15 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   serverExternalPackages: ['genkit'],
-  
+
   // Performance optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error']
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === 'production'
+        ? {
+            exclude: ['error'],
+          }
+        : false,
   },
 
   // Image optimization
@@ -164,12 +167,12 @@ const nextConfig = {
   // Output configuration for static export
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
   trailingSlash: false,
-  
+
   // TypeScript configuration
   typescript: {
     ignoreBuildErrors: false,
   },
-  
+
   // ESLint configuration
   eslint: {
     ignoreDuringBuilds: false,
