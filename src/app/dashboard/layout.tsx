@@ -237,13 +237,7 @@ export default function DashboardLayout({
   const userEmail = user?.email;
   const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : 'U';
 
-  const bottomNavItems = [
-    { href: '/dashboard', label: 'Home', icon: Home },
-    { href: '/dashboard/market', label: 'Market', icon: TrendingUp },
-    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo, isCenter: true },
-    { href: '/dashboard/rewards', label: 'Rewards', icon: Trophy },
-    { href: '/dashboard/profile', label: 'Profile', icon: User },
-  ];
+  // Navigation items now handled by MobileBottomNavigation component
 
   const getPageTitle = () => {
     const currentPath = pathname;
