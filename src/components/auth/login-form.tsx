@@ -54,32 +54,48 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    
-    if (typeof window !== 'undefined') {
-        if (values.rememberMe) {
-            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
-        } else {
-            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
-        }
-        sessionStorage.setItem('loggedInEmail', values.email);
-    }
-    
-    const { error } = await login(values);
 
-    if (error) {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
         toast({
-            title: "Login Failed",
-            description: error,
-            variant: "destructive",
+          title: "Login Failed",
+          description: data.error,
+          variant: "destructive",
         });
-    } else {
+      } else {
+        if (typeof window !== 'undefined') {
+          if (values.rememberMe) {
+            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
+          } else {
+            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+          }
+          sessionStorage.setItem('loggedInEmail', values.email);
+        }
+
         toast({
           title: "Login Successful",
           description: "Welcome to AstralCore!",
         });
         router.push('/dashboard');
+      }
+    } catch (error) {
+      toast({
+        title: "Login Failed",
+        description: "Network error. Please try again.",
+        variant: "destructive",
+      });
     }
-    
+
     setIsLoading(false);
   };
 
