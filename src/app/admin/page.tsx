@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function AdminPage() {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-secondary p-4">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <AdminAuth>
         <AdminPanel />
       </AdminAuth>
