@@ -1,6 +1,3 @@
-
-'use server';
-
 // Mock implementation for notifications using a simple JSON structure.
 import initialNotifications from '../../data/notifications.json';
 
@@ -58,4 +55,8 @@ export async function clearNotifications(userId: string): Promise<void> {
     if (mockNotifications[userId]) {
         mockNotifications[userId] = [];
     }
+}
+
+export async function getAllNotifications(): Promise<Record<string, Notification[]>> {
+    return mockNotifications;
 }

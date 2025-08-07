@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -37,7 +36,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { AstralLogo } from "../icons/astral-logo";
-import { register } from "@/lib/auth";
+import { clientRegister as register } from "@/lib/auth-client";
 import { countries } from "@/lib/countries";
 
 const MALDIVES_COUNTRY = countries.find(c => c.code === "MV")!;
@@ -82,29 +81,43 @@ export function RegisterForm() {
     const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      const { error } = await register({
-        email: values.email,
-        password: values.password,
-        options: {
-            data: {
-                username: values.username,
-                contact_number: fullContactNumber,
-                country: countryInfo.name,
-                referral_code: values.referralCode,
-            }
-        }
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+          fullName: values.username,
+          phoneNumber: fullContactNumber,
+          country: countryInfo.name,
+          referralCode: values.referralCode,
+        }),
       });
-      
-      if (error) {
-        throw new Error(error);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: 'Registration failed' };
+        }
+        throw new Error(errorData.error || 'Registration failed');
       }
-      
+
+      const data = await response.json();
+
       toast({
         title: "Account Created",
-        description: "Your account has been created successfully. You can now log in.",
+        description: data.message || "Your account has been created successfully. Please check your email for verification.",
       });
-      router.push("/dashboard");
+
+      // Redirect to login page for email verification
+      router.push("/login");
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
         description: error.message || "An unexpected error occurred.",

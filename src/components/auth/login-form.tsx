@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -30,7 +29,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
-import { login } from "@/lib/auth";
 import { AstralLogo } from "../icons/astral-logo";
 import { Separator } from "../ui/separator";
 
@@ -65,34 +63,81 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    
-    if (typeof window !== 'undefined') {
-        if (values.rememberMe) {
-            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
-        } else {
-            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
-        }
-        // Store email in session storage to determine role in dashboard layout
-        sessionStorage.setItem('loggedInEmail', values.email);
-    }
-    
-    const { error } = await login(values);
 
-    if (error) {
-        toast({
-            title: "Login Failed",
-            description: error,
-            variant: "destructive",
-        });
-    } else {
+    try {
+      // Handle localStorage
+      if (typeof window !== 'undefined') {
+        if (values.rememberMe) {
+          localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
+        } else {
+          localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+        }
+        sessionStorage.setItem('loggedInEmail', values.email);
+      }
+
+      // Create request with proper options
+      const requestOptions: RequestInit = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+      };
+
+      const response = await fetch('/api/auth/login', requestOptions);
+
+      // Handle response based on status
+      if (response.status >= 200 && response.status < 300) {
+        // Success - parse JSON
+        const data = await response.json();
+
         toast({
           title: "Login Successful",
           description: "Welcome to AstralCore!",
         });
-        router.push('/dashboard');
+
+        // Store user role for routing
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('userRole', data.role || 'user');
+        }
+
+        // Redirect based on role
+        if (data.role === 'admin') {
+          router.push('/admin');
+        } else if (data.role === 'moderator') {
+          router.push('/moderator');
+        } else {
+          router.push('/dashboard');
+        }
+      } else {
+        // Error - try to get error message
+        let errorMessage = 'An error occurred during login';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If JSON parsing fails, use default message
+        }
+
+        toast({
+          title: "Login Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login Failed",
+        description: "Network error. Please check your connection and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleGoogleSignIn = () => {
@@ -111,7 +156,7 @@ export function LoginForm() {
         <AstralLogo className="mx-auto h-28 w-28" />
         <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
         <CardDescription>
-          Access the highly intelligent CORE Nexus Quantum v3.76 trading bot.
+          Access your Hyperdrive trading intelligence platform.
         </CardDescription>
       </CardHeader>
       <CardContent>

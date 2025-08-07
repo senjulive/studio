@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -9,17 +8,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit, Plus } from "lucide-react";
+import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit, Plus, CreditCard, History, Star, Trophy, Brain } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { cn } from "@/lib/utils";
-import { VirtualCard } from "./virtual-card";
-import Image from "next/image";
 import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
@@ -28,6 +24,8 @@ import { format } from 'date-fns';
 import type { SVGProps } from 'react';
 import { Input } from "../ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { countries } from "@/lib/countries";
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -49,79 +47,134 @@ const rankIcons: Record<string, IconComponent> = {
     Lock,
 };
 
+interface AvatarUploadDialogProps {
+    onUploadSuccess: () => void;
+    wallet: WalletData | null;
+    children: React.ReactNode;
+}
 
-export function AvatarUploadDialog({ children, wallet, onUploadSuccess }: { children: React.ReactNode, wallet: WalletData | null, onUploadSuccess: () => void }) {
+export function AvatarUploadDialog({ onUploadSuccess, wallet, children }: AvatarUploadDialogProps) {
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = React.useState<string>('');
     const { toast } = useToast();
-    const { user } = useUser();
-    const [isUpdatingAvatar, setIsUpdatingAvatar] = React.useState(false);
-    const [avatarUrl, setAvatarUrl] = React.useState(wallet?.profile?.avatarUrl || "");
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
         if (file) {
-            if (file.size > 2 * 1024 * 1024) { // 2MB limit
-                toast({ title: "File too large", description: "Please select a file smaller than 2MB.", variant: "destructive" });
+            if (file.size > 5 * 1024 * 1024) {
+                toast({
+                    title: "File too large",
+                    description: "Please select an image under 5MB.",
+                    variant: "destructive"
+                });
                 return;
             }
-            if (!file.type.startsWith('image/')) {
-                toast({ title: "Invalid file type", description: "Only image files are supported.", variant: "destructive" });
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setAvatarUrl(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+
+            setSelectedFile(file);
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
         }
     };
-    
-    const handleUpdateAvatar = async () => {
-        if (!avatarUrl || !user?.id || !wallet) return;
-        
-        setIsUpdatingAvatar(true);
+
+    const handleUpload = async () => {
+        if (!selectedFile || !wallet) return;
+
+        setIsLoading(true);
         try {
-          const updatedWallet: WalletData = {
-            ...wallet,
-            profile: {
-              ...wallet.profile,
-              avatarUrl: avatarUrl,
-            },
-          };
-    
-          await updateWallet(updatedWallet);
-          toast({ title: "Avatar Updated!", description: "Your new profile picture has been saved." });
-          onUploadSuccess();
-        } catch (error: any) {
-          toast({ title: "Error", description: error.message, variant: "destructive" });
+            // Simulate upload delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const updatedWallet = {
+                ...wallet,
+                profile: {
+                    ...wallet.profile,
+                    avatarUrl: previewUrl
+                }
+            };
+
+            await updateWallet(wallet.id, updatedWallet);
+            
+            toast({
+                title: "Success",
+                description: "Profile picture updated successfully."
+            });
+            
+            onUploadSuccess();
+            setIsOpen(false);
+            setSelectedFile(null);
+            setPreviewUrl('');
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to update profile picture.",
+                variant: "destructive"
+            });
         } finally {
-          setIsUpdatingAvatar(false);
+            setIsLoading(false);
         }
     };
-    
+
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <div className="relative group">
-                    {children}
-                    <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-red-600 rounded-full flex items-center justify-center border-2 border-card cursor-pointer group-hover:bg-red-500 transition-colors">
-                        <Plus className="h-4 w-4 text-white" />
-                    </div>
-                </div>
+                {children}
             </DialogTrigger>
-            <DialogContent>
-                <DialogHeader><DialogTitle>Update Your Avatar</DialogTitle><DialogDescription>Select an image file from your device.</DialogDescription></DialogHeader>
+            <DialogContent className="sm:max-w-md bg-black/90 backdrop-blur-xl border-border/40">
+                <DialogHeader>
+                    <DialogTitle className="text-white">Update Profile Picture</DialogTitle>
+                    <DialogDescription>
+                        Upload a new avatar for your AstralCore profile
+                    </DialogDescription>
+                </DialogHeader>
+                
                 <div className="space-y-4">
-                    <div className="flex justify-center">
-                        <Image src={avatarUrl || "https://placehold.co/128x128.png"} alt="Avatar preview" width={128} height={128} className="rounded-full" />
+                    <div className="flex flex-col items-center space-y-4">
+                        <div className="relative">
+                            <Avatar className="h-24 w-24 border-2 border-blue-400/40">
+                                <AvatarImage src={previewUrl || wallet?.profile?.avatarUrl} />
+                                <AvatarFallback className="bg-gradient-to-br from-blue-500/30 to-purple-500/20 text-blue-400 text-2xl">
+                                    {wallet?.profile?.username?.charAt(0)?.toUpperCase() || 'U'}
+                                </AvatarFallback>
+                            </Avatar>
+                        </div>
+                        
+                        <div className="w-full">
+                            <Label htmlFor="avatar-upload" className="cursor-pointer">
+                                <div className="flex items-center justify-center w-full h-20 border-2 border-dashed border-border/40 rounded-lg hover:border-blue-400/40 transition-colors">
+                                    <div className="text-center">
+                                        <ImageIcon className="mx-auto h-6 w-6 text-gray-400" />
+                                        <p className="text-sm text-gray-400 mt-1">Click to select image</p>
+                                    </div>
+                                </div>
+                            </Label>
+                            <input
+                                id="avatar-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                className="hidden"
+                            />
+                        </div>
                     </div>
-                    <Input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef}/>
                 </div>
+                
                 <DialogFooter>
-                    <Button onClick={handleUpdateAvatar} disabled={isUpdatingAvatar || !avatarUrl}>
-                        {isUpdatingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                        Save Avatar
+                    <Button variant="outline" onClick={() => setIsOpen(false)}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={handleUpload} 
+                        disabled={!selectedFile || isLoading}
+                        className="bg-gradient-to-r from-blue-500 to-purple-600"
+                    >
+                        {isLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                            <Save className="h-4 w-4 mr-2" />
+                        )}
+                        {isLoading ? 'Uploading...' : 'Update'}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -129,267 +182,411 @@ export function AvatarUploadDialog({ children, wallet, onUploadSuccess }: { chil
     );
 }
 
-
-const ProfileDetailItem = ({
-  icon,
-  label,
-  value,
-  isLoading,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-  isLoading: boolean;
-}) => (
-  <div>
-    <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
-      {icon}
-      {label}
-    </Label>
-    <div className="mt-1">
-      {isLoading ? (
-        <Skeleton className="h-6 w-3/4" />
-      ) : (
-        <p className="text-base font-medium text-foreground break-words">{value || <span className="text-sm text-muted-foreground italic">Not set</span>}</p>
-      )}
-    </div>
-  </div>
-);
-
-const assetConfig = [
-    {
-        ticker: "USDT",
-        name: "Tether",
-        iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
-        balanceKey: "usdt",
-    },
-    {
-        ticker: "ETH",
-        name: "Ethereum",
-        iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
-        balanceKey: "eth",
-    },
-    {
-        ticker: "BTC",
-        name: "Bitcoin",
-        iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
-        balanceKey: "btc",
-    },
-] as const;
-
-const VerificationStatusBadge = ({ status }: { status?: string }) => {
-  if (status === 'verified') {
-    return (
-      <Badge variant="default" className="bg-green-600 hover:bg-green-700">
-        <CheckCircle className="h-4 w-4 mr-1.5" />
-        Verified
-      </Badge>
-    );
-  }
-  if (status === 'verifying') {
-    return (
-      <Badge variant="secondary">
-        <Clock className="h-4 w-4 mr-1.5 animate-spin" />
-        Verifying...
-      </Badge>
-    );
-  }
-  return (
-    <Badge variant="destructive">
-      <AlertCircle className="h-4 w-4 mr-1.5" />
-      Unverified
-    </Badge>
-  );
-};
-
-
 export function ProfileView() {
-  const [walletData, setWalletData] = React.useState<WalletData | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const { user } = useUser();
-  const [showVerificationPopup, setShowVerificationPopup] = React.useState(false);
-  const [isUpdatingDisplayName, setIsUpdatingDisplayName] = React.useState(false);
-  const [displayName, setDisplayName] = React.useState("");
-  const { toast } = useToast();
+    const [wallet, setWallet] = React.useState<WalletData | null>(null);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [isEditing, setIsEditing] = React.useState(false);
+    const [editForm, setEditForm] = React.useState({
+        username: '',
+        country: '',
+        phone: ''
+    });
 
-  const fetchWallet = React.useCallback(async () => {
-    if (user?.id) {
-        setIsLoading(true);
-        const data = await getOrCreateWallet(user.id);
-        setWalletData(data);
-        setDisplayName(data?.profile?.displayName || data?.profile?.username || "");
-       
-        if (data.profile.verificationStatus !== 'verified' && data.profile.verificationStatus !== 'verifying') {
-          setTimeout(() => setShowVerificationPopup(true), 1000);
+    const { user } = useUser();
+    const { toast } = useToast();
+
+    React.useEffect(() => {
+        if (user?.id) {
+            getOrCreateWallet(user.id).then((walletData) => {
+                setWallet(walletData);
+                setEditForm({
+                    username: walletData.profile?.username || '',
+                    country: walletData.profile?.country || '',
+                    phone: walletData.profile?.phone || ''
+                });
+                setIsLoading(false);
+            });
         }
+    }, [user]);
 
-        setIsLoading(false);
-    } else {
-        setIsLoading(false);
-    }
-  }, [user]);
+    const handleSaveProfile = async () => {
+        if (!wallet) return;
 
+        try {
+            const updatedWallet = {
+                ...wallet,
+                profile: {
+                    ...wallet.profile,
+                    username: editForm.username,
+                    country: editForm.country,
+                    phone: editForm.phone
+                }
+            };
 
-  React.useEffect(() => {
-    fetchWallet();
-
-    const interval = setInterval(() => {
-        if (walletData?.profile.verificationStatus === 'verifying') {
-            fetchWallet();
+            await updateWallet(wallet.id, updatedWallet);
+            setWallet(updatedWallet);
+            setIsEditing(false);
+            
+            toast({
+                title: "Success",
+                description: "Profile updated successfully."
+            });
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to update profile.",
+                variant: "destructive"
+            });
         }
-    }, 10000); // Poll every 10 seconds
+    };
 
-    return () => clearInterval(interval);
+    const fetchWalletData = React.useCallback(async () => {
+        if (user?.id) {
+            const walletData = await getOrCreateWallet(user.id);
+            setWallet(walletData);
+        }
+    }, [user]);
 
-  }, [user, fetchWallet, walletData?.profile.verificationStatus]);
-  
-  const handleUpdateDisplayName = async () => {
-    if (!displayName || !user?.id || !walletData) return;
-    if (displayName.length < 3) {
-        toast({ title: "Display Name Too Short", description: "Must be at least 3 characters.", variant: "destructive"});
-        return;
-    }
-
-    setIsUpdatingDisplayName(true);
-    try {
-      const updatedWallet: WalletData = {
-        ...walletData,
-        profile: {
-          ...walletData.profile,
-          displayName: displayName,
-        },
-      };
-
-      await updateWallet(updatedWallet);
-      setWalletData(updatedWallet);
-      toast({ title: "Display Name Updated!", description: "Your new display name has been saved." });
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } finally {
-      setIsUpdatingDisplayName(false);
-    }
-  };
-
-
-  const profile = walletData?.profile;
-  const profileDisplayName = profile?.displayName || profile?.fullName || profile?.username || "User Profile";
-  const squadSize = walletData?.squad?.members?.length ?? 0;
-  const usdtBalance = walletData?.balances?.usdt ?? 0;
-  const rank = getUserRank(usdtBalance);
-  const RankIcon = rankIcons[rank.Icon] || RecruitRankIcon;
-  
-  const isVerified = profile?.verificationStatus === 'verified';
-
-  return (
-    <>
-       <Dialog open={showVerificationPopup} onOpenChange={setShowVerificationPopup}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Verify Your Account</DialogTitle>
-                    <DialogDescription>
-                        To access all features and ensure your account's security, please complete your profile. Verification is quick and helps us protect your assets.
-                    </DialogDescription>
-                </DialogHeader>
-                <Button asChild onClick={() => setShowVerificationPopup(false)}>
-                    <Link href="/dashboard/profile/verify">Start Verification</Link>
-                </Button>
-            </DialogContent>
-        </Dialog>
-        <Card className="max-w-md mx-auto">
-            <CardHeader className="items-center text-center p-6">
-                <CardTitle className="text-2xl">
-                    {isLoading ? <Skeleton className="h-8 w-40 mx-auto" /> : profileDisplayName}
-                </CardTitle>
-                <div className="mt-2 flex justify-center gap-2 items-center">
-                    {isLoading ? (
-                    <>
-                        <Skeleton className="h-8 w-24" />
-                        <Skeleton className="h-6 w-20" />
-                    </>
-                    ) : (
-                    <>
-                        <Badge variant="outline" className={cn("text-base py-1 px-3 flex items-center gap-1.5", rank.className)}>
-                        <RankIcon className="h-5 w-5" />
-                        <span>{rank.name}</span>
-                        </Badge>
-                        <VerificationStatusBadge status={profile?.verificationStatus} />
-                    </>
-                    )}
-                </div>
-            </CardHeader>
-            <CardContent>
-            <div className="mb-6">
-                <Label className="text-xs text-muted-foreground text-center block mb-4">Asset Balances</Label>
-                {isLoading ? (
-                    <div className="flex justify-around">
-                        {Array.from({ length: 3 }).map((_, i) => (
-                             <div key={i} className="flex flex-col items-center gap-2">
-                                <Skeleton className="h-10 w-10 rounded-full" />
-                                <Skeleton className="h-5 w-16" />
-                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="flex justify-around text-center">
-                        {assetConfig.map(asset => (
-                            <div key={asset.ticker} className="flex flex-col items-center gap-2">
-                                <Image src={asset.iconUrl} alt={asset.name} width={40} height={40} className="rounded-full" />
-                                <span className="text-sm font-semibold font-mono">
-                                    {walletData?.balances[asset.balanceKey].toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 6,
-                                    }) ?? '0.00'}
-                                </span>
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <Card className="bg-black/40 backdrop-blur-xl border-border/40">
+                    <CardContent className="p-6">
+                        <div className="flex flex-col sm:flex-row items-start gap-6">
+                            <Skeleton className="h-20 w-20 rounded-full" />
+                            <div className="space-y-2 flex-1">
+                                <Skeleton className="h-6 w-48" />
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-4 w-24" />
                             </div>
-                        ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+    const totalBalance = wallet?.balances?.usdt ?? 0;
+    const rank = getUserRank(totalBalance);
+    const RankIcon = rankIcons[rank.Icon] || Lock;
+    const userCountry = countries.find(c => c.name === wallet?.profile?.country);
+
+    return (
+        <div className="space-y-4 max-w-4xl mx-auto">
+            {/* Profile Header - Mobile Optimized */}
+            <Card className="bg-black/40 backdrop-blur-xl border-border/40">
+                <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 w-full sm:w-auto">
+                            <AvatarUploadDialog onUploadSuccess={fetchWalletData} wallet={wallet}>
+                                <div className="relative group cursor-pointer">
+                                    <div className="absolute inset-0 bg-blue-400/30 rounded-full blur-lg animate-neural-pulse"></div>
+                                    <Avatar className="h-16 w-16 sm:h-20 sm:w-20 relative border-2 border-blue-400/40 backdrop-blur-xl">
+                                        <AvatarImage
+                                            src={wallet?.profile?.avatarUrl}
+                                            alt={wallet?.profile?.username || 'User'}
+                                        />
+                                        <AvatarFallback className="bg-gradient-to-br from-blue-500/30 to-purple-500/20 text-blue-400 font-bold text-lg backdrop-blur-xl">
+                                            {wallet?.profile?.username?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Edit className="h-5 w-5 text-white" />
+                                    </div>
+                                </div>
+                            </AvatarUploadDialog>
+                            
+                            <div className="text-center sm:text-left flex-1">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                                    <h1 className="text-xl sm:text-2xl font-bold text-white">
+                                        {wallet?.profile?.username || 'User'}
+                                    </h1>
+                                    {userCountry && (
+                                        <span className="text-2xl">{userCountry.flag}</span>
+                                    )}
+                                </div>
+                                <p className="text-sm text-gray-400 mb-3">{user?.email}</p>
+                                
+                                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                    <Badge className={cn("flex items-center gap-1 text-xs", rank.className)}>
+                                        <RankIcon className="h-3 w-3" />
+                                        Hyperdrive {rank.name}
+                                    </Badge>
+                                    <Badge variant="outline" className="text-xs border-green-400/40 text-green-300 bg-green-400/10">
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                        Active
+                                    </Badge>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex gap-2 w-full sm:w-auto">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setIsEditing(!isEditing)}
+                                className="flex-1 sm:flex-none"
+                            >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                            </Button>
+                            <Button
+                                size="sm"
+                                asChild
+                                className="flex-1 sm:flex-none bg-gradient-to-r from-blue-500 to-purple-600"
+                            >
+                                <Link href="/dashboard/profile/verify">
+                                    <ShieldCheck className="h-4 w-4 mr-2" />
+                                    KYC
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
-                )}
+                </CardContent>
+            </Card>
+
+            {/* Quick Actions - Mobile Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <Link href="/dashboard/cards">
+                    <Card className="bg-black/40 backdrop-blur-xl border-border/40 hover:border-blue-400/40 transition-all duration-300 cursor-pointer group">
+                        <CardContent className="p-4 text-center">
+                            <div className="relative mb-2">
+                                <div className="absolute inset-0 bg-blue-400/20 rounded-lg blur-sm group-hover:animate-pulse"></div>
+                                <div className="relative bg-gradient-to-br from-blue-500/20 to-blue-600/10 p-2 rounded-lg border border-blue-400/30">
+                                    <CreditCard className="h-5 w-5 mx-auto text-blue-400" />
+                                </div>
+                            </div>
+                            <p className="text-xs font-medium text-white">Wallet Cards</p>
+                        </CardContent>
+                    </Card>
+                </Link>
+                
+                <Link href="/dashboard/rewards">
+                    <Card className="bg-black/40 backdrop-blur-xl border-border/40 hover:border-purple-400/40 transition-all duration-300 cursor-pointer group">
+                        <CardContent className="p-4 text-center">
+                            <div className="relative mb-2">
+                                <div className="absolute inset-0 bg-purple-400/20 rounded-lg blur-sm group-hover:animate-pulse"></div>
+                                <div className="relative bg-gradient-to-br from-purple-500/20 to-purple-600/10 p-2 rounded-lg border border-purple-400/30">
+                                    <Trophy className="h-5 w-5 mx-auto text-purple-400" />
+                                </div>
+                            </div>
+                            <p className="text-xs font-medium text-white">Rewards</p>
+                        </CardContent>
+                    </Card>
+                </Link>
+                
+                <Link href="/dashboard/trading-info">
+                    <Card className="bg-black/40 backdrop-blur-xl border-border/40 hover:border-cyan-400/40 transition-all duration-300 cursor-pointer group">
+                        <CardContent className="p-4 text-center">
+                            <div className="relative mb-2">
+                                <div className="absolute inset-0 bg-cyan-400/20 rounded-lg blur-sm group-hover:animate-pulse"></div>
+                                <div className="relative bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 p-2 rounded-lg border border-cyan-400/30">
+                                    <Brain className="h-5 w-5 mx-auto text-cyan-400" />
+                                </div>
+                            </div>
+                            <p className="text-xs font-medium text-white">Hyperdrive</p>
+                        </CardContent>
+                    </Card>
+                </Link>
+                
+                <Link href="/dashboard/security">
+                    <Card className="bg-black/40 backdrop-blur-xl border-border/40 hover:border-green-400/40 transition-all duration-300 cursor-pointer group">
+                        <CardContent className="p-4 text-center">
+                            <div className="relative mb-2">
+                                <div className="absolute inset-0 bg-green-400/20 rounded-lg blur-sm group-hover:animate-pulse"></div>
+                                <div className="relative bg-gradient-to-br from-green-500/20 to-green-600/10 p-2 rounded-lg border border-green-400/30">
+                                    <ShieldCheck className="h-5 w-5 mx-auto text-green-400" />
+                                </div>
+                            </div>
+                            <p className="text-xs font-medium text-white">Security</p>
+                        </CardContent>
+                    </Card>
+                </Link>
             </div>
 
-            <div className="mb-6 p-4">
-              <VirtualCard walletData={walletData} userEmail={user?.email || null} />
+            {/* Profile Information */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Personal Information */}
+                <Card className="bg-black/40 backdrop-blur-xl border-border/40">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-lg text-white flex items-center gap-2">
+                            <User className="h-5 w-5 text-blue-400" />
+                            Personal Information
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        {isEditing ? (
+                            <div className="space-y-3">
+                                <div>
+                                    <Label htmlFor="username" className="text-sm text-gray-400">Username</Label>
+                                    <Input
+                                        id="username"
+                                        value={editForm.username}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, username: e.target.value }))}
+                                        className="bg-black/20 border-border/40"
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="country" className="text-sm text-gray-400">Country</Label>
+                                    <Input
+                                        id="country"
+                                        value={editForm.country}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, country: e.target.value }))}
+                                        className="bg-black/20 border-border/40"
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="phone" className="text-sm text-gray-400">Phone</Label>
+                                    <Input
+                                        id="phone"
+                                        value={editForm.phone}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
+                                        className="bg-black/20 border-border/40"
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button size="sm" onClick={handleSaveProfile} className="bg-gradient-to-r from-green-500 to-green-600">
+                                        <Save className="h-4 w-4 mr-1" />
+                                        Save
+                                    </Button>
+                                    <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                                        <User className="h-4 w-4 text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-400">Username</p>
+                                        <p className="text-sm text-white">{wallet?.profile?.username || 'Not set'}</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-green-500/10 rounded-lg">
+                                        <MapPin className="h-4 w-4 text-green-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-400">Country</p>
+                                        <p className="text-sm text-white flex items-center gap-2">
+                                            {wallet?.profile?.country || 'Not set'}
+                                            {userCountry && <span>{userCountry.flag}</span>}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-purple-500/10 rounded-lg">
+                                        <Phone className="h-4 w-4 text-purple-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-400">Phone</p>
+                                        <p className="text-sm text-white">{wallet?.profile?.phone || 'Not set'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                {/* Account Status */}
+                <Card className="bg-black/40 backdrop-blur-xl border-border/40">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-lg text-white flex items-center gap-2">
+                            <ShieldCheck className="h-5 w-5 text-green-400" />
+                            Account Status
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-green-500/10 rounded-lg">
+                                    <CheckCircle className="h-4 w-4 text-green-400" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-400">Email Verification</p>
+                                    <p className="text-sm text-green-400 font-medium">Verified</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-yellow-500/10 rounded-lg">
+                                    <AlertCircle className="h-4 w-4 text-yellow-400" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-400">KYC Verification</p>
+                                    <p className="text-sm text-yellow-400 font-medium">Pending</p>
+                                </div>
+                            </div>
+                            <Button size="sm" asChild variant="outline">
+                                <Link href="/dashboard/profile/verify">
+                                    Complete
+                                </Link>
+                            </Button>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-500/10 rounded-lg">
+                                <Calendar className="h-4 w-4 text-blue-400" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-400">Member Since</p>
+                                <p className="text-sm text-white">
+                                    {wallet?.createdAt ? format(new Date(wallet.createdAt), 'MMM yyyy') : 'N/A'}
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 mb-6">
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit Display Name</Button>
-                    </DialogTrigger>
-                    <DialogContent><DialogHeader><DialogTitle>Set Display Name</DialogTitle><DialogDescription>This name will be visible in the public chat.</DialogDescription></DialogHeader><div className="space-y-4"><div className="relative"><User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input id="display-name" placeholder="Your public name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="pl-9"/></div></div><DialogFooter><Button onClick={handleUpdateDisplayName} disabled={isUpdatingDisplayName || !displayName}>{isUpdatingDisplayName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Save Name</Button></DialogFooter></DialogContent>
-                </Dialog>
-            </div>
-
-            <Separator className="mb-6"/>
-
-                <div className="grid grid-cols-1 gap-y-6 text-left sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
-                    <ProfileDetailItem isLoading={isLoading} icon={<User className="h-4 w-4" />} label="Username" value={profile?.username} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="Full Name" value={profile?.fullName} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<Mail className="h-4 w-4" />} label="Email" value={user?.email} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<BadgeInfo className="h-4 w-4" />} label="ID Card No." value={profile?.idCardNo} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<Phone className="h-4 w-4" />} label="Contact Number" value={profile?.contactNumber} />
-                    <ProfileDetailItem isLoading={isLoading} icon={<MapPin className="h-4 w-4" />} label="Country" value={profile?.country} />
-                    {isVerified && (
-                    <>
-                        <ProfileDetailItem isLoading={isLoading} icon={<Home className="h-4 w-4" />} label="Address" value={profile?.address} />
-                        <ProfileDetailItem isLoading={isLoading} icon={<Calendar className="h-4 w-4" />} label="Date of Birth" value={profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set'} />
-                    </>
-                    )}
-                    <div className="sm:col-span-2">
-                        <ProfileDetailItem isLoading={isLoading} icon={<Users className="h-4 w-4" />} label="Squad Members" value={`${squadSize} member${squadSize !== 1 ? 's' : ''}`} />
+            {/* Hyperdrive Status */}
+            <Card className="bg-black/40 backdrop-blur-xl border-border/40">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-lg text-white flex items-center gap-2">
+                        <Brain className="h-5 w-5 text-purple-400" />
+                        AstralCore Hyperdrive Status
+                    </CardTitle>
+                    <CardDescription>Your quantum trading performance level</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg border border-purple-400/20">
+                        <div className="flex items-center gap-3">
+                            <div className="p-3 bg-gradient-to-br from-purple-500/20 to-blue-500/10 rounded-xl border border-purple-400/30">
+                                <RankIcon className="h-8 w-8 text-purple-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Current Hyperdrive Level</p>
+                                <p className="text-xl font-bold text-purple-400">{rank.name}</p>
+                                <p className="text-xs text-gray-500">Balance: ${totalBalance.toLocaleString()}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="flex-1">
+                            <div className="flex justify-between text-sm mb-2">
+                                <span className="text-gray-400">Progress to Next Level</span>
+                                <span className="text-gray-400">75%</span>
+                            </div>
+                            <div className="w-full bg-gray-700 rounded-full h-2">
+                                <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full" style={{width: '75%'}}></div>
+                            </div>
+                        </div>
+                        
+                        <Button size="sm" asChild className="bg-gradient-to-r from-purple-500 to-blue-600">
+                            <Link href="/dashboard/trading-info">
+                                View Details
+                                <Brain className="h-4 w-4 ml-2" />
+                            </Link>
+                        </Button>
                     </div>
-                </div>
-            </CardContent>
-            {!isVerified && !isLoading && (
-                <CardFooter>
-                <Button asChild className="w-full">
-                    <Link href="/dashboard/profile/verify">
-                        <ShieldCheck className="mr-2 h-4 w-4" />
-                        Edit Profile & Verify
-                    </Link>
-                </Button>
-            </CardFooter>
-            )}
-        </Card>
-    </>
-  );
+                </CardContent>
+            </Card>
+        </div>
+    );
 }

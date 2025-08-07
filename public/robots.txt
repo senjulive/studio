@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Allow crawling of main pages
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /help
+Allow: /faq
+Allow: /privacy
+Allow: /terms
+
+# Disallow admin and user areas
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api
+
+# Sitemap
+Sitemap: https://astralcore-hyperdrive.netlify.app/sitemap.xml

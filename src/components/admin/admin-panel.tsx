@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -25,6 +24,14 @@ import {
   ArrowUpFromLine,
   GitBranch,
   UserPlus,
+  Trophy,
+  CreditCard,
+  FileText,
+  Globe,
+  MessageSquare,
+  Zap,
+  Brain,
+  Edit
 } from 'lucide-react';
 import { WalletManager } from './wallet-manager';
 import { SupportChatManager } from './support-chat-manager';
@@ -42,41 +49,56 @@ import { WithdrawalManager } from './withdrawal-manager';
 import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
-
+import { RewardsManager } from './rewards-manager';
+import { SliderImageManager } from './slider-image-manager';
+import { DataFetcher } from './data-fetcher';
+import { WebPageEditor } from './web-page-editor';
 
 const adminSections = {
     'Dashboard': { component: <AnalyticsManager />, icon: LayoutDashboard },
     'User Management': {
         'Users': { component: <UserManager />, icon: UserPlus },
         'Wallets': { component: <WalletManager />, icon: WalletCards },
-        'Verifications': { component: <VerificationManager />, icon: () => <span className="text-xl">🪪</span> },
+        'KYC / UPDATE': { component: <VerificationManager />, icon: Shield },
         'Moderators': { component: <ModeratorManager />, icon: Users },
     },
-    'Platform Activity': {
+    'Financial Management': {
         'Deposits': { component: <DepositApprovalManager />, icon: Banknote },
         'Withdrawals': { component: <WithdrawalManager />, icon: ArrowUpFromLine },
+        'AstralCore Cards': { component: <WalletManager />, icon: CreditCard },
+    },
+    'Communication': {
         'Support Messages': { component: <SupportChatManager />, icon: Mail },
-        'Public Chat': { component: <PublicChatManager />, icon: Users },
-        'Action Log': { component: <ActionLogViewer />, icon: Activity },
+        'Public Chat': { component: <PublicChatManager />, icon: MessageSquare },
+        'Announcements': { component: <AnnouncementManager />, icon: Megaphone },
     },
     'Content & Engagement': {
-        'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
         'Promotions': { component: <PromotionManager />, icon: Gift },
-    },
-    'Platform Settings': {
-        'General Settings': { component: <SiteSettingsManager />, icon: Settings },
-        'Bot & Tier Settings': { component: <BotTierSettingsManager />, icon: Bot },
+        'Rewards System': { component: <RewardsManager />, icon: Trophy },
+        'Slider Images': { component: <SliderImageManager />, icon: FileText },
         'Squad & Rewards': { component: <SquadRewardSettingsManager />, icon: GitBranch },
+        'Web Page Editor': { component: <WebPageEditor />, icon: Edit },
+    },
+    'AstralCore Hyperdrive': {
+        'Hyperdrive Settings': { component: <BotTierSettingsManager />, icon: Brain },
+        'Trading Bot Config': { component: <BotSettingsManager />, icon: Bot },
+        'Neural Networks': { component: <BotSettingsManager />, icon: Zap },
+    },
+    'System Management': {
+        'General Settings': { component: <SiteSettingsManager />, icon: Settings },
+        'Action Logs': { component: <ActionLogViewer />, icon: Activity },
+        'Platform Analytics': { component: <AnalyticsManager />, icon: LayoutDashboard },
+        'Data Management': { component: <DataFetcher />, icon: Globe },
     }
 } as const;
 
-
 type AdminView = keyof (typeof adminSections)['User Management'] | 
-                 keyof (typeof adminSections)['Platform Activity'] |
+                 keyof (typeof adminSections)['Financial Management'] |
+                 keyof (typeof adminSections)['Communication'] |
                  keyof (typeof adminSections)['Content & Engagement'] |
-                 keyof (typeof adminSections)['Platform Settings'] |
+                 keyof (typeof adminSections)['AstralCore Hyperdrive'] |
+                 keyof (typeof adminSections)['System Management'] |
                  'Dashboard';
-
 
 export function AdminPanel() {
     const [activeView, setActiveView] = React.useState<AdminView>('Dashboard');
@@ -94,69 +116,112 @@ export function AdminPanel() {
         return null;
     };
 
+    const getActiveSection = () => {
+        if (activeView === 'Dashboard') return 'Dashboard';
+        for (const [sectionName, section] of Object.entries(adminSections)) {
+            if (typeof section === 'object' && activeView in section) {
+                return sectionName;
+            }
+        }
+        return 'Dashboard';
+    };
+
     return (
-        <Card className="w-full max-w-7xl">
-            <CardHeader>
-                <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-2 rounded-lg">
-                        <Shield className="h-6 w-6 text-primary" />
+        <div className="w-full max-w-7xl mx-auto">
+            {/* Enhanced Header */}
+            <Card className="mb-6 bg-black/40 backdrop-blur-xl border-border/40">
+                <CardHeader>
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/10 rounded-xl border border-blue-400/30">
+                            <Shield className="h-8 w-8 text-blue-400" />
+                        </div>
+                        <div>
+                            <CardTitle className="text-2xl text-white flex items-center gap-2">
+                                <Brain className="h-6 w-6 text-purple-400" />
+                                AstralCore Hyperdrive Admin Panel
+                            </CardTitle>
+                            <CardDescription className="text-lg">
+                                Advanced administration for quantum trading platform
+                            </CardDescription>
+                        </div>
                     </div>
-                    <div>
-                        <CardTitle>AstralCore AI</CardTitle>
-                        <CardDescription>Platform management and user oversight system.</CardDescription>
-                    </div>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-12 gap-6">
-                    <div className="col-span-12 md:col-span-3 lg:col-span-2 space-y-4">
-                        {Object.entries(adminSections).map(([sectionName, items]) => {
-                             if(sectionName === 'Dashboard') {
-                                const Icon = items.icon;
+                </CardHeader>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* Enhanced Sidebar */}
+                <Card className="lg:col-span-1 bg-black/40 backdrop-blur-xl border-border/40">
+                    <CardHeader>
+                        <CardTitle className="text-white flex items-center gap-2">
+                            <Settings className="h-5 w-5 text-blue-400" />
+                            Admin Controls
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-1">
+                        {Object.entries(adminSections).map(([sectionName, section]) => {
+                            if (sectionName === 'Dashboard') {
+                                const IconComponent = section.icon;
                                 return (
                                     <Button
                                         key={sectionName}
-                                        variant={activeView === sectionName ? 'default' : 'outline'}
-                                        onClick={() => setActiveView(sectionName as AdminView)}
-                                        className="w-full justify-start gap-2"
+                                        variant={activeView === 'Dashboard' ? 'default' : 'ghost'}
+                                        className={`w-full justify-start text-left ${
+                                            activeView === 'Dashboard' 
+                                                ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/10 border border-blue-400/40 text-blue-400' 
+                                                : 'hover:bg-white/5'
+                                        }`}
+                                        onClick={() => setActiveView('Dashboard')}
                                     >
-                                        <Icon className="h-4 w-4" />
+                                        <IconComponent className="mr-3 h-4 w-4" />
                                         {sectionName}
                                     </Button>
-                                )
-                             }
-                             return (
-                                <div key={sectionName}>
-                                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">{sectionName}</h3>
-                                    <div className="space-y-1">
-                                    {Object.entries(items).map(([itemName, itemDetails]) => {
-                                        const Icon = itemDetails.icon;
-                                        return (
-                                            <Button
-                                                key={itemName}
-                                                variant={activeView === itemName ? 'secondary' : 'ghost'}
-                                                onClick={() => setActiveView(itemName as AdminView)}
-                                                className="w-full justify-start gap-2"
-                                            >
-                                                <Icon className="h-4 w-4" />
-                                                {itemName}
-                                            </Button>
-                                        )
-                                    })}
+                                );
+                            } else {
+                                const currentSection = getActiveSection();
+                                const isSectionActive = currentSection === sectionName;
+                                
+                                return (
+                                    <div key={sectionName} className="space-y-1">
+                                        <div className={`text-xs font-bold text-gray-400 uppercase tracking-wider mt-4 mb-2 px-3 ${
+                                            isSectionActive ? 'text-blue-400' : ''
+                                        }`}>
+                                            {sectionName}
+                                        </div>
+                                        {Object.entries(section).map(([itemName, item]) => {
+                                            const IconComponent = item.icon;
+                                            const isActive = activeView === itemName;
+                                            return (
+                                                <Button
+                                                    key={itemName}
+                                                    variant={isActive ? 'default' : 'ghost'}
+                                                    className={`w-full justify-start text-left text-sm ${
+                                                        isActive 
+                                                            ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/10 border border-blue-400/40 text-blue-400' 
+                                                            : 'hover:bg-white/5 text-gray-300'
+                                                    }`}
+                                                    onClick={() => setActiveView(itemName as AdminView)}
+                                                >
+                                                    <IconComponent className="mr-3 h-4 w-4" />
+                                                    {itemName}
+                                                </Button>
+                                            );
+                                        })}
                                     </div>
-                                </div>
-                            )
+                                );
+                            }
                         })}
-                    </div>
-                    <div className="col-span-12 md:col-span-9 lg:col-span-10">
-                        <Card className="min-h-[70vh]">
-                            <CardContent className="p-6">
-                                {renderContent()}
-                            </CardContent>
-                        </Card>
-                    </div>
+                    </CardContent>
+                </Card>
+
+                {/* Main Content */}
+                <div className="lg:col-span-3">
+                    <Card className="bg-black/40 backdrop-blur-xl border-border/40">
+                        <CardContent className="p-6">
+                            {renderContent()}
+                        </CardContent>
+                    </Card>
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

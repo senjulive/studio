@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -54,7 +53,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import type { WalletData } from "@/lib/wallet";
-import { sendAdminMessage } from "@/lib/chat";
+import { sendAdminMessage } from "@/lib/chat-client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addNotification } from "@/lib/notifications";
 import { Badge } from "../ui/badge";

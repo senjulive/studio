@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -7,7 +6,7 @@ import {
   sendAdminMessage,
   type ChatHistory,
   type Message,
-} from '@/lib/chat';
+} from '@/lib/chat-client';
 import {Skeleton} from '@/components/ui/skeleton';
 import {
   Accordion,

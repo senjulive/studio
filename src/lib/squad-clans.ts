@@ -1,4 +1,3 @@
-
 'use server';
 
 import * as fs from 'fs/promises';
@@ -6,7 +5,7 @@ import * as path from 'path';
 import { getAllWallets, getWalletByUserId } from './wallet';
 import { type Rank } from './ranks';
 import { type TierSetting } from './tiers';
-import { getBotTierSettings } from './tiers';
+import { getBotTierSettingsServer } from './tiers-server';
 
 const CLANS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-clans.json');
 const CHATS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-chats.json');
@@ -138,14 +137,18 @@ export async function getClanMessages(clanId: string): Promise<ClanChatMessage[]
     const allChats = await readChats();
     const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
     const clanMessages = allChats[clanId] || [];
-    
+
     // Filter out old messages
     const recentMessages = clanMessages.filter(msg => msg.timestamp >= twentyFourHoursAgo);
-    
+
     if (recentMessages.length < clanMessages.length) {
         allChats[clanId] = recentMessages;
         await writeChats(allChats); // Clean up the old messages from the file
     }
 
     return recentMessages;
+}
+
+export async function getAllSquadClans(): Promise<Record<string, Clan>> {
+    return await readClans();
 }

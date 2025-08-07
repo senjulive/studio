@@ -1,4 +1,3 @@
-
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -120,6 +119,36 @@ export default {
           '50%': { transform: 'translateY(-15px) scale(1.1)', opacity: '1' },
           '100%': { transform: 'translateY(-40px) scale(0.8)', opacity: '0' },
         },
+        'neural-pulse': {
+          '0%, 100%': {
+            boxShadow: '0 0 20px rgba(59,130,246,0.4), 0 0 40px rgba(59,130,246,0.2)',
+            transform: 'scale(1)'
+          },
+          '50%': {
+            boxShadow: '0 0 30px rgba(59,130,246,0.6), 0 0 60px rgba(59,130,246,0.4)',
+            transform: 'scale(1.05)'
+          },
+        },
+        'hyperdrive-float': {
+          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+          '33%': { transform: 'translateY(-10px) rotate(120deg)' },
+          '66%': { transform: 'translateY(5px) rotate(240deg)' },
+        },
+        'hologram-flicker': {
+          '0%, 100%': { opacity: '1', filter: 'hue-rotate(0deg)' },
+          '25%': { opacity: '0.8', filter: 'hue-rotate(90deg)' },
+          '50%': { opacity: '0.9', filter: 'hue-rotate(180deg)' },
+          '75%': { opacity: '0.85', filter: 'hue-rotate(270deg)' },
+        },
+        'data-stream': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100vw)' },
+        },
+        'hyperdrive-spin': {
+          '0%': { transform: 'rotate(0deg) scale(1)' },
+          '50%': { transform: 'rotate(180deg) scale(1.1)' },
+          '100%': { transform: 'rotate(360deg) scale(1)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -130,6 +159,11 @@ export default {
         'flash-green': 'flashGreen 0.8s ease-in-out',
         'flash-red': 'flashRed 0.8s ease-in-out',
         'floatUp': 'floatUp 3s forwards',
+        'neural-pulse': 'neural-pulse 3s ease-in-out infinite',
+        'hyperdrive-float': 'hyperdrive-float 6s ease-in-out infinite',
+        'hologram-flicker': 'hologram-flicker 2s ease-in-out infinite',
+        'data-stream': 'data-stream 3s linear infinite',
+        'hyperdrive-spin': 'hyperdrive-spin 4s ease-in-out infinite',
       },
     },
   },
