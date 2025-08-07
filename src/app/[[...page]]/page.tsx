@@ -12,10 +12,15 @@ interface PageProps {
 }
 
 export default async function Page(props: PageProps) {
+  // Skip if this is the root path (let the main page.tsx handle it)
+  if (!props.params.page || props.params.page.length === 0) {
+    return null;
+  }
+
   const content = await builder
     .get('page', {
       userAttributes: {
-        urlPath: '/' + (props.params.page?.join('/') || ''),
+        urlPath: '/' + props.params.page.join('/'),
       },
     })
     .toPromise();
