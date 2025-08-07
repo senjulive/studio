@@ -221,9 +221,16 @@ export default function DashboardLayout({
   }, [isAdmin, isModerator]);
 
   const handleLogout = async () => {
-    sessionStorage.removeItem('loggedInEmail');
-    await logout();
-    router.push('/');
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      sessionStorage.removeItem('loggedInEmail');
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still redirect on error
+      sessionStorage.removeItem('loggedInEmail');
+      router.push('/');
+    }
   };
 
   const userEmail = user?.email;
