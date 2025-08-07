@@ -1,26 +1,4 @@
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
-  skipWaiting: true,
-  runtimeCaching: [
-    {
-      urlPattern: /^https:\/\/cdn\.builder\.io\/.*/i,
-      handler: 'CacheFirst',
-      options: {
-        cacheName: 'builder-cache',
-        expiration: {
-          maxEntries: 64,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
-        },
-      },
-    },
-  ],
-});
-
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -29,15 +7,12 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   serverExternalPackages: ['genkit'],
-
+  
   // Performance optimizations
   compiler: {
-    removeConsole:
-      process.env.NODE_ENV === 'production'
-        ? {
-            exclude: ['error'],
-          }
-        : false,
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error']
+    } : false,
   },
 
   // Image optimization
@@ -127,6 +102,17 @@ const nextConfig = {
 
   // Custom webpack configuration
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Bundle analyzer
+    if (process.env.ANALYZE === 'true') {
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          reportFilename: isServer ? '../bundles/server.html' : './bundles/client.html',
+          openAnalyzer: false,
+        })
+      );
+    }
+
     // Optimize bundle
     config.optimization.splitChunks = {
       chunks: 'all',
@@ -167,12 +153,12 @@ const nextConfig = {
   // Output configuration for static export
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
   trailingSlash: false,
-
+  
   // TypeScript configuration
   typescript: {
     ignoreBuildErrors: false,
   },
-
+  
   // ESLint configuration
   eslint: {
     ignoreDuringBuilds: false,
@@ -184,4 +170,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withBundleAnalyzer(withPWA(nextConfig));
+module.exports = nextConfig;
