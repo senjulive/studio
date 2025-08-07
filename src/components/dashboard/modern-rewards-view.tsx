@@ -25,7 +25,8 @@ import {
   CheckCircle,
   Clock,
   Sparkles,
-  Flame
+  Flame,
+  Lock
 } from 'lucide-react';
 
 interface Reward {
