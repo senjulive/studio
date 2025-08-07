@@ -71,23 +71,31 @@ export function RegisterForm() {
     const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      const { error } = await register({
-        email: values.email,
-        password: values.password,
-        options: {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+          options: {
             data: {
-                username: values.username,
-                contact_number: fullContactNumber,
-                country: countryInfo.name,
-                referral_code: values.referralCode,
+              username: values.username,
+              contact_number: fullContactNumber,
+              country: countryInfo.name,
+              referral_code: values.referralCode,
             }
-        }
+          }
+        }),
       });
-      
-      if (error) {
-        throw new Error(error);
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
       }
-      
+
       toast({
         title: "Account Created",
         description: "Your account has been created successfully. You can now log in.",
@@ -185,7 +193,7 @@ export function RegisterForm() {
                     <div className="relative">
                       <Input 
                         type={showConfirmPassword ? "text" : "password"} 
-                        placeholder="••••••••" 
+                        placeholder="��•••••••" 
                         {...field} 
                         className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200 h-10 text-sm pr-9"
                       />
