@@ -1,135 +1,209 @@
 'use client';
 
-import * as React from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Zap, Wifi, Clock, Activity } from "lucide-react";
+import { useEffect } from 'react';
 
 interface PerformanceMetrics {
-  loadTime: number;
-  connectionType: string;
-  latency: number;
-  isOnline: boolean;
+  navigationTiming?: PerformanceNavigationTiming;
+  paintTiming?: PerformancePaintTiming[];
+  layoutShiftEntries?: LayoutShift[];
+  largestContentfulPaint?: PerformanceEntry[];
 }
 
-export function PerformanceMonitor() {
-  const [metrics, setMetrics] = React.useState<PerformanceMetrics>({
-    loadTime: 0,
-    connectionType: 'unknown',
-    latency: 0,
-    isOnline: true
-  });
+function measurePerformance(): PerformanceMetrics {
+  if (typeof window === 'undefined') return {};
 
-  React.useEffect(() => {
-    // Measure initial load time
-    const loadTime = performance.now();
-    
-    // Get connection info
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
-    
-    // Measure latency with a simple ping
-    const measureLatency = async () => {
-      const start = performance.now();
-      try {
-        await fetch('/api/ping', { method: 'HEAD' });
-        return performance.now() - start;
-      } catch {
-        return 999; // High latency if fetch fails
-      }
-    };
+  const metrics: PerformanceMetrics = {};
 
-    const updateMetrics = async () => {
-      const latency = await measureLatency();
-      
-      setMetrics({
-        loadTime: Math.round(loadTime),
-        connectionType: connection ? connection.effectiveType || 'unknown' : 'unknown',
-        latency: Math.round(latency),
-        isOnline: navigator.onLine
+  // Navigation timing
+  if ('performance' in window && 'getEntriesByType' in window.performance) {
+    const navigationEntries = window.performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    if (navigationEntries.length > 0) {
+      metrics.navigationTiming = navigationEntries[0];
+    }
+
+    // Paint timing
+    const paintEntries = window.performance.getEntriesByType('paint') as PerformancePaintTiming[];
+    if (paintEntries.length > 0) {
+      metrics.paintTiming = paintEntries;
+    }
+
+    // Largest Contentful Paint
+    const lcpEntries = window.performance.getEntriesByType('largest-contentful-paint');
+    if (lcpEntries.length > 0) {
+      metrics.largestContentfulPaint = lcpEntries;
+    }
+  }
+
+  return metrics;
+}
+
+function reportWebVitals(metric: any) {
+  if (process.env.NODE_ENV === 'production') {
+    // Send to analytics service
+    console.log('Web Vital:', metric);
+    
+    // Example: Send to Google Analytics
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      (window as any).gtag('event', metric.name, {
+        event_category: 'Web Vitals',
+        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+        event_label: metric.id,
+        non_interaction: true,
       });
-    };
+    }
+  }
+}
 
-    updateMetrics();
+export function PerformanceMonitor({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-    // Listen for online/offline events
-    const handleOnline = () => setMetrics(prev => ({ ...prev, isOnline: true }));
-    const handleOffline = () => setMetrics(prev => ({ ...prev, isOnline: false }));
+    // Measure initial performance
+    const initialMetrics = measurePerformance();
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Performance Metrics:', initialMetrics);
+    }
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    // Set up observers for ongoing monitoring
+    if ('PerformanceObserver' in window) {
+      // Cumulative Layout Shift (CLS)
+      try {
+        const clsObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (entry.entryType === 'layout-shift' && !(entry as any).hadRecentInput) {
+              reportWebVitals({
+                name: 'CLS',
+                value: (entry as any).value,
+                id: entry.startTime.toString(),
+              });
+            }
+          }
+        });
+        clsObserver.observe({ type: 'layout-shift', buffered: true });
+      } catch (e) {
+        console.warn('CLS observer not supported');
+      }
 
-    // Periodic latency checks
-    const interval = setInterval(async () => {
-      const latency = await measureLatency();
-      setMetrics(prev => ({ ...prev, latency: Math.round(latency) }));
-    }, 30000); // Check every 30 seconds
+      // Largest Contentful Paint (LCP)
+      try {
+        const lcpObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1];
+          reportWebVitals({
+            name: 'LCP',
+            value: lastEntry.startTime,
+            id: lastEntry.startTime.toString(),
+          });
+        });
+        lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+      } catch (e) {
+        console.warn('LCP observer not supported');
+      }
 
+      // First Input Delay (FID)
+      try {
+        const fidObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            reportWebVitals({
+              name: 'FID',
+              value: (entry as any).processingStart - entry.startTime,
+              id: entry.startTime.toString(),
+            });
+          }
+        });
+        fidObserver.observe({ type: 'first-input', buffered: true });
+      } catch (e) {
+        console.warn('FID observer not supported');
+      }
+    }
+
+    // Monitor memory usage (if available)
+    if ('memory' in window.performance) {
+      const memoryInfo = (window.performance as any).memory;
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Memory Usage:', {
+          used: Math.round(memoryInfo.usedJSHeapSize / 1024 / 1024) + ' MB',
+          total: Math.round(memoryInfo.totalJSHeapSize / 1024 / 1024) + ' MB',
+          limit: Math.round(memoryInfo.jsHeapSizeLimit / 1024 / 1024) + ' MB',
+        });
+      }
+    }
+
+    // Cleanup function
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-      clearInterval(interval);
+      // Disconnect observers if needed
     };
   }, []);
 
-  const getLatencyColor = (latency: number) => {
-    if (latency < 100) return "text-green-400";
-    if (latency < 300) return "text-yellow-400";
-    return "text-red-400";
-  };
-
-  const getConnectionIcon = (type: string) => {
-    switch (type) {
-      case '4g':
-        return <Zap className="h-3 w-3" />;
-      case '3g':
-      case '2g':
-        return <Wifi className="h-3 w-3" />;
-      default:
-        return <Activity className="h-3 w-3" />;
-    }
-  };
-
-  if (!metrics.isOnline) {
-    return (
-      <div className="fixed bottom-4 right-4 z-40">
-        <Badge variant="destructive" className="animate-pulse">
-          <Activity className="h-3 w-3 mr-1" />
-          Offline
-        </Badge>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fixed bottom-4 right-4 z-40 hidden sm:block">
-      <Card className="bg-black/80 border-gray-700 backdrop-blur-sm">
-        <CardContent className="p-2">
-          <div className="flex items-center gap-3 text-xs">
-            <div className="flex items-center gap-1 text-gray-400">
-              <Clock className="h-3 w-3" />
-              <span>{metrics.loadTime}ms</span>
-            </div>
-            
-            <div className="flex items-center gap-1 text-gray-400">
-              {getConnectionIcon(metrics.connectionType)}
-              <span className="uppercase">{metrics.connectionType}</span>
-            </div>
-            
-            <div className={`flex items-center gap-1 ${getLatencyColor(metrics.latency)}`}>
-              <Activity className="h-3 w-3" />
-              <span>{metrics.latency}ms</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  return <>{children}</>;
 }
 
-// Simple ping API route helper
-export function createPingRoute() {
-  return {
-    GET: () => new Response('pong', { status: 200 }),
-    HEAD: () => new Response(null, { status: 200 })
-  };
+// Hook for measuring component performance
+export function usePerformanceTimer(name: string) {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const startTime = performance.now();
+    
+    return () => {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`${name} render time: ${duration.toFixed(2)}ms`);
+      }
+      
+      // Mark for performance timeline
+      if ('mark' in performance) {
+        performance.mark(`${name}-start`, { startTime });
+        performance.mark(`${name}-end`, { startTime: endTime });
+        performance.measure(name, `${name}-start`, `${name}-end`);
+      }
+    };
+  }, [name]);
+}
+
+// Component to display performance info in development
+export function PerformanceInfo() {
+  if (process.env.NODE_ENV !== 'development') {
+    return null;
+  }
+
+  useEffect(() => {
+    const logPerformanceInfo = () => {
+      const metrics = measurePerformance();
+      console.group('Performance Metrics');
+      
+      if (metrics.navigationTiming) {
+        const nav = metrics.navigationTiming;
+        console.log('Page Load Time:', nav.loadEventEnd - nav.navigationStart, 'ms');
+        console.log('DOM Content Loaded:', nav.domContentLoadedEventEnd - nav.navigationStart, 'ms');
+        console.log('Time to Interactive:', nav.domInteractive - nav.navigationStart, 'ms');
+      }
+      
+      if (metrics.paintTiming) {
+        metrics.paintTiming.forEach(entry => {
+          console.log(`${entry.name}:`, entry.startTime, 'ms');
+        });
+      }
+      
+      if (metrics.largestContentfulPaint) {
+        const lcp = metrics.largestContentfulPaint[metrics.largestContentfulPaint.length - 1];
+        console.log('Largest Contentful Paint:', lcp.startTime, 'ms');
+      }
+      
+      console.groupEnd();
+    };
+
+    // Wait for page to fully load
+    if (document.readyState === 'complete') {
+      logPerformanceInfo();
+    } else {
+      window.addEventListener('load', logPerformanceInfo);
+      return () => window.removeEventListener('load', logPerformanceInfo);
+    }
+  }, []);
+
+  return null;
 }
