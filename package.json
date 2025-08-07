@@ -1,15 +1,28 @@
 {
-  "name": "nextn",
-  "version": "0.1.0",
+  "name": "astralcore-platform",
+  "version": "1.0.0",
+  "description": "AstralCore - Modern crypto trading platform with AI-powered features",
   "private": true,
+  "author": "AstralCore Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.19.4",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
-    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "lint": "next lint --fix",
+    "lint:check": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Tests coming soon\" && exit 0",
+    "postinstall": "npm run typecheck",
+    "build:analyze": "ANALYZE=true npm run build",
+    "clean": "rm -rf .next && rm -rf out",
+    "export": "next export",
+    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
+    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts"
   },
   "dependencies": {
     "@builder.io/react": "^8.2.6",
