@@ -22,6 +22,8 @@ import { AstralLogo } from '@/components/icons/astral-logo';
 import { FuturisticLoading } from '@/components/ui/futuristic-loading';
 import { EnhancedThemeToggle } from '@/components/ui/enhanced-theme-toggle';
 import { UserProvider } from '@/contexts/UserContext';
+import { MobileBottomNavigation } from '@/components/ui/mobile-bottom-navigation';
+import { SwipeableNavigation } from '@/components/ui/swipeable-navigation';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
 import { getUserRank, getCurrentTier } from '@/lib/ranks';
 import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
