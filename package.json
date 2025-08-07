@@ -87,14 +87,49 @@
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.5.1",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/node": "^20.19.4",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
     "@types/three": "^0.167.1",
+    "@typescript-eslint/eslint-plugin": "^8.18.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.3.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "genkit-cli": "^1.13.0",
-    "postcss": "^8",
+    "postcss": "^8.5.1",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.16.2",
-    "typescript": "^5"
-  }
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "resolutions": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1"
+  },
+  "keywords": [
+    "cryptocurrency",
+    "trading",
+    "ai",
+    "blockchain",
+    "nextjs",
+    "react",
+    "typescript",
+    "tailwindcss"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/astralcore-platform"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/astralcore-platform/issues"
+  },
+  "homepage": "https://astralcore.io"
 }
