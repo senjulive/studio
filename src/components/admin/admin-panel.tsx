@@ -115,68 +115,107 @@ export function AdminPanel() {
     };
 
     return (
-        <Card className="w-full max-w-7xl">
-            <CardHeader>
-                <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-2 rounded-lg">
-                        <Shield className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                        <CardTitle>AstralCore AI</CardTitle>
-                        <CardDescription>Platform management and user oversight system.</CardDescription>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+            <div className="max-w-7xl mx-auto space-y-6">
+                {/* Header */}
+                <div className="text-center space-y-4">
+                    <div className="flex items-center justify-center space-x-3">
+                        <div className="p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl backdrop-blur-sm border border-white/10">
+                            <Shield className="h-8 w-8 text-purple-400" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                                AstralCore Admin
+                            </h1>
+                            <p className="text-slate-400 text-sm md:text-base">
+                                Platform management and oversight system
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-12 gap-6">
-                    <div className="col-span-12 md:col-span-3 lg:col-span-2 space-y-4">
+
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Mobile Navigation */}
+                    <div className="lg:hidden">
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-4">
+                            <select
+                                value={activeView}
+                                onChange={(e) => setActiveView(e.target.value as AdminView)}
+                                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            >
+                                <option value="Dashboard">Dashboard</option>
+                                {Object.entries(adminSections).map(([sectionName, items]) => {
+                                    if (sectionName === 'Dashboard') return null;
+                                    return Object.entries(items).map(([itemName]) => (
+                                        <option key={itemName} value={itemName}>
+                                            {sectionName} - {itemName}
+                                        </option>
+                                    ));
+                                })}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Desktop Sidebar */}
+                    <div className="hidden lg:block lg:col-span-1 space-y-4">
                         {Object.entries(adminSections).map(([sectionName, items]) => {
                              if(sectionName === 'Dashboard') {
                                 const Icon = items.icon;
                                 return (
-                                    <Button
-                                        key={sectionName}
-                                        variant={activeView === sectionName ? 'default' : 'outline'}
-                                        onClick={() => setActiveView(sectionName as AdminView)}
-                                        className="w-full justify-start gap-2"
-                                    >
-                                        <Icon className="h-4 w-4" />
-                                        {sectionName}
-                                    </Button>
+                                    <div key={sectionName} className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-4">
+                                        <Button
+                                            variant={activeView === sectionName ? 'default' : 'outline'}
+                                            onClick={() => setActiveView(sectionName as AdminView)}
+                                            className={`w-full justify-start gap-2 ${
+                                                activeView === sectionName
+                                                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0'
+                                                    : 'border-white/20 text-white hover:bg-white/10'
+                                            }`}
+                                        >
+                                            <Icon className="h-4 w-4" />
+                                            {sectionName}
+                                        </Button>
+                                    </div>
                                 )
                              }
                              return (
-                                <div key={sectionName}>
-                                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">{sectionName}</h3>
-                                    <div className="space-y-1">
-                                    {Object.entries(items).map(([itemName, itemDetails]) => {
-                                        const Icon = itemDetails.icon;
-                                        return (
-                                            <Button
-                                                key={itemName}
-                                                variant={activeView === itemName ? 'secondary' : 'ghost'}
-                                                onClick={() => setActiveView(itemName as AdminView)}
-                                                className="w-full justify-start gap-2"
-                                            >
-                                                <Icon className="h-4 w-4" />
-                                                {itemName}
-                                            </Button>
-                                        )
-                                    })}
+                                <div key={sectionName} className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-4">
+                                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                                        {sectionName}
+                                    </h3>
+                                    <div className="space-y-2">
+                                        {Object.entries(items).map(([itemName, itemDetails]) => {
+                                            const Icon = itemDetails.icon;
+                                            return (
+                                                <Button
+                                                    key={itemName}
+                                                    variant={activeView === itemName ? 'secondary' : 'ghost'}
+                                                    onClick={() => setActiveView(itemName as AdminView)}
+                                                    className={`w-full justify-start gap-2 text-left ${
+                                                        activeView === itemName
+                                                            ? 'bg-white/10 text-white'
+                                                            : 'text-slate-300 hover:text-white hover:bg-white/5'
+                                                    }`}
+                                                >
+                                                    <Icon className="h-4 w-4" />
+                                                    <span className="truncate">{itemName}</span>
+                                                </Button>
+                                            )
+                                        })}
                                     </div>
                                 </div>
                             )
                         })}
                     </div>
-                    <div className="col-span-12 md:col-span-9 lg:col-span-10">
-                        <Card className="min-h-[70vh]">
-                            <CardContent className="p-6">
-                                {renderContent()}
-                            </CardContent>
-                        </Card>
+
+                    {/* Main Content */}
+                    <div className="lg:col-span-3">
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 min-h-[70vh] overflow-hidden">
+                            {renderContent()}
+                        </div>
                     </div>
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }
