@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@builder.io/react": "^8.2.6",
-    "@builder.io/sdk": "^3.1.1",
+    "@builder.io/sdk": "^2.2.4",
     "@genkit-ai/firebase": "^1.15.5",
     "@genkit-ai/googleai": "^1.13.0",
     "@genkit-ai/next": "^1.13.0",
