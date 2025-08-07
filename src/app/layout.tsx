@@ -106,8 +106,8 @@ export default function RootLayout({
         >
           {children}
           <Toaster />
-          <Analytics />
-          <SpeedInsights />
+          {/* <Analytics /> */}
+          {/* <SpeedInsights /> */}
         </AdvancedThemeProvider>
       </body>
     </html>
