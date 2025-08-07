@@ -542,75 +542,18 @@ export default function DashboardLayout({
           </main>
         </div>
 
-        {/* Bottom Navigation (Mobile Only) */}
-        <nav className="fixed bottom-0 left-0 right-0 h-20 bg-background/95 backdrop-blur-xl border-t border-border/50 lg:hidden z-40">
-          <div className="flex items-center justify-center h-full px-2 relative">
-            {bottomNavItems.map((item, index) => {
-              const isActive = isClient && pathname === item.href;
-              const IconComponent = item.icon;
-              const isCenter = item.isCenter;
+        {/* Enhanced Mobile Navigation */}
+        <MobileBottomNavigation onMenuToggle={() => setIsSidebarOpen(true)} />
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'flex flex-col items-center justify-center transition-all duration-200',
-                    isCenter
-                      ? 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10'
-                      : 'flex-1 px-1',
-                    isActive && !isCenter ? 'text-primary' : !isCenter ? 'text-muted-foreground' : ''
-                  )}
-                >
-                  {isCenter ? (
-                    <div className="relative">
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={cn(
-                          "p-4 rounded-full transition-all duration-300 shadow-lg",
-                          isActive
-                            ? "bg-gradient-to-r from-primary to-purple-600 text-white shadow-primary/50 shadow-2xl"
-                            : "bg-gradient-to-r from-primary/90 to-purple-500/90 text-white shadow-primary/30"
-                        )}
-                      >
-                        <IconComponent className="h-7 w-7" />
-                      </motion.div>
-                      {isActive && (
-                        <motion.div
-                          layoutId="centerActiveIndicator"
-                          className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary rounded-full"
-                        />
-                      )}
-                      <motion.div
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="absolute top-full mt-1 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
-                      >
-                        <span className="text-xs font-bold text-primary">{item.label}</span>
-                      </motion.div>
-                    </div>
-                  ) : (
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex flex-col items-center space-y-1 py-2"
-                    >
-                      <IconComponent className="h-5 w-5" />
-                      <span className="text-xs font-medium truncate">{item.label}</span>
-                      {isActive && (
-                        <motion.div
-                          layoutId="sideActiveIndicator"
-                          className="w-1 h-1 bg-primary rounded-full"
-                        />
-                      )}
-                    </motion.div>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
+        {/* Swipeable Side Navigation */}
+        <SwipeableNavigation
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          user={user}
+          wallet={wallet}
+          rank={rank}
+          tier={tier}
+        />
       </div>
     </UserProvider>
   );
