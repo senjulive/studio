@@ -1,0 +1,102 @@
+{
+  "totalUsers": 12456,
+  "activeUsersToday": 2134,
+  "activeUsersWeek": 8567,
+  "activeUsersMonth": 11234,
+  "newSignupsToday": 234,
+  "newSignupsWeek": 1567,
+  "newSignupsMonth": 4567,
+  "totalDeposits": 2456789.12,
+  "totalWithdrawals": 1234567.89,
+  "totalTradingVolume": 15678901.23,
+  "totalGridEarnings": 234567.89,
+  "averageDepositAmount": 197.53,
+  "averageWithdrawalAmount": 156.78,
+  "conversionRate": 12.5,
+  "retentionRate7Day": 78.9,
+  "retentionRate30Day": 45.6,
+  "churnRate": 5.2,
+  "topCountries": [
+    { "country": "United States", "users": 2456, "percentage": 19.7 },
+    { "country": "United Kingdom", "users": 1789, "percentage": 14.4 },
+    { "country": "Germany", "users": 1234, "percentage": 9.9 },
+    { "country": "Canada", "users": 987, "percentage": 7.9 },
+    { "country": "Australia", "users": 765, "percentage": 6.1 },
+    { "country": "France", "users": 654, "percentage": 5.2 },
+    { "country": "Netherlands", "users": 543, "percentage": 4.4 },
+    { "country": "Switzerland", "users": 432, "percentage": 3.5 },
+    { "country": "Sweden", "users": 321, "percentage": 2.6 },
+    { "country": "Norway", "users": 234, "percentage": 1.9 }
+  ],
+  "rankDistribution": [
+    { "rank": "Recruit", "count": 6789, "percentage": 54.5 },
+    { "rank": "Bronze", "count": 2345, "percentage": 18.8 },
+    { "rank": "Silver", "count": 1567, "percentage": 12.6 },
+    { "rank": "Gold", "count": 987, "percentage": 7.9 },
+    { "rank": "Platinum", "count": 543, "percentage": 4.4 },
+    { "rank": "Diamond", "count": 225, "percentage": 1.8 }
+  ],
+  "tierDistribution": [
+    { "tier": "Free", "count": 7890, "percentage": 63.3 },
+    { "tier": "Core I", "count": 2345, "percentage": 18.8 },
+    { "tier": "Core II", "count": 1234, "percentage": 9.9 },
+    { "tier": "Core III", "count": 654, "percentage": 5.2 },
+    { "tier": "Core IV", "count": 234, "percentage": 1.9 },
+    { "tier": "Core V", "count": 99, "percentage": 0.8 }
+  ],
+  "dailyActiveUsers": [
+    { "date": "2024-12-25", "users": 1987 },
+    { "date": "2024-12-26", "users": 2134 },
+    { "date": "2024-12-27", "users": 2456 },
+    { "date": "2024-12-28", "users": 2234 },
+    { "date": "2024-12-29", "users": 2567 },
+    { "date": "2024-12-30", "users": 2345 },
+    { "date": "2024-12-31", "users": 2134 }
+  ],
+  "monthlyGrowth": [
+    { "month": "2024-06", "newUsers": 3456, "totalUsers": 8567 },
+    { "month": "2024-07", "newUsers": 4123, "totalUsers": 9234 },
+    { "month": "2024-08", "newUsers": 3987, "totalUsers": 10123 },
+    { "month": "2024-09", "newUsers": 4234, "totalUsers": 10789 },
+    { "month": "2024-10", "newUsers": 4567, "totalUsers": 11456 },
+    { "month": "2024-11", "newUsers": 4321, "totalUsers": 11987 },
+    { "month": "2024-12", "newUsers": 4567, "totalUsers": 12456 }
+  ],
+  "revenueMetrics": {
+    "totalRevenue": 456789.12,
+    "monthlyRecurringRevenue": 67890.45,
+    "averageRevenuePerUser": 36.67,
+    "lifetimeValue": 245.89,
+    "revenueGrowthRate": 8.9
+  },
+  "tradingMetrics": {
+    "totalTrades": 234567,
+    "successfulTrades": 198456,
+    "successRate": 84.6,
+    "averageTradeValue": 67.89,
+    "mostTradedPair": "BTC/USDT",
+    "tradingVolume24h": 567890.12,
+    "topTradingPairs": [
+      { "pair": "BTC/USDT", "volume": 234567.89, "trades": 5678 },
+      { "pair": "ETH/USDT", "volume": 123456.78, "trades": 3456 },
+      { "pair": "BNB/USDT", "volume": 89012.34, "trades": 2345 },
+      { "pair": "ADA/USDT", "volume": 56789.01, "trades": 1567 },
+      { "pair": "DOT/USDT", "volume": 34567.89, "trades": 987 }
+    ]
+  },
+  "supportMetrics": {
+    "totalTickets": 1456,
+    "openTickets": 234,
+    "resolvedTickets": 1222,
+    "averageResponseTime": 4.2,
+    "customerSatisfactionScore": 4.7,
+    "ticketCategories": [
+      { "category": "Deposit Issues", "count": 345, "percentage": 23.7 },
+      { "category": "Withdrawal Issues", "count": 289, "percentage": 19.8 },
+      { "category": "Trading Support", "count": 234, "percentage": 16.1 },
+      { "category": "Account Issues", "count": 178, "percentage": 12.2 },
+      { "category": "Technical Support", "count": 156, "percentage": 10.7 },
+      { "category": "General Inquiry", "count": 254, "percentage": 17.4 }
+    ]
+  }
+}

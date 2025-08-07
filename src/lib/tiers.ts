@@ -1,4 +1,3 @@
-
 'use server';
 // This is a server-safe module for tier data and logic.
 // It does not contain any client-side code (like React components or hooks).
@@ -50,10 +49,22 @@ export async function getBotTierSettings(): Promise<TierSetting[]> {
     return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
-// Placeholder for the missing function
-export async function getCurrentTier(userId: string): Promise<TierSetting | undefined> {
-  console.warn("getCurrentTier is a placeholder and needs actual implementation.");
+// Function to get current tier based on balance
+export async function getCurrentTier(balance: number, tierSettings?: TierSetting[]): Promise<TierSetting | null> {
+  const tiers = tierSettings || await getBotTierSettings();
+
+  // Find the highest tier that the user qualifies for
+  const qualifiedTiers = tiers.filter(tier => balance >= tier.balanceThreshold);
+  return qualifiedTiers.length > 0
+    ? qualifiedTiers.reduce((highest, current) =>
+        current.balanceThreshold > highest.balanceThreshold ? current : highest
+      )
+    : null;
+}
+
+// Legacy function for compatibility - gets tier by user ID
+export async function getCurrentTierByUserId(userId: string): Promise<TierSetting | null> {
+  console.warn("getCurrentTierByUserId is a placeholder and needs actual implementation.");
   // TODO: Implement logic to get the current tier for a user
   return defaultTierSettings[0]; // Return a default tier for now
 }
-    

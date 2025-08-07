@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -10,14 +9,6 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -36,8 +27,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
-import { AstralLogo } from "../icons/astral-logo";
-import { register } from "@/lib/auth";
 import { countries } from "@/lib/countries";
 
 const MALDIVES_COUNTRY = countries.find(c => c.code === "MV")!;
@@ -82,23 +71,31 @@ export function RegisterForm() {
     const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      const { error } = await register({
-        email: values.email,
-        password: values.password,
-        options: {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+          options: {
             data: {
-                username: values.username,
-                contact_number: fullContactNumber,
-                country: countryInfo.name,
-                referral_code: values.referralCode,
+              username: values.username,
+              contact_number: fullContactNumber,
+              country: countryInfo.name,
+              referral_code: values.referralCode,
             }
-        }
+          }
+        }),
       });
-      
-      if (error) {
-        throw new Error(error);
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
       }
-      
+
       toast({
         title: "Account Created",
         description: "Your account has been created successfully. You can now log in.",
@@ -116,177 +113,200 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <AstralLogo className="mx-auto" />
-        <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
-        <CardDescription>
-          Join Astral Core and start your automated trading journey.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Username</FormLabel>
-                        <FormControl>
-                            <Input placeholder="your_username" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                            <Input placeholder="name@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" {...field} />
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                control={form.control}
-                name="country"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Country</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select your country" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {countries.map(c => (
-                                    <SelectItem key={c.code} value={c.code}>
-                                        <div className="flex items-center gap-2">
-                                            <span>{c.flag}</span>
-                                            <span>{c.name}</span>
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="contactNumber"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Contact Number</FormLabel>
-                    <FormControl>
-                        <div className="flex items-center gap-2">
-                        <div className="flex h-10 w-24 items-center justify-center rounded-md border bg-muted px-3 text-sm shrink-0">
-                            <span className="mr-2">{selectedCountry.flag}</span>
-                            <span>{selectedCountry.dial_code}</span>
-                        </div>
-                        <Input
-                            placeholder="Your phone number"
-                            {...field}
-                            className="flex-1"
-                        />
-                        </div>
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-            </div>
+    <div className="w-full space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
             <FormField
               control={form.control}
-              name="referralCode"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Squad Code (Optional)</FormLabel>
+                  <FormLabel className="text-white/90 text-sm">Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter squad code" {...field} />
+                    <Input 
+                      placeholder="your_username" 
+                      {...field} 
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200 h-10 text-sm"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Account
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-      <CardFooter className="text-center text-sm">
-        <p className="w-full text-muted-foreground">
-          Already have an account?{" "}
-          <Button variant="link" asChild className="p-0 h-auto">
-            <Link href="/login" className="font-semibold text-primary hover:text-primary/90">
-                Login
-            </Link>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white/90 text-sm">Email</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="name@example.com" 
+                      {...field} 
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200 h-10 text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white/90 text-sm">Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        type={showPassword ? "text" : "password"} 
+                        placeholder="••••••••" 
+                        {...field} 
+                        className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200 h-10 text-sm pr-9"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 text-white/70 hover:text-white hover:bg-white/20"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white/90 text-sm">Confirm</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        type={showConfirmPassword ? "text" : "password"} 
+                        placeholder="��•••••••" 
+                        {...field} 
+                        className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200 h-10 text-sm pr-9"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 text-white/70 hover:text-white hover:bg-white/20"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white/90 text-sm">Country</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-white/20 border-white/30 text-white focus:bg-white/30 focus:border-white/50 transition-all duration-200 h-10">
+                        <SelectValue placeholder="Select country" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-slate-900/95 border-white/20">
+                      {countries.map(c => (
+                        <SelectItem key={c.code} value={c.code} className="text-white hover:bg-white/10">
+                          <div className="flex items-center gap-2">
+                            <span>{c.flag}</span>
+                            <span className="text-xs">{c.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="contactNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white/90 text-sm">Phone</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-1">
+                      <div className="flex h-10 w-14 items-center justify-center rounded-md border border-white/30 bg-white/20 px-1 text-xs shrink-0 text-white">
+                        <span className="mr-1">{selectedCountry.flag}</span>
+                        <span className="text-xs">{selectedCountry.dial_code}</span>
+                      </div>
+                      <Input
+                        placeholder="Phone number"
+                        {...field}
+                        className="flex-1 bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200 h-10 text-sm"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <FormField
+            control={form.control}
+            name="referralCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white/90 text-sm">Squad Code (Optional)</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter squad code" 
+                    {...field} 
+                    className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200 h-10 text-sm"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <Button 
+            type="submit" 
+            className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0 h-11 mt-6" 
+            disabled={isLoading}
+          >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Create Account
           </Button>
+        </form>
+      </Form>
+      
+      <div className="text-center text-sm">
+        <p className="text-white/70">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-white hover:text-white/80 font-semibold transition-colors duration-200 underline underline-offset-2"
+          >
+            Login
+          </Link>
         </p>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -11,14 +10,6 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Form,
   FormControl,
   FormField,
@@ -30,8 +21,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
-import { login } from "@/lib/auth";
-import { AstralLogo } from "../icons/astral-logo";
 import { Separator } from "../ui/separator";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
@@ -65,162 +54,185 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    
-    if (typeof window !== 'undefined') {
-        if (values.rememberMe) {
-            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
-        } else {
-            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
-        }
-        // Store email in session storage to determine role in dashboard layout
-        sessionStorage.setItem('loggedInEmail', values.email);
-    }
-    
-    const { error } = await login(values);
 
-    if (error) {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
         toast({
-            title: "Login Failed",
-            description: error,
-            variant: "destructive",
+          title: "Login Failed",
+          description: data.error,
+          variant: "destructive",
         });
-    } else {
+      } else {
+        if (typeof window !== 'undefined') {
+          if (values.rememberMe) {
+            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
+          } else {
+            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+          }
+          sessionStorage.setItem('loggedInEmail', values.email);
+        }
+
         toast({
           title: "Login Successful",
           description: "Welcome to AstralCore!",
         });
         router.push('/dashboard');
+      }
+    } catch (error) {
+      toast({
+        title: "Login Failed",
+        description: "Network error. Please try again.",
+        variant: "destructive",
+      });
     }
-    
+
     setIsLoading(false);
   };
 
   const handleGoogleSignIn = () => {
     console.log("UI: Google sign-in clicked");
-    // Placeholder for Google sign-in logic
   };
 
   const handleEmailSignIn = () => {
     console.log("UI: Email sign-in clicked");
-    // Placeholder for email sign-in logic
   }
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <AstralLogo className="mx-auto h-28 w-28" />
-        <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
-        <CardDescription>
-          Access the highly intelligent CORE Nexus Quantum v3.76 trading bot.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-4">
-          <Button variant="outline" onClick={handleGoogleSignIn}>
-            Sign in with Google
-          </Button>
-          <Button variant="outline" onClick={handleEmailSignIn}>
-            Sign in with Email
-          </Button>
-        </div>
-        <div className="relative my-4">
-          <Separator />
-          <span className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-            OR
-          </span>
-        </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
-                    <Button variant="link" asChild className="p-0 h-auto text-sm">
-                      <Link
-                        href="/forgot-password"
-                        className="font-medium text-primary/80 hover:text-primary"
-                      >
-                        Forgot password?
-                      </Link>
+    <div className="w-full space-y-6">
+      <div className="flex flex-col gap-3">
+        <Button 
+          variant="outline" 
+          onClick={handleGoogleSignIn}
+          className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:border-white/50 transition-all duration-200"
+        >
+          Sign in with Google
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={handleEmailSignIn}
+          className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:border-white/50 transition-all duration-200"
+        >
+          Sign in with Email
+        </Button>
+      </div>
+      
+      <div className="relative">
+        <Separator className="bg-white/30" />
+        <span className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-transparent px-3 text-xs text-white/70">
+          OR
+        </span>
+      </div>
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white/90">Email</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="name@example.com" 
+                    {...field} 
+                    className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center justify-between">
+                  <FormLabel className="text-white/90">Password</FormLabel>
+                  <Button variant="link" asChild className="p-0 h-auto text-sm">
+                    <Link
+                      href="/forgot-password"
+                      className="text-white/80 hover:text-white transition-colors duration-200"
+                    >
+                      Forgot password?
+                    </Link>
+                  </Button>
+                </div>
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="••••••••" 
+                      {...field} 
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30 focus:border-white/50 transition-all duration-200 pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-white/70 hover:text-white hover:bg-white/20"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
-                  <FormControl>
-                    <div className="relative">
-                      <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="rememberMe"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      Remember me
-                    </FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Authorizing..." : "Login"}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-      <CardFooter className="text-center text-sm">
-        <p className="w-full text-muted-foreground">
-          Don't have an account?{" "}
-          <Button variant="link" asChild className="p-0 h-auto">
-            <Link
-                href="/register"
-                className="font-semibold text-primary hover:text-primary/90"
-            >
-                Register
-            </Link>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="rememberMe"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    className="border-white/30 data-[state=checked]:bg-white/20 data-[state=checked]:border-white/50"
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="text-white/90 text-sm">
+                    Remember me
+                  </FormLabel>
+                </div>
+              </FormItem>
+            )}
+          />
+          <Button
+            type="submit"
+            className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0 h-11"
+            disabled={isLoading}
+          >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading ? "Authorizing..." : "Login"}
           </Button>
+        </form>
+      </Form>
+      
+      <div className="text-center text-sm">
+        <p className="text-white/70">
+          Don't have an account?{" "}
+          <Link
+            href="/register"
+            className="text-white hover:text-white/80 font-semibold transition-colors duration-200 underline underline-offset-2"
+          >
+            Register
+          </Link>
         </p>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

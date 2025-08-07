@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "globalMultiplier": 1.0,
+    "dailyResetTime": "00:00",
+    "maxRewardsPerDay": 10,
+    "vipBonusMultiplier": 1.5,
+    "referralLevels": [
+      {
+        "level": 1,
+        "percentage": 5,
+        "maxDepth": 3
+      },
+      {
+        "level": 2,
+        "percentage": 2,
+        "maxDepth": 2
+      },
+      {
+        "level": 3,
+        "percentage": 1,
+        "maxDepth": 1
+      }
+    ]
+  }
+}

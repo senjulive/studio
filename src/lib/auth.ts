@@ -1,63 +1,154 @@
-'use server';
+// Mock authentication functions for the crypto trading platform
 
-import { redirect } from 'next/navigation';
-
-type Credentials = {
-    email?: string;
-    password?: string;
-    options?: any;
+export interface User {
+  id: string;
+  email: string;
+  username?: string;
+  isAdmin?: boolean;
+  isModerator?: boolean;
 }
 
-const MOCK_ADMIN_EMAIL = "admin@astralcore.io";
-const MOCK_MODERATOR_EMAIL = "moderator@astralcore.io";
-const MOCK_ADMIN_PASS = "admin";
-const MOCK_MODERATOR_PASS = "moderator";
-
-export async function login(credentials: Credentials) {
-  console.log("Mock Login Attempt with:", credentials.email);
-  
-  if (!credentials.email || !credentials.password) {
-      return { error: "Please provide both email and password." };
-  }
-
-  if (credentials.email === MOCK_ADMIN_EMAIL && credentials.password === MOCK_ADMIN_PASS) {
-      return { error: null, role: 'admin' };
-  }
-
-  if (credentials.email === MOCK_MODERATOR_EMAIL && credentials.password === MOCK_MODERATOR_PASS) {
-      return { error: null, role: 'moderator' };
-  }
-
-  // Allow any other login for demo purposes
-  if (credentials.email.includes('@')) {
-      return { error: null, role: 'user' };
-  }
-  
-  return { error: "Invalid credentials" };
+export interface LoginCredentials {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
 }
 
-export async function register(credentials: Credentials) {
-  console.log("Mock Registration Attempt for:", credentials.email);
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  username?: string;
+  confirmPassword: string;
+}
+
+// Mock login function
+export async function login(credentials: LoginCredentials): Promise<{ user?: User; error?: string }> {
+  const { email, password } = credentials;
   
-  if (credentials.email && credentials.password) {
-    if (credentials.email === MOCK_ADMIN_EMAIL || credentials.email === MOCK_MODERATOR_EMAIL) {
-        return { error: "This email is reserved. Please use a different email." };
+  // Mock validation
+  if (!email || !password) {
+    return { error: 'Email and password are required' };
+  }
+  
+  // Mock user data
+  const mockUsers: Record<string, { password: string; user: User }> = {
+    'admin@astralcore.io': {
+      password: 'admin123',
+      user: {
+        id: 'admin-001',
+        email: 'admin@astralcore.io',
+        username: 'Admin',
+        isAdmin: true,
+      }
+    },
+    'moderator@astralcore.io': {
+      password: 'mod123',
+      user: {
+        id: 'mod-001',
+        email: 'moderator@astralcore.io',
+        username: 'Moderator',
+        isModerator: true,
+      }
+    },
+    'user@example.com': {
+      password: 'user123',
+      user: {
+        id: 'user-001',
+        email: 'user@example.com',
+        username: 'User',
+      }
     }
-    // In a real app, you would create a user here.
-    return { error: null };
+  };
+  
+  const userData = mockUsers[email];
+  if (!userData || userData.password !== password) {
+    return { error: 'Invalid email or password' };
   }
-  return { error: 'Registration failed. Please provide all required information.' };
+  
+  return { user: userData.user };
 }
 
-export async function logout() {
-  // In a real app, you would clear the session/token here.
-  // For the mock app, we just clear session storage and redirect.
-  redirect('/');
+// Mock register function
+export async function register(credentials: RegisterCredentials): Promise<{ user?: User; error?: string }> {
+  const { email, password, confirmPassword, username } = credentials;
+  
+  // Mock validation
+  if (!email || !password || !confirmPassword) {
+    return { error: 'All fields are required' };
+  }
+  
+  if (password !== confirmPassword) {
+    return { error: 'Passwords do not match' };
+  }
+  
+  if (password.length < 6) {
+    return { error: 'Password must be at least 6 characters' };
+  }
+  
+  // Check if user already exists (mock)
+  if (email === 'admin@astralcore.io' || email === 'moderator@astralcore.io') {
+    return { error: 'User already exists' };
+  }
+  
+  // Create new user
+  const newUser: User = {
+    id: `user-${Date.now()}`,
+    email,
+    username: username || email.split('@')[0],
+  };
+  
+  return { user: newUser };
 }
 
-export async function resetPasswordForEmail(email: string) {
-  console.log("Mock Password Reset requested for:", email);
-  // In a real app, you would trigger a password reset flow (e.g., send an email).
-  // For this demo, we just log the request and return success.
-  return null;
+// Mock logout function
+export async function logout(): Promise<{ success: boolean; error?: string }> {
+  // Mock logout logic
+  return { success: true };
+}
+
+// Mock session check
+export async function getSession(): Promise<{ user?: User; error?: string }> {
+  // Mock session retrieval - in real app this would check JWT/session storage
+  const storedEmail = typeof window !== 'undefined' ? sessionStorage.getItem('loggedInEmail') : null;
+  
+  if (!storedEmail) {
+    return { error: 'No session found' };
+  }
+  
+  // Return mock user based on stored email
+  return {
+    user: {
+      id: 'mock-user-123',
+      email: storedEmail,
+      username: storedEmail.split('@')[0],
+      isAdmin: storedEmail === 'admin@astralcore.io',
+      isModerator: storedEmail === 'moderator@astralcore.io',
+    }
+  };
+}
+
+// Mock password reset
+export async function resetPassword(email: string): Promise<{ success: boolean; error?: string }> {
+  if (!email) {
+    return { success: false, error: 'Email is required' };
+  }
+  
+  // Mock sending reset email
+  return { success: true };
+}
+
+// Mock token verification
+export async function verifyToken(token: string): Promise<{ user?: User; error?: string }> {
+  if (!token) {
+    return { error: 'Token is required' };
+  }
+  
+  // Mock token verification
+  return {
+    user: {
+      id: 'mock-user-123',
+      email: 'user@example.com',
+      username: 'User',
+    }
+  };
 }
