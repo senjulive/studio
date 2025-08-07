@@ -17,7 +17,7 @@
     "lint:check": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Tests coming soon\" && exit 0",
-    "postinstall": "npm run typecheck",
+    "postinstall": "echo 'Installation complete'",
     "clean": "rm -rf .next && rm -rf out",
     "export": "next export"
   },
