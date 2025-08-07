@@ -1,6 +1,6 @@
 import { getAllWallets } from './wallet';
 import { getAllNotifications } from './notifications';
-import { getPublicChatMessages } from './chat';
+import { getPublicChatMessages } from './chat-server';
 import { getAllSquadClans } from './squad-clans';
 import { getBotTierSettings } from './tiers';
 import { ranks, getUserRank } from './ranks';
