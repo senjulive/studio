@@ -1,0 +1,44 @@
+{
+  "rewards": [
+    {
+      "id": "reward-welcome",
+      "title": "Welcome Bonus",
+      "description": "Welcome to AstralCore! Claim your initial bonus.",
+      "type": "achievement",
+      "amount": 10,
+      "currency": "USDT",
+      "icon": "🎉",
+      "isActive": true,
+      "createdAt": "2024-12-30T00:00:00.000Z",
+      "updatedAt": "2024-12-30T00:00:00.000Z"
+    },
+    {
+      "id": "reward-daily",
+      "title": "Daily Login",
+      "description": "Login daily to claim this reward.",
+      "type": "daily",
+      "amount": 5,
+      "currency": "USDT",
+      "icon": "📅",
+      "isActive": true,
+      "cooldown": 24,
+      "createdAt": "2024-12-30T00:00:00.000Z",
+      "updatedAt": "2024-12-30T00:00:00.000Z"
+    },
+    {
+      "id": "reward-referral",
+      "title": "Squad Leader",
+      "description": "Invite 5 members to your squad to unlock this reward.",
+      "type": "referral",
+      "amount": 50,
+      "currency": "USDT",
+      "icon": "👥",
+      "isActive": true,
+      "requirements": {
+        "minReferrals": 5
+      },
+      "createdAt": "2024-12-30T00:00:00.000Z",
+      "updatedAt": "2024-12-30T00:00:00.000Z"
+    }
+  ]
+}
