@@ -222,4 +222,4 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
 };
 
-module.exports = withBundleAnalyzer(nextConfig);
+export default withBundleAnalyzer(nextConfig);
