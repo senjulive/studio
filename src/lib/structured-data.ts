@@ -193,17 +193,20 @@ export function generateSoftwareApplicationStructuredData(): StructuredData {
   };
 }
 
-// Helper function to inject structured data into page head
-export function injectStructuredData(data: StructuredData | StructuredData[]) {
+// Helper function to generate structured data JSON strings
+export function getStructuredDataScript(data: StructuredData | StructuredData[]): string {
   const structuredDataArray = Array.isArray(data) ? data : [data];
   
-  return structuredDataArray.map((item, index) => (
-    <script
-      key={`structured-data-${index}`}
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(item),
-      }}
-    />
-  ));
+  return structuredDataArray
+    .map(item => JSON.stringify(item))
+    .join('\n');
+}
+
+// Helper function to get structured data for HTML head
+export function getStructuredDataForHead(data: StructuredData | StructuredData[]): string {
+  const structuredDataArray = Array.isArray(data) ? data : [data];
+  
+  return structuredDataArray
+    .map(item => `<script type="application/ld+json">${JSON.stringify(item)}</script>`)
+    .join('\n');
 }
