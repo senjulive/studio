@@ -1,0 +1,244 @@
+{
+  "mock-user-123": {
+    "userId": "mock-user-123",
+    "status": "verified",
+    "level": "level_2",
+    "lastUpdated": "2024-12-15T10:30:00.000Z",
+    "documents": {
+      "identity": {
+        "type": "passport",
+        "status": "approved",
+        "documentNumber": "P1234567",
+        "issuingCountry": "US",
+        "expiryDate": "2030-06-15",
+        "submittedAt": "2024-12-10T14:20:00.000Z",
+        "approvedAt": "2024-12-11T09:15:00.000Z",
+        "reviewedBy": "admin@astralcore.io"
+      },
+      "address": {
+        "type": "utility_bill",
+        "status": "approved",
+        "documentDate": "2024-11-25",
+        "submittedAt": "2024-12-10T14:25:00.000Z",
+        "approvedAt": "2024-12-11T09:20:00.000Z",
+        "reviewedBy": "admin@astralcore.io"
+      },
+      "selfie": {
+        "status": "approved",
+        "submittedAt": "2024-12-10T14:30:00.000Z",
+        "approvedAt": "2024-12-11T09:25:00.000Z",
+        "reviewedBy": "admin@astralcore.io"
+      }
+    },
+    "limits": {
+      "daily": {
+        "deposit": 50000,
+        "withdrawal": 25000
+      },
+      "monthly": {
+        "deposit": 500000,
+        "withdrawal": 250000
+      }
+    },
+    "verificationHistory": [
+      {
+        "date": "2024-12-11T09:25:00.000Z",
+        "action": "approved",
+        "level": "level_2",
+        "reviewedBy": "admin@astralcore.io",
+        "notes": "All documents verified successfully"
+      },
+      {
+        "date": "2024-12-10T14:20:00.000Z",
+        "action": "submitted",
+        "level": "level_2",
+        "notes": "KYC documents submitted for review"
+      }
+    ]
+  },
+  "user-456": {
+    "userId": "user-456",
+    "status": "pending",
+    "level": "level_1",
+    "lastUpdated": "2024-12-31T08:45:00.000Z",
+    "documents": {
+      "identity": {
+        "type": "drivers_license",
+        "status": "under_review",
+        "documentNumber": "DL567890",
+        "issuingCountry": "CA",
+        "expiryDate": "2027-03-20",
+        "submittedAt": "2024-12-30T16:30:00.000Z",
+        "reviewedBy": null
+      },
+      "address": {
+        "type": "bank_statement",
+        "status": "pending",
+        "documentDate": "2024-12-28",
+        "submittedAt": "2024-12-30T16:35:00.000Z",
+        "reviewedBy": null
+      },
+      "selfie": {
+        "status": "pending",
+        "submittedAt": "2024-12-30T16:40:00.000Z",
+        "reviewedBy": null
+      }
+    },
+    "limits": {
+      "daily": {
+        "deposit": 5000,
+        "withdrawal": 1000
+      },
+      "monthly": {
+        "deposit": 10000,
+        "withdrawal": 5000
+      }
+    },
+    "verificationHistory": [
+      {
+        "date": "2024-12-30T16:30:00.000Z",
+        "action": "submitted",
+        "level": "level_1",
+        "notes": "Initial KYC documents submitted"
+      }
+    ]
+  },
+  "user-789": {
+    "userId": "user-789",
+    "status": "rejected",
+    "level": "level_0",
+    "lastUpdated": "2024-12-28T11:20:00.000Z",
+    "documents": {
+      "identity": {
+        "type": "national_id",
+        "status": "rejected",
+        "documentNumber": "ID123456",
+        "issuingCountry": "GB",
+        "expiryDate": "2026-08-10",
+        "submittedAt": "2024-12-25T13:15:00.000Z",
+        "rejectedAt": "2024-12-28T11:20:00.000Z",
+        "reviewedBy": "admin@astralcore.io",
+        "rejectionReason": "Document image quality too low, text not clearly visible"
+      },
+      "address": {
+        "type": "utility_bill",
+        "status": "rejected",
+        "documentDate": "2024-11-20",
+        "submittedAt": "2024-12-25T13:20:00.000Z",
+        "rejectedAt": "2024-12-28T11:25:00.000Z",
+        "reviewedBy": "admin@astralcore.io",
+        "rejectionReason": "Document older than 3 months"
+      },
+      "selfie": {
+        "status": "rejected",
+        "submittedAt": "2024-12-25T13:25:00.000Z",
+        "rejectedAt": "2024-12-28T11:30:00.000Z",
+        "reviewedBy": "admin@astralcore.io",
+        "rejectionReason": "Selfie does not match ID photo"
+      }
+    },
+    "limits": {
+      "daily": {
+        "deposit": 1000,
+        "withdrawal": 100
+      },
+      "monthly": {
+        "deposit": 2000,
+        "withdrawal": 500
+      }
+    },
+    "verificationHistory": [
+      {
+        "date": "2024-12-28T11:20:00.000Z",
+        "action": "rejected",
+        "level": "level_0",
+        "reviewedBy": "admin@astralcore.io",
+        "notes": "Multiple document issues - user can resubmit with corrected documents"
+      },
+      {
+        "date": "2024-12-25T13:15:00.000Z",
+        "action": "submitted",
+        "level": "level_1",
+        "notes": "Initial KYC documents submitted"
+      }
+    ]
+  },
+  "verificationLevels": {
+    "level_0": {
+      "name": "Unverified",
+      "description": "Basic account with limited functionality",
+      "requirements": [],
+      "limits": {
+        "daily": { "deposit": 1000, "withdrawal": 100 },
+        "monthly": { "deposit": 2000, "withdrawal": 500 }
+      },
+      "features": ["Basic trading", "Limited deposits"]
+    },
+    "level_1": {
+      "name": "Basic Verification",
+      "description": "Email and phone verification completed",
+      "requirements": ["Email verification", "Phone verification"],
+      "limits": {
+        "daily": { "deposit": 5000, "withdrawal": 1000 },
+        "monthly": { "deposit": 10000, "withdrawal": 5000 }
+      },
+      "features": ["Increased limits", "Basic features", "Customer support"]
+    },
+    "level_2": {
+      "name": "Full Verification",
+      "description": "Complete KYC verification with identity documents",
+      "requirements": ["Email verification", "Phone verification", "Identity document", "Address proof", "Selfie verification"],
+      "limits": {
+        "daily": { "deposit": 50000, "withdrawal": 25000 },
+        "monthly": { "deposit": 500000, "withdrawal": 250000 }
+      },
+      "features": ["Full platform access", "Maximum limits", "Priority support", "VIP features"]
+    },
+    "level_3": {
+      "name": "Enhanced Verification",
+      "description": "Additional verification for high-value transactions",
+      "requirements": ["All Level 2 requirements", "Source of funds documentation", "Enhanced due diligence"],
+      "limits": {
+        "daily": { "deposit": 100000, "withdrawal": 50000 },
+        "monthly": { "deposit": 1000000, "withdrawal": 500000 }
+      },
+      "features": ["Unlimited access", "Institutional features", "Dedicated support"]
+    }
+  },
+  "documentTypes": {
+    "identity": [
+      { "type": "passport", "name": "Passport", "acceptedCountries": ["all"] },
+      { "type": "drivers_license", "name": "Driver's License", "acceptedCountries": ["US", "CA", "AU", "GB"] },
+      { "type": "national_id", "name": "National ID Card", "acceptedCountries": ["EU", "GB", "other"] }
+    ],
+    "address": [
+      { "type": "utility_bill", "name": "Utility Bill", "maxAge": 90 },
+      { "type": "bank_statement", "name": "Bank Statement", "maxAge": 90 },
+      { "type": "tax_document", "name": "Tax Document", "maxAge": 365 },
+      { "type": "rental_agreement", "name": "Rental Agreement", "maxAge": 365 }
+    ]
+  },
+  "statistics": {
+    "totalUsers": 12456,
+    "verifiedUsers": 8934,
+    "pendingVerifications": 234,
+    "rejectedVerifications": 156,
+    "verificationRate": 71.7,
+    "averageProcessingTime": 24,
+    "levelDistribution": {
+      "level_0": 3522,
+      "level_1": 1834,
+      "level_2": 6890,
+      "level_3": 210
+    },
+    "rejectionReasons": {
+      "poor_image_quality": 45,
+      "document_expired": 23,
+      "document_mismatch": 18,
+      "selfie_mismatch": 35,
+      "document_too_old": 12,
+      "fake_document": 8,
+      "other": 15
+    }
+  }
+}
