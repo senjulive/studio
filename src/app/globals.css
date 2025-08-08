@@ -118,6 +118,15 @@
     50% { transform: translateY(-15px) scale(1.1); opacity: 1; }
     100% { transform: translateY(-40px) scale(0.8); opacity: 0; }
   }
+
+  /* Scrollbar hiding for neon wallet */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @layer components {

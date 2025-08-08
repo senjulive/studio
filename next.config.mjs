@@ -11,6 +11,7 @@ const nextConfig = {
     },
     optimizePackageImports: ['framer-motion', 'lucide-react'],
   },
+<<<<<<< HEAD
   
   // Image optimization
   images: {
@@ -23,11 +24,19 @@ const nextConfig = {
   },
   
   // Headers for security and performance
+=======
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['*'],
+    },
+  },
+>>>>>>> 9c0dc93ce72204eaa05223df50eccbb00523820a
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
+<<<<<<< HEAD
           // Security headers
           {
             key: 'X-DNS-Prefetch-Control',
@@ -101,11 +110,17 @@ const nextConfig = {
           {
             key: 'Access-Control-Allow-Headers',
             value: 'Content-Type, Authorization'
+=======
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+>>>>>>> 9c0dc93ce72204eaa05223df50eccbb00523820a
           },
         ],
       },
     ];
   },
+<<<<<<< HEAD
   
   // Redirects for SEO and UX
   async redirects() {
@@ -209,6 +224,8 @@ const nextConfig = {
   assetPrefix: process.env.NODE_ENV === 'production' 
     ? process.env.CDN_URL || '' 
     : '',
+=======
+>>>>>>> 9c0dc93ce72204eaa05223df50eccbb00523820a
 };
 
 export default nextConfig;
