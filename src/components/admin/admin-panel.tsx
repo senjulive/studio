@@ -87,9 +87,12 @@ const adminSections = {
 } as const;
 
 
-type AdminView = keyof (typeof adminSections)['User Management'] | 
+type AdminView = keyof (typeof adminSections)['User Management'] |
                  keyof (typeof adminSections)['Platform Activity'] |
                  keyof (typeof adminSections)['Content & Engagement'] |
+                 keyof (typeof adminSections)['Financial Management'] |
+                 keyof (typeof adminSections)['Security & Monitoring'] |
+                 keyof (typeof adminSections)['Communications'] |
                  keyof (typeof adminSections)['Platform Settings'] |
                  'Dashboard';
 
