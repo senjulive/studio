@@ -2,15 +2,18 @@ import { RegisterForm } from "@/components/auth/register-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Register - Quantum Ninja",
-    description: "Create your Quantum Ninja account.",
+    title: "Register - AstralCore",
+    description: "Create your AstralCore account.",
 };
 
 export default function RegisterPage() {
   return (
     <div className="container">
       <header className="qn-header">
-        <div className="qn-logo">Quantum Ninja</div>
+        <div className="qn-logo">
+          <AstralLogo className="h-8 w-8 mr-2" />
+          AstralCore
+        </div>
         <div className="auth-buttons">
           <span style={{color: 'var(--qn-light)'}}>Already have an account?</span>
           <a href="/login" className="qn-btn qn-btn-outline">Login</a>
