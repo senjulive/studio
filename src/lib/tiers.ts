@@ -21,7 +21,7 @@ const tierSettings: TierSetting[] = [
   { id: 'tier-8', name: 'VIP CORE VIII', balanceThreshold: 100000, dailyProfit: 0.12, clicks: 15, locked: true },
 ];
 
-export async function getBotTierSettings(): Promise<TierSetting[]> {
+export function getBotTierSettings(): TierSetting[] {
   return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
