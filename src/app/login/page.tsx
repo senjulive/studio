@@ -1,10 +1,14 @@
 import { LoginForm } from "@/components/auth/login-form";
+import { AstralLogo } from '@/components/icons/astral-logo';
 
 export default function LoginPage() {
   return (
     <div className="container">
       <header className="qn-header">
-        <div className="qn-logo">Quantum Ninja</div>
+        <div className="qn-logo">
+          <AstralLogo className="h-8 w-8 mr-2" />
+          AstralCore
+        </div>
         <div className="auth-buttons">
           <span style={{color: 'var(--qn-light)'}}>Don't have an account?</span>
           <a href="/register" className="qn-btn qn-btn-primary">Register</a>
