@@ -271,7 +271,9 @@
 
   /* Enhanced mobile styles */
   .mobile-container {
-    @apply max-w-sm mx-auto min-h-screen px-4 py-safe;
+    @apply max-w-sm mx-auto min-h-screen px-4 py-4;
+    padding-top: env(safe-area-inset-top, 1rem);
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
   }
 
   .mobile-header {
@@ -279,7 +281,8 @@
   }
 
   .mobile-content {
-    @apply space-y-4 pb-safe;
+    @apply space-y-4 pb-4;
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
   }
 
   .mobile-card {
