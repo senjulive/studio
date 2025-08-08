@@ -186,7 +186,7 @@ export function NeonWalletView() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          {cryptoAssets.map((asset) => (
+          {userAssets.length > 0 ? userAssets.map((asset) => (
             <div
               key={asset.id}
               className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-white/10 p-4 transition-all duration-300 hover:scale-[1.02] hover:border-purple-500/30"
@@ -230,7 +230,12 @@ export function NeonWalletView() {
                 </Badge>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="col-span-2 text-center p-8 text-gray-400">
+              <p className="text-lg mb-2">No assets found</p>
+              <p className="text-sm">Make a deposit to get started</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -241,7 +246,7 @@ export function NeonWalletView() {
             { href: "/dashboard", label: "Wallet", icon: "₿", active: true },
             { href: "/dashboard/market", label: "Portfolio", icon: "◉" },
             { href: "/dashboard/trading", label: "Trade", icon: "⚡" },
-            { href: "/dashboard/profile", label: "Settings", icon: "⚙" }
+            { href: "/dashboard/profile", label: "Settings", icon: "���" }
           ].map((item) => (
             <Link
               key={item.href}
