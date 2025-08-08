@@ -273,41 +273,20 @@ URL=${window.location.origin}`;
             </div>
           </SidebarHeader>
 
-          <div className="mt-12 mb-4 px-4 space-y-4">
-             <div className="flex items-center gap-3">
-                  <AvatarUploadDialog 
-                    onUploadSuccess={() => fetchWalletAndTiers(user.id)}
-                    wallet={wallet}
-                  >
-                    <Avatar className="h-12 w-12 cursor-pointer">
-                      <AvatarImage
-                        src={wallet?.profile?.avatarUrl}
-                        alt={wallet?.profile?.username || 'User'}
-                      />
-                      <AvatarFallback>{userInitial}</AvatarFallback>
-                    </Avatar>
-                  </AvatarUploadDialog>
-
-                  <div className="overflow-hidden">
-                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
-                        {wallet?.profile?.username || 'User'}
-                        {userCountry && <span className="text-lg">{userCountry.flag}</span>}
-                     </p>
-                     <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
-                  </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
-                    <RankIcon className="h-4 w-4" />
-                    <span>{rank.name}</span>
-                 </Badge>
-                 {tier && TierIcon && tierClassName && (
-                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
-                    <TierIcon className="h-4 w-4" />
-                    <span>{tier.name}</span>
-                  </Badge>
-                )}
-              </div>
+          <div className="qn-user-profile">
+            <div className="qn-avatar">{userInitial}</div>
+            <h3>{wallet?.profile?.username || 'AstralCore User'}</h3>
+            <div className="qn-badge" style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
+              <RankIcon className={cn("h-3 w-3", rank.color)} />
+              {rank.name}
+              {tier && TierIcon && (
+                <>
+                  <TierIcon className={cn("h-3 w-3 ml-1", tierClassName)} />
+                  {tier.name}
+                </>
+              )}
+              {userCountry && <span style={{marginLeft: '4px'}}>{userCountry.flag}</span>}
+            </div>
           </div>
           <Separator className="bg-sidebar-border" />
 
