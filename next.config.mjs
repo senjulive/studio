@@ -27,7 +27,7 @@ const nextConfig = {
       allowedOrigins: [
         'localhost:3000',
         '83d3739d531b4aadbdae8a7a08a3f33b-eba19dfe758949da97869d4e9.fly.dev',
-        /^.+\.fly\.dev$/
+        '*.fly.dev'
       ],
     },
   },
