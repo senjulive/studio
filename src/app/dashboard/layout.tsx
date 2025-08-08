@@ -421,7 +421,7 @@ URL=${window.location.origin}`;
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
-                  isClient && pathname.endsWith(item.href)
+                  isClient && pathname?.endsWith(item.href)
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
