@@ -1,4 +1,5 @@
 import { ProTraderView } from '@/components/dashboard/pro-trader-view';
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,6 +9,11 @@ export const metadata: Metadata = {
 
 export default function TradingPage() {
   return (
-    <ProTraderView />
+    <QuantumPageWrapper
+      title="Astral Core Trading"
+      description="Advanced trading bot with Grid Trading technology"
+    >
+      <ProTraderView />
+    </QuantumPageWrapper>
   );
 }
