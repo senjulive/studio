@@ -36,7 +36,7 @@ import { format } from 'date-fns';
 import { Badge } from '../ui/badge';
 import { getUserRank } from '@/lib/ranks';
 import { tierIcons, tierClassNames } from '@/lib/settings';
-import { GridTradingAnimation } from './grid-trading-animation';
+import { TradingChartAnimation } from './trading-chart-animation';
 import Link from 'next/link';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -606,15 +606,15 @@ export function ProTraderView() {
                             </div>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <div className="aspect-video bg-gradient-to-br from-background to-muted/20 relative overflow-hidden">
-                                <GridTradingAnimation 
-                                    totalBalance={totalBalance} 
-                                    profitPerTrade={profitPerTrade} 
-                                    profitPercentage={profitPercentagePerTrade} 
-                                    setBotLog={setBotLog} 
-                                    isAnimating={isAnimating} 
-                                    candlestickData={simState.candlestickData} 
-                                    currentPrice={simState.currentPrice} 
+                            <div className="aspect-video relative overflow-hidden">
+                                <TradingChartAnimation
+                                    totalBalance={totalBalance}
+                                    profitPerTrade={profitPerTrade}
+                                    profitPercentage={profitPercentagePerTrade}
+                                    setBotLog={setBotLog}
+                                    isAnimating={isAnimating}
+                                    candlestickData={simState.candlestickData}
+                                    currentPrice={simState.currentPrice}
                                 />
                             </div>
                         </CardContent>
