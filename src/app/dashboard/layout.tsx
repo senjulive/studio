@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -266,13 +265,11 @@ URL=${window.location.origin}`;
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
-        <Sidebar>
+        <Sidebar className="qn-sidebar">
           <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <AstralLogo className="h-10 w-10" />
-              <span className="text-lg font-semibold text-sidebar-foreground">
-                AstralCore
-              </span>
+            <div className="qn-logo" style={{justifyContent: 'flex-start', padding: '10px 0'}}>
+              <AstralLogo className="h-8 w-8 mr-2" />
+              AstralCore
             </div>
           </SidebarHeader>
 
