@@ -1,10 +1,14 @@
 import Link from 'next/link';
+import { AstralLogo } from '@/components/icons/astral-logo';
 
 export default function WelcomePage() {
   return (
     <div className="container">
       <header className="qn-header">
-        <div className="qn-logo">Quantum Ninja</div>
+        <div className="qn-logo">
+          <AstralLogo className="h-8 w-8 mr-2" />
+          AstralCore
+        </div>
         <div className="auth-buttons">
           <Link href="/login" className="qn-btn qn-btn-outline">Login</Link>
           <Link href="/register" className="qn-btn qn-btn-primary">Register</Link>
