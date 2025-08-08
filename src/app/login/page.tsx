@@ -14,7 +14,7 @@ export default function LoginPage() {
           <a href="/register" className="qn-btn qn-btn-primary">Register</a>
         </div>
       </header>
-
+      
       <main className="flex min-h-[80vh] items-center justify-center p-4">
         <div className="qn-main-content" style={{maxWidth: '400px', width: '100%'}}>
           <div style={{textAlign: 'center', marginBottom: '30px'}}>
