@@ -104,15 +104,32 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
   return (
     <TooltipProvider>
       <motion.div
+        ref={containerRef}
         initial={{ x: 100, opacity: 0 }}
-        animate={{ 
-          x: isVisible ? 0 : 100, 
-          opacity: isVisible ? 1 : 0 
+        animate={{
+          x: isVisible ? 0 : 100,
+          opacity: isVisible ? 1 : 0
         }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-40"
+        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+        className="fixed right-2 top-1/2 -translate-y-1/2 z-40"
+        drag="x"
+        dragConstraints={{ left: -100, right: 50 }}
+        dragElastic={0.1}
+        onPan={handlePan}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
       >
-        <div className="glass-nav rounded-2xl p-2 shadow-lg">
+        <motion.div
+          className="relative backdrop-blur-xl bg-background/20 border border-white/10 rounded-3xl p-3 shadow-2xl shadow-black/20"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+          }}
+          whileHover={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)',
+          }}
+        >
           {/* Toggle Button */}
           <div className="flex items-center justify-center mb-2">
             <Button
@@ -247,7 +264,7 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="w-8 h-8 glass-button"
+                      className="w-9 h-9 backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:scale-105 transition-all duration-300"
                     >
                       <MessageSquare className="h-4 w-4 text-green-500" />
                     </Button>
@@ -265,7 +282,7 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="w-8 h-8 glass-button"
+                      className="w-9 h-9 backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:scale-105 transition-all duration-300"
                     >
                       <TrendingUp className="h-4 w-4 text-orange-500" />
                     </Button>
@@ -277,7 +294,7 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
               </Tooltip>
             </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Edge indicator for swipe */}
         {!isVisible && (
