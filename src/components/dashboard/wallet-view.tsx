@@ -157,6 +157,7 @@ const assetConfig = [
 export function WalletView() {
   const { wallet: walletData, tier, rank } = useUser();
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
+  const [useNeonView, setUseNeonView] = React.useState(false);
 
   React.useEffect(() => {
     setAllAssetsData(initialCryptoData);
