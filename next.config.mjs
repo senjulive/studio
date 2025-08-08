@@ -2,16 +2,14 @@
 const nextConfig = {
   // React settings
   reactStrictMode: true,
-  swcMinify: true,
   
   // Experimental features
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'astralcore.app'],
+      allowedOrigins: ['localhost:3000', 'astralcore.app', '*'],
     },
     optimizePackageImports: ['framer-motion', 'lucide-react'],
   },
-<<<<<<< HEAD
   
   // Image optimization
   images: {
@@ -24,19 +22,11 @@ const nextConfig = {
   },
   
   // Headers for security and performance
-=======
-  experimental: {
-    serverActions: {
-      allowedOrigins: ['*'],
-    },
-  },
->>>>>>> 9c0dc93ce72204eaa05223df50eccbb00523820a
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-<<<<<<< HEAD
           // Security headers
           {
             key: 'X-DNS-Prefetch-Control',
@@ -110,17 +100,11 @@ const nextConfig = {
           {
             key: 'Access-Control-Allow-Headers',
             value: 'Content-Type, Authorization'
-=======
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
->>>>>>> 9c0dc93ce72204eaa05223df50eccbb00523820a
           },
         ],
       },
     ];
   },
-<<<<<<< HEAD
   
   // Redirects for SEO and UX
   async redirects() {
@@ -148,7 +132,7 @@ const nextConfig = {
     ];
   },
   
-  // Webpack optimization
+  // Webpack optimization - simplified to avoid babel-loader issues
   webpack: (config, { dev, isServer }) => {
     // Production optimizations
     if (!dev) {
@@ -158,33 +142,6 @@ const nextConfig = {
         usedExports: true,
       };
     }
-    
-    // Bundle analyzer (development only)
-    if (dev && process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'server',
-          analyzerPort: isServer ? 8888 : 8889,
-          openAnalyzer: true,
-        })
-      );
-    }
-    
-    // Optimize imports
-    config.module.rules.push({
-      test: /\.(js|jsx|ts|tsx)$/,
-      use: [{
-        loader: 'babel-loader',
-        options: {
-          presets: ['next/babel'],
-          plugins: [
-            ['import', { libraryName: 'framer-motion', style: false }, 'framer-motion'],
-            ['import', { libraryName: 'lucide-react', style: false }, 'lucide-react'],
-          ]
-        }
-      }]
-    });
     
     return config;
   },
@@ -224,8 +181,6 @@ const nextConfig = {
   assetPrefix: process.env.NODE_ENV === 'production' 
     ? process.env.CDN_URL || '' 
     : '',
-=======
->>>>>>> 9c0dc93ce72204eaa05223df50eccbb00523820a
 };
 
 export default nextConfig;
