@@ -1,12 +1,8 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
+// Client-safe squad-clans module - uses static/mock data
 import { getAllWallets, getWalletByUserId } from './wallet';
 import { type Rank } from './ranks';
 import { type TierSetting } from './tiers';
 import { getBotTierSettings } from './tiers';
-
-const CLANS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-clans.json');
-const CHATS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-chats.json');
 
 export type Clan = {
     id: string;
