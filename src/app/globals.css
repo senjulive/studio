@@ -485,6 +485,83 @@
     background: rgba(110, 0, 255, 0.1);
   }
 
+  /* Apply Quantum Ninja styling to existing sidebar */
+  .sidebar {
+    background: rgba(10, 10, 26, 0.8) !important;
+    border-radius: 10px !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .sidebar [data-sidebar="header"] {
+    padding: 20px !important;
+  }
+
+  .sidebar [data-sidebar="header"] .qn-logo {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    background: linear-gradient(90deg, var(--qn-primary), var(--qn-secondary)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+
+  .sidebar [data-sidebar="content"] {
+    padding: 0 20px !important;
+  }
+
+  .sidebar [data-sidebar="menu"] a {
+    color: var(--qn-light) !important;
+    transition: all 0.3s !important;
+    border-radius: 6px !important;
+    padding: 10px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .sidebar [data-sidebar="menu"] a:hover,
+  .sidebar [data-sidebar="menu"] a[data-active="true"] {
+    background: rgba(110, 0, 255, 0.2) !important;
+    color: var(--qn-secondary) !important;
+  }
+
+  .sidebar [data-sidebar="menu"] p {
+    color: var(--qn-secondary) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .sidebar [data-sidebar="footer"] {
+    padding: 20px !important;
+  }
+
+  /* Style the main content area */
+  [data-sidebar="inset"] {
+    background: rgba(10, 10, 26, 0.8) !important;
+    border-radius: 10px !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    margin: 20px !important;
+    padding: 20px !important;
+  }
+
+  /* Bottom navigation styling */
+  nav[class*="fixed bottom-0"] {
+    background: rgba(10, 10, 26, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  nav[class*="fixed bottom-0"] a {
+    color: var(--qn-light) !important;
+    transition: all 0.3s !important;
+  }
+
+  nav[class*="fixed bottom-0"] a[data-active="true"],
+  nav[class*="fixed bottom-0"] a:hover {
+    color: var(--qn-secondary) !important;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     .qn-dashboard {
