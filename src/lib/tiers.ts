@@ -21,11 +21,11 @@ const tierSettings: TierSetting[] = [
   { id: 'tier-8', name: 'VIP CORE VIII', balanceThreshold: 100000, dailyProfit: 0.12, clicks: 15, locked: true },
 ];
 
-export function getBotTierSettings(): TierSetting[] {
+export async function getBotTierSettings(): Promise<TierSetting[]> {
   return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
-export function getCurrentTierByBalance(balance: number): TierSetting | null {
+export async function getCurrentTier(balance: number): Promise<TierSetting | null> {
   const sortedTiers = tierSettings.sort((a, b) => b.balanceThreshold - a.balanceThreshold);
 
   for (const tier of sortedTiers) {
