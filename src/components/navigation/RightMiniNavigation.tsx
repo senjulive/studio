@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Bell, 
-  MessageSquare, 
-  Settings, 
-  User, 
+import {
+  Bell,
+  MessageSquare,
+  Settings,
+  User,
   Wallet,
   TrendingUp,
   Shield,
@@ -37,48 +37,62 @@ interface RightMiniNavigationProps {
 
 export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigationProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false); // Start hidden
   const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
-  // Auto-hide after 5 seconds of inactivity
+  // Auto-hide after 3 seconds of inactivity
   useEffect(() => {
-    if (isExpanded) {
-      const timer = setTimeout(() => {
+    if (isExpanded || isVisible) {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
         setIsExpanded(false);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [isExpanded]);
-
-  // Show/hide based on scroll or user interaction
-  useEffect(() => {
-    let scrollTimer: NodeJS.Timeout;
-    let lastScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Show when scrolling up, hide when scrolling down significantly
-      if (currentScrollY < lastScrollY || currentScrollY < 100) {
-        setIsVisible(true);
-      } else if (currentScrollY > lastScrollY + 100) {
         setIsVisible(false);
-        setIsExpanded(false);
-      }
-      
-      lastScrollY = currentScrollY;
-      
-      // Show temporarily when scrolling stops
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
+      }, 3000);
+    }
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [isExpanded, isVisible]);
+
+  // Handle swipe gestures
+  const handlePan = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const { offset, velocity } = info;
+
+    // Swipe from right edge to reveal
+    if (offset.x < -50 && velocity.x < -500) {
+      setIsVisible(true);
+      setIsExpanded(true);
+    }
+    // Swipe right to hide
+    else if (offset.x > 50 && velocity.x > 500) {
+      setIsExpanded(false);
+      setTimeout(() => setIsVisible(false), 300);
+    }
+  };
+
+  // Detect swipe from screen edge
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (touch.clientX > window.innerWidth - 30) { // 30px from right edge
         setIsVisible(true);
-      }, 150);
+      }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    const handleMouseMove = (e: MouseEvent) => {
+      if (e.clientX > window.innerWidth - 30) { // 30px from right edge
+        setIsVisible(true);
+      }
+    };
+
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimer);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
@@ -105,7 +119,7 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
               onClick={toggleExpanded}
               variant="ghost"
               size="icon"
-              className="glass-button w-8 h-8"
+              className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:scale-105 transition-all duration-300 w-9 h-9"
             >
               <motion.div
                 animate={{ rotate: isExpanded ? 180 : 0 }}
@@ -148,8 +162,13 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
                               variant="ghost"
                               size="icon"
                               className={`
-                                relative w-10 h-10 glass-button group
-                                ${isActive ? 'bg-primary/20 border border-primary/30' : ''}
+                                relative w-11 h-11 group transition-all duration-300
+                                backdrop-blur-sm border border-white/10 rounded-2xl
+                                hover:bg-white/10 hover:border-white/20 hover:scale-105
+                                ${isActive
+                                  ? 'bg-primary/20 border-primary/30 shadow-lg shadow-primary/20'
+                                  : 'bg-white/5 hover:bg-white/10'
+                                }
                               `}
                             >
                               <Icon className={`h-5 w-5 transition-all duration-200 group-hover:scale-110 ${
@@ -202,7 +221,7 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="relative w-8 h-8 glass-button"
+                      className="relative w-9 h-9 backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:scale-105 transition-all duration-300"
                     >
                       <Bell className="h-4 w-4 text-blue-500" />
                       {notificationCount > 0 && (
@@ -260,15 +279,26 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
           )}
         </div>
 
-        {/* Expand hint */}
-        {!isExpanded && (
+        {/* Edge indicator for swipe */}
+        {!isVisible && (
           <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 2 }}
-            className="absolute -left-8 top-1/2 -translate-y-1/2"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1, duration: 0.5 }}
+            className="fixed right-0 top-1/2 -translate-y-1/2 z-30"
           >
-            <div className="w-2 h-8 bg-primary/30 rounded-full animate-pulse" />
+            <motion.div
+              className="w-1 h-12 bg-gradient-to-b from-primary/40 via-primary/60 to-primary/40 rounded-l-full"
+              animate={{
+                opacity: [0.4, 0.8, 0.4],
+                scaleY: [1, 1.2, 1]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
           </motion.div>
         )}
       </motion.div>
