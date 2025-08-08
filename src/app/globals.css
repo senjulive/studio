@@ -743,6 +743,250 @@
     color: var(--qn-light) !important;
   }
 
+  /* Global Quantum Ninja styling for all pages */
+  main, .dashboard-content, .page-content {
+    background: rgba(10, 10, 26, 0.8) !important;
+    border-radius: 10px !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: var(--qn-light) !important;
+  }
+
+  /* Card components */
+  .card, [data-card] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 10px !important;
+    backdrop-filter: blur(10px) !important;
+    color: var(--qn-light) !important;
+  }
+
+  .card-header, [data-card-header] {
+    color: var(--qn-light) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .card-title, [data-card-title] {
+    color: var(--qn-light) !important;
+    font-weight: 600 !important;
+  }
+
+  .card-description, [data-card-description] {
+    color: var(--qn-secondary) !important;
+  }
+
+  /* Button styling */
+  button:not(.qn-btn):not([data-radix-toast-close]):not([type="button"]) {
+    background: linear-gradient(90deg, var(--qn-primary), var(--qn-secondary)) !important;
+    color: black !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    transition: all 0.3s !important;
+    cursor: pointer !important;
+  }
+
+  button:not(.qn-btn):not([data-radix-toast-close]):not([type="button"]):hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(110, 0, 255, 0.4) !important;
+  }
+
+  .button-outline, .btn-outline, [data-variant="outline"] {
+    background: transparent !important;
+    border: 1px solid var(--qn-primary) !important;
+    color: var(--qn-primary) !important;
+  }
+
+  .button-outline:hover, .btn-outline:hover, [data-variant="outline"]:hover {
+    background: rgba(110, 0, 255, 0.1) !important;
+    transform: translateY(-2px) !important;
+  }
+
+  /* Table styling */
+  table, .table {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: var(--qn-light) !important;
+  }
+
+  th, thead td {
+    background: rgba(110, 0, 255, 0.1) !important;
+    color: var(--qn-secondary) !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: var(--qn-light) !important;
+  }
+
+  tr:hover {
+    background: rgba(110, 0, 255, 0.05) !important;
+  }
+
+  /* Badge/Tag styling */
+  .badge, [data-badge] {
+    background: linear-gradient(90deg, var(--qn-primary), var(--qn-secondary)) !important;
+    color: black !important;
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+  }
+
+  .badge-outline, [data-variant="outline"].badge {
+    background: transparent !important;
+    border: 1px solid var(--qn-primary) !important;
+    color: var(--qn-primary) !important;
+  }
+
+  /* Progress bars */
+  .progress, [data-progress-root] {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 10px !important;
+  }
+
+  .progress-indicator, [data-progress-indicator] {
+    background: linear-gradient(90deg, var(--qn-primary), var(--qn-secondary)) !important;
+  }
+
+  /* Tab styling */
+  .tabs-list, [data-tabs-list] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 6px !important;
+    padding: 4px !important;
+  }
+
+  .tabs-trigger, [data-tabs-trigger] {
+    color: var(--qn-light) !important;
+    border-radius: 4px !important;
+    transition: all 0.3s !important;
+  }
+
+  .tabs-trigger[data-state="active"], [data-tabs-trigger][data-state="active"] {
+    background: rgba(110, 0, 255, 0.3) !important;
+    color: var(--qn-secondary) !important;
+  }
+
+  /* Dialog/Modal styling */
+  .dialog-content, [data-dialog-content] {
+    background: rgba(10, 10, 26, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(20px) !important;
+    color: var(--qn-light) !important;
+    border-radius: 10px !important;
+  }
+
+  .dialog-header, [data-dialog-header] {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--qn-light) !important;
+  }
+
+  .dialog-title, [data-dialog-title] {
+    color: var(--qn-light) !important;
+    font-weight: 600 !important;
+  }
+
+  /* Separator styling */
+  .separator, [data-separator] {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Skeleton loading */
+  .skeleton, [data-skeleton] {
+    background: rgba(255, 255, 255, 0.1) !important;
+    animation: pulse 1.5s ease-in-out infinite !important;
+  }
+
+  /* Alert styling */
+  .alert, [data-alert] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--qn-light) !important;
+    border-radius: 8px !important;
+  }
+
+  .alert-destructive, [data-alert-destructive] {
+    background: rgba(255, 56, 96, 0.1) !important;
+    border-color: rgba(255, 56, 96, 0.3) !important;
+    color: var(--qn-danger) !important;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 4px !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(110, 0, 255, 0.3) !important;
+    border-radius: 4px !important;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(110, 0, 255, 0.5) !important;
+  }
+
+  /* Text colors */
+  .text-muted-foreground, [data-muted] {
+    color: rgba(224, 224, 255, 0.7) !important;
+  }
+
+  .text-destructive, [data-destructive] {
+    color: var(--qn-danger) !important;
+  }
+
+  .text-success, [data-success] {
+    color: var(--qn-success) !important;
+  }
+
+  .text-warning, [data-warning] {
+    color: var(--qn-warning) !important;
+  }
+
+  /* Page headers */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--qn-light) !important;
+  }
+
+  /* Specific dashboard components */
+  .wallet-card, .trading-card, .stats-card {
+    background: linear-gradient(135deg, rgba(110, 0, 255, 0.2), rgba(0, 247, 255, 0.1)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 10px !important;
+    backdrop-filter: blur(10px) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .wallet-card::before, .trading-card::before, .stats-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -50% !important;
+    left: -50% !important;
+    width: 200% !important;
+    height: 200% !important;
+    background: linear-gradient(
+      to bottom right,
+      rgba(0, 255, 255, 0) 0%,
+      rgba(0, 255, 255, 0) 30%,
+      rgba(0, 255, 255, 0.1) 45%,
+      rgba(0, 255, 255, 0) 60%,
+      rgba(0, 255, 255, 0) 100%
+    ) !important;
+    transform: rotate(30deg) !important;
+    animation: shine 6s infinite !important;
+    pointer-events: none !important;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     .qn-dashboard {
