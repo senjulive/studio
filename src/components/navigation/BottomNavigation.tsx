@@ -68,11 +68,16 @@ export function BottomNavigation({ className }: BottomNavigationProps) {
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       className={cn(
         'fixed bottom-0 left-0 right-0 z-30 md:hidden',
-        'glass-nav border-t border-border/30 safe-bottom',
+        'glass-nav border-t border-border/30 safe-bottom rounded-t-3xl',
         className
       )}
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      }}
     >
-      <div className="flex items-center justify-around px-2 py-2">
+      <div className="flex items-center justify-around px-3 py-1.5">
         {bottomNavItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -89,23 +94,23 @@ export function BottomNavigation({ className }: BottomNavigationProps) {
                 <motion.div
                   whileTap={{ scale: 0.95 }}
                   className={cn(
-                    'flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 min-h-[60px] relative',
-                    item.isCenter 
-                      ? 'absolute -top-6 left-1/2 -translate-x-1/2' 
-                      : ''
+                    'flex flex-col items-center justify-center transition-all duration-200 relative',
+                    item.isCenter
+                      ? 'absolute -top-8 left-1/2 -translate-x-1/2 p-3'
+                      : 'p-2 min-h-[50px]'
                   )}
                 >
                   {/* Center item special styling */}
                   {item.isCenter ? (
                     <div className={cn(
-                      'relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300',
-                      isActive 
-                        ? 'bg-primary shadow-lg shadow-primary/50 scale-110' 
-                        : 'glass border border-border/50 hover:border-primary/50'
+                      'relative w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl',
+                      isActive
+                        ? 'bg-primary shadow-lg shadow-primary/60 scale-110'
+                        : 'backdrop-blur-xl bg-white/10 border-2 border-white/20 hover:border-primary/50 hover:bg-primary/10'
                     )}>
                       <Icon className={cn(
                         'transition-all duration-200',
-                        isActive ? 'h-8 w-8 text-primary-foreground' : 'h-7 w-7 text-primary'
+                        isActive ? 'h-9 w-9 text-primary-foreground' : 'h-8 w-8 text-primary'
                       )} />
                       
                       {/* Pulse animation for center item */}
@@ -120,13 +125,13 @@ export function BottomNavigation({ className }: BottomNavigationProps) {
                   ) : (
                     /* Regular items */
                     <div className={cn(
-                      'relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200',
-                      isActive 
-                        ? `glass ${item.activeColor}` 
-                        : 'hover:bg-muted/50'
+                      'relative w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200',
+                      isActive
+                        ? `backdrop-blur-sm ${item.activeColor} border border-white/20`
+                        : 'hover:bg-white/10 hover:backdrop-blur-sm'
                     )}>
                       <Icon className={cn(
-                        'h-6 w-6 transition-all duration-200',
+                        'h-5 w-5 transition-all duration-200',
                         isActive ? item.color : 'text-muted-foreground'
                       )} />
                       
@@ -143,8 +148,8 @@ export function BottomNavigation({ className }: BottomNavigationProps) {
 
                   {/* Label */}
                   <span className={cn(
-                    'text-xs font-medium transition-all duration-200 mt-1',
-                    item.isCenter && 'mt-3',
+                    'text-xs font-medium transition-all duration-200',
+                    item.isCenter ? 'mt-2' : 'mt-1',
                     isActive ? item.color : 'text-muted-foreground'
                   )}>
                     {item.label}
@@ -170,21 +175,21 @@ export function BottomNavigation({ className }: BottomNavigationProps) {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="absolute top-2 right-4"
+        className="absolute top-1 right-3"
       >
         <Link href="/dashboard/deposit">
           <motion.button
             whileTap={{ scale: 0.9 }}
             whileHover={{ scale: 1.1 }}
-            className="w-8 h-8 rounded-full glass border border-green-500/30 bg-green-500/20 flex items-center justify-center group"
+            className="w-7 h-7 rounded-full backdrop-blur-sm border border-green-500/30 bg-green-500/20 flex items-center justify-center group shadow-lg"
           >
-            <PlusCircle className="h-4 w-4 text-green-500 group-hover:text-green-400 transition-colors" />
+            <PlusCircle className="h-3.5 w-3.5 text-green-500 group-hover:text-green-400 transition-colors" />
           </motion.button>
         </Link>
       </motion.div>
 
       {/* Background glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/20 to-transparent pointer-events-none rounded-t-3xl" />
     </motion.nav>
   );
 }
