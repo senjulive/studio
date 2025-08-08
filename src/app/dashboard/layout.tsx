@@ -277,7 +277,7 @@ URL=${window.location.origin}`;
             <div className="qn-avatar">{userInitial}</div>
             <h3>{wallet?.profile?.username || 'AstralCore User'}</h3>
             <div className="qn-badge" style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
-              <RankIcon className={cn("h-3 w-3", rank.color)} />
+              <RankIcon className={cn("h-3 w-3", rank.className)} />
               {rank.name}
               {tier && TierIcon && (
                 <>
