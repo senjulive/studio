@@ -68,7 +68,7 @@ export default function DashboardLayout({
   
   const totalBalance = wallet?.balances?.usdt ?? 0;
   const rank = getUserRank(totalBalance);
-  const tier = await getCurrentTier(totalBalance, tierSettings);
+  const tier = getCurrentTier(totalBalance, tierSettings);
   
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
