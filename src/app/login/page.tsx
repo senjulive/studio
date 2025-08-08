@@ -22,7 +22,7 @@ export default function LoginPage() {
               Welcome Back
             </h1>
             <p style={{color: 'var(--qn-secondary)'}}>
-              Sign in to your Quantum Ninja account
+              Sign in to your AstralCore account
             </p>
           </div>
           <LoginForm />
