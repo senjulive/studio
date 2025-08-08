@@ -237,7 +237,15 @@
     @apply glass rounded-lg px-4 py-3 bg-opacity-10 placeholder:text-muted-foreground focus:bg-opacity-20 focus:ring-2 focus:ring-primary/50 transition-all duration-300;
   }
 
-  /* Mobile Navigation */
+  /* Navigation Systems */
+  .glass-nav {
+    @apply glass backdrop-blur-xl bg-opacity-90 border-opacity-50;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
   .mobile-nav {
     @apply fixed right-0 top-0 h-full w-80 glass-nav transform transition-transform duration-300 ease-in-out z-50;
   }
@@ -287,6 +295,29 @@
 
   .mobile-card {
     @apply glass-card min-h-fit;
+  }
+
+  /* Desktop layout enhancements */
+  .desktop-main-content {
+    @apply transition-all duration-300;
+    margin-left: 320px; /* Space for left sidebar */
+  }
+
+  .desktop-content-area {
+    @apply min-h-screen relative;
+  }
+
+  /* Navigation specific styles */
+  .left-nav-transition {
+    @apply transition-transform duration-300 ease-in-out;
+  }
+
+  .right-nav-container {
+    @apply fixed right-4 top-1/2 -translate-y-1/2 z-40;
+  }
+
+  .bottom-nav-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* Auto-hide navigation */
