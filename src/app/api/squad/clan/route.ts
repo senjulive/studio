@@ -1,6 +1,3 @@
-
-'use server';
-
 import { NextResponse } from 'next/server';
 import { createClan, getClanForUser, getClanById } from '@/lib/squad-clans';
 import { getWalletByUserId, getAllWallets } from '@/lib/wallet';
