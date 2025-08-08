@@ -1,4 +1,5 @@
 import { PublicChatView } from '@/components/dashboard/public-chat-view';
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,8 +9,11 @@ export const metadata: Metadata = {
 
 export default function ChatPage() {
   return (
-    <div className="space-y-6">
+    <QuantumPageWrapper
+      title="Community Chat"
+      description="Engage with the AstralCore community"
+    >
       <PublicChatView />
-    </div>
+    </QuantumPageWrapper>
   );
 }
