@@ -6,16 +6,17 @@ import { RenderBuilderContent } from '@/components/builder/render-builder-conten
 builder.init('your-builder-io-api-key-here');
 
 interface PageProps {
-  params: {
+  params: Promise<{
     page: string[];
-  };
+  }>;
 }
 
 export default async function Page(props: PageProps) {
+  const params = await props.params;
   const content = await builder
     .get('page', {
       userAttributes: {
-        urlPath: '/' + props.params.page.join('/'),
+        urlPath: '/' + params.page.join('/'),
       },
     })
     .toPromise();
