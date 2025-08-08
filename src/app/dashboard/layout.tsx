@@ -1,37 +1,16 @@
-
 'use client';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarTrigger,
-  SidebarInset,
-}
-from '@/components/ui/sidebar';
 import { logout } from '@/lib/auth';
 import * as React from 'react';
 import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
-import { Skeleton } from '@/components/ui/skeleton';
+import { SwipeNavigation } from '@/components/navigation/SwipeNavigation';
+import { QuickThemeToggle } from '@/components/ui/theme-toggle';
 
 import { HomeIcon } from '@/components/icons/nav/home-icon';
 import { MarketIcon } from '@/components/icons/nav/market-icon';
@@ -265,208 +244,50 @@ URL=${window.location.origin}`;
   
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
-      <SidebarProvider>
-        <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <AstralLogo className="h-10 w-10" />
-              <span className="text-lg font-semibold text-sidebar-foreground">
-                AstralCore
-              </span>
-            </div>
-          </SidebarHeader>
-
-          <div className="mt-12 mb-4 px-4 space-y-4">
-             <div className="flex items-center gap-3">
-                  <AvatarUploadDialog 
-                    onUploadSuccess={() => fetchWalletAndTiers(user.id)}
-                    wallet={wallet}
-                  >
-                    <Avatar className="h-12 w-12 cursor-pointer">
-                      <AvatarImage
-                        src={wallet?.profile?.avatarUrl}
-                        alt={wallet?.profile?.username || 'User'}
-                      />
-                      <AvatarFallback>{userInitial}</AvatarFallback>
-                    </Avatar>
-                  </AvatarUploadDialog>
-
-                  <div className="overflow-hidden">
-                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
-                        {wallet?.profile?.username || 'User'}
-                        {userCountry && <span className="text-lg">{userCountry.flag}</span>}
-                     </p>
-                     <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
+      <SwipeNavigation>
+        <div className="min-h-screen pb-20">
+          {/* Mobile Header */}
+          <header className="mobile-header">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage
+                    src={wallet?.profile?.avatarUrl}
+                    alt={wallet?.profile?.username || 'User'}
+                  />
+                  <AvatarFallback>{userInitial}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h1 className="font-semibold text-lg truncate">
+                    {isClient ? getPageTitle() : 'Loading...'}
+                  </h1>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className={cn("text-xs", rank.className)}>
+                      <RankIcon className="h-3 w-3 mr-1" />
+                      {rank.name}
+                    </Badge>
+                    {tier && TierIcon && tierClassName && (
+                      <Badge variant="outline" className={cn("text-xs", tierClassName)}>
+                        <TierIcon className="h-3 w-3 mr-1" />
+                        {tier.name}
+                      </Badge>
+                    )}
                   </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
-                    <RankIcon className="h-4 w-4" />
-                    <span>{rank.name}</span>
-                 </Badge>
-                 {tier && TierIcon && tierClassName && (
-                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
-                    <TierIcon className="h-4 w-4" />
-                    <span>{tier.name}</span>
-                  </Badge>
-                )}
-              </div>
-          </div>
-          <Separator className="bg-sidebar-border" />
-
-          <SidebarContent>
-            <SidebarMenu>
-              {menuConfig.map((group, index) => (
-                  <React.Fragment key={group.title}>
-                    {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
-                    <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
-                    {group.items.map((item) => (
-                      <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
-                          }
-                        >
-                          <Link href={item.href} download={item.download}>
-                            <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
-                            <span>{item.label}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </React.Fragment>
-                ))}
-            </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-2">
-                   <SettingsIcon className="mr-2 h-4 w-4" />
-                   Settings & Logout
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none text-foreground">
-                      {wallet?.profile?.username || 'User'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {userEmail || '...'}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/profile">
-                    <ProfileIcon className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/security">
-                    <SettingsIcon className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogoutIcon className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarFooter>
-        </Sidebar>
-        <div className="flex flex-1">
-          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
-            <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30 -ml-4 -mr-4 md:-ml-6 md:-mr-6">
-              <SidebarTrigger />
-              <div className="w-full flex-1">
-                <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                  <AstralLogo className="h-6 w-6" />
-                  {isClient ? (
-                    <span>{getPageTitle()}</span>
-                  ) : (
-                    <Skeleton className="h-6 w-24" />
-                  )}
-                </h1>
+                </div>
               </div>
               <div className="flex items-center gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                       <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
-                          <RankIcon className="h-4 w-4" />
-                          <span>{rank.name}</span>
-                       </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Account Rank</p>
-                    </TooltipContent>
-                  </Tooltip>
-                   {tier && TierIcon && tierClassName && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                          <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
-                            <TierIcon className="h-4 w-4" />
-                            <span>{tier.name}</span>
-                          </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>VIP CORE Tier</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </TooltipProvider>
-
-                <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                  <Link href="/dashboard/inbox">
-                    <InboxIcon className="h-5 w-5" />
-                    <span className="sr-only">Inbox</span>
-                  </Link>
-                </Button>
                 <NotificationBell />
-                <ModeToggle />
+                <QuickThemeToggle />
               </div>
-            </header>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="mobile-content">
             {children}
           </main>
-          <div className="hidden lg:block border-l">
-            <RightSidebar />
-          </div>
         </div>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
-            {bottomNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
-                  isClient && pathname.endsWith(item.href)
-                    ? 'text-primary font-medium'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {item.label === 'CORE' ? (
-                  <div className="absolute -top-7 flex items-center justify-center">
-                     <div className="h-16 w-16 rounded-full bg-transparent flex items-center justify-center">
-                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center p-1">
-                           <item.icon className="h-full w-full" />
-                        </div>
-                     </div>
-                  </div>
-                ) : (
-                  <item.icon className="h-6 w-6" />
-                )}
-                
-                <span className={cn(item.label === 'CORE' && 'mt-8')}>{item.label}</span>
-              </Link>
-            ))}
-          </nav>
-      </SidebarProvider>
+      </SwipeNavigation>
     </UserProvider>
   );
 }
