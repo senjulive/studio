@@ -55,7 +55,7 @@ const cryptoAssets = [
 
 export function NeonWalletView() {
   const { wallet, user } = useUser();
-  
+
   // Calculate total portfolio value from user's actual wallet
   const totalValue = React.useMemo(() => {
     if (!wallet?.balances) return 24857.90; // Default demo value
@@ -63,7 +63,41 @@ export function NeonWalletView() {
     return balances.usdt + (balances.btc * 68000) + (balances.eth * 3500);
   }, [wallet]);
 
+  // Calculate real crypto assets based on user's wallet
+  const userAssets = React.useMemo(() => {
+    if (!wallet?.balances) return cryptoAssets;
+
+    const balances = wallet.balances as any;
+    const btcPrice = 68000;
+    const ethPrice = 3500;
+    const solPrice = 150;
+
+    return [
+      {
+        ...cryptoAssets[0], // Bitcoin
+        amount: balances.btc || 0,
+        value: (balances.btc || 0) * btcPrice,
+      },
+      {
+        ...cryptoAssets[1], // Ethereum
+        amount: balances.eth || 0,
+        value: (balances.eth || 0) * ethPrice,
+      },
+      {
+        ...cryptoAssets[2], // Solana
+        amount: 0, // User doesn't have SOL in the current system
+        value: 0,
+      },
+      {
+        ...cryptoAssets[3], // LYKAN - custom token
+        amount: balances.usdt || 0, // Using USDT as proxy for now
+        value: balances.usdt || 0,
+      }
+    ].filter(asset => asset.amount > 0); // Only show assets with balance
+  }, [wallet]);
+
   const weeklyChange = 5.2; // Mock weekly change
+  const dailyEarnings = (wallet?.growth as any)?.dailyEarnings ?? 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950 text-white relative overflow-hidden">
