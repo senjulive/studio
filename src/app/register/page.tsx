@@ -25,10 +25,10 @@ export default function RegisterPage() {
         <div className="qn-main-content" style={{maxWidth: '400px', width: '100%'}}>
           <div style={{textAlign: 'center', marginBottom: '30px'}}>
             <h1 style={{fontSize: '32px', fontWeight: '700', marginBottom: '10px'}}>
-              Join Quantum Ninja
+              Join AstralCore
             </h1>
             <p style={{color: 'var(--qn-secondary)'}}>
-              Start your crypto growth journey today
+              Start your crypto trading journey today
             </p>
           </div>
           <RegisterForm />
