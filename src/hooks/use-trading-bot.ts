@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -70,12 +69,29 @@ export function useTradingBot(config: BotConfig) {
 
                 const lastCandle = prevState.candlestickData[prevState.candlestickData.length - 1];
                 const open = lastCandle.close;
-                const change = (Math.random() - 0.5) * (open * 0.005);
-                const close = open + change;
-                const high = Math.max(open, close) + (Math.random() * (open * 0.002));
-                const low = Math.min(open, close) - (Math.random() * (open * 0.002));
 
-                const newCandle: CandlestickData = { open, high, low, close, timestamp: Date.now() };
+                // More realistic price movement with trend simulation
+                const trend = Math.sin(Date.now() / 100000) * 0.002; // Long-term trend
+                const volatility = 0.003 + (Math.random() * 0.002); // Variable volatility
+                const change = (Math.random() - 0.5) * (open * volatility) + (open * trend);
+
+                const close = Math.max(open * 0.98, Math.min(open * 1.02, open + change)); // Limit extreme moves
+
+                // Calculate realistic high/low with wicks
+                const wickRange = open * 0.001;
+                const bodyHigh = Math.max(open, close);
+                const bodyLow = Math.min(open, close);
+                const high = bodyHigh + (Math.random() * wickRange);
+                const low = Math.max(bodyLow - (Math.random() * wickRange), bodyLow * 0.995);
+
+                const newCandle: CandlestickData = {
+                    open,
+                    high,
+                    low,
+                    close,
+                    timestamp: Date.now()
+                };
+
                 const newCandlestickData = [...prevState.candlestickData.slice(1), newCandle];
 
                 return {
@@ -84,9 +100,10 @@ export function useTradingBot(config: BotConfig) {
                     maxDrawdown: newMaxDrawdown,
                     candlestickData: newCandlestickData,
                     currentPrice: close,
+                    volume24h: prevState.volume24h * (1 + (Math.random() - 0.5) * 0.05), // Variable volume
                 };
             });
-        }, 1000); // Update every 1 second
+        }, 2000); // Update every 2 seconds for more realistic timing
 
         return () => clearInterval(interval);
     }, [config.initialPrice]);
