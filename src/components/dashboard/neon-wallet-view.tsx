@@ -138,9 +138,17 @@ export function NeonWalletView() {
             <p className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent mb-2">
               ${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
-            <div className="flex items-center gap-2 text-green-400">
-              <TrendingUp className="w-4 h-4" />
-              <span className="text-sm">{weeklyChange}% this week</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-green-400">
+                <TrendingUp className="w-4 h-4" />
+                <span className="text-sm">{weeklyChange}% this week</span>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Today's Earnings</p>
+                <p className="text-sm font-semibold text-green-400">
+                  +${dailyEarnings.toFixed(2)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
