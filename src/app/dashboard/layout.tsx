@@ -1,16 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { logout } from '@/lib/auth';
 import * as React from 'react';
 import type { SVGProps } from 'react';
-import { cn } from '@/lib/utils';
-import { NotificationBell } from '@/components/dashboard/notification-bell';
-import { AstralLogo } from '@/components/icons/astral-logo';
-import { SwipeNavigation } from '@/components/navigation/SwipeNavigation';
-import { QuickThemeToggle } from '@/components/ui/theme-toggle';
+import { DashboardLayoutWithNavigation } from '@/components/layout/DashboardLayoutWithNavigation';
 
 import { HomeIcon } from '@/components/icons/nav/home-icon';
 import { MarketIcon } from '@/components/icons/nav/market-icon';
@@ -244,50 +236,14 @@ URL=${window.location.origin}`;
   
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
-      <SwipeNavigation>
-        <div className="min-h-screen pb-20">
-          {/* Mobile Header */}
-          <header className="mobile-header">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage
-                    src={wallet?.profile?.avatarUrl}
-                    alt={wallet?.profile?.username || 'User'}
-                  />
-                  <AvatarFallback>{userInitial}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h1 className="font-semibold text-lg truncate">
-                    {isClient ? getPageTitle() : 'Loading...'}
-                  </h1>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className={cn("text-xs", rank.className)}>
-                      <RankIcon className="h-3 w-3 mr-1" />
-                      {rank.name}
-                    </Badge>
-                    {tier && TierIcon && tierClassName && (
-                      <Badge variant="outline" className={cn("text-xs", tierClassName)}>
-                        <TierIcon className="h-3 w-3 mr-1" />
-                        {tier.name}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <NotificationBell />
-                <QuickThemeToggle />
-              </div>
-            </div>
-          </header>
-
-          {/* Main Content */}
-          <main className="mobile-content">
-            {children}
-          </main>
-        </div>
-      </SwipeNavigation>
+      <DashboardLayoutWithNavigation
+        user={user}
+        wallet={wallet}
+        rank={rank}
+        tier={tier}
+      >
+        {children}
+      </DashboardLayoutWithNavigation>
     </UserProvider>
   );
 }
