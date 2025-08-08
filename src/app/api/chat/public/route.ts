@@ -1,12 +1,11 @@
-
 'use server';
 
 import { NextResponse } from 'next/server';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { getWalletByUserId } from '@/lib/wallet';
-import { getUserRank } from '@/lib/ranks';
-import { getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+import { getUserRank, getCurrentTier } from '@/lib/ranks';
+import { getBotTierSettings } from '@/lib/tiers';
 import type { Rank } from '@/lib/ranks';
 import type { TierSetting } from '@/lib/tiers';
 
