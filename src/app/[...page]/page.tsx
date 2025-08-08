@@ -20,5 +20,18 @@ export default async function Page(props: PageProps) {
     })
     .toPromise();
 
-  return <RenderBuilderContent content={content} />;
+  return (
+    <div className="min-h-screen" style={{
+      background: 'var(--qn-darker)',
+      color: 'var(--qn-light)',
+      backgroundImage: `
+        radial-gradient(circle at 10% 20%, rgba(110, 0, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(0, 247, 255, 0.1) 0%, transparent 20%)
+      `
+    }}>
+      <div className="container mx-auto p-4">
+        <RenderBuilderContent content={content} />
+      </div>
+    </div>
+  );
 }
