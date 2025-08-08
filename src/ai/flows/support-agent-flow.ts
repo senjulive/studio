@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A support agent AI flow for the admin panel.
@@ -9,7 +8,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 // We can't import the Message type directly into the schema because of client/server boundary issues with Zod.
 // So we redefine the message structure for the schema.

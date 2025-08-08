@@ -10,7 +10,7 @@ import { DiamondTierIcon } from '@/components/icons/tiers/diamond-tier-icon';
 import { Lock } from 'lucide-react';
 import type { TierSetting as TierSettingData } from '@/lib/tiers';
 
-export const tierIcons: { [key: string]: (props: SVGProps<SVGSVGElement>) => JSX.Element } = {
+export const tierIcons: { [key: string]: React.ComponentType<{ className?: string }> } = {
     'tier-1': RecruitTierIcon,
     'tier-2': BronzeTierIcon,
     'tier-3': SilverTierIcon,
@@ -33,6 +33,6 @@ export const tierClassNames: { [key: string]: string } = {
 };
 
 export type TierSetting = TierSettingData & {
-  Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  Icon: React.ComponentType<{ className?: string }>;
   className: string;
 };

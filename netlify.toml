@@ -1,14 +1,136 @@
-
-# Netlify configuration for a Next.js application.
-# This file tells Netlify how to build and deploy the site.
-
 [build]
-  # The command to build the Next.js application.
-  command = "npm run build"
-  # The directory where the built assets are located.
   publish = ".next"
+  command = "npm run build"
+  
+[build.environment]
+  NODE_ENV = "production"
+  NPM_FLAGS = "--production=false"
+  NODE_VERSION = "20.19.4"
+  NEXT_TELEMETRY_DISABLED = "1"
 
-# This plugin is essential for Next.js on Netlify. It handles server-side rendering,
-# API routes, image optimization, and more, automatically.
+# Production context
+[context.production]
+  command = "npm run build"
+  
+[context.production.environment]
+  ANALYZE = "false"
+  BUILD_STANDALONE = "false"
+
+# Deploy preview context
+[context.deploy-preview]
+  command = "npm run build"
+  
+[context.deploy-preview.environment]
+  NODE_ENV = "production"
+
+# Branch deploy context
+[context.branch-deploy]
+  command = "npm run build"
+
+# Redirects and rewrites
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/dashboard/home"
+  to = "/dashboard"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/_next/static/*"
+  to = "/static/:splat"
+  status = 200
+
+# SPA fallback for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.builder.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.builder.io https://cdn.builder.io wss:; frame-ancestors 'none';"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Cache-Control = "no-store, must-revalidate"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Form handling (if needed)
+[[forms]]
+  name = "contact"
+
+# Edge functions (if using Netlify Edge Functions)
+[[edge_functions]]
+  function = "auth-middleware"
+  path = "/dashboard/*"
+
+# Plugin configuration
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  
+  [plugins.inputs]
+    target = "server"
+
+# Environment variables (these should be set in Netlify dashboard)
+# NEXT_PUBLIC_APP_NAME
+# NEXT_PUBLIC_APP_URL
+# BUILDER_PUBLIC_KEY
+# NEXT_PUBLIC_BUILDER_API_KEY
+# GOOGLE_GENAI_API_KEY
+# NEXTAUTH_SECRET
+# ENCRYPTION_KEY
+# API_SECRET_KEY
+
+# Functions configuration
+[functions]
+  directory = ".netlify/functions"
+  node_bundler = "esbuild"
+  
+[functions."**"]
+  max_age = "1h"

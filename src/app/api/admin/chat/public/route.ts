@@ -1,14 +1,13 @@
-
 'use server';
 
 import { NextResponse } from 'next/server';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import type { ChatMessage } from '@/lib/chat';
+import type { Message } from '@/lib/chat';
 
 const CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
 
-async function readChatFile(): Promise<ChatMessage[]> {
+async function readChatFile(): Promise<Message[]> {
   try {
     const data = await fs.readFile(CHAT_FILE_PATH, 'utf-8');
     return JSON.parse(data);
@@ -18,7 +17,7 @@ async function readChatFile(): Promise<ChatMessage[]> {
   }
 }
 
-async function writeChatFile(messages: ChatMessage[]): Promise<void> {
+async function writeChatFile(messages: Message[]): Promise<void> {
   await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(messages, null, 2), 'utf-8');
 }
 

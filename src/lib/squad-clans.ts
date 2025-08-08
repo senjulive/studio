@@ -1,4 +1,3 @@
-
 'use server';
 
 import * as fs from 'fs/promises';
@@ -6,7 +5,7 @@ import * as path from 'path';
 import { getAllWallets, getWalletByUserId } from './wallet';
 import { type Rank } from './ranks';
 import { type TierSetting } from './tiers';
-import { getBotTierSettings } from './tiers';
+import { getBotTierSettingsServer } from './tiers-server';
 
 const CLANS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-clans.json');
 const CHATS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-chats.json');

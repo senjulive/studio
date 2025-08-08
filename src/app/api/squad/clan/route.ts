@@ -1,10 +1,9 @@
-
 'use server';
 
 import { NextResponse } from 'next/server';
 import { createClan, getClanForUser, getClanById } from '@/lib/squad-clans';
 import { getWalletByUserId, getAllWallets } from '@/lib/wallet';
-import { getBotTierSettings } from '@/lib/tiers';
+import { getBotTierSettingsServer } from '@/lib/tiers-server';
 
 // GET endpoint to fetch clan details for a user
 export async function GET(request: Request) {

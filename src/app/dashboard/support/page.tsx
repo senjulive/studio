@@ -1,13 +1,11 @@
-import { SupportChat } from "@/components/dashboard/support-chat";
+import { CustomerSupportView } from "@/components/dashboard/customer-support-view";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: "Support - AstralCore",
-    description: "Contact customer support.",
+    title: "Customer Support - AstralCore",
+    description: "Get expert help from our AstralCore support team.",
 };
 
 export default function SupportPage() {
-    return (
-        <SupportChat />
-    );
+    return <CustomerSupportView />;
 }

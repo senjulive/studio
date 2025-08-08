@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -67,7 +66,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AvatarUploadDialog } from './profile-view';
 import { RightSidebar } from '../ui/right-sidebar';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ComponentType<{ className?: string }>;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,
@@ -114,7 +113,7 @@ export default function DashboardLayout({
     try {
         const [walletData, tiers] = await Promise.all([
             getOrCreateWallet(userId),
-            getBotTierSettings()
+            Promise.resolve(getBotTierSettings())
         ]);
         setWallet(walletData);
         setTierSettings(tiers);
