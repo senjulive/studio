@@ -1,11 +1,16 @@
-// Placeholder for Squad Clan Chat component
+// Squad Clan Chat component
 
 import React from 'react';
 
-const SquadClanChat = () => {
+interface SquadClanChatProps {
+  clanId: string;
+}
+
+const SquadClanChat = ({ clanId }: SquadClanChatProps) => {
   return (
-    <div>
-      <h2>Squad Clan Chat</h2>
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Squad Clan Chat</h2>
+      <p className="text-muted-foreground">Clan ID: {clanId}</p>
       {/* Add your component logic here */}
     </div>
   );
