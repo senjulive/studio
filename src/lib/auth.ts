@@ -1,5 +1,3 @@
-'use server';
-
 import { redirect } from 'next/navigation';
 
 type Credentials = {
@@ -52,7 +50,11 @@ export async function register(credentials: Credentials) {
 export async function logout() {
   // In a real app, you would clear the session/token here.
   // For the mock app, we just clear session storage and redirect.
-  redirect('/');
+  if (typeof window !== 'undefined') {
+    sessionStorage.clear();
+    localStorage.removeItem('astral-remembered-email');
+    window.location.href = '/';
+  }
 }
 
 export async function resetPasswordForEmail(email: string) {

@@ -1,4 +1,4 @@
-// src/app/[[...page]]/page.tsx
+// src/app/[...page]/page.tsx
 import { builder } from '@builder.io/sdk';
 import { RenderBuilderContent } from '@/components/builder/render-builder-content';
 
@@ -7,7 +7,7 @@ builder.init('your-builder-io-api-key-here');
 
 interface PageProps {
   params: {
-    page?: string[];
+    page: string[];
   };
 }
 
@@ -15,7 +15,7 @@ export default async function Page(props: PageProps) {
   const content = await builder
     .get('page', {
       userAttributes: {
-        urlPath: '/' + (props.params.page?.join('/') || ''),
+        urlPath: '/' + props.params.page.join('/'),
       },
     })
     .toPromise();

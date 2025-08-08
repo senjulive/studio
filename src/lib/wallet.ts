@@ -1,6 +1,3 @@
-
-'use server';
-
 import { getBotTierSettings } from './tiers';
 import { getCurrentTier } from './ranks';
 import initialWallets from '../../data/wallets.json';
@@ -104,5 +101,3 @@ export async function getWithdrawalAddresses(): Promise<WithdrawalAddresses> {
     const wallet = await getOrCreateWallet();
     return wallet.security?.withdrawalAddresses || {};
 }
-
-    

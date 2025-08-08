@@ -1,6 +1,3 @@
-
-'use server';
-
 // Mock implementation after Supabase removal.
 
 export type ActionLog = {

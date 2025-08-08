@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -42,7 +41,12 @@ import { WithdrawalManager } from './withdrawal-manager';
 import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
-
+import { SecurityManager } from './security-manager';
+import { FinancialManager } from './financial-manager';
+import { ContentModerationManager } from './content-moderation-manager';
+import { SystemMonitoringManager } from './system-monitoring-manager';
+import { NotificationViewer } from './notification-viewer';
+import { MessageViewer } from './message-viewer';
 
 const adminSections = {
     'Dashboard': { component: <AnalyticsManager />, icon: LayoutDashboard },
@@ -62,6 +66,18 @@ const adminSections = {
     'Content & Engagement': {
         'Alerts': { component: <AnnouncementManager />, icon: Megaphone },
         'Promotions': { component: <PromotionManager />, icon: Gift },
+        'Content Moderation': { component: <ContentModerationManager />, icon: () => <span className="text-xl">🛡️</span> },
+    },
+    'Financial Management': {
+        'Financial Analytics': { component: <FinancialManager />, icon: () => <span className="text-xl">💰</span> },
+    },
+    'Security & Monitoring': {
+        'Security Manager': { component: <SecurityManager />, icon: () => <span className="text-xl">🔒</span> },
+        'System Monitoring': { component: <SystemMonitoringManager />, icon: () => <span className="text-xl">📊</span> },
+    },
+    'Communications': {
+        'Notifications': { component: <NotificationViewer />, icon: () => <span className="text-xl">🔔</span> },
+        'Messages': { component: <MessageViewer />, icon: () => <span className="text-xl">💬</span> },
     },
     'Platform Settings': {
         'General Settings': { component: <SiteSettingsManager />, icon: Settings },
@@ -71,9 +87,12 @@ const adminSections = {
 } as const;
 
 
-type AdminView = keyof (typeof adminSections)['User Management'] | 
+type AdminView = keyof (typeof adminSections)['User Management'] |
                  keyof (typeof adminSections)['Platform Activity'] |
                  keyof (typeof adminSections)['Content & Engagement'] |
+                 keyof (typeof adminSections)['Financial Management'] |
+                 keyof (typeof adminSections)['Security & Monitoring'] |
+                 keyof (typeof adminSections)['Communications'] |
                  keyof (typeof adminSections)['Platform Settings'] |
                  'Dashboard';
 
