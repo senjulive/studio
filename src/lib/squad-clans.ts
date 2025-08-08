@@ -24,42 +24,11 @@ export type ClanChatMessage = {
     tier: TierSetting | null;
 };
 
-async function readClans(): Promise<Record<string, Clan>> {
-    try {
-        const data = await fs.readFile(CLANS_FILE_PATH, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return {};
-    }
-}
+// Mock data storage
+let mockClans: Record<string, Clan> = {};
+let mockChats: Record<string, ClanChatMessage[]> = {};
 
-async function writeClans(data: Record<string, Clan>): Promise<void> {
-    await fs.writeFile(CLANS_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-async function readChats(): Promise<Record<string, ClanChatMessage[]>> {
-    try {
-        const data = await fs.readFile(CHATS_FILE_PATH, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return {};
-    }
-}
-
-async function writeChats(data: Record<string, ClanChatMessage[]>): Promise<void> {
-    await fs.writeFile(CHATS_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-async function getMinClanCreateBalance(): Promise<number> {
-    const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
-    try {
-        const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
-        const settings = JSON.parse(data);
-        return settings?.botSettings?.minClanCreateBalance || 100;
-    } catch {
-        return 100;
-    }
-}
+const MIN_CLAN_CREATE_BALANCE = 100;
 
 export async function createClan(leaderId: string, name: string, avatarUrl: string): Promise<Clan | null> {
     const leaderWallet = await getWalletByUserId(leaderId);
@@ -69,76 +38,61 @@ export async function createClan(leaderId: string, name: string, avatarUrl: stri
     const squadMembers = leaderWallet.squad?.members || [];
     
     // Check if the leader already has a clan
-    const allClans = await readClans();
-    const existingClan = Object.values(allClans).find(c => c.leaderId === leaderId);
+    const existingClan = Object.values(mockClans).find(c => c.leaderId === leaderId);
     if (existingClan) {
         throw new Error("Leader has already created a clan.");
     }
-    
-    const minBalance = await getMinClanCreateBalance();
-    
-    const verifiedMembersWithBalance = squadMembers.filter((memberId: string) => {
-        const memberWallet = allWallets[memberId];
-        return memberWallet?.verification_status === 'verified' && memberWallet?.balances?.usdt >= minBalance;
-    });
 
-    if (verifiedMembersWithBalance.length < 5) {
-        return null; // Not enough members meeting criteria
+    // Check minimum balance
+    if ((leaderWallet.balances?.usdt || 0) < MIN_CLAN_CREATE_BALANCE) {
+        throw new Error(`Minimum ${MIN_CLAN_CREATE_BALANCE} USDT required to create a clan.`);
     }
 
+    // Check if leader has at least 3 members
+    if (squadMembers.length < 3) {
+        throw new Error("Leader must have at least 3 squad members to create a clan.");
+    }
+
+    // Create clan
     const newClan: Clan = {
-        id: `clan_${crypto.randomUUID()}`,
+        id: `clan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name,
         avatarUrl,
         leaderId,
-        members: [leaderId, ...squadMembers],
+        members: [leaderId, ...squadMembers]
     };
 
-    allClans[newClan.id] = newClan;
-    await writeClans(allClans);
-
+    mockClans[newClan.id] = newClan;
     return newClan;
 }
 
 export async function getClanForUser(userId: string): Promise<Clan | null> {
-    const clans = await readClans();
-    return Object.values(clans).find(clan => clan.members.includes(userId)) || null;
+    const clan = Object.values(mockClans).find(c => c.members.includes(userId));
+    return clan || null;
 }
 
 export async function getClanById(clanId: string): Promise<Clan | null> {
-    const clans = await readClans();
-    return clans[clanId] || null;
+    return mockClans[clanId] || null;
 }
 
-export async function addClanMessage(clanId: string, messageData: Omit<ClanChatMessage, 'id' | 'clanId' | 'timestamp'>): Promise<void> {
-    const allChats = await readChats();
-    if (!allChats[clanId]) {
-        allChats[clanId] = [];
-    }
-    
+export async function addClanMessage(clanId: string, message: Omit<ClanChatMessage, 'id' | 'clanId' | 'timestamp'>): Promise<void> {
     const newMessage: ClanChatMessage = {
-        ...messageData,
-        id: `cmsg_${crypto.randomUUID()}`,
+        ...message,
+        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         clanId,
-        timestamp: Date.now(),
+        timestamp: Date.now()
     };
 
-    allChats[clanId].push(newMessage);
-    await writeChats(allChats);
+    if (!mockChats[clanId]) {
+        mockChats[clanId] = [];
+    }
+
+    mockChats[clanId].push(newMessage);
+    
+    // Keep only last 100 messages
+    mockChats[clanId] = mockChats[clanId].slice(-100);
 }
 
 export async function getClanMessages(clanId: string): Promise<ClanChatMessage[]> {
-    const allChats = await readChats();
-    const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
-    const clanMessages = allChats[clanId] || [];
-    
-    // Filter out old messages
-    const recentMessages = clanMessages.filter(msg => msg.timestamp >= twentyFourHoursAgo);
-    
-    if (recentMessages.length < clanMessages.length) {
-        allChats[clanId] = recentMessages;
-        await writeChats(allChats); // Clean up the old messages from the file
-    }
-
-    return recentMessages;
+    return mockChats[clanId] || [];
 }
