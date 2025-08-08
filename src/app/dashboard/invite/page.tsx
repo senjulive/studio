@@ -1,4 +1,5 @@
 import { InviteView } from '@/components/dashboard/invite-view';
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,8 +9,11 @@ export const metadata: Metadata = {
 
 export default function InvitePage() {
   return (
-    <div className="space-y-6">
+    <QuantumPageWrapper
+      title="Invite Friends"
+      description="Invite new members to your squad and earn rewards"
+    >
       <InviteView />
-    </div>
+    </QuantumPageWrapper>
   );
 }
