@@ -67,7 +67,7 @@ export async function POST(request: Request) {
         }
 
         const rank = getUserRank(wallet.balances.usdt || 0);
-        const tier = await getCurrentTier(wallet.balances.usdt || 0, tierSettings);
+        const tier = getCurrentTier(wallet.balances.usdt || 0, tierSettings);
 
         const newMessage: ChatMessage = {
             id: `msg_${Date.now()}_${Math.random()}`,
