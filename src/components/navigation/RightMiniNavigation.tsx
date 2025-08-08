@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import {
-  Bell,
-  MessageSquare,
-  Settings,
-  User,
+import { 
+  Bell, 
+  MessageSquare, 
+  Settings, 
+  User, 
   Wallet,
   TrendingUp,
   Shield,
@@ -37,55 +37,8 @@ interface RightMiniNavigationProps {
 
 export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigationProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isVisible, setIsVisible] = useState(false); // Start hidden
+  const [isVisible, setIsVisible] = useState(false);
   const pathname = usePathname();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
-
-  // Auto-hide after 3 seconds of inactivity
-  useEffect(() => {
-    if (isExpanded || isVisible) {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        setIsExpanded(false);
-        setIsVisible(false);
-      }, 3000);
-    }
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [isExpanded, isVisible]);
-
-  // Handle swipe gestures (simplified for now)
-  const handlePan = () => {
-    // Simplified implementation
-    setIsVisible(true);
-    setIsExpanded(true);
-  };
-
-  // Detect swipe from screen edge
-  useEffect(() => {
-    const handleTouchStart = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      if (touch.clientX > window.innerWidth - 30) { // 30px from right edge
-        setIsVisible(true);
-      }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (e.clientX > window.innerWidth - 30) { // 30px from right edge
-        setIsVisible(true);
-      }
-    };
-
-    document.addEventListener('touchstart', handleTouchStart, { passive: true });
-    document.addEventListener('mousemove', handleMouseMove, { passive: true });
-
-    return () => {
-      document.removeEventListener('touchstart', handleTouchStart);
-      document.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -95,30 +48,26 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
   return (
     <TooltipProvider>
       <motion.div
-        ref={containerRef}
         initial={{ x: 100, opacity: 0 }}
-        animate={{
-          x: isVisible ? 0 : 100,
-          opacity: isVisible ? 1 : 0
+        animate={{ 
+          x: isVisible ? 0 : 100, 
+          opacity: isVisible ? 1 : 0 
         }}
         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         className="fixed right-2 top-1/2 -translate-y-1/2 z-40"
-        drag="x"
-        dragConstraints={{ left: -100, right: 50 }}
-        dragElastic={0.1}
-        onPan={handlePan}
         whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => {
+          setIsExpanded(false);
+          setTimeout(() => setIsVisible(false), 1000);
+        }}
       >
-        <motion.div
+        <motion.div 
           className="relative backdrop-blur-xl bg-background/20 border border-white/10 rounded-3xl p-3 shadow-2xl shadow-black/20"
           style={{
             background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-          }}
-          whileHover={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)',
           }}
         >
           {/* Toggle Button */}
@@ -191,15 +140,6 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
                                 >
                                   {notificationCount > 9 ? '9+' : notificationCount}
                                 </Badge>
-                              )}
-                              
-                              {/* Active indicator */}
-                              {isActive && (
-                                <motion.div
-                                  layoutId="activeIndicator"
-                                  className="absolute inset-0 bg-primary/10 rounded-lg"
-                                  transition={{ duration: 0.2 }}
-                                />
                               )}
                             </Button>
                           </Link>
@@ -287,7 +227,7 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
           )}
         </motion.div>
 
-        {/* Edge indicator for swipe */}
+        {/* Edge indicator for hover */}
         {!isVisible && (
           <motion.div
             initial={{ opacity: 0, x: 50 }}
@@ -295,14 +235,14 @@ export function RightMiniNavigation({ notificationCount = 0 }: RightMiniNavigati
             transition={{ delay: 1, duration: 0.5 }}
             className="fixed right-0 top-1/2 -translate-y-1/2 z-30"
           >
-            <motion.div
+            <motion.div 
               className="w-1 h-12 bg-gradient-to-b from-primary/40 via-primary/60 to-primary/40 rounded-l-full"
-              animate={{
+              animate={{ 
                 opacity: [0.4, 0.8, 0.4],
                 scaleY: [1, 1.2, 1]
               }}
-              transition={{
-                duration: 2,
+              transition={{ 
+                duration: 2, 
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
