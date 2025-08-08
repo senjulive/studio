@@ -1,8 +1,13 @@
+import { AstralLogo } from '@/components/icons/astral-logo';
+
 export default function DashboardPage() {
   return (
     <div className="container">
       <header className="qn-header">
-        <div className="qn-logo">Quantum Ninja</div>
+        <div className="qn-logo">
+          <AstralLogo className="h-8 w-8 mr-2" />
+          AstralCore
+        </div>
         <div className="auth-buttons">
           <button className="qn-btn qn-btn-outline">Profile</button>
           <button className="qn-btn qn-btn-primary">Logout</button>
