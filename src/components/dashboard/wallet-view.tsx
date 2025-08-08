@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from "react";
@@ -30,6 +29,9 @@ import { useUser } from "@/contexts/UserContext";
 import { tierIcons, tierClassNames } from '@/lib/settings';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SquadSystem } from "./squad-system";
+import { NeonWalletView } from "./neon-wallet-view";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
