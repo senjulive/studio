@@ -1,9 +1,13 @@
 import { SquadSystem } from '@/components/dashboard/squad-system';
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 
 export default function SquadPage() {
   return (
-    <div className="space-y-6">
+    <QuantumPageWrapper
+      title="Squad System"
+      description="Join a clan and compete with other traders"
+    >
       <SquadSystem />
-    </div>
+    </QuantumPageWrapper>
   );
 }
