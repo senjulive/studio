@@ -1,6 +1,3 @@
-
-'use server';
-
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { getAllWallets, getWalletByUserId } from './wallet';

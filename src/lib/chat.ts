@@ -1,6 +1,3 @@
-
-'use server';
-
 // Mock implementation of chat functionality using a simple JSON structure.
 import initialChats from '../../data/chats.json';
 import { addPlatformNotification } from './notifications';
