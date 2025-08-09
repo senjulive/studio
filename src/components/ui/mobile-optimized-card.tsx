@@ -56,7 +56,7 @@ const MobileCard = forwardRef<HTMLDivElement, MobileCardProps>(
 
     return (
       <motion.div
-        ref={swipeable ? gestureRef : ref}
+        ref={swipeable ? (gestureRef as React.RefObject<HTMLDivElement>) : ref}
         className={cn(
           'backdrop-blur-sm transition-all duration-300',
           variantClasses[variant],
