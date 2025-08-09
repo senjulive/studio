@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -26,7 +25,7 @@ import { tierIcons } from '@/lib/settings';
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
 const rankIcons: Record<string, IconComponent> = {
-    RecruitRankIcon, BronzeRankIcon, SilverRankIcon, GoldRankIcon, PlatinumRankIcon, DiamondRankIcon, Lock,
+    RecruitRankIcon, BronzeRankIcon, SilverRankIcon, GoldRankIcon, PlatinumRankIcon, DiamondRankIcon, Lock: (props: SVGProps<SVGSVGElement>) => <Lock {...props} />,
 };
 
 type RewardSettings = {
