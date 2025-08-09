@@ -33,9 +33,9 @@ export function TradingBotCard({
 
   // Mock candlestick data for animation
   const candlestickData = React.useMemo(() => [
-    { time: new Date().getTime(), open: 100, high: 110, low: 95, close: 105 },
-    { time: new Date().getTime() + 1000, open: 105, high: 115, low: 100, close: 112 },
-    { time: new Date().getTime() + 2000, open: 112, high: 120, low: 108, close: 118 },
+    { timestamp: new Date().getTime(), open: 100, high: 110, low: 95, close: 105 },
+    { timestamp: new Date().getTime() + 1000, open: 105, high: 115, low: 100, close: 112 },
+    { timestamp: new Date().getTime() + 2000, open: 112, high: 120, low: 108, close: 118 },
   ], []);
 
   const currentPrice = 118;
