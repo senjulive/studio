@@ -148,8 +148,8 @@ export function MobileDashboard({ className }: MobileDashboardProps) {
   ];
 
   return (
-    <div 
-      ref={refreshGestureRef}
+    <div
+      ref={refreshGestureRef as React.RefObject<HTMLDivElement>}
       className={cn('space-y-6 pb-20', className)}
     >
       {/* Header */}
