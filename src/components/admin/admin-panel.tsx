@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -112,7 +111,7 @@ export function AdminPanel() {
                     <div className="col-span-12 md:col-span-3 lg:col-span-2 space-y-4">
                         {Object.entries(adminSections).map(([sectionName, items]) => {
                              if(sectionName === 'Dashboard') {
-                                const Icon = items.icon;
+                                const Icon = (items as { component: JSX.Element; icon: any }).icon;
                                 return (
                                     <Button
                                         key={sectionName}
