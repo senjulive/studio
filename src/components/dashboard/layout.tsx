@@ -330,7 +330,7 @@ URL=${window.location.origin}`;
                         <SidebarMenuButton
                           asChild
                           isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
+                            isClient ? (pathname?.endsWith(item.href) && !item.download) : false
                           }
                         >
                           <Link href={item.href} download={item.download}>
