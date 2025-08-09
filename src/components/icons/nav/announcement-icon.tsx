@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 
 export const AnnouncementIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -10,7 +9,6 @@ export const AnnouncementIcon = (props: React.SVGProps<SVGSVGElement>) => (
   >
     <foreignObject x="0" y="0" width="24" height="24">
       <div
-        xmlns="http://www.w3.org/1999/xhtml"
         style={{
           fontSize: '20px',
           lineHeight: '24px',

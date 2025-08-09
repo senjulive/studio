@@ -1,4 +1,5 @@
 import { PromotionsView } from '@/components/dashboard/promotions-view';
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,8 +9,11 @@ export const metadata: Metadata = {
 
 export default function PromotionsPage() {
   return (
-    <div className="space-y-6">
+    <QuantumPageWrapper
+      title="Promotions"
+      description="Check out the latest promotions and special offers"
+    >
       <PromotionsView />
-    </div>
+    </QuantumPageWrapper>
   );
 }

@@ -1,4 +1,5 @@
 import { ProfileView } from "@/components/dashboard/profile-view";
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,6 +9,11 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
     return (
-        <ProfileView />
+        <QuantumPageWrapper
+            title="User Profile"
+            description="Manage your account settings and verification status"
+        >
+            <ProfileView />
+        </QuantumPageWrapper>
     );
 }

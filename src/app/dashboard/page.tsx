@@ -1,7 +1,14 @@
-import { WalletView } from '@/components/dashboard/wallet-view';
+import { MobileDashboard } from '@/components/mobile/mobile-dashboard';
+import { DashboardLayout } from '@/components/layout/mobile-app-layout';
 
 export default function DashboardPage() {
   return (
-    <WalletView />
+    <DashboardLayout
+      title="Dashboard"
+      description="Your crypto trading overview"
+      showHeader={false}
+    >
+      <MobileDashboard />
+    </DashboardLayout>
   );
 }

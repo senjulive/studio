@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -24,7 +23,13 @@ import { Skeleton } from "../ui/skeleton";
 import { LiveTradingChart } from "./live-trading-chart";
 import { Button } from "../ui/button";
 import { BrainCircuit, Loader2 } from "lucide-react";
-import type { MarketSummaryOutput } from "@/ai/flows/market-summary-flow";
+// Local type to replace AI import for Netlify builds
+type MarketSummaryOutput = {
+  reasoning?: string;
+  summary: string;
+  trends?: string[];
+  confidence?: number;
+};
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp, Scale, Landmark, Bitcoin } from 'lucide-react';

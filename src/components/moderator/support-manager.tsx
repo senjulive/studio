@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -23,7 +22,14 @@ import {Input} from '@/components/ui/input';
 import {BrainCircuit, Loader2, Send, Hand} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {useToast} from '@/hooks/use-toast';
-import {type SupportAgentOutput} from '@/ai/flows/support-agent-flow';
+// Local type to replace AI import for Netlify builds
+type SupportAgentOutput = {
+  reasoning?: string;
+  response: string;
+  confidence?: number;
+  summary?: string;
+  suggestedReply?: string;
+};
 import {Card, CardContent} from '@/components/ui/card';
 import {type WalletData} from '@/lib/wallet';
 import {useUser} from '@/contexts/UserContext';
@@ -194,7 +200,7 @@ export function SupportManager() {
         const displayName = wallet?.profile?.username || userId;
         const currentClaim = claimStatus[userId];
         const isClaimedByOther =
-          currentClaim?.handler_id && currentClaim?.handler_id !== user?.id;
+          !!(currentClaim?.handler_id && currentClaim?.handler_id !== user?.id);
 
         return (
           <AccordionItem value={userId} key={userId}>

@@ -1,9 +1,13 @@
 import { DepositView } from '@/components/dashboard/deposit-view';
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 
 export default function DepositPage() {
   return (
-    <div className="space-y-6">
+    <QuantumPageWrapper
+      title="Deposit Funds"
+      description="Add funds to your AstralCore wallet to start trading"
+    >
       <DepositView />
-    </div>
+    </QuantumPageWrapper>
   );
 }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -46,7 +45,7 @@ const rankIcons: Record<string, IconComponent> = {
     GoldRankIcon,
     PlatinumRankIcon,
     DiamondRankIcon,
-    Lock,
+    Lock: (props: SVGProps<SVGSVGElement>) => <Lock {...props} />,
 };
 
 

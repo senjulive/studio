@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -48,8 +47,8 @@ import { MessageSquare, UserPlus, Shield, Lock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
-import { getUserRank } from '@/lib/ranks';
-import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+import { getUserRank, getCurrentTier } from '@/lib/ranks';
+import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
 import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
@@ -76,7 +75,7 @@ const rankIcons: Record<string, IconComponent> = {
     GoldRankIcon,
     PlatinumRankIcon,
     DiamondRankIcon,
-    Lock,
+    Lock: (props: SVGProps<SVGSVGElement>) => <Lock {...props} />,
 };
 
 // Mock user object
@@ -234,7 +233,7 @@ URL=${window.location.origin}`;
   ];
 
   const getPageTitle = () => {
-    const currentPath = pathname;
+    const currentPath = pathname || '/dashboard';
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
@@ -331,7 +330,7 @@ URL=${window.location.origin}`;
                         <SidebarMenuButton
                           asChild
                           isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
+                            isClient ? (pathname?.endsWith(item.href) && !item.download) : false
                           }
                         >
                           <Link href={item.href} download={item.download}>
@@ -446,7 +445,7 @@ URL=${window.location.origin}`;
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
-                  isClient && pathname.endsWith(item.href)
+                  isClient && pathname?.endsWith(item.href)
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}

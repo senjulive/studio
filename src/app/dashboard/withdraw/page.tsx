@@ -1,9 +1,13 @@
 import { WithdrawView } from '@/components/dashboard/withdraw-view';
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 
 export default function WithdrawPage() {
   return (
-    <div className="space-y-6">
+    <QuantumPageWrapper
+      title="Withdraw Funds"
+      description="Transfer your earnings to your external wallet"
+    >
       <WithdrawView />
-    </div>
+    </QuantumPageWrapper>
   );
 }

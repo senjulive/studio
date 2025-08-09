@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -9,7 +8,8 @@ import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BotAnimationPreview } from "./bot-animation-preview";
 import { AstralLogo } from "../icons/astral-logo";
-import { type TierSetting, getCurrentTier } from "@/lib/tiers";
+import { type TierSetting } from "@/lib/tiers";
+import { getCurrentTier } from "@/lib/ranks";
 import { GridTradingAnimation } from "./grid-trading-animation";
 
 export function TradingBotCard({
@@ -27,8 +27,18 @@ export function TradingBotCard({
 }) {
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [minGridBalance, setMinGridBalance] = React.useState(0);
+  const [botLog, setBotLog] = React.useState<{ message: string; time: Date; }[]>([]);
 
   const { toast } = useToast();
+
+  // Mock candlestick data for animation
+  const candlestickData = React.useMemo(() => [
+    { timestamp: new Date().getTime(), open: 100, high: 110, low: 95, close: 105 },
+    { timestamp: new Date().getTime() + 1000, open: 105, high: 115, low: 100, close: 112 },
+    { timestamp: new Date().getTime() + 2000, open: 112, high: 120, low: 108, close: 118 },
+  ], []);
+
+  const currentPrice = 118;
 
   React.useEffect(() => {
     async function fetchBotSettings() {
@@ -134,7 +144,15 @@ export function TradingBotCard({
       )}
     >
         {isAnimating && currentTier ? (
-            <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} />
+            <GridTradingAnimation
+                totalBalance={totalBalance}
+                profitPerTrade={profitPerTrade}
+                profitPercentage={profitPercentagePerTrade}
+                setBotLog={setBotLog}
+                isAnimating={isAnimating}
+                candlestickData={candlestickData}
+                currentPrice={currentPrice}
+            />
         ) : (
             <>
                 <CardHeader className="flex-row items-start justify-between pb-4">

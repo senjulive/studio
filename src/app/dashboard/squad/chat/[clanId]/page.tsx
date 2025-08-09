@@ -1,4 +1,3 @@
-
 import SquadClanChat from '@/components/dashboard/squad-clan-chat';
 import type { Metadata } from 'next';
 
@@ -13,14 +12,12 @@ interface ClanChatPageProps {
   params: Promise<{ clanId: string }>; // Explicitly typing params as a Promise
 }
 
-export default function ClanChatPage({ params }: ClanChatPageProps) {
-  // You might need to await params inside the component if it's truly a Promise,
-  // but in standard Next.js dynamic routes, params are directly available.
-  // The fact that the error suggests Promise<any> is unusual.
+export default async function ClanChatPage({ params }: ClanChatPageProps) {
+  const { clanId } = await params;
+
   return (
     <div className="space-y-6">
-      {/* Assuming params is directly available despite the error message */}
-      <SquadClanChat clanId={params.clanId} />
+      <SquadClanChat clanId={clanId} />
     </div>
   );
 }

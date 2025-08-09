@@ -1,4 +1,5 @@
 import { RewardsView } from '@/components/dashboard/rewards-view';
+import { QuantumPageWrapper } from '@/components/layout/quantum-page-wrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,8 +9,11 @@ export const metadata: Metadata = {
 
 export default function RewardsPage() {
   return (
-    <div className="space-y-6">
+    <QuantumPageWrapper
+      title="Rewards Center"
+      description="Claim rewards for your achievements and squad referrals"
+    >
       <RewardsView />
-    </div>
+    </QuantumPageWrapper>
   );
 }

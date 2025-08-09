@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -78,7 +77,7 @@ const rankIcons: Record<string, IconComponent> = {
     GoldRankIcon,
     PlatinumRankIcon,
     DiamondRankIcon,
-    Lock,
+    Lock: (props: SVGProps<SVGSVGElement>) => <Lock {...props} />,
 };
 
 // Mock user object
@@ -236,7 +235,7 @@ URL=${window.location.origin}`;
   ];
 
   const getPageTitle = () => {
-    const currentPath = pathname;
+    const currentPath = pathname || '/dashboard';
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
@@ -266,51 +265,28 @@ URL=${window.location.origin}`;
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
-        <Sidebar>
+        <Sidebar className="qn-sidebar">
           <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <AstralLogo className="h-10 w-10" />
-              <span className="text-lg font-semibold text-sidebar-foreground">
-                AstralCore
-              </span>
+            <div className="qn-logo" style={{justifyContent: 'flex-start', padding: '10px 0'}}>
+              <AstralLogo className="h-8 w-8 mr-2" />
+              AstralCore
             </div>
           </SidebarHeader>
 
-          <div className="mt-12 mb-4 px-4 space-y-4">
-             <div className="flex items-center gap-3">
-                  <AvatarUploadDialog 
-                    onUploadSuccess={() => fetchWalletAndTiers(user.id)}
-                    wallet={wallet}
-                  >
-                    <Avatar className="h-12 w-12 cursor-pointer">
-                      <AvatarImage
-                        src={wallet?.profile?.avatarUrl}
-                        alt={wallet?.profile?.username || 'User'}
-                      />
-                      <AvatarFallback>{userInitial}</AvatarFallback>
-                    </Avatar>
-                  </AvatarUploadDialog>
-
-                  <div className="overflow-hidden">
-                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
-                        {wallet?.profile?.username || 'User'}
-                        {userCountry && <span className="text-lg">{userCountry.flag}</span>}
-                     </p>
-                     <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
-                  </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
-                    <RankIcon className="h-4 w-4" />
-                    <span>{rank.name}</span>
-                 </Badge>
-                 {tier && TierIcon && tierClassName && (
-                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
-                    <TierIcon className="h-4 w-4" />
-                    <span>{tier.name}</span>
-                  </Badge>
-                )}
-              </div>
+          <div className="qn-user-profile">
+            <div className="qn-avatar">{userInitial}</div>
+            <h3>{wallet?.profile?.username || 'AstralCore User'}</h3>
+            <div className="qn-badge" style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
+              <RankIcon className={cn("h-3 w-3", rank.className)} />
+              {rank.name}
+              {tier && TierIcon && (
+                <>
+                  <TierIcon className={cn("h-3 w-3 ml-1", tierClassName)} />
+                  {tier.name}
+                </>
+              )}
+              {userCountry && <span style={{marginLeft: '4px'}}>{userCountry.flag}</span>}
+            </div>
           </div>
           <Separator className="bg-sidebar-border" />
 
@@ -325,7 +301,7 @@ URL=${window.location.origin}`;
                         <SidebarMenuButton
                           asChild
                           isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
+                            isClient ? (pathname?.endsWith(item.href) && !item.download) : false
                           }
                         >
                           <Link href={item.href} download={item.download}>
@@ -445,7 +421,7 @@ URL=${window.location.origin}`;
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
-                  isClient && pathname.endsWith(item.href)
+                  isClient && pathname?.endsWith(item.href)
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}

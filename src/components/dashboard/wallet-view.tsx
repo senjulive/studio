@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from "react";
@@ -30,6 +29,9 @@ import { useUser } from "@/contexts/UserContext";
 import { tierIcons, tierClassNames } from '@/lib/settings';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SquadSystem } from "./squad-system";
+import { NeonWalletView } from "./neon-wallet-view";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // Import rank icons
 import { RecruitRankIcon } from '@/components/icons/ranks/recruit-rank-icon';
@@ -48,7 +50,7 @@ const rankIcons: Record<string, IconComponent> = {
     GoldRankIcon,
     PlatinumRankIcon,
     DiamondRankIcon,
-    Lock,
+    Lock: (props: SVGProps<SVGSVGElement>) => <Lock {...props} />,
 };
 
 
@@ -155,6 +157,7 @@ const assetConfig = [
 export function WalletView() {
   const { wallet: walletData, tier, rank } = useUser();
   const [allAssetsData, setAllAssetsData] = React.useState<CryptoData[]>([]);
+  const [useNeonView, setUseNeonView] = React.useState(false);
 
   React.useEffect(() => {
     setAllAssetsData(initialCryptoData);
@@ -287,8 +290,41 @@ export function WalletView() {
   const balances = walletData.balances as any;
   const assetsWithFunds = assetConfig.filter(asset => balances[asset.balanceKey] > 0);
 
+  // If Neon view is enabled, render the Neon wallet component
+  if (useNeonView) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="neon-mode"
+              checked={useNeonView}
+              onCheckedChange={setUseNeonView}
+            />
+            <Label htmlFor="neon-mode" className="text-sm font-medium">
+              Neon Mode
+            </Label>
+          </div>
+        </div>
+        <NeonWalletView />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="neon-mode"
+            checked={useNeonView}
+            onCheckedChange={setUseNeonView}
+          />
+          <Label htmlFor="neon-mode" className="text-sm font-medium">
+            Neon Mode
+          </Label>
+        </div>
+      </div>
       <Tabs defaultValue="wallet">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="wallet"><WalletIcon className="mr-2 h-4 w-4"/>Wallet</TabsTrigger>
