@@ -200,7 +200,7 @@ export function SupportManager() {
         const displayName = wallet?.profile?.username || userId;
         const currentClaim = claimStatus[userId];
         const isClaimedByOther =
-          currentClaim?.handler_id && currentClaim?.handler_id !== user?.id;
+          !!(currentClaim?.handler_id && currentClaim?.handler_id !== user?.id);
 
         return (
           <AccordionItem value={userId} key={userId}>
