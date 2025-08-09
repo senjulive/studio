@@ -65,7 +65,7 @@ const AchievementItem = ({
         <Icon style={{width: '1.9cm', height: '1.9cm'}}/>
         <div className="flex-1">
           <p className="font-bold text-lg text-foreground">{item.name}</p>
-          <p className="text-sm">Min. Balance: ${item.balanceThreshold.toLocaleString()}</p>
+          <p className="text-sm">Min. Balance: ${('balanceThreshold' in item ? item.balanceThreshold : item.minBalance).toLocaleString()}</p>
         </div>
         {isUnlocked && <p className="font-semibold text-primary">🎉 Congratulations! 🎉</p>}
         {isUnlocked && (
