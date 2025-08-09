@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -300,7 +299,7 @@ export function WithdrawView() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {pendingWithdrawals.map((w) => (
+                        {pendingWithdrawals.map((w: any) => (
                             <TableRow key={w.id}>
                                 <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
                                 <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>
