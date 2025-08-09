@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -76,7 +75,7 @@ const rankIcons: Record<string, IconComponent> = {
     GoldRankIcon,
     PlatinumRankIcon,
     DiamondRankIcon,
-    Lock,
+    Lock: (props: SVGProps<SVGSVGElement>) => <Lock {...props} />,
 };
 
 // Mock user object
