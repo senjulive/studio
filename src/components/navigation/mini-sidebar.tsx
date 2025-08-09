@@ -198,8 +198,8 @@ export function MiniSidebar({ className }: MiniSidebarProps) {
   return (
     <>
       {/* Main screen touch area */}
-      <div 
-        ref={mainScreenRef}
+      <div
+        ref={mainScreenRef as React.RefObject<HTMLDivElement>}
         className="fixed inset-0 pointer-events-none z-0"
         style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
       />
