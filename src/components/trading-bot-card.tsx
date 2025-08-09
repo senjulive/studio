@@ -10,7 +10,7 @@ import { BotAnimationPreview } from "./dashboard/bot-animation-preview";
 import { AstralLogo } from "../icons/astral-logo";
 import { type TierSetting } from "@/lib/tiers";
 import { getCurrentTier } from "@/lib/ranks";
-import { GridTradingAnimation } from "./grid-trading-animation";
+import { GridTradingAnimation } from "./dashboard/grid-trading-animation";
 
 export function TradingBotCard({
   walletData,
