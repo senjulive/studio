@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -230,7 +229,7 @@ export function WalletManager() {
     if (!selectedWalletData) return;
     setIsCompleting(withdrawalId);
 
-    const withdrawal = selectedWalletData.pending_withdrawals.find(w => w.id === withdrawalId);
+    const withdrawal = selectedWalletData.pending_withdrawals.find((w: any) => w.id === withdrawalId);
     if (!withdrawal) {
         toast({ title: "Error", description: "Withdrawal not found.", variant: "destructive" });
         setIsCompleting(null);
