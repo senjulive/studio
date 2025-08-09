@@ -406,7 +406,7 @@ export function ProTraderView() {
                                 <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
                             ))
                          ) : (
-                             walletData.growth.earningsHistory.slice(-10).reverse().map((trade, index) => (
+                             walletData.growth.earningsHistory.slice(-10).reverse().map((trade: any, index: number) => (
                                  <HistoryItem key={trade.timestamp} log={`Grid Profit`} time={format(new Date(trade.timestamp), 'HH:mm:ss')} amount={trade.amount}/>
                              ))
                          )}
