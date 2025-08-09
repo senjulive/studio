@@ -144,7 +144,15 @@ export function TradingBotCard({
       )}
     >
         {isAnimating && currentTier ? (
-            <GridTradingAnimation totalBalance={totalBalance} profitPerTrade={profitPerTrade} profitPercentage={profitPercentagePerTrade} />
+            <GridTradingAnimation
+                totalBalance={totalBalance}
+                profitPerTrade={profitPerTrade}
+                profitPercentage={profitPercentagePerTrade}
+                setBotLog={setBotLog}
+                isAnimating={isAnimating}
+                candlestickData={candlestickData}
+                currentPrice={currentPrice}
+            />
         ) : (
             <>
                 <CardHeader className="flex-row items-start justify-between pb-4">
