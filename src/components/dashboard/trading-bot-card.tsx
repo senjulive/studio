@@ -27,8 +27,18 @@ export function TradingBotCard({
 }) {
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [minGridBalance, setMinGridBalance] = React.useState(0);
+  const [botLog, setBotLog] = React.useState<{ message: string; time: Date; }[]>([]);
 
   const { toast } = useToast();
+
+  // Mock candlestick data for animation
+  const candlestickData = React.useMemo(() => [
+    { time: new Date().getTime(), open: 100, high: 110, low: 95, close: 105 },
+    { time: new Date().getTime() + 1000, open: 105, high: 115, low: 100, close: 112 },
+    { time: new Date().getTime() + 2000, open: 112, high: 120, low: 108, close: 118 },
+  ], []);
+
+  const currentPrice = 118;
 
   React.useEffect(() => {
     async function fetchBotSettings() {
