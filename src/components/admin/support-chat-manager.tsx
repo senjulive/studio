@@ -27,6 +27,8 @@ type SupportAgentOutput = {
   reasoning?: string;
   response: string;
   confidence?: number;
+  summary?: string;
+  suggestedReply?: string;
 };
 import { Card, CardContent } from "@/components/ui/card";
 import { type WalletData } from "@/lib/wallet";
