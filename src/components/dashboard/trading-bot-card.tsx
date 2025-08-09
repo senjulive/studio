@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -9,7 +8,8 @@ import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BotAnimationPreview } from "./bot-animation-preview";
 import { AstralLogo } from "../icons/astral-logo";
-import { type TierSetting, getCurrentTier } from "@/lib/tiers";
+import { type TierSetting } from "@/lib/tiers";
+import { getCurrentTier } from "@/lib/ranks";
 import { GridTradingAnimation } from "./grid-trading-animation";
 
 export function TradingBotCard({
