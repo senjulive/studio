@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BotAnimationPreview } from "./dashboard/bot-animation-preview";
-import { AstralLogo } from "../icons/astral-logo";
+import { AstralLogo } from "./icons/astral-logo";
 import { type TierSetting } from "@/lib/tiers";
 import { getCurrentTier } from "@/lib/ranks";
 import { GridTradingAnimation } from "./dashboard/grid-trading-animation";
