@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -23,7 +22,12 @@ import { Input } from "@/components/ui/input";
 import { BrainCircuit, Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { type SupportAgentOutput } from "@/ai/flows/support-agent-flow";
+// Local type to replace AI import for Netlify builds
+type SupportAgentOutput = {
+  reasoning?: string;
+  response: string;
+  confidence?: number;
+};
 import { Card, CardContent } from "@/components/ui/card";
 import { type WalletData } from "@/lib/wallet";
 
