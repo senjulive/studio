@@ -520,7 +520,7 @@ export function CommunityBlog({ isFloating = false }: { isFloating?: boolean }) 
                           {squadMembers.length === 0 ? (
                             <p className="text-xs text-muted-foreground">No squad members found</p>
                           ) : (
-                            squadMembers.map((member: any, index) => (
+                            squadMembers.map((member: any, index: number) => (
                               <button
                                 key={index}
                                 onClick={() => handleMentionSelect(member.username || `User${index + 1}`)}
