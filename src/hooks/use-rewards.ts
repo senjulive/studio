@@ -2,38 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-
-export interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  reward: number;
-  icon: string;
-  category: 'trading' | 'referral' | 'milestone' | 'special';
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  requirement: {
-    type: 'balance' | 'referrals' | 'trades' | 'days' | 'deposits';
-    target: number;
-    current?: number;
-  };
-  isActive: boolean;
-  isEligible?: boolean;
-  isClaimed?: boolean;
-  canClaim?: boolean;
-  createdAt?: string;
-  claimedCount?: number;
-}
-
-export interface DailyReward {
-  id?: string;
-  day: number;
-  reward: number;
-  type: 'USDT' | 'bonus';
-  isActive?: boolean;
-  claimedToday?: number;
-  streak?: number;
-  canClaim?: boolean;
-}
+import type { Achievement, DailyReward } from '@/lib/rewards';
 
 export interface RewardsSummary {
   claimableAchievements: number;
