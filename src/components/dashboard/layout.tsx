@@ -75,7 +75,7 @@ const rankIcons: Record<string, IconComponent> = {
     GoldRankIcon,
     PlatinumRankIcon,
     DiamondRankIcon,
-    Lock,
+    Lock: Lock as IconComponent,
 };
 
 // Mock user object
