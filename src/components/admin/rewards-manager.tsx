@@ -304,10 +304,11 @@ export function RewardsManager() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="common">Common</SelectItem>
-                                <SelectItem value="rare">Rare</SelectItem>
-                                <SelectItem value="epic">Epic</SelectItem>
-                                <SelectItem value="legendary">Legendary</SelectItem>
+                                {ACHIEVEMENT_RARITIES.map(rarity => (
+                                  <SelectItem key={rarity.value} value={rarity.value}>
+                                    {rarity.label}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                             <FormMessage />
