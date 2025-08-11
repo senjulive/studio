@@ -1,7 +1,9 @@
-// next.config.mjs
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Remove swcMinify, it's enabled by default now
+  experimental: {
+    serverComponentsExternalPackages: []
+  }
 };
 
 export default nextConfig;
