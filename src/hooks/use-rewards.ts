@@ -4,12 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { Achievement, DailyReward } from '@/lib/rewards';
 
-export interface RewardsSummary {
-  claimableAchievements: number;
-  claimableRewardsValue: number;
-  totalEarned: number;
-  dailyStreak: number;
-}
+import type { RewardsSummary } from '@/lib/rewards';
 
 export interface RewardsStatus {
   summary: {
