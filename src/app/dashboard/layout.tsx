@@ -643,7 +643,7 @@ URL=${window.location.origin}`;
             {children}
           </main>
           <div className="hidden lg:block border-l">
-            <RightSidebar />
+            <RightSidebar isOpen={true} onClose={() => {}} />
           </div>
         </div>
           <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
