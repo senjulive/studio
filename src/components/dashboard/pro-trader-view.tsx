@@ -101,7 +101,7 @@ export function ProTraderView() {
     return tier.dailyProfit * 100; // Convert to percentage
   }, [tier]);
 
-  const [botLog, setBotLog] = React.useState<string[]>([]);
+  const [botLog, setBotLog] = React.useState<{ message: string; time: Date; }[]>([]);
 
   const candlestickData = React.useMemo(() => [
     { time: '9:00', open: 68000, high: 68500, low: 67800, close: 68200 },
