@@ -156,28 +156,6 @@ export function RewardsManager() {
     }
   };
 
-  const getRarityColor = (rarity: Achievement['rarity']) => {
-    switch (rarity) {
-      case 'common': return 'text-gray-600 bg-gray-100';
-      case 'rare': return 'text-blue-600 bg-blue-100';
-      case 'epic': return 'text-purple-600 bg-purple-100';
-      case 'legendary': return 'text-yellow-600 bg-yellow-100';
-    }
-  };
-
-  const getCategoryColor = (category: Achievement['category']) => {
-    switch (category) {
-      case 'trading': return 'text-green-600 bg-green-100';
-      case 'referral': return 'text-blue-600 bg-blue-100';
-      case 'milestone': return 'text-purple-600 bg-purple-100';
-      case 'special': return 'text-orange-600 bg-orange-100';
-    }
-  };
-
-  const getIconComponent = (iconName: string) => {
-    const iconOption = iconOptions.find(option => option.value === iconName);
-    return iconOption?.icon || Trophy;
-  };
 
   const startEditAchievement = (achievement: Achievement) => {
     setEditingAchievement(achievement);
