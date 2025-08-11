@@ -48,16 +48,27 @@ function getIconComponent(iconName: string) {
 }
 
 export function RewardsManager() {
-  const { toast } = useToast();
-  const [achievements, setAchievements] = React.useState<Achievement[]>(mockAchievements);
-  const [dailyRewards, setDailyRewards] = React.useState<DailyReward[]>(mockDailyRewards);
+  const {
+    achievements,
+    dailyRewards,
+    isLoading,
+    error,
+    fetchRewards,
+    createAchievement,
+    updateAchievement,
+    deleteAchievement,
+    createDailyReward,
+    updateDailyReward,
+    deleteDailyReward
+  } = useAdminRewards();
+
   const [editingAchievement, setEditingAchievement] = React.useState<Achievement | null>(null);
   const [editingDailyReward, setEditingDailyReward] = React.useState<DailyReward | null>(null);
   const [isAddingAchievement, setIsAddingAchievement] = React.useState(false);
   const [isAddingDailyReward, setIsAddingDailyReward] = React.useState(false);
 
-  const achievementForm = useForm<AchievementFormData>({
-    resolver: zodResolver(achievementSchema),
+  const achievementForm = useForm<CreateAchievementData>({
+    resolver: zodResolver(CreateAchievementSchema),
     defaultValues: {
       title: '',
       description: '',
@@ -71,8 +82,8 @@ export function RewardsManager() {
     }
   });
 
-  const dailyRewardForm = useForm<DailyRewardFormData>({
-    resolver: zodResolver(dailyRewardSchema),
+  const dailyRewardForm = useForm<CreateDailyRewardData>({
+    resolver: zodResolver(CreateDailyRewardSchema),
     defaultValues: {
       day: 1,
       reward: 0,
@@ -80,6 +91,10 @@ export function RewardsManager() {
       isActive: true
     }
   });
+
+  React.useEffect(() => {
+    fetchRewards();
+  }, [fetchRewards]);
 
   const handleCreateAchievement = async (data: AchievementFormData) => {
     try {
