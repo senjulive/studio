@@ -137,7 +137,7 @@ export function AdminPanel() {
                                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">{sectionName}</h3>
                                     <div className="space-y-1">
                                     {Object.entries(items).map(([itemName, itemDetails]) => {
-                                        const Icon = itemDetails.icon;
+                                        const Icon = (itemDetails as any).icon;
                                         return (
                                             <Button
                                                 key={itemName}
