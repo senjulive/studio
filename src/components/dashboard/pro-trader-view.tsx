@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { Play, Pause, Activity, TrendingUp, BarChart3, Settings, Shield, Lock, AlertTriangle, CheckCircle } from "lucide-react";
-// import { GridTradingAnimation } from "./grid-trading-animation";
+import { GridTradingAnimation } from "./grid-trading-animation";
 import { useToast } from "@/hooks/use-toast";
 import { TradingBotCard } from "../trading-bot-card";
 import Link from "next/link";
@@ -290,11 +290,30 @@ export function ProTraderView() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="p-8 text-center text-muted-foreground">
-            <p>Trading animation temporarily disabled for debugging</p>
-            <p>Balance: ${totalBalance?.toFixed(2) || 0}</p>
-            <p>Status: {isTrading ? 'Active' : 'Stopped'}</p>
-          </div>
+          {/* Safe GridTradingAnimation with error boundary */}
+          {React.useMemo(() => {
+            try {
+              return (
+                <GridTradingAnimation
+                  totalBalance={totalBalance || 0}
+                  profitPerTrade={profitPerTrade || 2.5}
+                  profitPercentage={profitPercentage || 1.5}
+                  setBotLog={setBotLog || (() => {})}
+                  isAnimating={isTrading}
+                  candlestickData={candlestickData || []}
+                  currentPrice={currentPrice || 68900}
+                />
+              );
+            } catch (error) {
+              console.error('GridTradingAnimation error:', error);
+              return (
+                <div className="p-8 text-center text-muted-foreground">
+                  <p>Trading visualization temporarily unavailable</p>
+                  <p>Balance: ${totalBalance?.toFixed(2) || 0}</p>
+                </div>
+              );
+            }
+          }, [totalBalance, profitPerTrade, profitPercentage, setBotLog, isTrading, candlestickData, currentPrice])}
         </CardContent>
       </Card>
 
