@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /moderator/
+Disallow: /dashboard/
+
+Sitemap: https://astralcore.netlify.app/sitemap.xml
