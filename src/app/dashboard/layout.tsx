@@ -347,7 +347,7 @@ URL=${window.location.origin}`;
   ];
 
   const getPageTitle = () => {
-    const currentPath = pathname;
+    const currentPath = pathname || '/dashboard';
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
@@ -465,7 +465,7 @@ URL=${window.location.origin}`;
                     </h3>
                     <div className="space-y-1">
                       {group.items.map((item) => {
-                        const isActive = isClient ? (pathname.endsWith(item.href) && !item.download) : false;
+                        const isActive = isClient ? ((pathname || '').endsWith(item.href) && !item.download) : false;
                         return (
                           <SidebarMenuItem key={item.href}>
                             <SidebarMenuButton
@@ -653,7 +653,7 @@ URL=${window.location.origin}`;
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
-                  isClient && pathname.endsWith(item.href)
+                  isClient && (pathname || '').endsWith(item.href)
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
