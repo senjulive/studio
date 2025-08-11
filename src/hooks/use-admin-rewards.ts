@@ -2,30 +2,16 @@
 
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import type { Achievement, DailyReward } from '@/hooks/use-rewards';
+import type {
+  Achievement,
+  DailyReward,
+  CreateAchievementData,
+  CreateDailyRewardData
+} from '@/lib/rewards';
 
 export interface AdminRewardsData {
   achievements: Achievement[];
   dailyRewards: DailyReward[];
-}
-
-export interface CreateAchievementData {
-  title: string;
-  description: string;
-  reward: number;
-  category: 'trading' | 'referral' | 'milestone' | 'special';
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  requirementType: 'balance' | 'referrals' | 'trades' | 'days' | 'deposits';
-  requirementTarget: number;
-  icon: string;
-  isActive: boolean;
-}
-
-export interface CreateDailyRewardData {
-  day: number;
-  reward: number;
-  type: 'USDT' | 'bonus';
-  isActive: boolean;
 }
 
 export function useAdminRewards() {
