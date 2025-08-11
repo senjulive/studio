@@ -90,6 +90,28 @@ export function ProTraderView() {
     });
   };
 
+  // Missing variable definitions for GridTradingAnimation
+  const profitPerTrade = React.useMemo(() => {
+    if (!tier || !totalBalance) return 0.5; // Default small profit per trade
+    return (totalBalance * tier.dailyProfit) / 100; // Estimate profit per trade
+  }, [totalBalance, tier]);
+
+  const profitPercentage = React.useMemo(() => {
+    if (!tier) return 2.5; // Default percentage
+    return tier.dailyProfit * 100; // Convert to percentage
+  }, [tier]);
+
+  const [botLog, setBotLog] = React.useState<string[]>([]);
+
+  const candlestickData = React.useMemo(() => [
+    { time: '9:00', open: 68000, high: 68500, low: 67800, close: 68200 },
+    { time: '9:15', open: 68200, high: 68800, low: 68100, close: 68600 },
+    { time: '9:30', open: 68600, high: 69000, low: 68400, close: 68900 },
+    { time: '9:45', open: 68900, high: 69200, low: 68700, close: 69100 },
+  ], []);
+
+  const currentPrice = React.useMemo(() => 68900, []);
+
   const tradingPairs = [
     { pair: "BTC/USDT", profit: "+2.45%", volume: "$45.2M", status: isTrading ? "active" : "offline" },
     { pair: "ETH/USDT", profit: "+1.87%", volume: "$32.1M", status: isTrading ? "active" : "offline" },
