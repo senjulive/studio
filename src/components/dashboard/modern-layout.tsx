@@ -71,28 +71,31 @@ export function ModernDashboardLayout({ children }: ModernDashboardLayoutProps) 
   };
 
   const getPageTitle = () => {
-    const segments = pathname.split('/').filter(Boolean);
+    const currentPath = pathname || '/dashboard';
+    const segments = currentPath.split('/').filter(Boolean);
     const lastSegment = segments[segments.length - 1];
-    
-    if (pathname === '/dashboard') return 'Dashboard';
-    if (pathname === '/dashboard/trading') return 'CORE AI Trading';
-    
+
+    if (currentPath === '/dashboard') return 'Dashboard';
+    if (currentPath === '/dashboard/trading') return 'CORE AI Trading';
+
     return lastSegment
-      ? lastSegment.split('-').map(word => 
+      ? lastSegment.split('-').map(word =>
           word.charAt(0).toUpperCase() + word.slice(1)
         ).join(' ')
       : 'Dashboard';
   };
 
   const getPageIcon = () => {
-    if (pathname.includes('trading')) return <Zap className="h-5 w-5 text-primary" />;
-    if (pathname.includes('market')) return <TrendingUp className="h-5 w-5 text-green-500" />;
-    if (pathname.includes('profile')) return <User className="h-5 w-5 text-blue-500" />;
+    const currentPath = pathname || '/dashboard';
+    if (currentPath.includes('trading')) return <Zap className="h-5 w-5 text-primary" />;
+    if (currentPath.includes('market')) return <TrendingUp className="h-5 w-5 text-green-500" />;
+    if (currentPath.includes('profile')) return <User className="h-5 w-5 text-blue-500" />;
     return <Globe className="h-5 w-5 text-muted-foreground" />;
   };
 
   const breadcrumbs = React.useMemo(() => {
-    const segments = pathname.split('/').filter(Boolean);
+    const currentPath = pathname || '/dashboard';
+    const segments = currentPath.split('/').filter(Boolean);
     return segments.map((segment, index) => ({
       name: segment.charAt(0).toUpperCase() + segment.slice(1),
       href: '/' + segments.slice(0, index + 1).join('/'),
