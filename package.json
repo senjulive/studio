@@ -15,7 +15,9 @@
     "export": "next export",
     "clean": "rm -rf .next out",
     "prebuild": "npm run clean",
-    "postbuild": "echo 'Build completed successfully!'"
+    "postbuild": "echo 'Build completed successfully!'",
+    "check": "node scripts/production-check.js",
+    "deploy:check": "npm run check && npm run typecheck && npm run lint:check"
   },
   "dependencies": {
     "@builder.io/react": "^8.2.6",
