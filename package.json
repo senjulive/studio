@@ -8,8 +8,14 @@
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "lint": "next lint --fix",
+    "lint:check": "next lint",
+    "typecheck": "tsc --noEmit",
+    "build:analyze": "ANALYZE=true npm run build",
+    "export": "next export",
+    "clean": "rm -rf .next out",
+    "prebuild": "npm run clean",
+    "postbuild": "echo 'Build completed successfully!'"
   },
   "dependencies": {
     "@builder.io/react": "^8.2.6",
