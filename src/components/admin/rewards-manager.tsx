@@ -34,12 +34,6 @@ import {
   type DailyReward
 } from '@/lib/rewards';
 
-const iconOptions = REWARD_ICONS.map(icon => ({
-  value: icon.value,
-  label: icon.label,
-  icon: getIconComponent(icon.value)
-}));
-
 function getIconComponent(iconName: string) {
   const iconMap: Record<string, any> = {
     Trophy, Gift, Star, Crown, Zap, Users, TrendingUp, Coins, Sparkles, Award, Target
