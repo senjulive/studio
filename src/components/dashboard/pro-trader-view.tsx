@@ -268,7 +268,15 @@ export function ProTraderView() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <GridTradingAnimation isActive={isTrading} />
+          <GridTradingAnimation
+            totalBalance={totalBalance}
+            profitPerTrade={profitPerTrade}
+            profitPercentage={profitPercentage}
+            setBotLog={setBotLog}
+            isAnimating={isTrading}
+            candlestickData={candlestickData}
+            currentPrice={currentPrice}
+          />
         </CardContent>
       </Card>
 
