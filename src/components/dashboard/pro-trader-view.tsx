@@ -291,13 +291,13 @@ export function ProTraderView() {
         </CardHeader>
         <CardContent>
           <GridTradingAnimation
-            totalBalance={totalBalance}
-            profitPerTrade={profitPerTrade}
-            profitPercentage={profitPercentage}
-            setBotLog={setBotLog}
+            totalBalance={totalBalance || 0}
+            profitPerTrade={2.5}
+            profitPercentage={1.5}
+            setBotLog={() => {}}
             isAnimating={isTrading}
-            candlestickData={candlestickData}
-            currentPrice={currentPrice}
+            candlestickData={[]}
+            currentPrice={68900}
           />
         </CardContent>
       </Card>
