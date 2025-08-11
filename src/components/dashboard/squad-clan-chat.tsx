@@ -2,10 +2,14 @@
 
 import React from 'react';
 
-const SquadClanChat = () => {
+interface SquadClanChatProps {
+  clanId: string;
+}
+
+const SquadClanChat = ({ clanId }: SquadClanChatProps) => {
   return (
     <div>
-      <h2>Squad Clan Chat</h2>
+      <h2>Squad Clan Chat - {clanId}</h2>
       {/* Add your component logic here */}
     </div>
   );
