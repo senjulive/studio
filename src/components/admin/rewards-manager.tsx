@@ -279,10 +279,11 @@ export function RewardsManager() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="trading">Trading</SelectItem>
-                                <SelectItem value="referral">Referral</SelectItem>
-                                <SelectItem value="milestone">Milestone</SelectItem>
-                                <SelectItem value="special">Special</SelectItem>
+                                {ACHIEVEMENT_CATEGORIES.map(category => (
+                                  <SelectItem key={category.value} value={category.value}>
+                                    {category.label}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                             <FormMessage />
