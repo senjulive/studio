@@ -104,10 +104,10 @@ export function ProTraderView() {
   const [botLog, setBotLog] = React.useState<{ message: string; time: Date; }[]>([]);
 
   const candlestickData = React.useMemo(() => [
-    { time: '9:00', open: 68000, high: 68500, low: 67800, close: 68200 },
-    { time: '9:15', open: 68200, high: 68800, low: 68100, close: 68600 },
-    { time: '9:30', open: 68600, high: 69000, low: 68400, close: 68900 },
-    { time: '9:45', open: 68900, high: 69200, low: 68700, close: 69100 },
+    { timestamp: Date.now() - 3600000, open: 68000, high: 68500, low: 67800, close: 68200 },
+    { timestamp: Date.now() - 2700000, open: 68200, high: 68800, low: 68100, close: 68600 },
+    { timestamp: Date.now() - 1800000, open: 68600, high: 69000, low: 68400, close: 68900 },
+    { timestamp: Date.now() - 900000, open: 68900, high: 69200, low: 68700, close: 69100 },
   ], []);
 
   const currentPrice = React.useMemo(() => 68900, []);
