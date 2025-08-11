@@ -175,7 +175,7 @@ npm run clean && npm run build
 
 ### Admin Features
 - **User Management:** Complete user oversight and control
-- **Financial Management:** Deposit/withdrawal approvals
+- **Financial Management:** Deposit/withdra nowal approvals
 - **Content Management:** Announcements and promotions
 - **Analytics:** Platform metrics and reporting
 - **Moderation:** Chat and content moderation tools
