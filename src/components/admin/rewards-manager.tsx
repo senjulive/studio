@@ -34,120 +34,18 @@ import {
   type DailyReward
 } from '@/lib/rewards';
 
-const achievementSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
-  reward: z.number().min(0, 'Reward must be positive'),
-  category: z.enum(['trading', 'referral', 'milestone', 'special']),
-  rarity: z.enum(['common', 'rare', 'epic', 'legendary']),
-  requirementType: z.enum(['balance', 'referrals', 'trades', 'days', 'deposits']),
-  requirementTarget: z.number().min(1, 'Target must be positive'),
-  icon: z.string(),
-  isActive: z.boolean().default(true)
-});
+const iconOptions = REWARD_ICONS.map(icon => ({
+  value: icon.value,
+  label: icon.label,
+  icon: getIconComponent(icon.value)
+}));
 
-const dailyRewardSchema = z.object({
-  day: z.number().min(1).max(30),
-  reward: z.number().min(0),
-  type: z.enum(['USDT', 'bonus']),
-  isActive: z.boolean().default(true)
-});
-
-type AchievementFormData = z.infer<typeof achievementSchema>;
-type DailyRewardFormData = z.infer<typeof dailyRewardSchema>;
-
-type Achievement = {
-  id: string;
-  title: string;
-  description: string;
-  reward: number;
-  icon: string;
-  category: 'trading' | 'referral' | 'milestone' | 'special';
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  requirement: {
-    type: 'balance' | 'referrals' | 'trades' | 'days' | 'deposits';
-    target: number;
+function getIconComponent(iconName: string) {
+  const iconMap: Record<string, any> = {
+    Trophy, Gift, Star, Crown, Zap, Users, TrendingUp, Coins, Sparkles, Award, Target
   };
-  isActive: boolean;
-  createdAt: string;
-  claimedCount: number;
-};
-
-type DailyReward = {
-  id: string;
-  day: number;
-  reward: number;
-  type: 'USDT' | 'bonus';
-  isActive: boolean;
-  claimedToday: number;
-};
-
-const iconOptions = [
-  { value: 'Trophy', label: '🏆 Trophy', icon: Trophy },
-  { value: 'Gift', label: '🎁 Gift', icon: Gift },
-  { value: 'Star', label: '⭐ Star', icon: Star },
-  { value: 'Crown', label: '👑 Crown', icon: Crown },
-  { value: 'Zap', label: '⚡ Zap', icon: Zap },
-  { value: 'Users', label: '👥 Users', icon: Users },
-  { value: 'TrendingUp', label: '📈 Trending Up', icon: TrendingUp },
-  { value: 'Coins', label: '🪙 Coins', icon: Coins },
-  { value: 'Sparkles', label: '✨ Sparkles', icon: Sparkles },
-  { value: 'Award', label: '🥇 Award', icon: Award },
-  { value: 'Target', label: '🎯 Target', icon: Target }
-];
-
-// Mock data
-const mockAchievements: Achievement[] = [
-  {
-    id: '1',
-    title: 'Welcome Aboard',
-    description: 'Make your first deposit to start trading',
-    reward: 5,
-    icon: 'Coins',
-    category: 'milestone',
-    rarity: 'common',
-    requirement: { type: 'deposits', target: 1 },
-    isActive: true,
-    createdAt: '2024-01-01',
-    claimedCount: 247
-  },
-  {
-    id: '2',
-    title: 'High Roller',
-    description: 'Reach $500 total balance',
-    reward: 25,
-    icon: 'Crown',
-    category: 'trading',
-    rarity: 'rare',
-    requirement: { type: 'balance', target: 500 },
-    isActive: true,
-    createdAt: '2024-01-01',
-    claimedCount: 89
-  },
-  {
-    id: '3',
-    title: 'Squad Builder',
-    description: 'Refer 5 new members',
-    reward: 20,
-    icon: 'Users',
-    category: 'referral',
-    rarity: 'common',
-    requirement: { type: 'referrals', target: 5 },
-    isActive: true,
-    createdAt: '2024-01-01',
-    claimedCount: 156
-  }
-];
-
-const mockDailyRewards: DailyReward[] = [
-  { id: '1', day: 1, reward: 2, type: 'USDT', isActive: true, claimedToday: 89 },
-  { id: '2', day: 2, reward: 3, type: 'USDT', isActive: true, claimedToday: 67 },
-  { id: '3', day: 3, reward: 4, type: 'USDT', isActive: true, claimedToday: 45 },
-  { id: '4', day: 4, reward: 5, type: 'USDT', isActive: true, claimedToday: 34 },
-  { id: '5', day: 5, reward: 6, type: 'USDT', isActive: true, claimedToday: 28 },
-  { id: '6', day: 6, reward: 8, type: 'USDT', isActive: true, claimedToday: 19 },
-  { id: '7', day: 7, reward: 15, type: 'bonus', isActive: true, claimedToday: 12 }
-];
+  return iconMap[iconName] || Trophy;
+}
 
 export function RewardsManager() {
   const { toast } = useToast();
