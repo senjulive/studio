@@ -182,6 +182,21 @@ export function RewardsManager() {
     });
   };
 
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center text-red-500">
+            <p>Error loading rewards: {error}</p>
+            <Button onClick={() => fetchRewards()} className="mt-2">
+              Try Again
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -189,6 +204,12 @@ export function RewardsManager() {
           <h2 className="text-2xl font-bold">Rewards Management</h2>
           <p className="text-muted-foreground">Manage achievements and daily rewards for users</p>
         </div>
+        {isLoading && (
+          <div className="flex items-center text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            Loading...
+          </div>
+        )}
       </div>
 
       <Tabs defaultValue="achievements" className="space-y-6">
