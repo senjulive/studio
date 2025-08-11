@@ -229,7 +229,7 @@ export function WalletManager() {
     if (!selectedWalletData) return;
     setIsCompleting(withdrawalId);
 
-    const withdrawal = selectedWalletData.pending_withdrawals.find(w => w.id === withdrawalId);
+    const withdrawal = selectedWalletData.pending_withdrawals.find((w: any) => w.id === withdrawalId);
     if (!withdrawal) {
         toast({ title: "Error", description: "Withdrawal not found.", variant: "destructive" });
         setIsCompleting(null);
@@ -237,7 +237,7 @@ export function WalletManager() {
     }
 
     const newWalletData: Partial<WalletData> = {
-        pending_withdrawals: selectedWalletData.pending_withdrawals.filter(w => w.id !== withdrawalId),
+        pending_withdrawals: selectedWalletData.pending_withdrawals.filter((w: any) => w.id !== withdrawalId),
     };
 
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedWalletData.user_id, newWalletData }, searchForm.getValues("email"));
