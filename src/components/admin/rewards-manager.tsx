@@ -96,172 +96,63 @@ export function RewardsManager() {
     fetchRewards();
   }, [fetchRewards]);
 
-  const handleCreateAchievement = async (data: AchievementFormData) => {
+  const handleCreateAchievement = async (data: CreateAchievementData) => {
     try {
-      const newAchievement: Achievement = {
-        id: Date.now().toString(),
-        title: data.title,
-        description: data.description,
-        reward: data.reward,
-        icon: data.icon,
-        category: data.category,
-        rarity: data.rarity,
-        requirement: {
-          type: data.requirementType,
-          target: data.requirementTarget
-        },
-        isActive: data.isActive,
-        createdAt: new Date().toISOString(),
-        claimedCount: 0
-      };
-
-      setAchievements(prev => [...prev, newAchievement]);
+      await createAchievement(data);
       achievementForm.reset();
       setIsAddingAchievement(false);
-
-      toast({
-        title: 'Achievement Created',
-        description: `"${data.title}" has been created successfully.`,
-      });
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to create achievement.',
-        variant: 'destructive'
-      });
+      // Error handling is done in the hook
     }
   };
 
-  const handleUpdateAchievement = async (data: AchievementFormData) => {
+  const handleUpdateAchievement = async (data: CreateAchievementData) => {
     if (!editingAchievement) return;
 
     try {
-      setAchievements(prev => prev.map(achievement => 
-        achievement.id === editingAchievement.id 
-          ? {
-              ...achievement,
-              title: data.title,
-              description: data.description,
-              reward: data.reward,
-              icon: data.icon,
-              category: data.category,
-              rarity: data.rarity,
-              requirement: {
-                type: data.requirementType,
-                target: data.requirementTarget
-              },
-              isActive: data.isActive
-            }
-          : achievement
-      ));
-
+      await updateAchievement(editingAchievement.id, data);
       setEditingAchievement(null);
       achievementForm.reset();
-
-      toast({
-        title: 'Achievement Updated',
-        description: `"${data.title}" has been updated successfully.`,
-      });
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update achievement.',
-        variant: 'destructive'
-      });
+      // Error handling is done in the hook
     }
   };
 
   const handleDeleteAchievement = async (id: string) => {
     try {
-      setAchievements(prev => prev.filter(achievement => achievement.id !== id));
-      
-      toast({
-        title: 'Achievement Deleted',
-        description: 'Achievement has been deleted successfully.',
-      });
+      await deleteAchievement(id);
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to delete achievement.',
-        variant: 'destructive'
-      });
+      // Error handling is done in the hook
     }
   };
 
-  const handleCreateDailyReward = async (data: DailyRewardFormData) => {
+  const handleCreateDailyReward = async (data: CreateDailyRewardData) => {
     try {
-      const newDailyReward: DailyReward = {
-        id: Date.now().toString(),
-        day: data.day,
-        reward: data.reward,
-        type: data.type,
-        isActive: data.isActive,
-        claimedToday: 0
-      };
-
-      setDailyRewards(prev => [...prev, newDailyReward].sort((a, b) => a.day - b.day));
+      await createDailyReward(data);
       dailyRewardForm.reset();
       setIsAddingDailyReward(false);
-
-      toast({
-        title: 'Daily Reward Created',
-        description: `Day ${data.day} reward has been created successfully.`,
-      });
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to create daily reward.',
-        variant: 'destructive'
-      });
+      // Error handling is done in the hook
     }
   };
 
-  const handleUpdateDailyReward = async (data: DailyRewardFormData) => {
+  const handleUpdateDailyReward = async (data: CreateDailyRewardData) => {
     if (!editingDailyReward) return;
 
     try {
-      setDailyRewards(prev => prev.map(reward => 
-        reward.id === editingDailyReward.id 
-          ? {
-              ...reward,
-              day: data.day,
-              reward: data.reward,
-              type: data.type,
-              isActive: data.isActive
-            }
-          : reward
-      ).sort((a, b) => a.day - b.day));
-
+      await updateDailyReward(editingDailyReward.id, data);
       setEditingDailyReward(null);
       dailyRewardForm.reset();
-
-      toast({
-        title: 'Daily Reward Updated',
-        description: `Day ${data.day} reward has been updated successfully.`,
-      });
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update daily reward.',
-        variant: 'destructive'
-      });
+      // Error handling is done in the hook
     }
   };
 
   const handleDeleteDailyReward = async (id: string) => {
     try {
-      setDailyRewards(prev => prev.filter(reward => reward.id !== id));
-      
-      toast({
-        title: 'Daily Reward Deleted',
-        description: 'Daily reward has been deleted successfully.',
-      });
+      await deleteDailyReward(id);
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to delete daily reward.',
-        variant: 'destructive'
-      });
+      // Error handling is done in the hook
     }
   };
 
