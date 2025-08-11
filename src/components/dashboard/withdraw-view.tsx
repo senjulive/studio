@@ -1,317 +1,600 @@
-
-"use client";
+'use client';
 
 import * as React from "react";
-import { Info, Loader2, Clock } from "lucide-react";
-
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
-import {
-  getWithdrawalAddresses,
-  saveWithdrawalAddress,
-  type WithdrawalAddresses,
-  getOrCreateWallet,
-  type WalletData,
-} from "@/lib/wallet";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import Image from "next/image";
-import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import { Send, Wallet, AlertCircle, CheckCircle, Clock, Shield, ArrowUpRight, TrendingUp, Zap, Calculator } from "lucide-react";
+import { withdrawRequestSchema } from "@/lib/validators";
+import { cn } from "@/lib/utils";
+import { SecurityAuth } from "@/components/ui/security-auth";
+
+type WithdrawFormValues = z.infer<typeof withdrawRequestSchema>;
+
+const cryptoAssets = [
+  {
+    symbol: "USDT",
+    name: "Tether",
+    iconUrl: "https://assets.coincap.io/assets/icons/usdt@2x.png",
+    networks: [
+      { name: "TRC20 (TRON)", minWithdraw: 10 },
+      { name: "ERC20 (Ethereum)", minWithdraw: 20 },
+      { name: "BEP20 (BSC)", minWithdraw: 10 }
+    ]
+  },
+  {
+    symbol: "BTC",
+    name: "Bitcoin",
+    iconUrl: "https://assets.coincap.io/assets/icons/btc@2x.png",
+    networks: [
+      { name: "Bitcoin Network", minWithdraw: 0.001 }
+    ]
+  },
+  {
+    symbol: "ETH",
+    name: "Ethereum",
+    iconUrl: "https://assets.coincap.io/assets/icons/eth@2x.png",
+    networks: [
+      { name: "ERC20 (Ethereum)", minWithdraw: 0.01 }
+    ]
+  }
+];
+
+const pendingWithdrawals = [
+  {
+    id: "with_001",
+    amount: 500,
+    currency: "USDT",
+    network: "TRC20 (TRON)",
+    walletAddress: "TQn9Y2khEsLJW1ChVWFMSMeRDow5oNDMkx",
+    status: "pending",
+    timestamp: "2024-01-15T14:30:00Z"
+  },
+  {
+    id: "with_002",
+    amount: 0.1,
+    currency: "BTC",
+    network: "Bitcoin Network",
+    walletAddress: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    status: "completed",
+    timestamp: "2024-01-14T09:15:00Z"
+  }
+];
 
 export function WithdrawView() {
+  const { wallet } = useUser();
   const { toast } = useToast();
-  const [savedAddresses, setSavedAddresses] =
-    React.useState<WithdrawalAddresses | null>(null);
-  const [walletData, setWalletData] = React.useState<WalletData | null>(null);
-  const [currentAddress, setCurrentAddress] = React.useState("");
-  const [amount, setAmount] = React.useState("");
-  const [passcode, setPasscode] = React.useState("");
-  const { user } = useUser();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [isSaving, setIsSaving] = React.useState(false);
-  const [isWithdrawing, setIsWithdrawing] = React.useState(false);
+  const [selectedAsset, setSelectedAsset] = React.useState(cryptoAssets[0]);
 
-  const asset = "usdt";
-  
-  const fetchWalletData = React.useCallback(async () => {
-    if (user?.id) {
-        setIsLoading(true);
-        const [addresses, wallet] = await Promise.all([
-          getWithdrawalAddresses(),
-          getOrCreateWallet(),
-        ]);
-        setSavedAddresses(addresses);
-        setWalletData(wallet);
-        setIsLoading(false);
-      }
-  }, [user]);
+  const [isConfirming, setIsConfirming] = React.useState(false);
+  const [showSecurityAuth, setShowSecurityAuth] = React.useState(false);
+  const [pendingWithdrawalData, setPendingWithdrawalData] = React.useState<any>(null);
 
-  React.useEffect(() => {
-    fetchWalletData();
-  }, [fetchWalletData]);
+  const form = useForm<WithdrawFormValues>({
+    resolver: zodResolver(withdrawRequestSchema),
+    defaultValues: {
+      amount: 0,
+      currency: "USDT",
+      walletAddress: "",
+      network: "",
+    },
+  });
 
-  const handleSaveAddress = async () => {
-    if (!currentAddress || !/T[A-Za-z1-9]{33}/.test(currentAddress)) {
+  const watchedAmount = form.watch("amount");
+  const currentNetwork = selectedAsset.networks[0];
+  const balances = wallet?.balances as any;
+  const availableBalance = balances?.[selectedAsset.symbol.toLowerCase()] || 0;
+  const netAmount = watchedAmount;
+
+  const onSubmit = async (values: WithdrawFormValues) => {
+    if (values.amount > availableBalance) {
       toast({
-        title: "Invalid TRC20 Address",
-        description: "Please enter a valid TRC20 address for USDT.",
-        variant: "destructive",
+        title: "Insufficient Balance",
+        description: "You don't have enough funds for this withdrawal.",
+        variant: "destructive"
       });
       return;
     }
-    if (!user?.id) return;
 
-    setIsSaving(true);
-    await saveWithdrawalAddress(asset, currentAddress);
-    const updatedAddresses = await getWithdrawalAddresses();
-    setSavedAddresses(updatedAddresses);
-    setIsSaving(false);
-    toast({ title: "Address Saved", description: "Your withdrawal address has been saved." });
+    if (values.amount < currentNetwork.minWithdraw) {
+      toast({
+        title: "Minimum Amount Required",
+        description: `Minimum withdrawal amount is ${currentNetwork.minWithdraw} ${selectedAsset.symbol}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsConfirming(true);
   };
 
-  const handleWithdraw = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const withdrawAmount = parseFloat(amount);
+  const confirmWithdrawal = async () => {
+    const withdrawalData = {
+      ...form.getValues(),
+      currency: selectedAsset.symbol,
+      network: currentNetwork.name,
+      netAmount
+    };
 
-    if (!walletData || !user?.id || !savedAddresses?.usdt) return;
+    setPendingWithdrawalData(withdrawalData);
+    setIsConfirming(false);
+    setShowSecurityAuth(true);
+  };
 
-    if (!amount || withdrawAmount <= 0) {
-      toast({ title: "Invalid Amount", description: "Please enter a valid amount.", variant: "destructive" });
-      return;
-    }
-
-    if (withdrawAmount < 10) {
-      toast({ title: "Minimum Withdrawal", description: `The minimum withdrawal amount is $10.00 USDT.`, variant: "destructive" });
-      return;
-    }
-    
-    if (withdrawAmount > walletData.balances.usdt) {
-      toast({ title: "Insufficient Balance", description: `Your USDT balance is too low.`, variant: "destructive" });
-      return;
-    }
-
-    if (!passcode || passcode.length < 4) {
-      toast({ title: "Passcode Required", description: `Please enter your 4-6 digit withdrawal passcode.`, variant: "destructive" });
-      return;
-    }
-
-    setIsWithdrawing(true);
-    
-    // Mock passcode check
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
+  const handleSecuritySuccess = async () => {
     try {
-        const response = await fetch('/api/withdraw/request', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userId: user.id,
-                amount: withdrawAmount,
-                asset: 'usdt',
-                address: savedAddresses.usdt,
-            }),
-        });
-        const result = await response.json();
+      console.log("Withdrawal request:", pendingWithdrawalData);
 
-        if (!response.ok) {
-            throw new Error(result.error || "Failed to submit withdrawal request.");
-        }
+      toast({
+        title: "Withdrawal Requested",
+        description: "Your withdrawal request has been submitted and will be processed within 24 hours.",
+      });
 
-        await fetchWalletData(); // Refetch data to show new pending request and updated balance
-
-        setAmount("");
-        setPasscode("");
-        toast({
-            title: "Withdrawal Initiated",
-            description: `Your request for ${withdrawAmount.toFixed(2)} USDT is being processed.`,
-        });
-
-    } catch (error: any) {
-        toast({ title: "Withdrawal Failed", description: error.message, variant: "destructive" });
-    } finally {
-        setIsWithdrawing(false);
+      form.reset();
+      setShowSecurityAuth(false);
+      setPendingWithdrawalData(null);
+    } catch (error) {
+      toast({
+        title: "Withdrawal Failed",
+        description: "Failed to submit withdrawal request. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
-  const hasSavedAddress = savedAddresses && savedAddresses[asset as keyof WithdrawalAddresses];
-  const pendingWithdrawals = walletData?.pending_withdrawals || [];
-  
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-1/3" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-1/4" />
-          </div>
-      );
-    }
-
-    if (!hasSavedAddress) {
-      return (
-        <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            You have not set a withdrawal address for{" "}
-            {asset.toUpperCase()}. Please add one to continue.
-          </p>
-          <div className="space-y-2">
-            <Label htmlFor="new-address">
-              New {asset.toUpperCase()} Withdrawal Address (TRC20)
-            </Label>
-            <Input
-              id="new-address"
-              placeholder="Enter your external TRC20 wallet address"
-              value={currentAddress}
-              onChange={(e) => setCurrentAddress(e.target.value)}
-            />
-          </div>
-          <Button
-            onClick={handleSaveAddress}
-            disabled={isSaving}
-          >
-            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Address
-          </Button>
-        </div>
-      );
-    }
-
-    return (
-        <form onSubmit={handleWithdraw} className="space-y-4">
-            <div className="space-y-2">
-            <Label>Your Saved USDT Address</Label>
-            <Input
-                value={
-                savedAddresses?.[asset as keyof WithdrawalAddresses] || ""
-                }
-                readOnly
-                className="font-mono text-sm"
-            />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount to Withdraw (Available: ${walletData?.balances.usdt.toFixed(2)})</Label>
-                <Input
-                    id="amount"
-                    type="number"
-                    placeholder="Minimum $10.00"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    disabled={isWithdrawing}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="passcode">Withdrawal Passcode</Label>
-                <Input
-                    id="passcode"
-                    type="password"
-                    maxLength={6}
-                    placeholder="••••••"
-                    value={passcode}
-                    onChange={(e) => setPasscode(e.target.value)}
-                    disabled={isWithdrawing}
-                />
-              </div>
-            </div>
-            <Button type="submit" disabled={isWithdrawing || !amount || !passcode} className="w-full">
-            {isWithdrawing && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Request Withdrawal
-            </Button>
-        </form>
-    );
+  const handleSecurityCancel = () => {
+    setShowSecurityAuth(false);
+    setPendingWithdrawalData(null);
   };
 
+  const setMaxAmount = () => {
+    const maxAmount = availableBalance;
+    form.setValue("amount", maxAmount);
+  };
 
   return (
     <div className="space-y-6">
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-            <Image src="https://assets.coincap.io/assets/icons/usdt@2x.png" alt="USDT logo" width={24} height={24} className="rounded-full" />
-            <span>Withdraw USDT (TRC20)</span>
-        </CardTitle>
-        <CardDescription>
-          Manage your withdrawal address and send funds to your external
-          wallet.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6 py-4">
-          {renderContent()}
-
-          <Alert className="mt-4 text-left">
-            <Info className="h-4 w-4" />
-            <AlertTitle>Please Note</AlertTitle>
-            <AlertDescription>
-              <ul className="list-inside list-disc space-y-1">
-                <li>
-                  Ensure the wallet address is correct and on the{" "}
-                  <strong>TRC20</strong> network.
-                </li>
-                <li>
-                  Withdrawals typically take <strong>24-72 hours</strong> to be fully processed for security reasons.
-                </li>
-                <li>
-                  You must set a withdrawal passcode on the Security page before you can withdraw funds.
-                </li>
-              </ul>
-            </AlertDescription>
-          </Alert>
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500/10 via-orange-500/10 to-yellow-500/10 border border-red-500/20">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+        <div className="relative p-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-red-500/20 rounded-full">
+                  <ArrowUpRight className="h-8 w-8 text-red-500" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground">Withdraw Funds</h1>
+                  <p className="text-muted-foreground">Transfer your earnings to your personal wallet</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Badge variant="outline" className="bg-green-500/10 border-green-500/20 text-green-400">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Secure Transfer
+                </Badge>
+                <Badge variant="outline" className="bg-blue-500/10 border-blue-500/20 text-blue-400">
+                  <Clock className="h-3 w-3 mr-1" />
+                  24h Processing
+                </Badge>
+                <Badge variant="outline" className="bg-purple-500/10 border-purple-500/20 text-purple-400">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  Low Fees
+                </Badge>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <div className="text-3xl font-bold text-primary">
+                ${availableBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <div className="text-sm text-muted-foreground">Available Balance</div>
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
 
-    {pendingWithdrawals.length > 0 && (
-        <Card className="w-full max-w-2xl mx-auto">
+      <Tabs defaultValue="withdraw" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 gap-1">
+          <TabsTrigger value="withdraw" className="flex items-center gap-2 text-xs sm:text-sm">
+            <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Make Withdrawal</span>
+            <span className="sm:hidden">Withdraw</span>
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2 text-xs sm:text-sm">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+            History
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="withdraw" className="space-y-6">
+          {/* Available Balances */}
+          <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    Pending Withdrawals
-                </CardTitle>
-                <CardDescription>These withdrawals are currently being processed.</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="h-5 w-5 text-primary" />
+                Available Balances
+              </CardTitle>
+              <CardDescription>Your cryptocurrency holdings ready for withdrawal</CardDescription>
             </CardHeader>
             <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Amount (USDT)</TableHead>
-                            <TableHead>Address</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {pendingWithdrawals.map((w) => (
-                            <TableRow key={w.id}>
-                                <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
-                                <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>
-                                <TableCell className="font-mono text-xs truncate max-w-[100px] sm:max-w-xs">{w.address}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+              <div className="grid gap-4 md:grid-cols-3">
+                {cryptoAssets.map((asset) => {
+                  const balance = balances?.[asset.symbol.toLowerCase()] || 0;
+                  return (
+                    <div key={asset.symbol} className="group relative overflow-hidden rounded-xl border p-4 hover:border-primary/50 transition-all duration-300">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-full bg-gradient-to-br from-primary/10 to-purple-500/10">
+                            <Image
+                              src={asset.iconUrl}
+                              alt={asset.symbol}
+                              width={24}
+                              height={24}
+                              className="rounded-full"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{asset.name}</p>
+                            <p className="text-sm text-muted-foreground">{asset.symbol}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-foreground">
+                            {balance.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: asset.symbol === 'USDT' ? 2 : 6
+                            })}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{asset.symbol}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </CardContent>
-        </Card>
-    )}
+          </Card>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Asset & Network Selection */}
+            <Card className="overflow-hidden">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Asset & Network
+                </CardTitle>
+                <CardDescription>Select cryptocurrency and blockchain network</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-foreground">Choose Asset</label>
+                  <div className="grid gap-2">
+                    {cryptoAssets.map((asset) => (
+                      <button
+                        key={asset.symbol}
+                        onClick={() => {
+                          setSelectedAsset(asset);
+                          form.setValue("currency", asset.symbol as any);
+                        }}
+                        className={cn(
+                          "flex items-center gap-3 p-3 border rounded-lg text-left transition-colors",
+                          selectedAsset.symbol === asset.symbol
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50 hover:bg-accent/50"
+                        )}
+                      >
+                        <Image
+                          src={asset.iconUrl}
+                          alt={asset.symbol}
+                          width={24}
+                          height={24}
+                          className="rounded-full"
+                        />
+                        <span className="font-medium text-foreground">{asset.symbol}</span>
+                        {selectedAsset.symbol === asset.symbol && (
+                          <CheckCircle className="h-4 w-4 text-primary ml-auto" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-foreground">Network</label>
+                  <div className="p-4 border rounded-lg bg-primary/5 border-primary">
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">{currentNetwork.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Min: {currentNetwork.minWithdraw} {selectedAsset.symbol} • <span className="text-green-600 font-medium">No fees</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Withdrawal Form */}
+            <Card className="overflow-hidden">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5 text-primary" />
+                  Withdrawal Details
+                </CardTitle>
+                <CardDescription>Enter amount and destination wallet</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="walletAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Destination Wallet Address</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={`Enter ${selectedAsset.symbol} wallet address`}
+                              {...field}
+                              className="font-mono bg-background/50"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="amount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Withdrawal Amount</FormLabel>
+                          <FormControl>
+                            <div className="space-y-3">
+                              <div className="flex gap-2">
+                                <Input
+                                  type="number"
+                                  step="0.000001"
+                                  placeholder="0.00"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                  className="bg-background/50"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={setMaxAmount}
+                                  disabled={availableBalance <= 0}
+                                  className="border-primary/30 hover:bg-primary/10"
+                                >
+                                  Max
+                                </Button>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                Available: {availableBalance.toFixed(6)} {selectedAsset.symbol}
+                              </p>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* No Fee Confirmation */}
+                    {watchedAmount > 0 && (
+                      <div className="p-4 bg-gradient-to-r from-green-500/5 to-emerald-500/5 border border-green-500/20 rounded-xl space-y-3">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Calculator className="h-4 w-4 text-green-600" />
+                          <span className="font-medium text-foreground">Withdrawal Summary</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Withdrawal Amount:</span>
+                            <span className="font-medium text-foreground">{watchedAmount} {selectedAsset.symbol}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Network Fee:</span>
+                            <span className="font-medium text-green-600">FREE</span>
+                          </div>
+                          <div className="border-t border-green-500/20 pt-2 flex justify-between">
+                            <span className="font-medium text-foreground">You Will Receive:</span>
+                            <span className="font-bold text-green-600">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          type="submit" 
+                          className="w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-semibold py-3"
+                          disabled={availableBalance === 0 || watchedAmount <= 0}
+                        >
+                          <Send className="h-4 w-4 mr-2" />
+                          Request Withdrawal
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="max-w-md">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Confirm Withdrawal</AlertDialogTitle>
+                          <AlertDialogDescription asChild>
+                            <div className="space-y-4">
+                              <p>Please verify your withdrawal details:</p>
+                              <div className="space-y-3 p-4 bg-gradient-to-r from-primary/5 to-purple-500/5 border border-primary/20 rounded-lg">
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Asset:</span>
+                                  <span className="font-medium text-foreground">{selectedAsset.symbol}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Network:</span>
+                                  <span className="font-medium text-foreground">{currentNetwork.name}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Address:</span>
+                                  <span className="font-mono text-xs break-all text-foreground">
+                                    {form.getValues("walletAddress")}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Amount:</span>
+                                  <span className="font-medium text-foreground">{watchedAmount} {selectedAsset.symbol}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Fee:</span>
+                                  <span className="font-medium text-green-600">FREE</span>
+                                </div>
+                                <div className="flex justify-between border-t border-primary/20 pt-2">
+                                  <span className="font-medium text-foreground">Amount You'll Receive:</span>
+                                  <span className="font-bold text-green-600">{netAmount.toFixed(6)} {selectedAsset.symbol}</span>
+                                </div>
+                              </div>
+                              <div className="flex gap-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                                  This action cannot be undone. Please double-check the wallet address.
+                                </p>
+                              </div>
+                            </div>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={confirmWithdrawal} className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700">
+                            Confirm Withdrawal
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Security Information */}
+          <Card className="overflow-hidden bg-gradient-to-br from-green-500/5 to-blue-500/5 border-green-500/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-green-500" />
+                Security & Processing Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-blue-500" />
+                    Processing Time
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Withdrawals are processed within 24 hours during business days.
+                    Large amounts may require additional KYC verification.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-green-500" />
+                    Security Measures
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    All withdrawals are reviewed by our security team to ensure 
+                    the safety of your funds. Email confirmation is required.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4">
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Withdrawal History
+              </CardTitle>
+              <CardDescription>
+                Track all your withdrawal transactions and their status
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {pendingWithdrawals.map((withdrawal) => (
+                  <div key={withdrawal.id} className="group relative overflow-hidden rounded-xl border p-4 hover:border-primary/50 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-full bg-gradient-to-br from-primary/10 to-purple-500/10">
+                          <Image
+                            src={cryptoAssets.find(a => a.symbol === withdrawal.currency)?.iconUrl || ""}
+                            alt={withdrawal.currency}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-semibold text-foreground">
+                            {withdrawal.amount} {withdrawal.currency}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {withdrawal.network} • {new Date(withdrawal.timestamp).toLocaleDateString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground font-mono">
+                            To: {withdrawal.walletAddress.slice(0, 20)}...
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <Badge
+                          variant={
+                            withdrawal.status === "completed" ? "default" :
+                            withdrawal.status === "pending" ? "secondary" : "destructive"
+                          }
+                          className={cn(
+                            "font-medium",
+                            withdrawal.status === "completed" && "bg-green-500/10 border-green-500/20 text-green-400"
+                          )}
+                        >
+                          {withdrawal.status === "completed" && <CheckCircle className="h-3 w-3 mr-1" />}
+                          {withdrawal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
+                          {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
+                        </Badge>
+                        <p className="text-xs text-green-600 font-medium">
+                          No fees charged
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Security Authentication Dialog */}
+      <SecurityAuth
+        isOpen={showSecurityAuth}
+        onClose={handleSecurityCancel}
+        onSuccess={handleSecuritySuccess}
+        title="Secure Withdrawal Verification"
+        description="For your security, please verify your identity before proceeding with this withdrawal."
+      />
     </div>
   );
 }

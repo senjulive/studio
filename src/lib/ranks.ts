@@ -1,4 +1,3 @@
-
 import type { SVGProps } from 'react';
 import type { TierSetting } from './tiers';
 
@@ -10,7 +9,7 @@ export type Rank = {
 };
 
 export const ranks: Rank[] = [
-  { name: 'Recruit', minBalance: 0, Icon: 'RecruitRankIcon', className: 'text-muted-foreground' },
+  { name: 'Recruit', minBalance: 100, Icon: 'RecruitRankIcon', className: 'text-muted-foreground' },
   { name: 'Bronze', minBalance: 500, Icon: 'BronzeRankIcon', className: 'text-orange-600' },
   { name: 'Silver', minBalance: 1000, Icon: 'SilverRankIcon', className: 'text-slate-400' },
   { name: 'Gold', minBalance: 5000, Icon: 'GoldRankIcon', className: 'text-amber-500' },
@@ -25,13 +24,3 @@ export const getUserRank = (balance: number): Rank => {
   // Exclude locked ranks from being assigned to a user for now.
   return sortedRanks.find(rank => balance >= rank.minBalance && rank.Icon !== 'Lock') || ranks[0];
 };
-
-export function getCurrentTier(balance: number, tiers: TierSetting[]): TierSetting | null {
-    if (!tiers || tiers.length === 0) return null;
-    const applicableTier = [...tiers].reverse().find(
-      tier => balance >= tier.balanceThreshold && !tier.locked
-    );
-    return applicableTier || tiers.find(t => !t.locked) || null;
-};
-
-    

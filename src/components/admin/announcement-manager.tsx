@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -51,7 +50,7 @@ export function AnnouncementManager() {
       const initialData = getAnnouncements();
 
       const currentAnnouncements = data || initialData;
-      setAnnouncements(currentAnnouncements.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+      setAnnouncements(currentAnnouncements.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()));
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
       setAnnouncements([]);

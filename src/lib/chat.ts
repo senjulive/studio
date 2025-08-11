@@ -1,6 +1,3 @@
-
-'use server';
-
 // Mock implementation of chat functionality using a simple JSON structure.
 import initialChats from '../../data/chats.json';
 import { addPlatformNotification } from './notifications';
@@ -19,6 +16,18 @@ export type Message = {
 
 export type ChatHistory = {
   [userId: string]: Message[];
+};
+
+export type ChatMessage = {
+  id: string;
+  username: string;
+  message: string;
+  timestamp: string;
+  avatarUrl?: string;
+  isVerified?: boolean;
+  mentions?: string[];
+  reactions?: { emoji: string; count: number; users: string[] }[];
+  flagged?: boolean;
 };
 
 

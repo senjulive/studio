@@ -1,62 +1,144 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 224 71% 4%;
-    --foreground: 210 40% 98%;
-    
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    
-    --popover: 224 71% 4%;
-    --popover-foreground: 210 40% 98%;
-    
-    --primary: 213 94% 68%; /* A vibrant blue */
-    --primary-foreground: 222 47% 11%;
-    
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    
-    --destructive: 0 63% 31%;
+    /* Dark Black Theme - Sleek Modern Design */
+    --background: 0 0% 2%; /* Deep black */
+    --foreground: 0 0% 95%; /* Almost white text */
+
+    --card: 0 0% 4%; /* Very dark card background */
+    --card-foreground: 0 0% 92%;
+
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 210 100% 60%; /* Bright electric blue */
+    --primary-foreground: 0 0% 2%;
+
+    --secondary: 0 0% 8%; /* Dark gray */
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 0 0% 6%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 0 0% 12%; /* Subtle gray borders */
+    --input: 0 0% 6%;
+    --ring: 210 100% 60%;
+
+    --chart-1: 210 100% 60%; /* Electric blue */
+    --chart-2: 280 100% 70%; /* Electric purple */
+    --chart-3: 170 100% 50%; /* Electric cyan */
+    --chart-4: 50 100% 60%; /* Electric gold */
+    --chart-5: 120 100% 50%; /* Electric green */
+    --radius: 1rem;
+
+    /* Sidebar Variables */
+    --sidebar-background: 0 0% 1%; /* Pure black sidebar */
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 0% 95%;
+    --sidebar-primary-foreground: 0 0% 2%;
+    --sidebar-accent: 0 0% 8%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 8%;
+    --sidebar-ring: 210 100% 60%;
+
+    /* Rank Colors - Electric Neon Theme */
+    --color-recruit: 0 0% 40%;
+    --color-bronze: 30 100% 50%;
+    --color-silver: 0 0% 75%;
+    --color-gold: 50 100% 60%;
+    --color-platinum: 210 100% 60%;
+    --color-diamond: 280 100% 70%;
+  }
+
+  /* Light Theme */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 210 100% 50%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    
-    --border: 217 33% 25%; /* Slightly lighter border for glass effect */
-    --input: 217 33% 17%;
-    --ring: 213 94% 68%;
-    
-    --chart-1: 22 92% 58%;
-    --chart-2: 142.1 76.2% 36.3%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.75rem;
 
-    /* Custom Sidebar Vars */
-    --sidebar-background: 224 71% 4%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 40% 98%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 213 94% 68%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 100% 50%;
 
-    /* Chart Colors for Ranks */
-    --color-recruit: 240 3.8% 46.1%;
-    --color-bronze: 24 9.8% 30%;
-    --color-silver: 240 4.8% 95.9%;
-    --color-gold: 47.9 95.8% 53.1%;
-    --color-platinum: 197.8 91.1% 47.6%;
-    --color-diamond: 270 95.2% 60.2%;
+    /* Light Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-primary: 222.2 84% 4.9%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222.2 84% 4.9%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 210 100% 50%;
+  }
+
+  /* Purple Neon Theme */
+  .purple {
+    --background: 280 20% 2%; /* Deep purple-black */
+    --foreground: 280 10% 95%;
+
+    --card: 280 15% 4%;
+    --card-foreground: 280 10% 92%;
+
+    --popover: 280 20% 3%;
+    --popover-foreground: 280 10% 95%;
+
+    --primary: 280 100% 70%; /* Electric purple */
+    --primary-foreground: 280 20% 2%;
+
+    --secondary: 280 10% 8%;
+    --secondary-foreground: 280 10% 90%;
+
+    --muted: 280 10% 6%;
+    --muted-foreground: 280 5% 60%;
+
+    --accent: 280 10% 10%;
+    --accent-foreground: 280 10% 95%;
+
+    --destructive: 350 75% 55%;
+    --destructive-foreground: 280 10% 95%;
+
+    --border: 280 8% 12%;
+    --input: 280 10% 6%;
+    --ring: 280 100% 70%;
+
+    /* Purple Sidebar */
+    --sidebar-background: 280 25% 1%;
+    --sidebar-foreground: 280 10% 95%;
+    --sidebar-primary: 280 10% 95%;
+    --sidebar-primary-foreground: 280 20% 2%;
+    --sidebar-accent: 280 15% 8%;
+    --sidebar-accent-foreground: 280 10% 95%;
+    --sidebar-border: 280 10% 8%;
+    --sidebar-ring: 280 100% 70%;
   }
 }
 
@@ -64,245 +146,558 @@
   * {
     @apply border-border;
   }
+  
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at 1px 1px, hsl(var(--border)) 1px, transparent 0);
-    background-size: 2rem 2rem;
+    /* Subtle dark pattern */
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(147, 51, 234, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%);
+    background-attachment: fixed;
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/20;
+  }
+
+  /* Selection Styling */
+  ::selection {
+    @apply bg-primary/30 text-primary-foreground;
   }
 }
 
 @layer utilities {
-  @keyframes ripple {
-    to {
-      transform: scale(4);
-      opacity: 0;
+  /* Custom Animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px hsl(var(--primary)), 0 0 10px hsl(var(--primary)), 0 0 15px hsl(var(--primary)); }
+    50% { box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary)), 0 0 30px hsl(var(--primary)); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+      transform: scale(1);
     }
+    50% { 
+      box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes matrix-rain {
+    0% { transform: translateY(-100vh); opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+
+  @keyframes neon-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+
+  .animate-neon-flicker {
+    animation: neon-flicker 0.15s infinite linear;
+  }
+
+  /* Glassmorphism Effects */
+  .glass {
+    @apply bg-black/20 backdrop-blur-xl border border-white/10;
+  }
+
+  .glass-strong {
+    @apply bg-black/40 backdrop-blur-2xl border border-white/20;
+  }
+
+  .glass-subtle {
+    @apply bg-black/10 backdrop-blur-md border border-white/5;
+  }
+
+  /* Neon Text Effects */
+  .text-neon-blue {
+    color: #00D4FF;
+    text-shadow: 
+      0 0 5px #00D4FF,
+      0 0 10px #00D4FF,
+      0 0 15px #00D4FF,
+      0 0 20px #00D4FF;
+  }
+
+  .text-neon-purple {
+    color: #B347FF;
+    text-shadow: 
+      0 0 5px #B347FF,
+      0 0 10px #B347FF,
+      0 0 15px #B347FF,
+      0 0 20px #B347FF;
+  }
+
+  .text-neon-green {
+    color: #00FF94;
+    text-shadow: 
+      0 0 5px #00FF94,
+      0 0 10px #00FF94,
+      0 0 15px #00FF94,
+      0 0 20px #00FF94;
+  }
+
+  /* Gradient Backgrounds */
+  .bg-gradient-dark {
+    background: linear-gradient(135deg, 
+      rgba(0, 0, 0, 0.9) 0%, 
+      rgba(10, 10, 10, 0.95) 25%,
+      rgba(5, 5, 5, 0.97) 50%,
+      rgba(0, 0, 0, 0.99) 100%);
+  }
+
+  .bg-gradient-neon {
+    background: linear-gradient(135deg,
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(147, 51, 234, 0.1) 100%);
+  }
+
+  .bg-gradient-cyber {
+    background: linear-gradient(45deg,
+      rgba(0, 212, 255, 0.1) 0%,
+      rgba(179, 71, 255, 0.1) 50%,
+      rgba(0, 255, 148, 0.1) 100%);
+  }
+
+  /* Card Hover Effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl;
+  }
+
+  .card-glow {
+    @apply relative;
+  }
+
+  .card-glow::before {
+    content: '';
+    @apply absolute -inset-0.5 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 rounded-lg opacity-0 blur transition-opacity duration-300;
+  }
+
+  .card-glow:hover::before {
+    @apply opacity-20;
+  }
+
+  /* Button Effects */
+  .btn-neon {
+    @apply relative overflow-hidden;
+  }
+
+  .btn-neon::before {
+    content: '';
+    @apply absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Matrix/Cyber Grid */
+  .cyber-grid {
+    background-image: 
+      linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .cyber-grid-lg {
+    background-image: 
+      linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 }
 
 @layer components {
-    .trading-card {
-        @apply bg-slate-800/80 rounded-2xl p-7 shadow-2xl backdrop-blur-2xl max-w-7xl w-full border border-blue-500/20;
-    }
-    .header {
-        @apply flex justify-between items-center mb-7 pb-5 border-b border-white/10;
-    }
-    .logo {
-        @apply text-3xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent flex items-center gap-3 tracking-tight;
-    }
-    .logo::before {
-        content: "📊";
-        @apply text-3xl;
-    }
-    .bot-status {
-        @apply flex items-center gap-2.5 py-2.5 px-5 rounded-full cursor-pointer transition-all duration-300 font-semibold;
-    }
-    .status-indicator {
-        @apply w-2.5 h-2.5 rounded-full animate-pulse;
-    }
-    .controls {
-        @apply flex justify-between mb-6 gap-6 items-center;
-    }
-    .pair-selector {
-        @apply flex gap-3;
-    }
-    .pair-btn {
-        @apply bg-slate-700/80 border border-white/10 text-slate-200 py-3 px-5 rounded-xl cursor-pointer transition-all duration-300 text-sm font-semibold relative overflow-hidden;
-    }
-    .pair-btn:hover {
-        @apply bg-blue-500/20 border-blue-500/50 -translate-y-0.5;
-    }
-    .pair-btn.active {
-        @apply bg-gradient-to-r from-blue-500 to-blue-700 border-blue-500 shadow-[0_8px_25px_rgba(59,130,246,0.3)];
-    }
-    .timeframe-selector {
-        @apply flex gap-1.5 bg-slate-900/80 p-1.5 rounded-xl border border-white/10;
-    }
-    .timeframe-btn {
-        @apply bg-transparent border-none text-slate-400 py-2 px-4 rounded-lg text-xs cursor-pointer transition-all duration-300 font-medium;
-    }
-    .timeframe-btn:hover {
-        @apply bg-blue-500/20 text-slate-200;
-    }
-    .timeframe-btn.active {
-        @apply bg-gradient-to-r from-blue-500 to-blue-700 text-white shadow-[0_4px_12px_rgba(59,130,246,0.3)];
-    }
-    .content-grid {
-        @apply grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6 mb-6;
-    }
-    .chart-section {
-        @apply bg-slate-900/80 rounded-2xl p-5 border border-white/10 relative;
-    }
-    .chart-tabs {
-        @apply flex gap-3;
-    }
-    .chart-tab {
-        @apply bg-slate-700/60 border-none text-slate-400 py-2 px-4 rounded-lg text-xs cursor-pointer transition-all duration-300 font-medium;
-    }
-    .chart-tab.active {
-        @apply bg-blue-500/20 text-blue-500 border border-blue-500/30;
-    }
-    .chart-container {
-        @apply h-96 relative bg-black/40 rounded-xl border border-white/5 overflow-hidden mb-4;
-    }
-    .price-display {
-        @apply flex justify-between items-center py-4 border-t border-white/10;
-    }
-    .price-info {
-        @apply flex items-center gap-4;
-    }
-    .price-value {
-        @apply text-2xl font-bold text-amber-400 [text-shadow:0_0_20px_rgba(251,191,36,0.4)] tracking-tight;
-    }
-    .price-change {
-        @apply font-semibold py-1.5 px-3 rounded-lg text-sm;
-    }
-    .price-change.positive {
-        @apply text-emerald-500 bg-emerald-500/10 border border-emerald-500/30;
-    }
-    .price-change.negative {
-        @apply text-red-500 bg-red-500/10 border border-red-500/30;
-    }
-    .volume-info {
-        @apply text-slate-400 text-sm;
-    }
-    .stats-section {
-        @apply flex flex-col gap-5;
-    }
-    .stats-grid {
-        @apply grid grid-cols-2 gap-4;
-    }
-    .stat-card {
-        @apply bg-gradient-to-br from-slate-700/80 to-slate-700/40 border border-white/10 rounded-xl p-4 transition-all duration-300 relative overflow-hidden;
-    }
-    .stat-card:hover {
-        @apply bg-gradient-to-br from-blue-500/10 to-slate-700/60 -translate-y-1 shadow-2xl;
-    }
-    .stat-label {
-        @apply text-xs text-slate-400 mb-1.5 uppercase font-semibold tracking-wider;
-    }
-    .stat-value {
-        @apply text-lg font-bold tracking-tight;
-    }
-    .profit {
-        @apply text-emerald-400 [text-shadow:0_0_12px_rgba(16,185,129,0.4)];
-    }
-    .loss {
-        @apply text-red-400 [text-shadow:0_0_12px_rgba(239,68,68,0.4)];
-    }
-    .section-header {
-        @apply text-sm text-slate-400 mb-3 uppercase font-bold tracking-wider border-b border-white/10 pb-2;
-    }
-    .performance-section {
-        @apply bg-gradient-to-br from-slate-900/90 to-slate-800/60 rounded-2xl p-5 border border-white/10;
-    }
-    .performance-grid {
-        @apply grid grid-cols-2 gap-4;
-    }
-    .performance-item {
-        @apply flex flex-col gap-1 p-3 bg-slate-700/40 rounded-lg border border-white/5 transition-all duration-300;
-    }
-    .performance-item:hover {
-        @apply bg-blue-500/10 border-blue-500/30;
-    }
-    .performance-label {
-        @apply text-xs text-slate-400 uppercase font-semibold tracking-wider;
-    }
-    .performance-value {
-        @apply text-base font-bold tracking-tight;
-    }
-    .bottom-stats {
-        @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-    }
-    .order-history {
-        @apply bg-gradient-to-br from-slate-900/90 to-slate-800/60 rounded-2xl p-5 border border-white/10;
-    }
-    .order-list {
-        @apply max-h-52 overflow-y-auto mt-4;
-    }
-    .order-item {
-        @apply flex justify-between items-center py-3 border-b border-white/5 text-sm transition-all duration-300;
-    }
-    .order-item:hover {
-        @apply bg-gradient-to-r from-blue-500/10 to-transparent rounded-md px-3;
-    }
-    .order-buy {
-        @apply text-emerald-400 font-bold [text-shadow:0_0_8px_rgba(16,185,129,0.3)];
-    }
-    .order-sell {
-        @apply text-red-400 font-bold [text-shadow:0_0_8px_rgba(239,68,68,0.3)];
-    }
-    .order-time {
-        @apply text-slate-500 text-xs;
-    }
-    .candle { @apply absolute; }
-    .candle-wick { @apply absolute w-px left-1/2 -translate-x-1/2 bg-slate-500; }
-    .candle-body { @apply absolute left-1/2 -translate-x-1/2 rounded-sm min-h-[2px] transition-all duration-200; }
-    .candle:hover .candle-body { @apply shadow-[0_0_10px_rgba(255,255,255,0.3)] scale-110; }
-    .bullish { @apply bg-gradient-to-b from-emerald-500 to-emerald-700 border border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]; }
-    .bearish { @apply bg-gradient-to-b from-red-500 to-red-700 border border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]; }
-    .grid-line { @apply absolute left-0 right-0 border-t border-dashed border-slate-700/50; }
-    .price-line { @apply absolute left-0 right-0 border-t border-blue-500 z-10; }
-    .price-line::after {
-        content: attr(data-price);
-        @apply absolute right-2 -top-2.5 bg-blue-500 text-white py-0.5 px-2 rounded text-xs font-bold shadow-[0_2px_8px_rgba(59,130,246,0.4)];
-    }
-    .profit-float { @apply absolute text-emerald-400 font-bold text-sm animate-floatUp pointer-events-none z-30 [text-shadow:0_0_12px_rgba(16,185,129,0.8)]; }
-    .loss-float { @apply absolute text-red-400 font-bold text-sm animate-floatUp pointer-events-none z-30 [text-shadow:0_0_12px_rgba(239,68,68,0.8)]; }
+  /* Enhanced Trading Card Components */
+  .trading-card {
+    @apply glass-strong rounded-3xl p-8 shadow-2xl max-w-7xl w-full relative overflow-hidden;
+  }
 
-    .trading-container * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    .trading-container {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        font-family: 'Courier New', monospace;
-        color: #ffffff;
-        overflow: hidden;
-        border-radius: var(--radius);
-    }
-    .transaction {
-        position: absolute;
-        width: 24px;
-        height: 24px;
-        animation: transactionPop 1s ease-out;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    @keyframes transactionPop {
-        0% { transform: scale(0); opacity: 1; }
-        50% { transform: scale(1.5); opacity: 0.8; }
-        100% { transform: scale(0); opacity: 0; }
-    }
-    
-    .grid-levels {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-    }
-   
-    .dynamic-status {
-        position: absolute;
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.5);
-        padding: 5px 15px;
-        border-radius: 5px;
-        font-size: 12px;
-        animation: fadeInOut 5s;
-    }
-    @keyframes fadeInOut {
-        0%, 100% { opacity: 0; }
-        20%, 80% { opacity: 1; }
-    }
+  .trading-card::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none;
+  }
+
+  .header {
+    @apply flex justify-between items-center mb-8 pb-6 border-b border-white/10 relative z-10;
+  }
+
+  .logo {
+    @apply text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-4 tracking-tight;
+  }
+
+  .logo::before {
+    content: "⚡";
+    @apply text-4xl animate-neon-flicker;
+  }
+
+  .bot-status {
+    @apply flex items-center gap-3 py-3 px-6 rounded-full cursor-pointer transition-all duration-300 font-semibold glass;
+  }
+
+  .bot-status:hover {
+    @apply scale-105 shadow-lg;
+  }
+
+  .status-indicator {
+    @apply w-3 h-3 rounded-full animate-pulse;
+  }
+
+  .controls {
+    @apply flex justify-between mb-8 gap-8 items-center relative z-10;
+  }
+
+  .pair-selector {
+    @apply flex gap-4;
+  }
+
+  .pair-btn {
+    @apply glass text-white py-4 px-6 rounded-xl cursor-pointer transition-all duration-300 text-sm font-semibold relative overflow-hidden btn-neon;
+  }
+
+  .pair-btn:hover {
+    @apply bg-blue-500/20 border-blue-500/50 transform -translate-y-1 shadow-lg;
+  }
+
+  .pair-btn.active {
+    @apply bg-gradient-to-r from-blue-500/30 to-purple-500/30 border-blue-500/70 shadow-[0_0_30px_rgba(59,130,246,0.3)] animate-pulse-glow;
+  }
+
+  .timeframe-selector {
+    @apply flex gap-2 glass p-2 rounded-xl;
+  }
+
+  .timeframe-btn {
+    @apply bg-transparent border-none text-gray-400 py-3 px-5 rounded-lg text-xs cursor-pointer transition-all duration-300 font-medium;
+  }
+
+  .timeframe-btn:hover {
+    @apply bg-blue-500/20 text-white transform scale-105;
+  }
+
+  .timeframe-btn.active {
+    @apply bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)] animate-glow;
+  }
+
+  .content-grid {
+    @apply grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-8 mb-8 relative z-10;
+  }
+
+  .chart-section {
+    @apply glass-strong rounded-2xl p-6 relative overflow-hidden;
+  }
+
+  .chart-section::before {
+    content: '';
+    @apply absolute inset-0 cyber-grid opacity-30 pointer-events-none;
+  }
+
+  .chart-tabs {
+    @apply flex gap-4 relative z-10;
+  }
+
+  .chart-tab {
+    @apply glass text-gray-400 py-3 px-5 rounded-lg text-xs cursor-pointer transition-all duration-300 font-medium;
+  }
+
+  .chart-tab.active {
+    @apply bg-blue-500/20 text-blue-400 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)];
+  }
+
+  .chart-container {
+    @apply h-96 relative bg-black/60 rounded-xl border border-white/10 overflow-hidden mb-6 backdrop-blur-sm;
+  }
+
+  .price-display {
+    @apply flex justify-between items-center py-6 border-t border-white/10 relative z-10;
+  }
+
+  .price-info {
+    @apply flex items-center gap-6;
+  }
+
+  .price-value {
+    @apply text-3xl font-bold text-neon-blue tracking-tight;
+  }
+
+  .price-change {
+    @apply font-semibold py-2 px-4 rounded-lg text-sm glass;
+  }
+
+  .price-change.positive {
+    @apply text-neon-green bg-green-500/10 border-green-500/30;
+  }
+
+  .price-change.negative {
+    @apply text-red-400 bg-red-500/10 border-red-500/30;
+  }
+
+  .volume-info {
+    @apply text-gray-400 text-sm;
+  }
+
+  .stats-section {
+    @apply flex flex-col gap-6;
+  }
+
+  .stats-grid {
+    @apply grid grid-cols-2 gap-4;
+  }
+
+  .stat-card {
+    @apply glass rounded-xl p-5 transition-all duration-300 relative overflow-hidden card-hover card-glow;
+  }
+
+  .stat-card:hover {
+    @apply bg-blue-500/10 border-blue-500/30;
+  }
+
+  .stat-label {
+    @apply text-xs text-gray-400 mb-2 uppercase font-semibold tracking-wider;
+  }
+
+  .stat-value {
+    @apply text-xl font-bold tracking-tight;
+  }
+
+  .profit {
+    @apply text-neon-green;
+  }
+
+  .loss {
+    @apply text-red-400;
+  }
+
+  .section-header {
+    @apply text-sm text-gray-400 mb-4 uppercase font-bold tracking-wider border-b border-white/10 pb-3;
+  }
+
+  .performance-section {
+    @apply glass-strong rounded-2xl p-6 relative overflow-hidden;
+  }
+
+  .performance-grid {
+    @apply grid grid-cols-2 gap-4;
+  }
+
+  .performance-item {
+    @apply flex flex-col gap-2 p-4 glass rounded-lg transition-all duration-300 card-hover;
+  }
+
+  .performance-item:hover {
+    @apply bg-blue-500/10 border-blue-500/30;
+  }
+
+  .performance-label {
+    @apply text-xs text-gray-400 uppercase font-semibold tracking-wider;
+  }
+
+  .performance-value {
+    @apply text-lg font-bold tracking-tight;
+  }
+
+  .bottom-stats {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10;
+  }
+
+  .order-history {
+    @apply glass-strong rounded-2xl p-6 relative overflow-hidden;
+  }
+
+  .order-list {
+    @apply max-h-64 overflow-y-auto mt-6 space-y-2;
+  }
+
+  .order-item {
+    @apply flex justify-between items-center py-4 px-4 glass rounded-lg text-sm transition-all duration-300 card-hover;
+  }
+
+  .order-item:hover {
+    @apply bg-blue-500/10 border-blue-500/30 transform scale-[1.02];
+  }
+
+  .order-buy {
+    @apply text-neon-green font-bold;
+  }
+
+  .order-sell {
+    @apply text-red-400 font-bold;
+  }
+
+  .order-time {
+    @apply text-gray-500 text-xs;
+  }
+
+  /* Enhanced Candlestick Styling */
+  .candle { 
+    @apply absolute cursor-pointer;
+  }
+  
+  .candle-wick { 
+    @apply absolute w-px left-1/2 -translate-x-1/2 bg-gray-500; 
+  }
+  
+  .candle-body { 
+    @apply absolute left-1/2 -translate-x-1/2 rounded-sm min-h-[2px] transition-all duration-200 border; 
+  }
+  
+  .candle:hover .candle-body { 
+    @apply shadow-[0_0_15px_rgba(255,255,255,0.4)] scale-125 z-10; 
+  }
+  
+  .bullish { 
+    @apply bg-gradient-to-b from-green-400 to-green-600 border-green-400 shadow-[0_0_10px_rgba(34,197,94,0.3)]; 
+  }
+  
+  .bearish { 
+    @apply bg-gradient-to-b from-red-400 to-red-600 border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.3)]; 
+  }
+
+  .grid-line { 
+    @apply absolute left-0 right-0 border-t border-dashed border-gray-700/50; 
+  }
+  
+  .price-line { 
+    @apply absolute left-0 right-0 border-t-2 border-blue-400 z-10 shadow-[0_0_10px_rgba(59,130,246,0.5)]; 
+  }
+  
+  .price-line::after {
+    content: attr(data-price);
+    @apply absolute right-3 -top-3 bg-blue-500 text-white py-1 px-3 rounded-md text-xs font-bold shadow-[0_4px_15px_rgba(59,130,246,0.4)] animate-pulse;
+  }
+
+  /* Transaction Animations */
+  .profit-float { 
+    @apply absolute text-neon-green font-bold text-sm animate-float pointer-events-none z-30; 
+  }
+  
+  .loss-float { 
+    @apply absolute text-red-400 font-bold text-sm animate-float pointer-events-none z-30; 
+  }
+
+  .trading-container {
+    @apply w-full h-full flex flex-col relative overflow-hidden rounded-xl;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    color: #ffffff;
+  }
+
+  .transaction {
+    @apply absolute w-6 h-6 flex items-center justify-center;
+    animation: transactionPop 1.5s ease-out;
+  }
+
+  @keyframes transactionPop {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    50% { transform: scale(1.8) rotate(180deg); opacity: 0.9; }
+    100% { transform: scale(0) rotate(360deg); opacity: 0; }
+  }
+
+  .grid-levels {
+    @apply absolute inset-0 pointer-events-none cyber-grid;
+  }
+
+  .dynamic-status {
+    @apply absolute bottom-4 left-1/2 transform -translate-x-1/2 glass py-2 px-4 rounded-lg text-xs font-medium;
+    animation: statusPulse 6s ease-in-out infinite;
+  }
+
+  @keyframes statusPulse {
+    0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    20%, 80% { opacity: 1; transform: translateX(-50%) translateY(0px); }
+  }
+}
+
+/* Custom Component Enhancements */
+@layer components {
+  /* Modern Card Variants */
+  .card-electric {
+    @apply glass-strong relative overflow-hidden;
+  }
+
+  .card-electric::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10 pointer-events-none;
+  }
+
+  .card-electric::after {
+    content: '';
+    @apply absolute inset-px bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl pointer-events-none;
+  }
+
+  /* Button Variants */
+  .btn-cyber {
+    @apply glass relative overflow-hidden transition-all duration-300 hover:scale-105;
+  }
+
+  .btn-cyber::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] transition-transform duration-1000;
+  }
+
+  .btn-cyber:hover::before {
+    @apply translate-x-[100%];
+  }
+
+  /* Text Effects */
+  .text-cyber {
+    @apply bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent font-bold;
+  }
+
+  .text-hologram {
+    @apply relative;
+  }
+
+  .text-hologram::before {
+    content: attr(data-text);
+    @apply absolute inset-0 text-blue-400/30 animate-pulse;
+    transform: translate(1px, 1px);
+  }
+
+  .text-hologram::after {
+    content: attr(data-text);
+    @apply absolute inset-0 text-purple-400/20;
+    transform: translate(-1px, -1px);
+  }
 }
