@@ -714,8 +714,11 @@ export function RewardsManager() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="USDT">USDT</SelectItem>
-                              <SelectItem value="bonus">Bonus</SelectItem>
+                              {REWARD_TYPES.map(type => (
+                                <SelectItem key={type.value} value={type.value}>
+                                  {type.label}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />
