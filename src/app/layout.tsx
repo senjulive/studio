@@ -56,8 +56,10 @@ export default function RootLayout({
           themes={['light', 'dark', 'purple', 'system']}
           disableTransitionOnChange
         >
-          {children}
-          <Toaster />
+          <ErrorBoundary>
+            {children}
+            <Toaster />
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>
