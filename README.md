@@ -26,7 +26,7 @@ A revolutionary cryptocurrency trading platform powered by quantum AI technology
 - **Charts:** Recharts
 - **PWA:** Next.js PWA support
 
-## 📋 Prerequisites
+## �� Prerequisites
 
 - Node.js 18+ 
 - npm or yarn package manager
@@ -175,7 +175,7 @@ npm run clean && npm run build
 
 ### Admin Features
 - **User Management:** Complete user oversight and control
-- **Financial Management:** Deposit/withdra nowal approvals
+- **Financial Management:** Deposit/withdrawal approvals
 - **Content Management:** Announcements and promotions
 - **Analytics:** Platform metrics and reporting
 - **Moderation:** Chat and content moderation tools
