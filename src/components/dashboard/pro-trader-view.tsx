@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { Play, Pause, Activity, TrendingUp, BarChart3, Settings, Shield, Lock, AlertTriangle, CheckCircle } from "lucide-react";
-import { GridTradingAnimation } from "./grid-trading-animation";
+// import { GridTradingAnimation } from "./grid-trading-animation";
 import { useToast } from "@/hooks/use-toast";
 import { TradingBotCard } from "../trading-bot-card";
 import Link from "next/link";
