@@ -13,11 +13,26 @@ import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminRewards } from '@/hooks/use-admin-rewards';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Trophy, Gift, Star, Crown, Zap, Users, TrendingUp, Coins, Sparkles, Award, Plus, Edit, Trash2, Calendar, Target, Settings } from 'lucide-react';
+import { Trophy, Gift, Star, Crown, Zap, Users, TrendingUp, Coins, Sparkles, Award, Plus, Edit, Trash2, Calendar, Target, Settings, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  CreateAchievementSchema,
+  CreateDailyRewardSchema,
+  REWARD_ICONS,
+  ACHIEVEMENT_CATEGORIES,
+  ACHIEVEMENT_RARITIES,
+  REQUIREMENT_TYPES,
+  REWARD_TYPES,
+  getRarityColor,
+  getCategoryColor,
+  type CreateAchievementData,
+  type CreateDailyRewardData,
+  type Achievement,
+  type DailyReward
+} from '@/lib/rewards';
 
 const achievementSchema = z.object({
   title: z.string().min(1, 'Title is required'),
