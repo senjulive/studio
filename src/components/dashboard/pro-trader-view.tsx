@@ -290,15 +290,11 @@ export function ProTraderView() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <GridTradingAnimation
-            totalBalance={totalBalance || 0}
-            profitPerTrade={2.5}
-            profitPercentage={1.5}
-            setBotLog={() => {}}
-            isAnimating={isTrading}
-            candlestickData={[]}
-            currentPrice={68900}
-          />
+          <div className="p-8 text-center text-muted-foreground">
+            <p>Trading animation temporarily disabled for debugging</p>
+            <p>Balance: ${totalBalance?.toFixed(2) || 0}</p>
+            <p>Status: {isTrading ? 'Active' : 'Stopped'}</p>
+          </div>
         </CardContent>
       </Card>
 
