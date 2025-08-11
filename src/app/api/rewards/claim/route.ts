@@ -1,83 +1,253 @@
+import { NextRequest, NextResponse } from 'next/server';
 
-import { NextResponse } from 'next/server';
-import { getWalletByUserId, updateWalletByUserId } from '@/lib/wallet';
-import { getRewardSettings } from '@/lib/rewards';
-import { addNotification } from '@/lib/notifications';
+// Mock user data - In production, this would come from your database
+const mockUserProgress = {
+  userId: 'user123',
+  balance: 750,
+  referrals: 3,
+  trades: 25,
+  deposits: 5,
+  accountDays: 15,
+  dailyStreak: 4,
+  lastClaimDate: '2024-01-15',
+  claimedAchievements: ['1'],
+  claimedDailyRewards: ['2024-01-15']
+};
 
-export async function POST(request: Request) {
+// Mock achievements (same as admin but with user progress)
+const mockAchievements = [
+  {
+    id: '1',
+    title: 'Welcome Aboard',
+    description: 'Make your first deposit to start trading',
+    reward: 5,
+    requirement: { type: 'deposits', target: 1 },
+    isActive: true
+  },
+  {
+    id: '2',
+    title: 'High Roller',
+    description: 'Reach $500 total balance',
+    reward: 25,
+    requirement: { type: 'balance', target: 500 },
+    isActive: true
+  },
+  {
+    id: '3',
+    title: 'Squad Builder',
+    description: 'Refer 5 new members',
+    reward: 20,
+    requirement: { type: 'referrals', target: 5 },
+    isActive: true
+  },
+  {
+    id: '4',
+    title: 'Active Trader',
+    description: 'Complete 50 trades',
+    reward: 30,
+    requirement: { type: 'trades', target: 50 },
+    isActive: true
+  },
+  {
+    id: '5',
+    title: 'Veteran',
+    description: 'Account active for 30 days',
+    reward: 40,
+    requirement: { type: 'days', target: 30 },
+    isActive: true
+  }
+];
+
+const mockDailyRewards = [
+  { day: 1, reward: 2, type: 'USDT' },
+  { day: 2, reward: 3, type: 'USDT' },
+  { day: 3, reward: 4, type: 'USDT' },
+  { day: 4, reward: 5, type: 'USDT' },
+  { day: 5, reward: 6, type: 'USDT' },
+  { day: 6, reward: 8, type: 'USDT' },
+  { day: 7, reward: 15, type: 'bonus' }
+];
+
+export async function GET(request: NextRequest) {
   try {
-    const { userId, type, key, referralId } = await request.json();
+    const url = new URL(request.url);
+    const userId = url.searchParams.get('userId') || 'user123';
 
-    if (!userId || !type || !key) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+    // Calculate achievement progress
+    const achievementsWithProgress = mockAchievements.map(achievement => {
+      let current = 0;
+      
+      switch (achievement.requirement.type) {
+        case 'balance':
+          current = mockUserProgress.balance;
+          break;
+        case 'referrals':
+          current = mockUserProgress.referrals;
+          break;
+        case 'trades':
+          current = mockUserProgress.trades;
+          break;
+        case 'deposits':
+          current = mockUserProgress.deposits;
+          break;
+        case 'days':
+          current = mockUserProgress.accountDays;
+          break;
+      }
 
-    const [wallet, rewardSettings] = await Promise.all([
-      getWalletByUserId(userId),
-      getRewardSettings(),
-    ]);
-    
-    if (!wallet) {
-      return NextResponse.json({ error: 'User wallet not found.' }, { status: 404 });
-    }
+      const isEligible = current >= achievement.requirement.target;
+      const isClaimed = mockUserProgress.claimedAchievements.includes(achievement.id);
 
-    let bonusAmount = 0;
-    let claimedMessage = '';
-    const claimedAchievements = wallet.claimed_achievements || { ranks: [], tiers: [] };
-    const claimedReferrals = wallet.claimed_referrals || [];
-
-    if (type === 'rank' || type === 'tier') {
-        const settingsKey = type === 'rank' ? 'rankAchievementBonus' : 'tierAchievementBonus';
-        if (claimedAchievements[type + 's']?.includes(key)) {
-            return NextResponse.json({ error: 'Reward already claimed.' }, { status: 400 });
-        }
-        bonusAmount = rewardSettings[settingsKey] || 0;
-        claimedAchievements[type + 's'].push(key);
-        claimedMessage = `You claimed the ${key} achievement bonus!`;
-    } else if (type === 'referral') {
-        if (claimedReferrals.includes(referralId)) {
-            return NextResponse.json({ error: 'Referral bonus already claimed.' }, { status: 400 });
-        }
-        const totalReferrals = wallet.squad?.members?.length ?? 0;
-        bonusAmount = totalReferrals <= 3 ? rewardSettings.referralBonusTier1 : rewardSettings.referralBonusTier2;
-        claimedReferrals.push(referralId);
-        claimedMessage = `You claimed your referral bonus!`;
-    } else if (type === 'new_member_referral') {
-        if (claimedReferrals.includes(referralId)) {
-             return NextResponse.json({ error: 'Referral bonus already claimed.' }, { status: 400 });
-        }
-        bonusAmount = rewardSettings.newUserBonus;
-        claimedReferrals.push(referralId);
-        claimedMessage = `You claimed your new member bonus!`;
-    }
-
-    if (bonusAmount <= 0) {
-      return NextResponse.json({ error: 'Invalid reward or bonus not configured.' }, { status: 400 });
-    }
-    
-    const updatedWalletData = {
-      ...wallet,
-      balances: {
-        ...wallet.balances,
-        usdt: (wallet.balances.usdt || 0) + bonusAmount,
-      },
-      claimed_achievements: claimedAchievements,
-      claimed_referrals: claimedReferrals,
-    };
-    
-    await updateWalletByUserId(userId, updatedWalletData);
-    
-    await addNotification(userId, {
-        title: "Reward Claimed!",
-        content: `${claimedMessage} +$${bonusAmount.toFixed(2)} has been added to your balance.`,
-        href: "/dashboard/rewards",
+      return {
+        ...achievement,
+        requirement: {
+          ...achievement.requirement,
+          current
+        },
+        isEligible,
+        isClaimed,
+        canClaim: isEligible && !isClaimed
+      };
     });
 
-    return NextResponse.json({ success: true, message: 'Reward claimed successfully.' });
+    // Check daily reward eligibility
+    const today = new Date().toISOString().split('T')[0];
+    const canClaimDaily = !mockUserProgress.claimedDailyRewards.includes(today);
+    const currentDailyReward = mockDailyRewards[Math.min(mockUserProgress.dailyStreak, 6)];
 
-  } catch (error: any) {
+    return NextResponse.json({
+      success: true,
+      data: {
+        achievements: achievementsWithProgress,
+        dailyReward: {
+          ...currentDailyReward,
+          streak: mockUserProgress.dailyStreak + 1,
+          canClaim: canClaimDaily
+        },
+        summary: {
+          claimableAchievements: achievementsWithProgress.filter(a => a.canClaim).length,
+          claimableRewardsValue: achievementsWithProgress
+            .filter(a => a.canClaim)
+            .reduce((sum, a) => sum + a.reward, 0),
+          totalEarned: mockUserProgress.claimedAchievements.length * 10, // Mock calculation
+          dailyStreak: mockUserProgress.dailyStreak
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user rewards:', error);
     return NextResponse.json(
-      { error: error.message || 'An unexpected error occurred.' },
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { type, achievementId, userId = 'user123' } = body;
+
+    switch (type) {
+      case 'achievement':
+        if (!achievementId) {
+          return NextResponse.json(
+            { success: false, error: 'Achievement ID is required' },
+            { status: 400 }
+          );
+        }
+
+        const achievement = mockAchievements.find(a => a.id === achievementId);
+        if (!achievement) {
+          return NextResponse.json(
+            { success: false, error: 'Achievement not found' },
+            { status: 404 }
+          );
+        }
+
+        // Check if already claimed
+        if (mockUserProgress.claimedAchievements.includes(achievementId)) {
+          return NextResponse.json(
+            { success: false, error: 'Achievement already claimed' },
+            { status: 400 }
+          );
+        }
+
+        // Check eligibility
+        let current = 0;
+        switch (achievement.requirement.type) {
+          case 'balance':
+            current = mockUserProgress.balance;
+            break;
+          case 'referrals':
+            current = mockUserProgress.referrals;
+            break;
+          case 'trades':
+            current = mockUserProgress.trades;
+            break;
+          case 'deposits':
+            current = mockUserProgress.deposits;
+            break;
+          case 'days':
+            current = mockUserProgress.accountDays;
+            break;
+        }
+
+        if (current < achievement.requirement.target) {
+          return NextResponse.json(
+            { success: false, error: 'Achievement requirements not met' },
+            { status: 400 }
+          );
+        }
+
+        // Claim achievement (in production, update database)
+        mockUserProgress.claimedAchievements.push(achievementId);
+
+        return NextResponse.json({
+          success: true,
+          data: {
+            achievement,
+            reward: achievement.reward,
+            message: `Successfully claimed "${achievement.title}" and earned $${achievement.reward} USDT!`
+          }
+        });
+
+      case 'daily':
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Check if already claimed today
+        if (mockUserProgress.claimedDailyRewards.includes(today)) {
+          return NextResponse.json(
+            { success: false, error: 'Daily reward already claimed today' },
+            { status: 400 }
+          );
+        }
+
+        const dailyReward = mockDailyRewards[Math.min(mockUserProgress.dailyStreak, 6)];
+        
+        // Claim daily reward (in production, update database)
+        mockUserProgress.claimedDailyRewards.push(today);
+        mockUserProgress.dailyStreak += 1;
+
+        return NextResponse.json({
+          success: true,
+          data: {
+            reward: dailyReward,
+            newStreak: mockUserProgress.dailyStreak,
+            message: `Daily reward claimed! You earned $${dailyReward.reward} ${dailyReward.type}. Streak: ${mockUserProgress.dailyStreak} days!`
+          }
+        });
+
+      default:
+        return NextResponse.json(
+          { success: false, error: 'Invalid claim type' },
+          { status: 400 }
+        );
+    }
+  } catch (error) {
+    console.error('Error claiming reward:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }
