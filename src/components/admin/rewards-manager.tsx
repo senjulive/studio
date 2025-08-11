@@ -331,11 +331,11 @@ export function RewardsManager() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="balance">Balance</SelectItem>
-                                <SelectItem value="referrals">Referrals</SelectItem>
-                                <SelectItem value="trades">Trades</SelectItem>
-                                <SelectItem value="days">Days</SelectItem>
-                                <SelectItem value="deposits">Deposits</SelectItem>
+                                {REQUIREMENT_TYPES.map(type => (
+                                  <SelectItem key={type.value} value={type.value}>
+                                    {type.label}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                             <FormMessage />
