@@ -18,6 +18,18 @@ export type ChatHistory = {
   [userId: string]: Message[];
 };
 
+export type ChatMessage = {
+  id: string;
+  username: string;
+  message: string;
+  timestamp: string;
+  avatarUrl?: string;
+  isVerified?: boolean;
+  mentions?: string[];
+  reactions?: { emoji: string; count: number; users: string[] }[];
+  flagged?: boolean;
+};
+
 
 // Admin function: Fetches all chats from the mock data.
 export async function getAllChats(): Promise<ChatHistory> {
