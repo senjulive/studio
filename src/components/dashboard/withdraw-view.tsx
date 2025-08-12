@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -87,8 +86,9 @@ export function WithdrawView() {
     toast({ title: "Address Saved", description: "Your withdrawal address has been saved." });
   };
 
-  const handleWithdraw = async (e: React.FormEvent) => {
+  const handleWithdraw = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const withdrawAmount = parseFloat(amount);
 
     if (!walletData || !user?.id || !savedAddresses?.usdt) return;

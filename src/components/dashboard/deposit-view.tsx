@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -113,8 +112,9 @@ const PersonalDepositRequest = () => {
     }
   }, [user]);
 
-  const handleDepositRequest = async (e: React.FormEvent) => {
+  const handleDepositRequest = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!amount || parseFloat(amount) <= 0 || !user) {
       toast({
         title: "Invalid Amount",
