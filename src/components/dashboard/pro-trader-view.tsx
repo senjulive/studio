@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -290,19 +289,29 @@ export function ProTraderView() {
         <div className="trading-card">
             <header className="header">
                 <div className="logo flex-col !items-start">
-                    CORE Nexus Quantum v3.76
-                    <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className={cn("text-base py-1 px-2 flex items-center gap-1.5", rank.className)}>
-                          <RankIcon className="h-5 w-5" />
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-lg animate-pulse-glow" />
+                            <div className="relative w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                                <Bot className="h-5 w-5 text-white" />
+                            </div>
+                        </div>
+                        <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                            CORE Nexus Quantum v3.76
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3">
+                        <Badge variant="outline" className={cn("text-sm py-1.5 px-3 flex items-center gap-1.5 bg-background/20 backdrop-blur-sm border-white/20", rank.className)}>
+                          <RankIcon className="h-4 w-4" />
                           <span>{rank.name}</span>
                         </Badge>
                         {currentTier && TierIcon && tierClassName && (
-                          <Badge variant="outline" className={cn("text-base py-1 px-2 flex items-center gap-1.5", tierClassName)}>
-                            <TierIcon className="h-5 w-5" />
+                          <Badge variant="outline" className={cn("text-sm py-1.5 px-3 flex items-center gap-1.5 bg-background/20 backdrop-blur-sm border-white/20", tierClassName)}>
+                            <TierIcon className="h-4 w-4" />
                             <span>{currentTier.name}</span>
                           </Badge>
                         )}
-                        <Button asChild variant="ghost" size="sm" className="text-slate-400 hover:bg-slate-700 hover:text-white -ml-2">
+                        <Button asChild variant="ghost" size="sm" className="text-slate-300 hover:bg-white/10 hover:text-white -ml-2 backdrop-blur-sm rounded-xl">
                            <Link href="/dashboard/trading-info">
                               <Trophy className="h-4 w-4 mr-2"/>
                               Tiers & Ranks
@@ -310,20 +319,29 @@ export function ProTraderView() {
                         </Button>
                     </div>
                 </div>
-                 <Button onClick={handleStartBot} disabled={!canStart} size="lg" className={cn(!canStart && 'bg-gray-500 hover:bg-gray-500', canStart && 'bg-green-600 hover:bg-green-700')}>
+                 <Button 
+                    onClick={handleStartBot} 
+                    disabled={!canStart} 
+                    size="lg" 
+                    className={cn(
+                        "rounded-2xl px-8 py-4 font-bold text-lg transition-all duration-300 shadow-lg backdrop-blur-sm transform hover:scale-105",
+                        !canStart && 'bg-gray-600/50 hover:bg-gray-600/50 border border-gray-500/30 text-gray-300', 
+                        canStart && 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white shadow-green-500/25'
+                    )}
+                >
                     {isAnimating ? (
                         <>
-                            <Bot className="h-5 w-5 mr-2 animate-pulse"/>
+                            <Bot className="h-6 w-6 mr-3 animate-pulse"/>
                             <span>Bot is Running...</span>
                         </>
                     ) : canStart ? (
                         <>
-                            <PlayCircle className="h-5 w-5 mr-2" />
+                            <PlayCircle className="h-6 w-6 mr-3" />
                             <span>Start Bot</span>
                         </>
                     ) : (
                          <>
-                            <Lock className="h-5 w-5 mr-2"/>
+                            <Lock className="h-6 w-6 mr-3"/>
                             <span>Offline</span>
                          </>
                     )}
@@ -331,14 +349,14 @@ export function ProTraderView() {
             </header>
 
             {totalBalance < minGridBalance && (
-                <Alert className="mb-6">
+                <Alert className="mb-6 bg-amber-500/10 border-amber-500/20 text-amber-200">
                     <Wallet className="h-4 w-4" />
                     <AlertTitle>Insufficient Balance</AlertTitle>
                     <AlertDescription className="flex items-center justify-between">
                         <div>
                            You need at least {formatCurrency(minGridBalance)} to start the bot.
                         </div>
-                        <Button asChild size="sm">
+                        <Button asChild size="sm" className="bg-amber-500 hover:bg-amber-600 text-black">
                             <Link href="/dashboard/deposit">Deposit Funds</Link>
                         </Button>
                     </AlertDescription>
@@ -349,18 +367,26 @@ export function ProTraderView() {
                 <div className="chart-section">
                     <div className="flex justify-between items-center mb-4">
                          {isAnimating ? (
-                            <div className="flex items-center gap-2 text-emerald-400">
-                                <div className="status-indicator bg-green-400 animate-pulse"></div>
-                                🤖 ONLINE
-                                <span className="text-xs tabular-nums">({progress.toFixed(0)}%)</span>
+                            <div className="flex items-center gap-3 text-emerald-400">
+                                <div className="status-indicator bg-green-400 animate-pulse shadow-lg shadow-green-400/50"></div>
+                                <div className="flex items-center gap-2">
+                                    <Bot className="h-5 w-5 animate-bounce" />
+                                    <span className="font-bold">ONLINE</span>
+                                </div>
+                                <div className="bg-green-400/20 backdrop-blur-sm rounded-full px-3 py-1 border border-green-400/30">
+                                    <span className="text-xs tabular-nums font-mono">{progress.toFixed(0)}%</span>
+                                </div>
                             </div>
                         ) : (
-                             <div className={cn("flex items-center gap-2 text-sm", gridsRemaining > 0 ? "text-slate-400" : "text-red-400")}>
-                                <div className={cn("status-indicator", gridsRemaining > 0 ? "bg-slate-400" : "bg-red-400 animate-pulse")}></div>
-                                🤖 OFFLINE
+                             <div className={cn("flex items-center gap-3 text-sm", gridsRemaining > 0 ? "text-slate-300" : "text-red-400")}>
+                                <div className={cn("status-indicator", gridsRemaining > 0 ? "bg-slate-400" : "bg-red-400 animate-pulse shadow-lg shadow-red-400/50")}></div>
+                                <div className="flex items-center gap-2">
+                                    <Bot className="h-5 w-5" />
+                                    <span className="font-bold">OFFLINE</span>
+                                </div>
                             </div>
                         )}
-                        <Button variant="ghost" size="sm" className="text-slate-400 hover:bg-slate-700 hover:text-white">
+                        <Button variant="ghost" size="sm" className="text-slate-300 hover:bg-white/10 hover:text-white backdrop-blur-sm rounded-xl">
                             <SlidersHorizontal className="h-4 w-4 mr-2"/>
                             Indicators
                         </Button>
@@ -370,11 +396,18 @@ export function ProTraderView() {
                     </div>
                      <div className="price-display">
                         <div className="price-info">
-                             <UsdtLogoIcon className="h-8 w-8" />
-                            <div className="price-value">{formatCurrency(animatedBalance)}</div>
+                             <div className="relative">
+                                <div className="absolute inset-0 bg-green-400/20 rounded-full blur-lg animate-pulse-glow" />
+                                <UsdtLogoIcon className="relative h-8 w-8" />
+                             </div>
+                            <div className="price-value bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent font-bold">
+                                {formatCurrency(animatedBalance)}
+                            </div>
                         </div>
                         <div className="volume-info">
-                            Vol: {simState.volume24h.toLocaleString()}M
+                            <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-1 border border-white/20">
+                                Vol: {simState.volume24h.toLocaleString()}M
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -387,7 +420,12 @@ export function ProTraderView() {
                         <StatCard label="Profit per Grid" value={`~${profitPercentagePerTrade.toFixed(4)}%`} />
                     </div>
                     <div className="performance-section">
-                        <h3 className="section-header">🤖 Quantum Operation v3.76</h3>
+                        <h3 className="section-header flex items-center gap-2">
+                            <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <Bot className="h-4 w-4 text-white" />
+                            </div>
+                            🤖 Quantum Operation v3.76
+                        </h3>
                         <div className="performance-grid">
                             <PerformanceItem label="Win Rate" value={`${simState.winRate.toFixed(1)}%`} className="text-green-400"/>
                             <PerformanceItem label="Total Trades" value={totalTrades.toString()} />
@@ -400,8 +438,13 @@ export function ProTraderView() {
 
             <div className="bottom-stats">
                  <div className="order-history">
-                    <h3 className="section-header">History</h3>
-                     <div className="order-list">
+                    <h3 className="section-header flex items-center gap-2">
+                        <div className="w-5 h-5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-md flex items-center justify-center">
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                        </div>
+                        History
+                    </h3>
+                     <div className="order-list scrollbar-modern">
                          {isAnimating ? (
                             simState.botLog.map((log, index) => (
                                 <HistoryItem key={index} log={log.message} time={format(log.time, 'HH:mm:ss')} />
@@ -414,14 +457,28 @@ export function ProTraderView() {
                      </div>
                  </div>
                  <div className="order-history">
-                     <h3 className="section-header">Operation Status</h3>
-                     <div className="order-list">
+                     <h3 className="section-header flex items-center gap-2">
+                        <div className="w-5 h-5 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-md flex items-center justify-center">
+                            <Bot className="h-3 w-3 text-white" />
+                        </div>
+                        Operation Status
+                     </h3>
+                     <div className="order-list scrollbar-modern">
                         {[...Array(totalGrids)].map((_, i) => (
                            <div className="order-item" key={i}>
-                                <div className={cn("font-bold text-white")}>
-                                    Operation status 🤖 {i + 1}
+                                <div className={cn("font-bold text-white flex items-center gap-2")}>
+                                    <div className={cn(
+                                        "w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold",
+                                        i < executedGrids ? "bg-green-500/20 text-green-400 border border-green-500/30" : "bg-slate-600/20 text-slate-400 border border-slate-600/30"
+                                    )}>
+                                        {i + 1}
+                                    </div>
+                                    Operation 🤖 {i + 1}
                                 </div>
-                                <Badge variant={i < executedGrids ? "default" : "secondary"} className={cn(i < executedGrids ? "bg-green-600/80" : "bg-slate-600/80")}>
+                                <Badge variant={i < executedGrids ? "default" : "secondary"} className={cn(
+                                    "backdrop-blur-sm",
+                                    i < executedGrids ? "bg-green-600/80 text-green-100 border-green-500/30" : "bg-slate-600/80 text-slate-300 border-slate-500/30"
+                                )}>
                                     {i < executedGrids ? 'Executed' : 'Pending'}
                                 </Badge>
                                 <div className="order-time">
@@ -435,5 +492,3 @@ export function ProTraderView() {
         </div>
     );
 }
-
-    
