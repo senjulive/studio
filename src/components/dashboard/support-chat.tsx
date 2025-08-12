@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -87,8 +86,9 @@ export function SupportChat() {
     }
   };
   
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if ((!newMessage.trim() && !selectedFile) || !user?.id) return;
 
     setIsSending(true);

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -141,8 +140,9 @@ export function PublicChatView({ isFloating = false }: { isFloating?: boolean })
     }
   }, [messages]);
   
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!newMessage.trim() || !user?.id || !wallet) return;
 
     if (!wallet.profile?.displayName && !wallet.profile?.username) {
