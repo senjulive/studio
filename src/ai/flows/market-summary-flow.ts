@@ -28,7 +28,46 @@ const MarketSummaryOutputSchema = z.object({
 export type MarketSummaryOutput = z.infer<typeof MarketSummaryOutputSchema>;
 
 export async function summarizeMarket(input: MarketSummaryInput): Promise<MarketSummaryOutput> {
-  return marketSummaryFlow(input);
+  try {
+    // Check if API key is configured
+    if (!process.env.GOOGLE_AI_API_KEY) {
+      return generateAnalyticFallback(input);
+    }
+
+    return await marketSummaryFlow(input);
+  } catch (error) {
+    console.error('AI market analysis failed:', error);
+    return generateAnalyticFallback(input);
+  }
+}
+
+// Generate a data-driven fallback summary when AI is unavailable
+function generateAnalyticFallback(input: MarketSummaryInput): MarketSummaryOutput {
+  const { coins } = input;
+  const positiveCoins = coins.filter(c => c.change24h > 0);
+  const negativeCoins = coins.filter(c => c.change24h < 0);
+  const avgChange = coins.reduce((sum, c) => sum + c.change24h, 0) / coins.length;
+
+  const topGainer = coins.reduce((max, coin) => coin.change24h > max.change24h ? coin : max);
+  const topLoser = coins.reduce((min, coin) => coin.change24h < min.change24h ? coin : min);
+
+  let summary = `Market Analysis (${new Date().toLocaleDateString()}): `;
+
+  if (avgChange > 2) {
+    summary += `The market is showing strong bullish momentum with an average gain of ${avgChange.toFixed(1)}%. `;
+  } else if (avgChange > 0) {
+    summary += `The market is displaying modest positive sentiment with an average gain of ${avgChange.toFixed(1)}%. `;
+  } else if (avgChange > -2) {
+    summary += `The market is experiencing mild consolidation with an average change of ${avgChange.toFixed(1)}%. `;
+  } else {
+    summary += `The market is facing bearish pressure with an average decline of ${Math.abs(avgChange).toFixed(1)}%. `;
+  }
+
+  summary += `${topGainer.name} leads gains at +${topGainer.change24h.toFixed(1)}%, while ${topLoser.name} shows the largest decline at ${topLoser.change24h.toFixed(1)}%. `;
+  summary += `${positiveCoins.length} of ${coins.length} assets are trading in the green. `;
+  summary += `This automated analysis provides a snapshot of current market conditions based on 24-hour price movements.`;
+
+  return { summary };
 }
 
 const prompt = ai.definePrompt({
