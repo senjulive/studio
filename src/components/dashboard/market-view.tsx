@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -150,10 +149,14 @@ export function MarketView() {
   }
   
   const handleAnalyzeMarket = async () => {
-    if (!data.length) return;
+    if (!data.length) {
+      setSummary({ summary: 'No market data available for analysis.' });
+      return;
+    }
+
     setIsAnalyzing(true);
     setSummary(null);
-    
+
     try {
         const analysisInput = {
             coins: data.map(c => ({
@@ -163,17 +166,29 @@ export function MarketView() {
                 change24h: c.change24h,
             }))
         };
+
         const response = await fetch('/api/market-summary', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(analysisInput),
         });
-        if (!response.ok) throw new Error('Failed to get market analysis.');
-        const result: MarketSummaryOutput = await response.json();
-        setSummary(result);
+
+        const result = await response.json();
+
+        // Handle both success and fallback responses
+        if (response.ok) {
+            setSummary(result);
+        } else {
+            console.error('Market analysis error:', result.error);
+            setSummary({
+                summary: result.error || 'Market analysis is temporarily unavailable. Please try again later.'
+            });
+        }
     } catch (error) {
-        console.error(error);
-        setSummary({ summary: 'Could not retrieve market analysis at this time.' });
+        console.error('Network error during market analysis:', error);
+        setSummary({
+            summary: 'Unable to connect to market analysis service. Please check your connection and try again.'
+        });
     } finally {
         setIsAnalyzing(false);
     }
