@@ -667,11 +667,11 @@
 }
 
 .haptic-medium {
-  @apply transition-transform duration-100 active:scale-90;
+  @apply transition-transform duration-100 active:scale-95;
 }
 
 .haptic-heavy {
-  @apply transition-transform duration-150 active:scale-85;
+  @apply transition-transform duration-150 active:scale-90;
 }
 
 /* Enhanced focus states for accessibility */
