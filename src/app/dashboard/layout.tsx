@@ -43,7 +43,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { MessageSquare, UserPlus, Shield, Lock, Trophy } from 'lucide-react';
+import { MessageSquare, UserPlus, Shield, Lock, Trophy, Sparkles, Zap, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -87,9 +87,19 @@ const mockUser = {
 function DashboardLoading() {
   return (
     <div className="flex flex-col items-center justify-center min-h-dvh bg-background text-foreground animate-in fade-in-50">
-      <AstralLogo className="h-40 w-40 animate-pulse" />
-      <p className="mt-4 text-lg font-semibold">Loading Your Dashboard</p>
-      <p className="text-muted-foreground">Please wait a moment...</p>
+      <div className="relative">
+        <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse-glow" />
+        <AstralLogo className="relative h-32 w-32 sm:h-40 sm:w-40 animate-float" />
+      </div>
+      <div className="mt-6 space-y-2 text-center">
+        <p className="text-xl sm:text-2xl font-bold">Loading Your Dashboard</p>
+        <p className="text-muted-foreground">Preparing quantum trading interface...</p>
+        <div className="flex items-center justify-center gap-1 mt-4">
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100" />
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200" />
+        </div>
+      </div>
     </div>
   );
 }
@@ -139,7 +149,6 @@ export default function DashboardLayout({
     initializeUser();
   }, [fetchWalletAndTiers]);
 
-
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const fileContent = `[InternetShortcut]\nURL=${window.location.origin}`;
@@ -154,44 +163,49 @@ export default function DashboardLayout({
     const baseConfig = [
       {
         title: 'Overview',
+        icon: Star,
         items: [
-          { href: '/dashboard', label: 'Home', icon: HomeIcon },
-          { href: '/dashboard/market', label: 'Market', icon: MarketIcon },
-          { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+          { href: '/dashboard', label: 'Home', icon: HomeIcon, description: 'Dashboard overview' },
+          { href: '/dashboard/market', label: 'Market', icon: MarketIcon, description: 'Live market data' },
+          { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo, description: 'AI Trading Bot', highlight: true },
         ],
       },
       {
         title: 'Community',
+        icon: MessageSquare,
         items: [
-          { href: '/dashboard/chat', label: 'Chat', icon: MessageSquare },
-          { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon },
-          { href: '/dashboard/invite', label: 'Invite', icon: UserPlus },
-          { href: '/dashboard/rewards', label: 'Rewards', icon: Trophy },
+          { href: '/dashboard/chat', label: 'Chat', icon: MessageSquare, description: 'Public chat' },
+          { href: '/dashboard/squad', label: 'Squad', icon: SquadIcon, description: 'Team trading' },
+          { href: '/dashboard/invite', label: 'Invite', icon: UserPlus, description: 'Invite friends' },
+          { href: '/dashboard/rewards', label: 'Rewards', icon: Trophy, description: 'Earn rewards' },
         ],
       },
       {
         title: 'Manage',
+        icon: Zap,
         items: [
-          { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon },
-          { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
+          { href: '/dashboard/deposit', label: 'Deposit', icon: DepositIcon, description: 'Fund account' },
+          { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon, description: 'Withdraw funds' },
         ],
       },
       {
         title: 'Account',
+        icon: Shield,
         items: [
-          { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
-          { href: '/dashboard/security', label: 'Security', icon: SettingsIcon },
-          { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon },
+          { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon, description: 'Account settings' },
+          { href: '/dashboard/security', label: 'Security', icon: SettingsIcon, description: 'Security settings' },
+          { href: '/dashboard/inbox', label: 'Inbox', icon: InboxIcon, description: 'Messages' },
         ],
       },
       {
         title: 'Platform',
+        icon: Sparkles,
         items: [
-          { href: '/dashboard/promotions', label: 'Promotions', icon: PromotionIcon },
-          { href: '/dashboard/trading-info', label: 'Tiers & Ranks', icon: Trophy },
-          { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-          { href: '/dashboard/about', label: 'About', icon: AboutIcon },
-          { href: downloadHref, label: 'Download App', icon: DownloadIcon, download: 'AstralCore.url'},
+          { href: '/dashboard/promotions', label: 'Promotions', icon: PromotionIcon, description: 'Special offers' },
+          { href: '/dashboard/trading-info', label: 'Tiers & Ranks', icon: Trophy, description: 'Account tiers' },
+          { href: '/dashboard/support', label: 'Support', icon: SupportIcon, description: 'Get help' },
+          { href: '/dashboard/about', label: 'About', icon: AboutIcon, description: 'Platform info' },
+          { href: downloadHref, label: 'Download App', icon: DownloadIcon, download: 'AstralCore.url', description: 'Mobile app'},
         ],
       },
     ];
@@ -199,20 +213,20 @@ export default function DashboardLayout({
     if (isAdmin || isModerator) {
       const adminItems = [];
       if (isAdmin) {
-        adminItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
+        adminItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield, description: 'Admin controls' });
       }
       if (isModerator) {
-        adminItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield });
+        adminItems.push({ href: '/moderator', label: 'Moderator Panel', icon: Shield, description: 'Moderator tools' });
       }
       baseConfig.push({
         title: 'Admin Tools',
+        icon: Shield,
         items: adminItems,
       });
     }
 
     return baseConfig;
   }, [isAdmin, isModerator, downloadHref]);
-
 
   const handleLogout = async () => {
     sessionStorage.removeItem('loggedInEmail');
@@ -226,7 +240,7 @@ export default function DashboardLayout({
   const bottomNavItems = [
     { href: '/dashboard', label: 'Home', icon: HomeIcon },
     { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
-    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo },
+    { href: '/dashboard/trading', label: 'CORE', icon: AstralLogo, special: true },
     { href: '/dashboard/withdraw', label: 'Withdraw', icon: WithdrawIcon },
     { href: '/dashboard/profile', label: 'Profile', icon: ProfileIcon },
   ];
@@ -262,32 +276,40 @@ export default function DashboardLayout({
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
-        <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <AstralLogo className="h-10 w-10" />
-              <span className="text-lg font-semibold text-sidebar-foreground">
-                AstralCore
-              </span>
+        <Sidebar className="border-r border-border/50">
+          <SidebarHeader className="border-b border-border/50 p-6">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg" />
+                <AstralLogo className="relative h-10 w-10" />
+              </div>
+              <div className="space-y-1">
+                <span className="text-xl font-bold text-sidebar-foreground bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                  AstralCore
+                </span>
+                <p className="text-xs text-sidebar-foreground/60">Quantum Trading</p>
+              </div>
             </div>
           </SidebarHeader>
 
-          <div className="mt-12 mb-4 px-4 space-y-4">
+          <div className="mt-6 mb-6 px-6 space-y-4">
              <div className="flex items-center gap-3">
                   <AvatarUploadDialog 
                     onUploadSuccess={() => fetchWalletAndTiers(user.id)}
                     wallet={wallet}
                   >
-                    <Avatar className="h-12 w-12 cursor-pointer">
+                    <Avatar className="h-12 w-12 cursor-pointer ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
                       <AvatarImage
                         src={wallet?.profile?.avatarUrl}
                         alt={wallet?.profile?.username || 'User'}
                       />
-                      <AvatarFallback>{userInitial}</AvatarFallback>
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {userInitial}
+                      </AvatarFallback>
                     </Avatar>
                   </AvatarUploadDialog>
 
-                  <div className="overflow-hidden">
+                  <div className="overflow-hidden flex-1 min-w-0">
                      <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
                         {wallet?.profile?.username || 'User'}
                         {userCountry && <span className="text-lg">{userCountry.flag}</span>}
@@ -295,52 +317,94 @@ export default function DashboardLayout({
                      <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
                   </div>
               </div>
+              
               <div className="flex flex-wrap items-center gap-2">
-                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
-                    <RankIcon className="h-4 w-4" />
+                 <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1.5", rank.className)}>
+                    <RankIcon className="h-3 w-3" />
                     <span>{rank.name}</span>
                  </Badge>
                  {tier && TierIcon && tierClassName && (
-                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
-                    <TierIcon className="h-4 w-4" />
+                  <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1.5", tierClassName)}>
+                    <TierIcon className="h-3 w-3" />
                     <span>{tier.name}</span>
                   </Badge>
                 )}
               </div>
-          </div>
-          <Separator className="bg-sidebar-border" />
 
-          <SidebarContent>
-            <SidebarMenu>
+              {/* Balance display */}
+              <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
+                <div className="text-xs text-sidebar-foreground/60 mb-1">Total Balance</div>
+                <div className="text-lg font-bold text-primary">${totalBalance.toFixed(2)}</div>
+              </div>
+          </div>
+          
+          <Separator className="bg-sidebar-border mx-6" />
+
+          <SidebarContent className="px-3 py-4">
+            <SidebarMenu className="space-y-2">
               {menuConfig.map((group, index) => (
                   <React.Fragment key={group.title}>
-                    {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
-                    <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
+                    <div className="px-3 py-2">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider">
+                        <group.icon className="h-3 w-3" />
+                        {group.title}
+                      </div>
+                    </div>
                     {group.items.map((item) => (
                       <SidebarMenuItem key={item.href}>
                         <SidebarMenuButton
                           asChild
-                          isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
-                          }
+                          className={cn(
+                            "rounded-xl transition-all duration-200 h-auto py-3",
+                            isClient && (pathname.endsWith(item.href) && !item.download) && "bg-primary/10 border border-primary/20 text-primary"
+                          )}
                         >
                           <Link href={item.href} download={item.download}>
-                            <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
-                            <span>{item.label}</span>
+                            <div className="flex items-center gap-3 w-full">
+                              <div className={cn(
+                                "flex items-center justify-center w-8 h-8 rounded-lg",
+                                item.highlight ? "bg-primary/20" : "bg-sidebar-accent",
+                                item.label === 'CORE' && 'p-1'
+                              )}>
+                                <item.icon className={cn(
+                                  "h-4 w-4",
+                                  item.label === 'CORE' && 'h-full w-full',
+                                  item.highlight && "text-primary"
+                                )} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium truncate">{item.label}</span>
+                                  {item.highlight && (
+                                    <Badge className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5">
+                                      AI
+                                    </Badge>
+                                  )}
+                                </div>
+                                {item.description && (
+                                  <p className="text-xs text-sidebar-foreground/60 truncate">{item.description}</p>
+                                )}
+                              </div>
+                            </div>
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
+                    {index < menuConfig.length - 1 && <Separator className="my-3 bg-sidebar-border/50" />}
                   </React.Fragment>
                 ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter>
+          
+          <SidebarFooter className="p-4 border-t border-sidebar-border">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-2">
-                   <SettingsIcon className="mr-2 h-4 w-4" />
-                   Settings & Logout
+                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-3 rounded-xl hover:bg-sidebar-accent">
+                   <SettingsIcon className="mr-3 h-4 w-4" />
+                   <div className="flex-1 text-left">
+                     <div className="font-medium">Settings</div>
+                     <div className="text-xs text-sidebar-foreground/60">Account & logout</div>
+                   </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -376,24 +440,31 @@ export default function DashboardLayout({
             </DropdownMenu>
           </SidebarFooter>
         </Sidebar>
-        <SidebarInset>
-          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
-            <SidebarTrigger />
+        
+        <SidebarInset className="bg-secondary/30">
+          <header className="flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur-xl px-4 lg:h-[70px] lg:px-6 sticky top-0 z-30 mobile-padding">
+            <SidebarTrigger className="lg:hidden" />
             <div className="w-full flex-1">
-              <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                <AstralLogo className="h-6 w-6" />
+              <h1 className="flex items-center gap-3 text-lg font-bold md:text-2xl capitalize">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg" />
+                  <AstralLogo className="relative h-6 w-6" />
+                </div>
                 {isClient ? (
-                  <span>{getPageTitle()}</span>
+                  <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                    {getPageTitle()}
+                  </span>
                 ) : (
                   <Skeleton className="h-6 w-24" />
                 )}
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            
+            <div className="flex items-center gap-3">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                     <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
+                     <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5 px-3 py-1", rank.className)}>
                         <RankIcon className="h-4 w-4" />
                         <span>{rank.name}</span>
                      </Badge>
@@ -402,10 +473,11 @@ export default function DashboardLayout({
                     <p>Account Rank</p>
                   </TooltipContent>
                 </Tooltip>
+                
                  {tier && TierIcon && tierClassName && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                        <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
+                        <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5 px-3 py-1", tierClassName)}>
                           <TierIcon className="h-4 w-4" />
                           <span>{tier.name}</span>
                         </Badge>
@@ -418,43 +490,66 @@ export default function DashboardLayout({
               </TooltipProvider>
 
               <ThemeSwitcher />
-              <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+              
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" asChild>
                 <Link href="/dashboard/inbox">
                   <InboxIcon className="h-5 w-5" />
                   <span className="sr-only">Inbox</span>
                 </Link>
               </Button>
+              
               <NotificationBell />
             </div>
           </header>
-          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
-            {children}
+          
+          <main className="flex-1 p-4 md:p-6 pb-24 lg:pb-6 mobile-gap">
+            <div className="animate-fade-in">
+              {children}
+            </div>
           </main>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
+          
+          {/* Enhanced mobile navigation */}
+          <nav className="mobile-nav flex items-center justify-around z-50 md:hidden">
             {bottomNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
+                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-all duration-200 relative haptic-light',
                   isClient && pathname.endsWith(item.href)
-                    ? 'text-primary font-medium'
+                    ? 'text-primary font-semibold'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                {item.label === 'CORE' ? (
-                  <div className="absolute -top-7 flex items-center justify-center">
+                {item.special ? (
+                  <div className="absolute -top-8 flex items-center justify-center">
                      <div className="h-16 w-16 rounded-full bg-transparent flex items-center justify-center">
-                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center p-1">
+                        <div className="h-14 w-14 rounded-full bg-gradient-to-r from-primary to-purple-600 text-primary-foreground flex items-center justify-center p-2 shadow-lg shadow-primary/25">
                            <item.icon className="h-full w-full" />
                         </div>
                      </div>
                   </div>
                 ) : (
-                  <item.icon className="h-6 w-6" />
+                  <div className={cn(
+                    "flex items-center justify-center w-6 h-6 transition-transform duration-200",
+                    isClient && pathname.endsWith(item.href) && "scale-110"
+                  )}>
+                    <item.icon className="h-full w-full" />
+                  </div>
                 )}
                 
-                <span className={cn(item.label === 'CORE' && 'mt-8')}>{item.label}</span>
+                <span className={cn(
+                  "font-medium transition-all duration-200",
+                  item.special && 'mt-8',
+                  isClient && pathname.endsWith(item.href) && "text-primary font-semibold"
+                )}>
+                  {item.label}
+                </span>
+                
+                {/* Active indicator */}
+                {isClient && pathname.endsWith(item.href) && !item.special && (
+                  <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full" />
+                )}
               </Link>
             ))}
           </nav>
