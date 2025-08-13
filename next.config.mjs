@@ -9,12 +9,31 @@ const nextConfig = {
   experimental: {
     // Enable modern JavaScript features
     esmExternals: true,
-    // Optimize package imports
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'recharts'],
+    // Optimize package imports for tree shaking
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-icons',
+      'recharts',
+      'framer-motion',
+      'react-icons',
+      'date-fns',
+      'clsx',
+      'class-variance-authority'
+    ],
     // Enable server actions
     serverActions: true,
     // Optimize CSS
     optimizeCss: true,
+    // Enable Turbopack optimizations
+    turbo: {
+      loaders: {
+        '.svg': ['@svgr/webpack'],
+      },
+    },
+    // Runtime optimizations
+    runtime: 'nodejs',
+    // Enable parallel builds
+    workerThreads: true,
   },
 
   // Image optimization for crypto assets and charts
@@ -176,26 +195,73 @@ const nextConfig = {
       };
     }
 
-    // Optimize for trading chart libraries
+    // Advanced bundle splitting for better performance
     config.optimization = {
       ...config.optimization,
       splitChunks: {
         chunks: 'all',
+        minSize: 20000,
+        maxSize: 200000, // 200KB max chunk size
         cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
+          // Framework chunks
+          framework: {
             chunks: 'all',
+            name: 'framework',
+            test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
+            priority: 40,
+            enforce: true,
           },
-          crypto: {
+
+          // Next.js chunks
+          nextjs: {
+            name: 'nextjs',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/]next[\\/]/,
+            priority: 35,
+            enforce: true,
+          },
+
+          // Large libraries split
+          charts: {
             test: /[\\/]node_modules[\\/](recharts|three|framer-motion)[\\/]/,
-            name: 'crypto-libs',
+            name: 'charts',
             chunks: 'all',
+            priority: 30,
+            enforce: true,
           },
+
+          // UI library chunks
           ui: {
             test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
-            name: 'ui-libs',
+            name: 'ui',
             chunks: 'all',
+            priority: 25,
+            enforce: true,
+          },
+
+          // Crypto/trading specific
+          crypto: {
+            test: /[\\/]node_modules[\\/](zod|date-fns|clsx|class-variance-authority)[\\/]/,
+            name: 'crypto-utils',
+            chunks: 'all',
+            priority: 20,
+            enforce: true,
+          },
+
+          // Common vendor chunks (smaller)
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendor',
+            chunks: 'all',
+            priority: 10,
+            minChunks: 2,
+          },
+
+          // Default chunk
+          default: {
+            minChunks: 2,
+            priority: 5,
+            reuseExistingChunk: true,
           },
         },
       },
