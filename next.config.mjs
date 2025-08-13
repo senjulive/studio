@@ -7,8 +7,6 @@ const nextConfig = {
   
   // Performance optimizations
   experimental: {
-    // Enable modern JavaScript features
-    esmExternals: true,
     // Optimize package imports for tree shaking
     optimizePackageImports: [
       'lucide-react',
@@ -20,20 +18,17 @@ const nextConfig = {
       'clsx',
       'class-variance-authority'
     ],
-    // Enable server actions
-    serverActions: true,
     // Optimize CSS
     optimizeCss: true,
-    // Enable Turbopack optimizations
-    turbo: {
-      loaders: {
-        '.svg': ['@svgr/webpack'],
-      },
-    },
-    // Runtime optimizations
-    runtime: 'nodejs',
     // Enable parallel builds
     workerThreads: true,
+  },
+
+  // Turbopack configuration (stable)
+  turbopack: {
+    rules: {
+      '*.svg': ['@svgr/webpack'],
+    },
   },
 
   // Image optimization for crypto assets and charts
