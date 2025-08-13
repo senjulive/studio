@@ -20,84 +20,116 @@ export function RenderBuilderContent({ content, urlPath }: RenderBuilderContentP
     return <BuilderComponent model="page" content={content} apiKey={BUILDER_API_KEY} />;
   }
 
-  // If this is the root path and no content, show enhanced welcome page
+  // Modern mobile-first welcome page with electric theme
   if (urlPath === '/') {
     return (
-      <div className="min-h-dvh bg-gradient-to-br from-background via-background to-muted/20">
-        {/* Hero Section */}
-        <main className="flex min-h-dvh flex-col items-center justify-center p-8 text-center animate-in fade-in-50 duration-1000">
-          <div className="flex flex-col items-center gap-8 max-w-4xl">
-            <AstralLogo className="h-32 w-32 sm:h-40 sm:w-40 animate-pulse" />
+      <div className="min-h-dvh bg-background overflow-hidden relative">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-3/4 right-1/4 w-48 h-48 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-accent/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        </div>
 
-            <div className="space-y-4">
-              <h1 className="text-4xl sm:text-6xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                Welcome to AstralCore
+        {/* Main content */}
+        <main className="relative z-10 mobile-container min-h-dvh flex flex-col">
+          {/* Hero Section - Mobile Optimized */}
+          <div className="flex-1 flex flex-col justify-center items-center text-center pt-8 pb-24">
+
+            {/* Logo with electric glow */}
+            <div className="mb-8 relative">
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl scale-150 animate-pulse"></div>
+              <AstralLogo className="relative h-24 w-24 sm:h-32 sm:w-32 electric-glow" />
+            </div>
+
+            {/* Electric title */}
+            <div className="space-y-4 mb-8">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight">
+                <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-pulse">
+                  AstralCore
+                </span>
               </h1>
-              <p className="max-w-3xl text-lg sm:text-xl text-muted-foreground leading-relaxed">
-                Your intelligent crypto management platform. Our sophisticated trading bot employs Grid Trading to turn market volatility into consistent, automated profits for you.
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-md leading-relaxed px-4">
+                Next-gen crypto trading platform with AI-powered automation and electric performance
               </p>
             </div>
 
-            {/* Features Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 w-full max-w-4xl">
-              <div className="p-6 rounded-lg border bg-card/50 backdrop-blur">
-                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 mx-auto">
-                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+            {/* Modern feature cards - Mobile stack */}
+            <div className="w-full max-w-sm space-y-4 mb-8">
+              <div className="mobile-card group hover:electric-glow transition-all duration-300">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center electric-glow group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-sm text-foreground">AI Trading Bot</h3>
+                    <p className="text-xs text-muted-foreground">24/7 automated profits</p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Automated Trading</h3>
-                <p className="text-sm text-muted-foreground">Advanced algorithms execute trades 24/7 to maximize your profits</p>
               </div>
 
-              <div className="p-6 rounded-lg border bg-card/50 backdrop-blur">
-                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 mx-auto">
-                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
+              <div className="mobile-card group hover:electric-glow-cyan transition-all duration-300">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-secondary to-accent flex items-center justify-center electric-glow-cyan group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-sm text-foreground">Ultra Secure</h3>
+                    <p className="text-xs text-muted-foreground">Military-grade encryption</p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Secure Platform</h3>
-                <p className="text-sm text-muted-foreground">Bank-level security with multi-layer protection for your assets</p>
               </div>
 
-              <div className="p-6 rounded-lg border bg-card/50 backdrop-blur">
-                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 mx-auto">
-                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                  </svg>
+              <div className="mobile-card group hover:electric-glow-magenta transition-all duration-300">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center electric-glow-magenta group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-sm text-foreground">Live Analytics</h3>
+                    <p className="text-xs text-muted-foreground">Real-time insights</p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Real-time Analytics</h3>
-                <p className="text-sm text-muted-foreground">Monitor your portfolio performance with detailed insights</p>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              <Button asChild size="lg" className="text-lg px-8 py-6">
+            {/* Modern CTA buttons */}
+            <div className="w-full max-w-sm space-y-3">
+              <Button asChild className="w-full h-12 text-base font-bold electric-glow hover:scale-105 transition-all duration-300 bg-gradient-to-r from-primary to-secondary">
                 <Link href="/login">
-                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                  Launch App <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+              <Button asChild variant="outline" className="w-full h-12 text-base font-bold border-primary/50 hover:bg-primary/10 hover:electric-glow transition-all duration-300">
                 <Link href="/dashboard">
                   View Dashboard
                 </Link>
               </Button>
             </div>
 
-            {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-8 mt-12 pt-8 border-t border-border/50">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">$10M+</div>
-                <div className="text-sm text-muted-foreground">Assets Managed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">50K+</div>
-                <div className="text-sm text-muted-foreground">Active Users</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">99.9%</div>
-                <div className="text-sm text-muted-foreground">Uptime</div>
+            {/* Electric stats bar */}
+            <div className="mt-12 w-full max-w-sm">
+              <div className="mobile-card">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">$50M+</div>
+                    <div className="text-xs text-muted-foreground">Volume</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">100K+</div>
+                    <div className="text-xs text-muted-foreground">Users</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">99.9%</div>
+                    <div className="text-xs text-muted-foreground">Uptime</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
