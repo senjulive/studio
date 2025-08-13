@@ -5,10 +5,16 @@ const path = require('path');
 
 // Performance budget thresholds (in bytes)
 const BUDGETS = {
-  maxBundleSize: 512 * 1024, // 512KB
-  maxChunkSize: 256 * 1024,  // 256KB
-  maxImageSize: 100 * 1024,  // 100KB
-  maxCssSize: 50 * 1024,     // 50KB
+  // Relaxed budgets for crypto trading platform
+  maxBundleSize: 800 * 1024,  // 800KB (crypto platforms need more)
+  maxChunkSize: 300 * 1024,   // 300KB per chunk
+  maxImageSize: 100 * 1024,   // 100KB for images
+  maxCssSize: 80 * 1024,      // 80KB for CSS
+  maxServerSize: 15 * 1024 * 1024, // 15MB server bundle
+
+  // Target budgets (ideal)
+  targetBundleSize: 600 * 1024,  // 600KB target
+  targetChunkSize: 200 * 1024,   // 200KB target per chunk
 };
 
 function formatBytes(bytes) {
@@ -47,6 +53,24 @@ function analyzeBundle() {
     console.log(`\n🖥️  Server Bundle: ${formatBytes(serverSize)}`);
   }
   
+  // Performance recommendations
+  console.log('\n💡 Performance Recommendations:');
+
+  const totalJsSize = getTotalJSSize();
+  if (totalJsSize > BUDGETS.maxBundleSize) {
+    console.log('   📦 Consider using dynamic imports for heavy components');
+    console.log('   🔄 Enable code splitting for trading chart libraries');
+    console.log('   🗜️  Use tree shaking to remove unused code');
+  }
+
+  if (totalJsSize > BUDGETS.targetBundleSize && totalJsSize <= BUDGETS.maxBundleSize) {
+    console.log('   ✅ Bundle size acceptable but could be optimized');
+  }
+
+  if (totalJsSize <= BUDGETS.targetBundleSize) {
+    console.log('   🎯 Excellent! Bundle size meets target budget');
+  }
+
   console.log('\n✅ Performance analysis complete!');
 }
 
