@@ -1,0 +1,98 @@
+{
+  "compilerOptions": {
+    
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    
+    
+    "lib": ["dom", "dom.iterable", "es6", "es2017", "es2018", "es2019", "es2020"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    
+    
+    "incremental": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleDetection": "force",
+    
+    
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/pages/*": ["./src/pages/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/contexts/*": ["./src/contexts/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/styles/*": ["./src/styles/*"],
+      "@/public/*": ["./public/*"]
+    },
+    
+    
+    "jsx": "preserve",
+    "jsxImportSource": "react",
+    
+    
+    "forceConsistentCasingInFileNames": true,
+    
+    
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    
+    
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/**/*",
+    "pages/**/*",
+    "components/**/*",
+    "lib/**/*",
+    "hooks/**/*",
+    "contexts/**/*",
+    "types/**/*",
+    "utils/**/*"
+  ],
+  
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "cypress",
+    "e2e"
+  ],
+  
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS",
+      "target": "ES2020"
+    }
+  }
+}
