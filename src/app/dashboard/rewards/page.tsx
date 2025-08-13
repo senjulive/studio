@@ -1,4 +1,4 @@
-import { RewardsView } from '@/components/dashboard/rewards-view';
+import { RewardsViewMobile } from '@/components/dashboard/rewards-view-mobile';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,8 +8,6 @@ export const metadata: Metadata = {
 
 export default function RewardsPage() {
   return (
-    <div className="space-y-6">
-      <RewardsView />
-    </div>
+    <RewardsViewMobile />
   );
 }
