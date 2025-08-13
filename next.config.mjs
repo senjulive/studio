@@ -2,7 +2,6 @@
 const nextConfig = {
   // Core configuration
   reactStrictMode: true,
-  swcMinify: true,
   serverExternalPackages: ['@builder.io/react'],
   
   // Performance optimizations
@@ -25,7 +24,7 @@ const nextConfig = {
   },
 
   // Turbopack configuration (stable)
-  turbopack: {
+  turbo: {
     rules: {
       '*.svg': ['@svgr/webpack'],
     },
