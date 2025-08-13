@@ -25,7 +25,10 @@
     "security:audit": "npm audit --audit-level=moderate",
     "security:fix": "npm audit fix",
     "performance:check": "node scripts/performance-check.js",
+    "performance:analyze": "node scripts/bundle-analyzer.mjs",
+    "deployment:check": "node scripts/deployment-readiness.mjs",
     "env:validate": "node scripts/validate-env.mjs",
+    "production:ready": "npm run build && npm run performance:analyze && npm run deployment:check",
     "prepare": "husky install || true",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
