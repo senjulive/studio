@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -106,39 +105,22 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <AstralLogo className="mx-auto h-28 w-28" />
-        <CardTitle className="text-2xl font-headline">Astral Core</CardTitle>
-        <CardDescription>
-          Access the highly intelligent CORE Nexus Quantum v3.76 trading bot.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-4">
-          <Button variant="outline" onClick={handleGoogleSignIn}>
-            Sign in with Google
-          </Button>
-          <Button variant="outline" onClick={handleEmailSignIn}>
-            Sign in with Email
-          </Button>
-        </div>
-        <div className="relative my-4">
-          <Separator />
-          <span className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-            OR
-          </span>
-        </div>
+    <div className="mobile-card w-full backdrop-blur-xl border border-primary/20 electric-glow">
+      <div className="p-6 space-y-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground">Email Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
+                    <Input
+                      placeholder="Enter your email"
+                      className="h-12 bg-background/50 border-primary/30 focus:border-primary/60 focus:electric-glow transition-all"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -150,24 +132,27 @@ export function LoginForm() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
-                    <Button variant="link" asChild className="p-0 h-auto text-sm">
-                      <Link
-                        href="/forgot-password"
-                        className="font-medium text-primary/80 hover:text-primary"
-                      >
-                        Forgot password?
-                      </Link>
-                    </Button>
+                    <FormLabel className="text-sm font-medium text-foreground">Password</FormLabel>
+                    <Link
+                      href="/forgot-password"
+                      className="text-sm text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
                   </div>
                   <FormControl>
                     <div className="relative">
-                      <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        className="h-12 bg-background/50 border-primary/30 focus:border-primary/60 focus:electric-glow transition-all pr-12"
+                        {...field}
+                      />
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -182,45 +167,69 @@ export function LoginForm() {
               control={form.control}
               name="rememberMe"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
+                      className="border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      Remember me
-                    </FormLabel>
-                  </div>
+                  <FormLabel className="text-sm font-medium text-foreground cursor-pointer">
+                    Remember me
+                  </FormLabel>
                 </FormItem>
               )}
             />
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-12 text-base font-bold bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-all duration-300 electric-glow"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Authorizing..." : "Login"}
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </Form>
-      </CardContent>
-      <CardFooter className="text-center text-sm">
-        <p className="w-full text-muted-foreground">
-          Don't have an account?{" "}
-          <Button variant="link" asChild className="p-0 h-auto">
-            <Link
-                href="/register"
-                className="font-semibold text-primary hover:text-primary/90"
+
+        {/* Social login options */}
+        <div className="space-y-3">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-primary/20" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              onClick={handleGoogleSignIn}
+              className="h-11 border-primary/30 hover:bg-primary/10 hover:electric-glow transition-all"
             >
-                Register
-            </Link>
-          </Button>
-        </p>
-      </CardFooter>
-    </Card>
+              <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Google
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleEmailSignIn}
+              className="h-11 border-primary/30 hover:bg-primary/10 hover:electric-glow transition-all"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Email
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
