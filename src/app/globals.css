@@ -131,8 +131,24 @@
 }
 
 @layer components {
+    /* Mobile-first trading card */
     .trading-card {
-        @apply bg-slate-800/80 rounded-2xl p-7 shadow-2xl backdrop-blur-2xl max-w-7xl w-full border border-blue-500/20;
+        @apply bg-card/90 rounded-3xl p-4 md:p-7 shadow-2xl backdrop-blur-3xl w-full border border-primary/20 electric-glow;
+        background: linear-gradient(135deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.7));
+    }
+
+    /* Mobile-optimized containers */
+    .mobile-container {
+        @apply px-4 py-4 max-w-sm mx-auto md:max-w-7xl;
+    }
+
+    .mobile-section {
+        @apply mb-4 md:mb-6;
+    }
+
+    .mobile-card {
+        @apply bg-card/80 backdrop-blur-xl rounded-2xl p-4 border border-primary/10 electric-glow;
+        background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6));
     }
     .header {
         @apply flex justify-between items-center mb-7 pb-5 border-b border-white/10;
