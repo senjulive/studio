@@ -56,8 +56,41 @@ export function TradingBotMobile() {
   const totalTrades = trades || 0;
   const successRate = 92.3; // Mock data
 
+  const performanceMetrics = getPerformanceMetrics();
+
   return (
     <div className="space-y-4">
+      {/* Animated Trading Visualization */}
+      <div className="mobile-card">
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-lg">Live Trading Visualization</h2>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="text-xs"
+              >
+                <BarChart className="w-4 h-4 mr-1" />
+                {showAdvanced ? 'Simple' : 'Advanced'}
+              </Button>
+            </div>
+          </div>
+
+          {showAdvanced ? (
+            <GridTradingAnimation />
+          ) : (
+            <AnimatedTradingBot
+              isRunning={isRunning}
+              profit={profit}
+              trades={trades}
+              className="mb-4"
+            />
+          )}
+        </div>
+      </div>
+
       {/* Bot Status Card */}
       <div className="mobile-card relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5"></div>
