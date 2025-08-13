@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Environment validation script for builds
-import { validateEnv } from '../src/lib/env-validation.js';
+import { validateEnv } from '../src/lib/env-validation.ts';
 
 try {
   const env = validateEnv();
