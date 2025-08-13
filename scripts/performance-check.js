@@ -139,14 +139,14 @@ function getFileSize(filePath) {
 
 function getDirSize(dirPath) {
   let totalSize = 0;
-  
+
   function traverse(currentDir) {
     const items = fs.readdirSync(currentDir);
-    
+
     for (const item of items) {
       const fullPath = path.join(currentDir, item);
       const stat = fs.statSync(fullPath);
-      
+
       if (stat.isDirectory()) {
         traverse(fullPath);
       } else {
@@ -154,9 +154,21 @@ function getDirSize(dirPath) {
       }
     }
   }
-  
+
   traverse(dirPath);
   return totalSize;
+}
+
+function getTotalJSSize() {
+  const staticDir = path.join(process.cwd(), '.next', 'static');
+  const jsDir = path.join(staticDir, 'chunks');
+
+  if (!fs.existsSync(jsDir)) {
+    return 0;
+  }
+
+  const jsFiles = getFilesRecursively(jsDir, '.js');
+  return jsFiles.reduce((sum, file) => sum + getFileSize(file), 0);
 }
 
 // Run analysis
