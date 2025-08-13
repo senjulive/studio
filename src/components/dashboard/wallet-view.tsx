@@ -1,12 +1,12 @@
-
 'use client';
 
 import * as React from "react";
 import Link from "next/link";
-import { Repeat, Lock, LineChart, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight } from "lucide-react";
+import { Repeat, Lock, LineChart, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight, TrendingUp, Plus, Eye, EyeOff } from "lucide-react";
 import type { SVGProps } from 'react';
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
