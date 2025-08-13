@@ -35,10 +35,7 @@ const nextConfig = {
     ],
   },
   reactStrictMode: true,
-  swcMinify: true,
-  experimental: {
-    serverComponentsExternalPackages: ['@builder.io/react'],
-  },
+  serverExternalPackages: ['@builder.io/react'],
 };
 
 export default nextConfig;
