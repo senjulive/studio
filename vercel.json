@@ -1,14 +1,40 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
+  "name": "astralcore-crypto-platform",
+  "version": 2,
+  
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "outputDirectory": ".next",
-  "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 30
+  
+  "build": {
+    "env": {
+      "NODE_VERSION": "20",
+      "NEXT_TELEMETRY_DISABLED": "1",
+      "NODE_OPTIONS": "--max-old-space-size=4096"
     }
   },
+  
+  "env": {
+    "NODE_ENV": "production",
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30,
+      "memory": 1024,
+      "runtime": "nodejs20.x"
+    },
+    "src/pages/api/**/*.ts": {
+      "maxDuration": 30,
+      "memory": 1024,
+      "runtime": "nodejs20.x"
+    }
+  },
+  
   "headers": [
     {
       "source": "/(.*)",
@@ -18,14 +44,164 @@
           "value": "nosniff"
         },
         {
-          "key": "X-Frame-Options",
+          "key": "X-Frame-Options", 
           "value": "DENY"
         },
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.builder.io https://assets.coincap.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https: wss: ws:; media-src 'self'; object-src 'none'; frame-src 'self' https://cdn.builder.io;"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        }
+      ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/icons/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods", 
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     }
-  ]
+  ],
+  
+  "redirects": [
+    {
+      "source": "/dashboard/home",
+      "destination": "/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard/wallet", 
+      "destination": "/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard/bot",
+      "destination": "/dashboard/trading", 
+      "permanent": true
+    },
+    {
+      "source": "/404",
+      "destination": "/not-found",
+      "permanent": true
+    }
+  ],
+  
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "/api/healthcheck"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    }
+  ],
+  
+  "regions": ["iad1", "sfo1", "lhr1"],
+  
+  "crons": [
+    {
+      "path": "/api/cron/market-data",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "0 2 * * *"
+    }
+  ],
+  
+  "github": {
+    "enabled": true,
+    "autoAlias": true,
+    "autoJobCancelation": true
+  },
+  
+  "cleanUrls": true,
+  "trailingSlash": false,
+  
+  "images": {
+    "domains": [
+      "assets.coincap.io",
+      "cdn.builder.io", 
+      "images.unsplash.com",
+      "placehold.co",
+      "cdn.dribbble.com"
+    ],
+    "formats": ["image/webp", "image/avif"],
+    "minimumCacheTTL": 31536000,
+    "dangerouslyAllowSVG": false,
+    "contentSecurityPolicy": "default-src 'self'; script-src 'none'; sandbox;"
+  },
+  
+  "analytics": {
+    "enable": true
+  },
+  
+  "webAnalytics": {
+    "enable": true
+  },
+  
+  "speedInsights": {
+    "enable": true
+  }
 }

@@ -1,29 +1,207 @@
+# Netlify Configuration for AstralCore Crypto Trading Platform
 [build]
   publish = ".next"
   command = "npm run build"
 
 [build.environment]
+  # Node.js version
   NODE_VERSION = "20"
+  
+  # Build optimizations
+  NEXT_TELEMETRY_DISABLED = "1"
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  
+  # Environment specific settings
+  NETLIFY_NEXT_PLUGIN_SKIP = "false"
+  NEXT_PRIVATE_TARGET = "server"
 
+# Next.js plugin for optimal performance
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  
+  [plugins.inputs]
+    # Enable ISR (Incremental Static Regeneration)
+    publish_dir = ".next"
 
+# Development settings
 [dev]
   command = "npm run dev"
   port = 3000
+  targetPort = 3000
+  publish = ".next"
+  autoLaunch = false
 
+# Production context settings
+[context.production]
+  command = "npm run build"
+  
+  [context.production.environment]
+    NODE_ENV = "production"
+    NEXT_TELEMETRY_DISABLED = "1"
+
+# Branch deploy context
+[context.branch-deploy]
+  command = "npm run build"
+  
+  [context.branch-deploy.environment]
+    NODE_ENV = "production"
+
+# Deploy preview context
+[context.deploy-preview]
+  command = "npm run build"
+  
+  [context.deploy-preview.environment]
+    NODE_ENV = "production"
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    
+    # Performance headers
+    X-DNS-Prefetch-Control = "on"
+    
+    # Crypto platform specific security
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.builder.io https://assets.coincap.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https: wss: ws:; media-src 'self'; object-src 'none'; frame-src 'self' https://cdn.builder.io;"
+
+# PWA manifest
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=31536000"
+
+# Static assets caching
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# API routes headers
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# Redirects for clean URLs and SPA behavior
+[[redirects]]
+  from = "/dashboard/home"
+  to = "/dashboard"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/dashboard/wallet"
+  to = "/dashboard"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/dashboard/bot"
+  to = "/dashboard/trading"
+  status = 301
+  force = true
+
+# Admin panel protection (basic)
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin"
+  status = 200
+  force = false
+  conditions = {Role = ["admin"]}
+
+# Moderator panel protection
+[[redirects]]
+  from = "/moderator/*"
+  to = "/moderator"
+  status = 200
+  force = false
+  conditions = {Role = ["moderator", "admin"]}
+
+# SPA fallback for client-side routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
+# Error pages
+[[redirects]]
+  from = "/404"
+  to = "/not-found"
+  status = 301
 
-[[headers]]
-  for = "/manifest.webmanifest"
-  [headers.values]
-    Content-Type = "application/manifest+json"
+# Form handling for contact/support
+[forms]
+  # Support form configuration
+  [forms.support]
+    name = "support"
+    action = "/api/support"
+    method = "POST"
+
+# Functions configuration for serverless
+[functions]
+  # Directory for Netlify functions
+  directory = "netlify/functions"
+  
+  # Runtime settings
+  node_bundler = "esbuild"
+  
+  # Environment for functions
+  [functions.environment]
+    NODE_ENV = "production"
+
+# Edge functions for real-time features
+[edge_functions]
+  # Real-time trading data
+  [edge_functions.trading-data]
+    function = "trading-data"
+    path = "/api/trading-data"
+
+  # Market updates
+  [edge_functions.market-updates]
+    function = "market-updates"
+    path = "/api/market-updates"
+
+# Large Media for asset optimization
+[large_media]
+  lfs = true
+
+# Build processing
+[processing]
+  skip_processing = false
+  
+  [processing.css]
+    bundle = true
+    minify = true
+  
+  [processing.js]
+    bundle = true
+    minify = true
+  
+  [processing.html]
+    pretty_urls = true
+    canonical_urls = true
+  
+  [processing.images]
+    compress = true
+    quality = 85
+    formats = ["webp", "avif"]
+
+# Branch-specific deploys
+[context.feature-branches]
+  command = "npm run build"
