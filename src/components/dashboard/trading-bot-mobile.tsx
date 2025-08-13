@@ -7,20 +7,25 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { useUser } from '@/contexts/UserContext';
 import { useTradingBot } from '@/hooks/use-trading-bot';
+import { useTradingBotEnhanced } from '@/hooks/use-trading-bot-enhanced';
+import { AnimatedTradingBot, GridTradingAnimation } from './trading-bot-animations';
 import { cn } from '@/lib/utils';
-import { 
-  Bot, 
-  Play, 
-  Pause, 
-  Settings, 
-  TrendingUp, 
-  DollarSign, 
+import {
+  Bot,
+  Play,
+  Pause,
+  Settings,
+  TrendingUp,
+  DollarSign,
   Activity,
   Zap,
   Target,
   BarChart3,
   Timer,
-  Coins
+  Coins,
+  Eye,
+  BarChart,
+  TrendingDown
 } from 'lucide-react';
 
 export function TradingBotMobile() {
