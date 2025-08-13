@@ -20,7 +20,24 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.builder.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
+  },
+  reactStrictMode: true,
+  swcMinify: true,
+  experimental: {
+    serverComponentsExternalPackages: ['@builder.io/react'],
   },
 };
 
