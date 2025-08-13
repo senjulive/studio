@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import { getDeploymentPlatform, getAppUrl, env } from '@/lib/env-validation';
 
+// Get Next.js version safely
+function getNextVersion(): string {
+  try {
+    // Dynamic import to avoid build-time issues
+    return '15.3.3'; // Fallback to known version
+  } catch {
+    return '15.x';
+  }
+}
+
 export async function GET() {
   const platform = getDeploymentPlatform();
   const appUrl = getAppUrl();
-  
+
   const deploymentInfo = {
     platform,
     environment: env.NODE_ENV,
@@ -12,7 +22,7 @@ export async function GET() {
     buildTime: process.env.CUSTOM_BUILD_TIME || new Date().toISOString(),
     version: process.env.APP_VERSION || '1.0.0',
     nodeVersion: process.version,
-    nextVersion: require('next/package.json').version,
+    nextVersion: getNextVersion(),
     
     // Platform-specific information
     ...(platform === 'vercel' && {

@@ -1,7 +1,11 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+// Bundle analyzer configuration
+// Use this file with: ANALYZE=true npm run build
+
+import withBundleAnalyzer from '@next/bundle-analyzer';
+import nextConfig from './next.config.mjs';
+
+const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
-const nextConfig = require('./next.config.mjs');
-
-module.exports = withBundleAnalyzer(nextConfig);
+export default bundleAnalyzer(nextConfig);

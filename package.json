@@ -25,7 +25,7 @@
     "security:audit": "npm audit --audit-level=moderate",
     "security:fix": "npm audit fix",
     "performance:check": "node scripts/performance-check.js",
-    "env:validate": "node -e \"require('./src/lib/env-validation').validateEnv(); console.log('✅ Environment validation passed')\"",
+    "env:validate": "tsx -e \"import('./src/lib/env-validation.js').then(m => { m.validateEnv(); console.log('✅ Environment validation passed'); })\"",
     "prepare": "husky install || true",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
