@@ -1,10 +1,11 @@
 'use client';
 
-import { BuilderComponent, useIsPreviewing } from '@builder.io/react';
+import { BuilderComponent } from '@builder.io/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { ArrowRight, Home } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY || 'demo-key';
 
@@ -14,7 +15,22 @@ interface RenderBuilderContentProps {
 }
 
 export function RenderBuilderContent({ content, urlPath }: RenderBuilderContentProps) {
-  const isPreviewing = useIsPreviewing();
+  const [isPreviewing, setIsPreviewing] = useState(false);
+
+  // Safe Builder.io preview detection
+  useEffect(() => {
+    try {
+      // Check if we're in Builder.io preview mode
+      const isPreview = typeof window !== 'undefined' && 
+        (window.location.search.includes('builder.') || 
+         window.location.search.includes('preview=true') ||
+         window.parent !== window);
+      setIsPreviewing(isPreview);
+    } catch (error) {
+      console.warn('Builder.io preview detection failed:', error);
+      setIsPreviewing(false);
+    }
+  }, []);
 
   if (content || isPreviewing) {
     return <BuilderComponent model="page" content={content} apiKey={BUILDER_API_KEY} />;
