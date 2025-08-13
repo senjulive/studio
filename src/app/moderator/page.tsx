@@ -1,17 +1,17 @@
-import {ModeratorPanel} from '@/components/moderator/moderator-panel';
-import {ModeratorAuth} from '@/components/moderator/moderator-auth';
-import type {Metadata} from 'next';
+import { ModeratorDashboardMobile } from '@/components/moderator/moderator-dashboard-mobile';
+import { ModeratorAuth } from '@/components/moderator/moderator-auth';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'AstralCore AI - Moderator Panel',
-  description: 'Manage the AstralCore Platform.',
+  description: 'Moderator Panel for Customer Support.',
 };
 
 export default function ModeratorPage() {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-secondary p-4">
+    <main className="min-h-dvh bg-background p-4">
       <ModeratorAuth>
-        <ModeratorPanel />
+        <ModeratorDashboardMobile />
       </ModeratorAuth>
     </main>
   );
