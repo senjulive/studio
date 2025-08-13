@@ -166,16 +166,13 @@
     NODE_ENV = "production"
 
 # Edge functions for real-time features
-[edge_functions]
-  # Real-time trading data
-  [edge_functions.trading-data]
-    function = "trading-data"
-    path = "/api/trading-data"
+[[edge_functions]]
+  function = "trading-data"
+  path = "/api/trading-data"
 
-  # Market updates
-  [edge_functions.market-updates]
-    function = "market-updates"
-    path = "/api/market-updates"
+[[edge_functions]]
+  function = "market-updates"
+  path = "/api/market-updates"
 
 # Large Media for asset optimization
 [large_media]
