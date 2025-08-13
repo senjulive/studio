@@ -30,16 +30,27 @@ import {
 
 export function TradingBotMobile() {
   const { wallet, tier } = useUser();
-  const { 
-    isRunning, 
-    profit, 
-    trades, 
-    toggleBot, 
-    settings 
+  const {
+    isRunning,
+    profit,
+    trades,
+    toggleBot,
+    settings
   } = useTradingBot();
+
+  // Use enhanced trading bot for animations
+  const {
+    bot: enhancedBot,
+    logs,
+    isLoading,
+    updateSettings,
+    getPerformanceMetrics
+  } = useTradingBotEnhanced();
 
   const [riskLevel, setRiskLevel] = React.useState([3]);
   const [autoReinvest, setAutoReinvest] = React.useState(true);
+  const [showAdvanced, setShowAdvanced] = React.useState(false);
+  const [showLogs, setShowLogs] = React.useState(false);
 
   const dailyProfit = profit || 0;
   const totalTrades = trades || 0;
