@@ -263,6 +263,134 @@ export function TradingBotMobile() {
         </div>
       </div>
 
+      {/* Performance Analytics */}
+      <div className="mobile-card">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <BarChart3 className="w-5 h-5 text-primary" />
+            <h3 className="font-bold text-lg">Performance Analytics</h3>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="p-3 bg-background/50 rounded-xl text-center">
+              <div className={cn(
+                "text-lg font-bold",
+                performanceMetrics.profitability === 'profitable' ? "text-green-400" : "text-red-400"
+              )}>
+                {enhancedBot.stats.successRate.toFixed(1)}%
+              </div>
+              <div className="text-xs text-muted-foreground">Win Rate</div>
+            </div>
+            <div className="p-3 bg-background/50 rounded-xl text-center">
+              <div className="text-lg font-bold text-blue-400">
+                {enhancedBot.stats.averageTradeTime}m
+              </div>
+              <div className="text-xs text-muted-foreground">Avg Trade Time</div>
+            </div>
+            <div className="p-3 bg-background/50 rounded-xl text-center">
+              <div className="text-lg font-bold text-green-400">
+                +${enhancedBot.stats.bestTrade.toFixed(2)}
+              </div>
+              <div className="text-xs text-muted-foreground">Best Trade</div>
+            </div>
+            <div className="p-3 bg-background/50 rounded-xl text-center">
+              <div className="text-lg font-bold text-purple-400">
+                ${enhancedBot.stats.monthlyProfit.toFixed(2)}
+              </div>
+              <div className="text-xs text-muted-foreground">Monthly P&L</div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Efficiency</span>
+              <span className={cn(
+                "font-medium capitalize",
+                performanceMetrics.efficiency === 'excellent' ? "text-green-400" :
+                performanceMetrics.efficiency === 'good' ? "text-blue-400" : "text-orange-400"
+              )}>
+                {performanceMetrics.efficiency}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Risk Level</span>
+              <span className={cn(
+                "font-medium capitalize",
+                performanceMetrics.riskLevel === 'low' ? "text-green-400" :
+                performanceMetrics.riskLevel === 'medium' ? "text-orange-400" : "text-red-400"
+              )}>
+                {performanceMetrics.riskLevel}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Trading Logs */}
+      <div className="mobile-card">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Activity className="w-5 h-5 text-secondary" />
+              <h3 className="font-bold text-lg">Trading Activity</h3>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowLogs(!showLogs)}
+              className="text-xs"
+            >
+              <Eye className="w-4 h-4 mr-1" />
+              {showLogs ? 'Hide' : 'Show'} Logs
+            </Button>
+          </div>
+
+          {showLogs && (
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {logs.slice(0, 10).map((log) => (
+                <div key={log.id} className="flex items-start gap-2 p-2 bg-background/50 rounded-lg">
+                  <div className={cn(
+                    "w-2 h-2 rounded-full mt-1.5 flex-shrink-0",
+                    log.type === 'success' ? "bg-green-400" :
+                    log.type === 'warning' ? "bg-orange-400" :
+                    log.type === 'error' ? "bg-red-400" : "bg-blue-400"
+                  )} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm">{log.message}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+
+              {logs.length === 0 && (
+                <div className="text-center py-4 text-muted-foreground">
+                  <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No activity logs yet</p>
+                  <p className="text-xs">Start the bot to see trading activity</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!showLogs && (
+            <div className="text-center py-6">
+              <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span>{logs.filter(l => l.type === 'success').length} Successful</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+                  <span>{logs.filter(l => l.type === 'info').length} Info</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Tier Info */}
       {tier && (
         <div className="mobile-card">
