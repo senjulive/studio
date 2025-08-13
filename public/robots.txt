@@ -1,0 +1,70 @@
+# AstralCore Crypto Trading Platform - Robots.txt
+
+User-agent: *
+Allow: /
+Allow: /dashboard
+Allow: /login
+Allow: /register
+Allow: /forgot-password
+
+# Disallow sensitive areas
+Disallow: /admin/
+Disallow: /moderator/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /dashboard/security
+Disallow: /dashboard/withdraw
+Disallow: /dashboard/deposit
+
+# Disallow private user content
+Disallow: /dashboard/profile/verify
+Disallow: /dashboard/inbox
+Disallow: /dashboard/support
+
+# Allow public API endpoints
+Allow: /api/public-settings
+Allow: /api/market-summary
+
+# Crawl delay for responsible crawling
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://astralcore.app/sitemap.xml
+Sitemap: https://astralcore.netlify.app/sitemap.xml
+Sitemap: https://astralcore.vercel.app/sitemap.xml
+
+# Google-specific directives
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Bing-specific directives
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Block AI crawlers for privacy
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# Block common bad bots
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
