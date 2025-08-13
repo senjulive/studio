@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -381,91 +380,149 @@ URL=${window.location.origin}`;
           </SidebarFooter>
         </Sidebar>
         <div className="flex flex-1">
-          <main className="flex-1 bg-secondary p-4 md:p-6 pb-20">
-            <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30 -ml-4 -mr-4 md:-ml-6 md:-mr-6">
-              <SidebarTrigger />
-              <div className="w-full flex-1">
-                <h1 className="flex items-center gap-2 text-lg font-semibold md:text-2xl capitalize">
-                  <AstralLogo className="h-6 w-6" />
-                  {isClient ? (
-                    <span>{getPageTitle()}</span>
-                  ) : (
-                    <Skeleton className="h-6 w-24" />
-                  )}
-                </h1>
+          <main className="flex-1 bg-background p-2 md:p-6 pb-20 relative overflow-hidden">
+            {/* Background elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl"></div>
+            </div>
+
+            {/* Mobile-first header */}
+            <header className="relative z-10 flex h-12 md:h-16 items-center gap-3 mobile-card mb-4 sticky top-2 md:top-6">
+              <SidebarTrigger className="md:hidden" />
+              <div className="flex-1 flex items-center gap-2 min-w-0">
+                <div className="hidden md:flex items-center gap-2">
+                  <AstralLogo className="h-6 w-6 electric-glow" />
+                </div>
+                {isClient ? (
+                  <h1 className="text-sm md:text-xl font-bold truncate bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    {getPageTitle()}
+                  </h1>
+                ) : (
+                  <Skeleton className="h-5 w-20 md:h-6 md:w-24" />
+                )}
               </div>
-              <div className="flex items-center gap-2">
+
+              {/* Mobile-optimized header actions */}
+              <div className="flex items-center gap-1 md:gap-2">
                 <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                       <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
-                          <RankIcon className="h-4 w-4" />
-                          <span>{rank.name}</span>
-                       </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Account Rank</p>
-                    </TooltipContent>
-                  </Tooltip>
-                   {tier && TierIcon && tierClassName && (
+                  {/* Mobile: Show only icons, Desktop: Show badges */}
+                  <div className="flex md:hidden">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                          <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
-                            <TierIcon className="h-4 w-4" />
-                            <span>{tier.name}</span>
-                          </Badge>
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center electric-glow">
+                          <RankIcon className="h-4 w-4 text-primary" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>VIP CORE Tier</p>
+                        <p>{rank.name} Rank</p>
                       </TooltipContent>
                     </Tooltip>
-                  )}
+                  </div>
+
+                  <div className="hidden md:flex gap-2">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                         <Badge variant="outline" className={cn("flex items-center gap-1.5 electric-glow", rank.className)}>
+                            <RankIcon className="h-4 w-4" />
+                            <span>{rank.name}</span>
+                         </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Account Rank</p>
+                      </TooltipContent>
+                    </Tooltip>
+                     {tier && TierIcon && tierClassName && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Badge variant="outline" className={cn("flex items-center gap-1.5 electric-glow-cyan", tierClassName)}>
+                              <TierIcon className="h-4 w-4" />
+                              <span>{tier.name}</span>
+                            </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>VIP CORE Tier</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
                 </TooltipProvider>
 
-                <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10 rounded-xl hover:electric-glow transition-all" asChild>
                   <Link href="/dashboard/inbox">
-                    <InboxIcon className="h-5 w-5" />
+                    <InboxIcon className="h-4 w-4 md:h-5 md:w-5" />
                     <span className="sr-only">Inbox</span>
                   </Link>
                 </Button>
-                <NotificationBell />
-                <ModeToggle />
+                <div className="hidden md:block">
+                  <NotificationBell />
+                </div>
+                <div className="hidden lg:block">
+                  <ModeToggle />
+                </div>
               </div>
             </header>
-            {children}
+
+            {/* Main content with mobile optimization */}
+            <div className="relative z-10">
+              {children}
+            </div>
           </main>
-          <div className="hidden lg:block border-l">
+
+          {/* Right sidebar - hidden on mobile */}
+          <div className="hidden lg:block border-l border-primary/20">
             <RightSidebar />
           </div>
         </div>
-          <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t border-border/50 flex items-center justify-around z-10 md:hidden">
+
+        {/* Modern bottom navigation - always visible on mobile */}
+        <nav className="fixed bottom-0 left-0 right-0 h-20 md:hidden z-50">
+          {/* Background with blur and electric border */}
+          <div className="absolute inset-0 bg-background/90 backdrop-blur-xl border-t border-primary/30 electric-glow"></div>
+
+          {/* Navigation items */}
+          <div className="relative z-10 flex items-center justify-around h-full px-2">
             {bottomNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
+                  'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-all duration-300 relative rounded-xl',
                   isClient && pathname.endsWith(item.href)
-                    ? 'text-primary font-medium'
+                    ? 'text-primary font-bold'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {item.label === 'CORE' ? (
-                  <div className="absolute -top-7 flex items-center justify-center">
-                     <div className="h-16 w-16 rounded-full bg-transparent flex items-center justify-center">
-                        <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center p-1">
-                           <item.icon className="h-full w-full" />
+                  <div className="absolute -top-8 flex items-center justify-center">
+                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm border-2 border-primary/50 flex items-center justify-center electric-glow">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-1 electric-glow">
+                           <item.icon className="h-full w-full text-white" />
                         </div>
                      </div>
                   </div>
                 ) : (
-                  <item.icon className="h-6 w-6" />
+                  <div className={cn(
+                    "p-2 rounded-xl transition-all duration-300",
+                    isClient && pathname.endsWith(item.href)
+                      ? 'bg-primary/20 electric-glow scale-110'
+                      : 'hover:bg-primary/10'
+                  )}>
+                    <item.icon className="h-6 w-6" />
+                  </div>
                 )}
-                
-                <span className={cn(item.label === 'CORE' && 'mt-8')}>{item.label}</span>
+
+                <span className={cn(
+                  "font-medium transition-all duration-300",
+                  item.label === 'CORE' && 'mt-8',
+                  isClient && pathname.endsWith(item.href) && item.label !== 'CORE' && 'text-primary'
+                )}>
+                  {item.label}
+                </span>
               </Link>
             ))}
-          </nav>
+          </div>
+        </nav>
       </SidebarProvider>
     </UserProvider>
   );
