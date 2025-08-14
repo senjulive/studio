@@ -3,7 +3,7 @@ const nextConfig = {
   // Core configuration
   reactStrictMode: true,
   serverExternalPackages: ['@builder.io/react'],
-  
+
   // Performance optimizations
   experimental: {
     // Optimize package imports for tree shaking
@@ -15,14 +15,13 @@ const nextConfig = {
       'react-icons',
       'date-fns',
       'clsx',
-      'class-variance-authority'
+      'class-variance-authority',
     ],
     // Optimize CSS
     optimizeCss: true,
     // Enable parallel builds
     workerThreads: true,
   },
-
 
   // Image optimization for crypto assets and charts
   images: {
@@ -151,7 +150,7 @@ const nextConfig = {
       permanent: true,
     },
     {
-      source: '/moderator/home', 
+      source: '/moderator/home',
       destination: '/moderator',
       permanent: true,
     },
@@ -266,18 +265,18 @@ const nextConfig = {
 
   // Output configuration for deployment
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
-  
+
   // Enable compression
   compress: true,
-  
+
   // Disable powered by header for security
   poweredByHeader: false,
-  
+
   // TypeScript configuration
   typescript: {
     ignoreBuildErrors: false,
   },
-  
+
   // ESLint configuration
   eslint: {
     ignoreDuringBuilds: false,
@@ -290,7 +289,6 @@ const nextConfig = {
     DEPLOYMENT_PLATFORM: process.env.VERCEL ? 'vercel' : process.env.NETLIFY ? 'netlify' : 'other',
   },
 
-
   // Production optimizations
   ...(process.env.NODE_ENV === 'production' && {
     // Remove console logs except errors
@@ -299,7 +297,7 @@ const nextConfig = {
         exclude: ['error', 'warn'],
       },
     },
-    
+
     // Enable source maps for debugging
     productionBrowserSourceMaps: false,
   }),
