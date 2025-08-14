@@ -23,12 +23,6 @@ const nextConfig = {
     workerThreads: true,
   },
 
-  // Turbopack configuration (stable)
-  turbo: {
-    rules: {
-      '*.svg': ['@svgr/webpack'],
-    },
-  },
 
   // Image optimization for crypto assets and charts
   images: {
@@ -299,8 +293,8 @@ const nextConfig = {
   // Development configuration
   ...(process.env.NODE_ENV === 'development' && {
     devIndicators: {
-      buildActivity: true,
-      buildActivityPosition: 'bottom-right',
+      appIsrStatus: true,
+      position: 'bottom-right',
     },
   }),
 
