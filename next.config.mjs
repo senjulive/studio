@@ -290,13 +290,6 @@ const nextConfig = {
     DEPLOYMENT_PLATFORM: process.env.VERCEL ? 'vercel' : process.env.NETLIFY ? 'netlify' : 'other',
   },
 
-  // Development configuration
-  ...(process.env.NODE_ENV === 'development' && {
-    devIndicators: {
-      appIsrStatus: true,
-      position: 'bottom-right',
-    },
-  }),
 
   // Production optimizations
   ...(process.env.NODE_ENV === 'production' && {
