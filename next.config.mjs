@@ -21,13 +21,14 @@ const nextConfig = {
     optimizeCss: true,
     // Enable parallel builds
     workerThreads: true,
-    // Turbopack configuration
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+
+  // Turbopack configuration (stable)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
