@@ -18,10 +18,6 @@
 # Next.js plugin for optimal performance
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  
-  [plugins.inputs]
-    # Enable ISR (Incremental Static Regeneration)
-    publish_dir = ".next"
 
 # Development settings
 [dev]
