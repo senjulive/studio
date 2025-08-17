@@ -200,13 +200,14 @@ const nextConfig = {
         minSize: 20000,
         maxSize: 200000, // 200KB max chunk size
         cacheGroups: {
-          // Framework chunks
+          // Framework chunks (smaller)
           framework: {
             chunks: 'all',
             name: 'framework',
             test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
-            priority: 40,
+            priority: 50,
             enforce: true,
+            maxSize: 150000, // 150KB limit
           },
 
           // Next.js chunks
@@ -214,17 +215,29 @@ const nextConfig = {
             name: 'nextjs',
             chunks: 'all',
             test: /[\\/]node_modules[\\/]next[\\/]/,
-            priority: 35,
+            priority: 45,
             enforce: true,
+            maxSize: 200000, // 200KB limit
           },
 
-          // Large libraries split
-          charts: {
-            test: /[\\/]node_modules[\\/](recharts|three|framer-motion)[\\/]/,
-            name: 'charts',
+          // Builder.io chunks (separate for lazy loading)
+          builder: {
+            test: /[\\/]node_modules[\\/]@builder\.io[\\/]/,
+            name: 'builder',
             chunks: 'all',
-            priority: 30,
+            priority: 40,
             enforce: true,
+            maxSize: 180000, // 180KB limit
+          },
+
+          // Chart libraries (lazy loaded)
+          charts: {
+            test: /[\\/]node_modules[\\/](recharts|three|framer-motion|d3)[\\/]/,
+            name: 'charts',
+            chunks: 'async', // Only for dynamic imports
+            priority: 35,
+            enforce: true,
+            maxSize: 250000, // 250KB limit
           },
 
           // UI library chunks
@@ -232,17 +245,29 @@ const nextConfig = {
             test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
             name: 'ui',
             chunks: 'all',
-            priority: 25,
+            priority: 30,
             enforce: true,
+            maxSize: 180000, // 180KB limit
           },
 
-          // Crypto/trading specific
+          // Crypto/trading specific utilities
           crypto: {
             test: /[\\/]node_modules[\\/](zod|date-fns|clsx|class-variance-authority)[\\/]/,
             name: 'crypto-utils',
             chunks: 'all',
+            priority: 25,
+            enforce: true,
+            maxSize: 120000, // 120KB limit
+          },
+
+          // Heavy libraries (separate chunks)
+          heavy: {
+            test: /[\\/]node_modules[\\/](lodash|moment|rxjs)[\\/]/,
+            name: 'heavy-libs',
+            chunks: 'async', // Only load when needed
             priority: 20,
             enforce: true,
+            maxSize: 200000, // 200KB limit
           },
 
           // Common vendor chunks (smaller)
@@ -250,8 +275,9 @@ const nextConfig = {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendor',
             chunks: 'all',
-            priority: 10,
+            priority: 15,
             minChunks: 2,
+            maxSize: 150000, // 150KB limit
           },
 
           // Default chunk
@@ -259,6 +285,7 @@ const nextConfig = {
             minChunks: 2,
             priority: 5,
             reuseExistingChunk: true,
+            maxSize: 100000, // 100KB limit
           },
         },
       },

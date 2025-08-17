@@ -1,140 +1,148 @@
-// Dynamic component loaders for performance optimization
 import dynamic from 'next/dynamic';
-import { Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AstralLogo } from '@/components/icons/astral-logo';
 
-// Loading component for dynamic imports
-const LoadingSpinner = () => (
+// Loading fallback component
+const LoadingFallback = () => (
   <div className="flex items-center justify-center p-8">
-    <Loader2 className="h-6 w-6 animate-spin text-primary" />
-    <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
+    <div className="flex flex-col items-center space-y-4">
+      <AstralLogo className="h-8 w-8 animate-pulse text-primary" />
+      <Skeleton className="h-4 w-32" />
+    </div>
   </div>
 );
 
-// Heavy chart components - load on demand
-export const TradingChart = dynamic(
-  () => import('@/components/dashboard/trading-bot-animations').then(mod => ({
-    default: mod.AnimatedTradingBot
-  })),
-  {
-    loading: () => <LoadingSpinner />,
-    ssr: false, // Disable SSR for chart components
-  }
-);
-
-export const WalletManagement = dynamic(
-  () => import('@/components/dashboard/wallet-management-system'),
-  {
-    loading: () => <LoadingSpinner />,
-    ssr: false,
-  }
-);
-
-export const AdminDashboard = dynamic(
-  () => import('@/components/admin/admin-dashboard-mobile'),
-  {
-    loading: () => <LoadingSpinner />,
-    ssr: false,
-  }
-);
-
-export const ModeratorDashboard = dynamic(
-  () => import('@/components/moderator/moderator-dashboard-mobile'),
-  {
-    loading: () => <LoadingSpinner />,
-    ssr: false,
-  }
-);
-
+// Dashboard components - lazy loaded
 export const TradingBotMobile = dynamic(
   () => import('@/components/dashboard/trading-bot-mobile'),
   {
-    loading: () => <LoadingSpinner />,
+    loading: LoadingFallback,
     ssr: false,
   }
 );
 
-// Chat components
+export const WalletManagementSystem = dynamic(
+  () => import('@/components/dashboard/wallet-management-system'),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  }
+);
+
+export const AllAssetsChart = dynamic(
+  () => import('@/components/dashboard/all-assets-chart'),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  }
+);
+
+export const MarketView = dynamic(
+  () => import('@/components/dashboard/market-view'),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  }
+);
+
 export const ChatViewMobile = dynamic(
   () => import('@/components/dashboard/chat-view-mobile'),
   {
-    loading: () => <LoadingSpinner />,
+    loading: LoadingFallback,
     ssr: false,
   }
 );
 
-// Market components
-export const MarketViewMobile = dynamic(
-  () => import('@/components/dashboard/market-view-mobile'),
+// Admin components - lazy loaded
+export const AdminDashboardMobile = dynamic(
+  () => import('@/components/admin/admin-dashboard-mobile'),
   {
-    loading: () => <LoadingSpinner />,
+    loading: LoadingFallback,
     ssr: false,
   }
 );
 
-// 3D and animation heavy components
-export const ThreeJSComponent = dynamic(
-  () => import('@/components/dashboard/three-js-component').catch(() => ({
-    default: () => <div>3D component unavailable</div>
-  })),
+export const UserManager = dynamic(
+  () => import('@/components/admin/user-manager'),
   {
-    loading: () => <LoadingSpinner />,
+    loading: LoadingFallback,
     ssr: false,
   }
 );
 
-// QR Code component
-export const QRCodeGenerator = dynamic(
-  () => import('qrcode.react').then(mod => ({
-    default: mod.QRCodeCanvas
-  })),
+export const AnnouncementManager = dynamic(
+  () => import('@/components/admin/announcement-manager'),
   {
-    loading: () => <LoadingSpinner />,
+    loading: LoadingFallback,
     ssr: false,
   }
 );
 
-// Form components with validation
-export const HeavyForm = dynamic(
-  () => import('react-hook-form').then(mod => ({
-    default: mod.useForm
-  })),
+// Heavy UI components - lazy loaded
+export const RightSidebar = dynamic(
+  () => import('@/components/ui/right-sidebar'),
   {
-    loading: () => <LoadingSpinner />,
-    ssr: true, // Forms can be SSR'd
+    loading: () => <Skeleton className="w-80 h-full" />,
+    ssr: false,
   }
 );
 
-// Export all for easier imports
-export const DynamicComponents = {
-  TradingChart,
-  WalletManagement,
-  AdminDashboard,
-  ModeratorDashboard,
+export const NotificationBell = dynamic(
+  () => import('@/components/dashboard/notification-bell'),
+  {
+    loading: () => <Skeleton className="h-8 w-8 rounded-full" />,
+    ssr: false,
+  }
+);
+
+// Chart components - lazy loaded for better performance
+export const RewardsChart = dynamic(
+  () => import('@/components/dashboard/rewards-chart'),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  }
+);
+
+export const PerformanceChart = dynamic(
+  () => import('@/components/dashboard/performance-chart'),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  }
+);
+
+// Forms - lazy loaded
+export const DepositViewMobile = dynamic(
+  () => import('@/components/dashboard/deposit-view-mobile'),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  }
+);
+
+export const WithdrawViewMobile = dynamic(
+  () => import('@/components/dashboard/withdraw-view-mobile'),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  }
+);
+
+// Export all for easy importing
+export default {
   TradingBotMobile,
+  WalletManagementSystem,
+  AllAssetsChart,
+  MarketView,
   ChatViewMobile,
-  MarketViewMobile,
-  ThreeJSComponent,
-  QRCodeGenerator,
+  AdminDashboardMobile,
+  UserManager,
+  AnnouncementManager,
+  RightSidebar,
+  NotificationBell,
+  RewardsChart,
+  PerformanceChart,
+  DepositViewMobile,
+  WithdrawViewMobile,
 };
-
-// Helper function to create dynamic imports with consistent loading states
-export function createDynamicComponent<T extends React.ComponentType<any>>(
-  importFn: () => Promise<{ default: T }>,
-  options: {
-    loadingComponent?: React.ComponentType;
-    ssr?: boolean;
-    suspense?: boolean;
-  } = {}
-) {
-  const {
-    loadingComponent = LoadingSpinner,
-    ssr = false,
-    suspense = false,
-  } = options;
-
-  return dynamic(importFn, {
-    loading: loadingComponent,
-    ssr,
-    suspense,
-  });
-}

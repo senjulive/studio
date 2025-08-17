@@ -22,14 +22,24 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
-} from '@/components/ui/sidebar';
+}
+from '@/components/ui/sidebar';
 import { logout } from '@/lib/auth';
 import * as React from 'react';
 import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
-import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import { Skeleton } from '@/components/ui/skeleton';
+import dynamic from 'next/dynamic';
+
+// Lazy load heavy components for better performance
+const NotificationBell = dynamic(
+  () => import('@/components/dashboard/notification-bell').then(mod => ({ default: mod.NotificationBell })),
+  {
+    loading: () => <Skeleton className="h-8 w-8 rounded-full" />,
+    ssr: false,
+  }
+);
 
 import { HomeIcon } from '@/components/icons/nav/home-icon';
 import { MarketIcon } from '@/components/icons/nav/market-icon';
@@ -64,22 +74,30 @@ import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
-import { RightSidebar } from '@/components/ui/right-sidebar';
 import { ModeToggle } from '@/components/ui/mode-toggle';
+
+// Lazy load RightSidebar for better performance
+const RightSidebar = dynamic(
+  () => import('@/components/ui/right-sidebar').then(mod => ({ default: mod.RightSidebar })),
+  {
+    loading: () => <Skeleton className="w-80 h-full" />,
+    ssr: false,
+  }
+);
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
 // Wrapper component for Lucide Lock icon to match our type
-const Lock: IconComponent = props => <LucideLock {...props} />;
+const Lock: IconComponent = (props) => <LucideLock {...props} />;
 
 const rankIcons: Record<string, IconComponent> = {
-  RecruitRankIcon,
-  BronzeRankIcon,
-  SilverRankIcon,
-  GoldRankIcon,
-  PlatinumRankIcon,
-  DiamondRankIcon,
-  Lock,
+    RecruitRankIcon,
+    BronzeRankIcon,
+    SilverRankIcon,
+    GoldRankIcon,
+    PlatinumRankIcon,
+    DiamondRankIcon,
+    Lock,
 };
 
 // Mock user object
@@ -98,7 +116,11 @@ function DashboardLoading() {
   );
 }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = React.useState<any | null>(null);
@@ -111,14 +133,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const fetchWalletAndTiers = React.useCallback(async (userId: string) => {
     try {
-      const [walletData, tiers] = await Promise.all([
-        getOrCreateWallet(userId),
-        getBotTierSettings(),
-      ]);
-      setWallet(walletData);
-      setTierSettings(tiers);
+        const [walletData, tiers] = await Promise.all([
+            getOrCreateWallet(userId),
+            getBotTierSettings()
+        ]);
+        setWallet(walletData);
+        setTierSettings(tiers);
     } catch (error) {
-      console.error('Failed to fetch initial data:', error);
+        console.error("Failed to fetch initial data:", error);
     }
   }, []);
 
@@ -139,11 +161,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     initializeUser();
   }, [fetchWalletAndTiers]);
 
+
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const fileContent = `[InternetShortcut]
 URL=${window.location.origin}`;
-      const dataUri = `data:text/plain;charset=utf-8,${encodeURIComponent(fileContent)}`;
+      const dataUri = `data:text/plain;charset=utf-8,${encodeURIComponent(
+        fileContent
+      )}`;
       setDownloadHref(dataUri);
     }
   }, []);
@@ -189,12 +214,7 @@ URL=${window.location.origin}`;
           { href: '/dashboard/trading-info', label: 'Tiers & Ranks', icon: Trophy },
           { href: '/dashboard/support', label: 'Support', icon: SupportIcon },
           { href: '/dashboard/about', label: 'About', icon: AboutIcon },
-          {
-            href: downloadHref,
-            label: 'Download App',
-            icon: DownloadIcon,
-            download: 'AstralCore.url',
-          },
+          { href: downloadHref, label: 'Download App', icon: DownloadIcon, download: 'AstralCore.url'},
         ],
       },
     ];
@@ -216,6 +236,7 @@ URL=${window.location.origin}`;
     return baseConfig;
   }, [isAdmin, isModerator, downloadHref]);
 
+
   const handleLogout = async () => {
     sessionStorage.removeItem('loggedInEmail');
     await logout();
@@ -235,27 +256,20 @@ URL=${window.location.origin}`;
 
   const getPageTitle = () => {
     const currentPath = pathname || '/dashboard';
-    const simplePath = currentPath.startsWith('/dashboard')
-      ? currentPath
-      : `/dashboard${currentPath}`;
+    const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
-    const currentItem = menuConfig
-      .flatMap(g => g.items)
-      .find(item => {
-        return (
-          (simplePath.startsWith(item.href) && item.href !== '/dashboard') ||
-          simplePath === item.href
-        );
-      });
-    if (simplePath === '/dashboard') return 'Home';
+    const currentItem = menuConfig.flatMap(g => g.items).find((item) => {
+        return simplePath.startsWith(item.href) && item.href !== '/dashboard' || simplePath === item.href;
+    });
+     if (simplePath === '/dashboard') return 'Home';
     return currentItem
       ? currentItem.label
       : simplePath.split('/').pop()?.replace('-', ' ') || 'Home';
   };
 
   const isClient = typeof window !== 'undefined';
-
+  
   const totalBalance = wallet?.balances?.usdt ?? 0;
   const rank = getUserRank(totalBalance);
   const RankIcon = rankIcons[rank.Icon] || Lock;
@@ -267,7 +281,7 @@ URL=${window.location.origin}`;
   if (isInitializing) {
     return <DashboardLoading />;
   }
-
+  
   return (
     <UserProvider value={{ user: user as any, wallet, rank, tier, tierSettings }}>
       <SidebarProvider>
@@ -275,90 +289,81 @@ URL=${window.location.origin}`;
           <SidebarHeader>
             <div className="flex items-center gap-2">
               <AstralLogo className="h-10 w-10" />
-              <span className="text-lg font-semibold text-sidebar-foreground">AstralCore</span>
+              <span className="text-lg font-semibold text-sidebar-foreground">
+                AstralCore
+              </span>
             </div>
           </SidebarHeader>
 
           <div className="mt-12 mb-4 px-4 space-y-4">
-            <div className="flex items-center gap-3">
-              <AvatarUploadDialog
-                onUploadSuccess={() => fetchWalletAndTiers(user.id)}
-                wallet={wallet}
-              >
-                <Avatar className="h-12 w-12 cursor-pointer">
-                  <AvatarImage
-                    src={wallet?.profile?.avatarUrl}
-                    alt={wallet?.profile?.username || 'User'}
-                  />
-                  <AvatarFallback>{userInitial}</AvatarFallback>
-                </Avatar>
-              </AvatarUploadDialog>
+             <div className="flex items-center gap-3">
+                  <AvatarUploadDialog 
+                    onUploadSuccess={() => fetchWalletAndTiers(user.id)}
+                    wallet={wallet}
+                  >
+                    <Avatar className="h-12 w-12 cursor-pointer">
+                      <AvatarImage
+                        src={wallet?.profile?.avatarUrl}
+                        alt={wallet?.profile?.username || 'User'}
+                      />
+                      <AvatarFallback>{userInitial}</AvatarFallback>
+                    </Avatar>
+                  </AvatarUploadDialog>
 
-              <div className="overflow-hidden">
-                <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
-                  {wallet?.profile?.username || 'User'}
-                  {userCountry && <span className="text-lg">{userCountry.flag}</span>}
-                </p>
-                <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
+                  <div className="overflow-hidden">
+                     <p className="font-semibold text-sidebar-foreground truncate flex items-center gap-2">
+                        {wallet?.profile?.username || 'User'}
+                        {userCountry && <span className="text-lg">{userCountry.flag}</span>}
+                     </p>
+                     <p className="text-xs text-sidebar-foreground/70 truncate">{userEmail}</p>
+                  </div>
               </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant="outline"
-                className={cn('text-sm py-1 px-2 flex items-center gap-1.5', rank.className)}
-              >
-                <RankIcon className="h-4 w-4" />
-                <span>{rank.name}</span>
-              </Badge>
-              {tier && TierIcon && tierClassName && (
-                <Badge
-                  variant="outline"
-                  className={cn('text-sm py-1 px-2 flex items-center gap-1.5', tierClassName)}
-                >
-                  <TierIcon className="h-4 w-4" />
-                  <span>{tier.name}</span>
-                </Badge>
-              )}
-            </div>
+              <div className="flex flex-wrap items-center gap-2">
+                 <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", rank.className)}>
+                    <RankIcon className="h-4 w-4" />
+                    <span>{rank.name}</span>
+                 </Badge>
+                 {tier && TierIcon && tierClassName && (
+                  <Badge variant="outline" className={cn("text-sm py-1 px-2 flex items-center gap-1.5", tierClassName)}>
+                    <TierIcon className="h-4 w-4" />
+                    <span>{tier.name}</span>
+                  </Badge>
+                )}
+              </div>
           </div>
           <Separator className="bg-sidebar-border" />
 
           <SidebarContent>
             <SidebarMenu>
               {menuConfig.map((group, index) => (
-                <React.Fragment key={group.title}>
-                  {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
-                  <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">
-                    {group.title}
-                  </p>
-                  {group.items.map(item => (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={
-                          isClient ? (pathname || '').endsWith(item.href) && !item.download : false
-                        }
-                      >
-                        <Link href={item.href} download={item.download}>
-                          <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
-                          <span>{item.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </React.Fragment>
-              ))}
+                  <React.Fragment key={group.title}>
+                    {index > 0 && <Separator className="my-2 bg-sidebar-border/50" />}
+                    <p className="px-4 pt-2 pb-1 text-xs font-semibold text-sidebar-foreground/50">{group.title}</p>
+                    {group.items.map((item) => (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={
+                            isClient ? ((pathname || '').endsWith(item.href) && !item.download) : false
+                          }
+                        >
+                          <Link href={item.href} download={item.download}>
+                            <item.icon className={cn(item.label === 'CORE' && 'h-6 w-6 p-0.5')} />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </React.Fragment>
+                ))}
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-sidebar-foreground h-auto p-2"
-                >
-                  <SettingsIcon className="mr-2 h-4 w-4" />
-                  Settings & Logout
+                <Button variant="ghost" className="w-full justify-start text-sidebar-foreground h-auto p-2">
+                   <SettingsIcon className="mr-2 h-4 w-4" />
+                   Settings & Logout
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -438,31 +443,22 @@ URL=${window.location.origin}`;
                   <div className="hidden md:flex gap-2">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Badge
-                          variant="outline"
-                          className={cn('flex items-center gap-1.5 electric-glow', rank.className)}
-                        >
-                          <RankIcon className="h-4 w-4" />
-                          <span>{rank.name}</span>
-                        </Badge>
+                         <Badge variant="outline" className={cn("flex items-center gap-1.5 electric-glow", rank.className)}>
+                            <RankIcon className="h-4 w-4" />
+                            <span>{rank.name}</span>
+                         </Badge>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Account Rank</p>
                       </TooltipContent>
                     </Tooltip>
-                    {tier && TierIcon && tierClassName && (
+                     {tier && TierIcon && tierClassName && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              'flex items-center gap-1.5 electric-glow-cyan',
-                              tierClassName
-                            )}
-                          >
-                            <TierIcon className="h-4 w-4" />
-                            <span>{tier.name}</span>
-                          </Badge>
+                            <Badge variant="outline" className={cn("flex items-center gap-1.5 electric-glow-cyan", tierClassName)}>
+                              <TierIcon className="h-4 w-4" />
+                              <span>{tier.name}</span>
+                            </Badge>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>VIP CORE Tier</p>
@@ -472,12 +468,7 @@ URL=${window.location.origin}`;
                   </div>
                 </TooltipProvider>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 md:h-10 md:w-10 rounded-xl hover:electric-glow transition-all"
-                  asChild
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10 rounded-xl hover:electric-glow transition-all" asChild>
                   <Link href="/dashboard/inbox">
                     <InboxIcon className="h-4 w-4 md:h-5 md:w-5" />
                     <span className="sr-only">Inbox</span>
@@ -493,7 +484,9 @@ URL=${window.location.origin}`;
             </header>
 
             {/* Main content with mobile optimization */}
-            <div className="relative z-10">{children}</div>
+            <div className="relative z-10">
+              {children}
+            </div>
           </main>
 
           {/* Right sidebar - hidden on mobile */}
@@ -509,7 +502,7 @@ URL=${window.location.origin}`;
 
           {/* Navigation items */}
           <div className="relative z-10 flex items-center justify-around h-full px-2">
-            {bottomNavItems.map(item => (
+            {bottomNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -522,35 +515,28 @@ URL=${window.location.origin}`;
               >
                 {item.label === 'CORE' ? (
                   <div className="absolute -top-8 flex items-center justify-center">
-                    <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm border-2 border-primary/50 flex items-center justify-center electric-glow">
-                      <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-1 electric-glow">
-                        <item.icon className="h-full w-full text-white" />
-                      </div>
-                    </div>
+                     <div className="h-16 w-16 rounded-full bg-background/80 backdrop-blur-sm border-2 border-primary/50 flex items-center justify-center electric-glow">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-1 electric-glow">
+                           <item.icon className="h-full w-full text-white" />
+                        </div>
+                     </div>
                   </div>
                 ) : (
-                  <div
-                    className={cn(
-                      'p-2 rounded-xl transition-all duration-300',
-                      isClient && (pathname || '').endsWith(item.href)
-                        ? 'bg-primary/20 scale-110'
-                        : 'hover:bg-primary/10'
-                    )}
-                  >
+                  <div className={cn(
+                    "p-2 rounded-xl transition-all duration-300",
+                    isClient && (pathname || '').endsWith(item.href)
+                      ? 'bg-primary/20 scale-110'
+                      : 'hover:bg-primary/10'
+                  )}>
                     <item.icon className="h-6 w-6" />
                   </div>
                 )}
 
-                <span
-                  className={cn(
-                    'font-medium transition-all duration-300',
-                    item.label === 'CORE' && 'mt-8',
-                    isClient &&
-                      (pathname || '').endsWith(item.href) &&
-                      item.label !== 'CORE' &&
-                      'text-primary'
-                  )}
-                >
+                <span className={cn(
+                  "font-medium transition-all duration-300",
+                  item.label === 'CORE' && 'mt-8',
+                  isClient && (pathname || '').endsWith(item.href) && item.label !== 'CORE' && 'text-primary'
+                )}>
                   {item.label}
                 </span>
               </Link>
