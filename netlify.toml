@@ -1,6 +1,6 @@
 # Netlify Configuration for AstralCore Crypto Trading Platform
 [build]
-  command = "npm ci --only=production && npm install --only=dev && npm run build"
+  command = "npm ci && npm run build"
   publish = ".next"
 
 [build.environment]
