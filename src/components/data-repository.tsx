@@ -22,14 +22,14 @@ import {
 } from 'lucide-react';
 
 // Import all repository data
-import chatsData from '@/data/chats.json';
-import notificationsData from '@/data/notifications.json';
-import settingsData from '@/data/settings.json';
-import walletsData from '@/data/wallets.json';
-import publicChatData from '@/src/data/public-chat.json';
-import srcWalletsData from '@/src/data/wallets.json';
-import squadChatsData from '@/src/data/squad-chats.json';
-import squadClansData from '@/src/data/squad-clans.json';
+import chatsData from '../../data/chats.json';
+import notificationsData from '../../data/notifications.json';
+import settingsData from '../../data/settings.json';
+import walletsData from '../../data/wallets.json';
+import publicChatData from '@/data/public-chat.json';
+import srcWalletsData from '@/data/wallets.json';
+import squadChatsData from '@/data/squad-chats.json';
+import squadClansData from '@/data/squad-clans.json';
 
 const DataRepository = () => {
   const [selectedUser] = useState('mock-user-123');
