@@ -1,333 +1,323 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
-import path from 'path';
+/**
+ * AstralCore Deployment Readiness Check
+ * Validates project configuration before deployment
+ */
+
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const projectRoot = join(__dirname, '..');
 
-// Production deployment readiness checker
+// Colors for console output
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m'
+};
+
 class DeploymentChecker {
   constructor() {
     this.checks = [];
-    this.errors = [];
     this.warnings = [];
-    this.passed = 0;
-    this.total = 0;
+    this.errors = [];
   }
 
-  check(name, description, checkFn) {
-    this.total++;
-    try {
-      const result = checkFn();
-      if (result.success) {
-        this.passed++;
-        this.checks.push({
-          name,
-          description,
-          status: 'pass',
-          message: result.message || 'OK'
-        });
+  log(message, color = 'reset') {
+    console.log(`${colors[color]}${message}${colors.reset}`);
+  }
+
+  success(message) {
+    this.log(`✅ ${message}`, 'green');
+  }
+
+  warning(message) {
+    this.log(`⚠️  ${message}`, 'yellow');
+    this.warnings.push(message);
+  }
+
+  error(message) {
+    this.log(`❌ ${message}`, 'red');
+    this.errors.push(message);
+  }
+
+  info(message) {
+    this.log(`ℹ️  ${message}`, 'blue');
+  }
+
+  // Check if required files exist
+  checkRequiredFiles() {
+    this.info('Checking required files...');
+    
+    const requiredFiles = [
+      'package.json',
+      'next.config.mjs',
+      'tailwind.config.ts',
+      'tsconfig.json',
+      'netlify.toml',
+      'vercel.json'
+    ];
+
+    requiredFiles.forEach(file => {
+      const filePath = join(projectRoot, file);
+      if (existsSync(filePath)) {
+        this.success(`${file} exists`);
       } else {
-        if (result.severity === 'error') {
-          this.errors.push({ name, description, message: result.message });
-        } else {
-          this.warnings.push({ name, description, message: result.message });
-        }
-        this.checks.push({
-          name,
-          description,
-          status: result.severity || 'error',
-          message: result.message
-        });
+        this.error(`${file} is missing`);
       }
-    } catch (error) {
-      this.errors.push({ name, description, message: error.message });
-      this.checks.push({
-        name,
-        description,
-        status: 'error',
-        message: error.message
+    });
+  }
+
+  // Check package.json configuration
+  checkPackageJson() {
+    this.info('Checking package.json configuration...');
+    
+    try {
+      const packagePath = join(projectRoot, 'package.json');
+      const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+
+      // Check required scripts
+      const requiredScripts = ['build', 'start', 'dev'];
+      requiredScripts.forEach(script => {
+        if (packageJson.scripts && packageJson.scripts[script]) {
+          this.success(`Script "${script}" is defined`);
+        } else {
+          this.error(`Script "${script}" is missing`);
+        }
       });
+
+      // Check essential dependencies
+      const essentialDeps = ['next', 'react', 'react-dom'];
+      essentialDeps.forEach(dep => {
+        if (packageJson.dependencies && packageJson.dependencies[dep]) {
+          this.success(`Dependency "${dep}" is installed`);
+        } else {
+          this.error(`Dependency "${dep}" is missing`);
+        }
+      });
+
+      // Check for build optimization packages
+      if (packageJson.devDependencies) {
+        if (packageJson.devDependencies['@next/bundle-analyzer']) {
+          this.success('Bundle analyzer is available');
+        } else {
+          this.warning('Bundle analyzer not installed - consider adding for performance monitoring');
+        }
+      }
+
+    } catch (error) {
+      this.error(`Failed to read package.json: ${error.message}`);
     }
   }
 
-  fileExists(filePath) {
-    return fs.existsSync(path.join(process.cwd(), filePath));
+  // Check Next.js configuration
+  checkNextConfig() {
+    this.info('Checking Next.js configuration...');
+    
+    const configPath = join(projectRoot, 'next.config.mjs');
+    if (existsSync(configPath)) {
+      this.success('next.config.mjs exists');
+      
+      try {
+        const configContent = readFileSync(configPath, 'utf8');
+        
+        // Check for important configurations
+        if (configContent.includes('output:')) {
+          this.success('Output configuration is set');
+        } else {
+          this.warning('Consider setting output configuration for deployment');
+        }
+
+        if (configContent.includes('headers:')) {
+          this.success('Security headers are configured');
+        } else {
+          this.warning('Security headers not configured');
+        }
+
+        if (configContent.includes('images:')) {
+          this.success('Image optimization is configured');
+        } else {
+          this.warning('Image optimization not configured');
+        }
+
+      } catch (error) {
+        this.error(`Failed to read next.config.mjs: ${error.message}`);
+      }
+    }
   }
 
-  runChecks() {
-    console.log('🔍 Running deployment readiness checks...\n');
-
-    // Core files check
-    this.check(
-      'Next.js Config',
-      'next.config.mjs exists and is valid',
-      () => {
-        if (!this.fileExists('next.config.mjs')) {
-          return { success: false, message: 'next.config.mjs not found' };
+  // Check deployment configurations
+  checkDeploymentConfigs() {
+    this.info('Checking deployment configurations...');
+    
+    // Check Netlify config
+    const netlifyPath = join(projectRoot, 'netlify.toml');
+    if (existsSync(netlifyPath)) {
+      this.success('Netlify configuration exists');
+      
+      try {
+        const netlifyConfig = readFileSync(netlifyPath, 'utf8');
+        if (netlifyConfig.includes('[build]')) {
+          this.success('Netlify build configuration is set');
+        } else {
+          this.warning('Netlify build configuration may be incomplete');
         }
-        return { success: true, message: 'Configuration file present' };
+      } catch (error) {
+        this.error(`Failed to read netlify.toml: ${error.message}`);
       }
-    );
+    } else {
+      this.warning('Netlify configuration is missing');
+    }
 
-    this.check(
-      'Package.json',
-      'package.json exists with required scripts',
-      () => {
-        if (!this.fileExists('package.json')) {
-          return { success: false, message: 'package.json not found' };
+    // Check Vercel config
+    const vercelPath = join(projectRoot, 'vercel.json');
+    if (existsSync(vercelPath)) {
+      this.success('Vercel configuration exists');
+      
+      try {
+        const vercelConfig = JSON.parse(readFileSync(vercelPath, 'utf8'));
+        if (vercelConfig.framework) {
+          this.success(`Vercel framework is set to: ${vercelConfig.framework}`);
+        } else {
+          this.warning('Vercel framework not specified');
         }
-        
-        const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-        const requiredScripts = ['build', 'start', 'dev'];
-        const missingScripts = requiredScripts.filter(script => !pkg.scripts[script]);
-        
-        if (missingScripts.length > 0) {
-          return { success: false, message: `Missing scripts: ${missingScripts.join(', ')}` };
-        }
-        
-        return { success: true, message: 'All required scripts present' };
+      } catch (error) {
+        this.error(`Failed to read vercel.json: ${error.message}`);
       }
-    );
-
-    // Deployment configurations
-    this.check(
-      'Vercel Config',
-      'vercel.json exists for Vercel deployment',
-      () => {
-        if (!this.fileExists('vercel.json')) {
-          return { success: false, severity: 'warning', message: 'vercel.json not found (optional)' };
-        }
-        return { success: true, message: 'Vercel configuration ready' };
-      }
-    );
-
-    this.check(
-      'Netlify Config',
-      'netlify.toml exists for Netlify deployment',
-      () => {
-        if (!this.fileExists('netlify.toml')) {
-          return { success: false, severity: 'warning', message: 'netlify.toml not found (optional)' };
-        }
-        return { success: true, message: 'Netlify configuration ready' };
-      }
-    );
-
-    // Build artifacts
-    this.check(
-      'Build Directory',
-      '.next directory exists (run npm run build)',
-      () => {
-        if (!this.fileExists('.next')) {
-          return { success: false, message: 'No build found. Run npm run build first.' };
-        }
-        return { success: true, message: 'Build artifacts present' };
-      }
-    );
-
-    // Environment setup
-    this.check(
-      'Environment Template',
-      '.env.example exists for environment setup',
-      () => {
-        if (!this.fileExists('.env.example')) {
-          return { success: false, severity: 'warning', message: 'No environment template found' };
-        }
-        return { success: true, message: 'Environment template available' };
-      }
-    );
-
-    // Security files
-    this.check(
-      'Security Headers',
-      'Security configuration in Next.js config',
-      () => {
-        const configPath = path.join(process.cwd(), 'next.config.mjs');
-        if (!fs.existsSync(configPath)) {
-          return { success: false, message: 'Next.js config not found' };
-        }
-        
-        const configContent = fs.readFileSync(configPath, 'utf8');
-        if (!configContent.includes('headers:')) {
-          return { success: false, severity: 'warning', message: 'No security headers configured' };
-        }
-        
-        return { success: true, message: 'Security headers configured' };
-      }
-    );
-
-    // Performance files
-    this.check(
-      'Performance Scripts',
-      'Performance monitoring scripts available',
-      () => {
-        const perfScript = this.fileExists('scripts/performance-check.js');
-        const bundleScript = this.fileExists('scripts/bundle-analyzer.mjs');
-        
-        if (!perfScript && !bundleScript) {
-          return { success: false, severity: 'warning', message: 'No performance monitoring scripts' };
-        }
-        
-        return { success: true, message: 'Performance monitoring available' };
-      }
-    );
-
-    // Documentation
-    this.check(
-      'Documentation',
-      'Deployment documentation exists',
-      () => {
-        const hasDeploymentMd = this.fileExists('DEPLOYMENT.md');
-        const hasReadme = this.fileExists('README.md');
-        
-        if (!hasDeploymentMd && !hasReadme) {
-          return { success: false, severity: 'warning', message: 'No documentation found' };
-        }
-        
-        return { success: true, message: 'Documentation available' };
-      }
-    );
-
-    // TypeScript setup
-    this.check(
-      'TypeScript Config',
-      'tsconfig.json properly configured',
-      () => {
-        if (!this.fileExists('tsconfig.json')) {
-          return { success: false, message: 'tsconfig.json not found' };
-        }
-        
-        const tsconfig = JSON.parse(fs.readFileSync('tsconfig.json', 'utf8'));
-        if (!tsconfig.compilerOptions || !tsconfig.compilerOptions.paths) {
-          return { success: false, severity: 'warning', message: 'TypeScript paths not configured' };
-        }
-        
-        return { success: true, message: 'TypeScript properly configured' };
-      }
-    );
-
-    // Git setup
-    this.check(
-      'Git Repository',
-      'Git repository initialized',
-      () => {
-        if (!this.fileExists('.git')) {
-          return { success: false, severity: 'warning', message: 'Not a git repository' };
-        }
-        return { success: true, message: 'Git repository ready' };
-      }
-    );
-
-    // CI/CD
-    this.check(
-      'CI/CD Pipeline',
-      'GitHub Actions workflow exists',
-      () => {
-        if (!this.fileExists('.github/workflows')) {
-          return { success: false, severity: 'warning', message: 'No CI/CD workflows found' };
-        }
-        return { success: true, message: 'CI/CD pipeline configured' };
-      }
-    );
-
-    // PWA setup
-    this.check(
-      'PWA Manifest',
-      'Web app manifest exists',
-      () => {
-        const manifestExists = this.fileExists('public/manifest.webmanifest') || 
-                              this.fileExists('public/manifest.json');
-        
-        if (!manifestExists) {
-          return { success: false, severity: 'warning', message: 'No PWA manifest found' };
-        }
-        return { success: true, message: 'PWA manifest configured' };
-      }
-    );
+    } else {
+      this.warning('Vercel configuration is missing');
+    }
   }
 
-  printResults() {
-    console.log('\n📊 Deployment Readiness Report\n');
-    console.log('='.repeat(60));
+  // Check TypeScript configuration
+  checkTypeScript() {
+    this.info('Checking TypeScript configuration...');
+    
+    const tsconfigPath = join(projectRoot, 'tsconfig.json');
+    if (existsSync(tsconfigPath)) {
+      this.success('TypeScript configuration exists');
+      
+      try {
+        const tsconfig = JSON.parse(readFileSync(tsconfigPath, 'utf8'));
+        
+        if (tsconfig.compilerOptions) {
+          if (tsconfig.compilerOptions.strict) {
+            this.success('Strict mode is enabled');
+          } else {
+            this.warning('Consider enabling strict mode for better type checking');
+          }
 
-    // Summary
-    const successRate = Math.round((this.passed / this.total) * 100);
-    console.log(`✅ Passed: ${this.passed}/${this.total} (${successRate}%)`);
-    console.log(`❌ Errors: ${this.errors.length}`);
-    console.log(`⚠️  Warnings: ${this.warnings.length}`);
+          if (tsconfig.compilerOptions.paths) {
+            this.success('Path mapping is configured');
+          } else {
+            this.warning('Path mapping not configured');
+          }
+        }
+      } catch (error) {
+        this.error(`Failed to read tsconfig.json: ${error.message}`);
+      }
+    }
+  }
 
-    // Overall status
-    console.log('\n🎯 Overall Status:', this.getOverallStatus());
-
-    // Detailed results
-    console.log('\n📋 Detailed Results:');
-    this.checks.forEach(check => {
-      const icon = check.status === 'pass' ? '✅' : 
-                   check.status === 'warning' ? '⚠️' : '❌';
-      console.log(`   ${icon} ${check.name}: ${check.message}`);
+  // Check environment setup
+  checkEnvironment() {
+    this.info('Checking environment setup...');
+    
+    // Check for environment files
+    const envFiles = ['.env.local', '.env.production', '.env'];
+    let hasEnvFile = false;
+    
+    envFiles.forEach(file => {
+      if (existsSync(join(projectRoot, file))) {
+        this.success(`Environment file ${file} exists`);
+        hasEnvFile = true;
+      }
     });
 
-    // Critical errors
-    if (this.errors.length > 0) {
-      console.log('\n🚨 Critical Issues:');
-      this.errors.forEach(error => {
-        console.log(`   ❌ ${error.name}: ${error.message}`);
-      });
-    }
-
-    // Warnings
-    if (this.warnings.length > 0) {
-      console.log('\n⚠️  Warnings:');
-      this.warnings.forEach(warning => {
-        console.log(`   ⚠️  ${warning.name}: ${warning.message}`);
-      });
-    }
-
-    // Recommendations
-    console.log('\n💡 Recommendations:');
-    if (this.errors.length === 0 && this.warnings.length === 0) {
-      console.log('   🎉 Perfect! Your application is ready for production deployment.');
-      console.log('   🚀 You can deploy to Vercel or Netlify with confidence.');
-    } else if (this.errors.length === 0) {
-      console.log('   ✅ Good to go! Address warnings for optimal deployment.');
-      console.log('   🚀 Ready for production deployment.');
-    } else {
-      console.log('   🔧 Fix critical errors before deploying to production.');
-      console.log('   📝 Follow the deployment guide for detailed instructions.');
-    }
-
-    // Quick commands
-    console.log('\n🔧 Quick Commands:');
-    console.log('   npm run build              # Build for production');
-    console.log('   npm run performance:check  # Check bundle performance');
-    console.log('   npm run deploy:vercel      # Deploy to Vercel');
-    console.log('   npm run deploy:netlify     # Deploy to Netlify');
-
-    console.log('\n' + '='.repeat(60));
-  }
-
-  getOverallStatus() {
-    if (this.errors.length === 0 && this.warnings.length === 0) {
-      return '🎯 EXCELLENT - Ready for production';
-    } else if (this.errors.length === 0) {
-      return '✅ GOOD - Ready with minor warnings';
-    } else if (this.errors.length <= 2) {
-      return '⚠️ NEEDS ATTENTION - Fix errors before deployment';
-    } else {
-      return '❌ NOT READY - Multiple issues to resolve';
+    if (!hasEnvFile) {
+      this.warning('No environment files found - make sure to set environment variables during deployment');
     }
   }
 
-  run() {
-    this.runChecks();
-    this.printResults();
+  // Check security configurations
+  checkSecurity() {
+    this.info('Checking security configurations...');
     
-    // Exit with appropriate code
-    process.exit(this.errors.length > 0 ? 1 : 0);
+    const nextConfigPath = join(projectRoot, 'next.config.mjs');
+    if (existsSync(nextConfigPath)) {
+      const config = readFileSync(nextConfigPath, 'utf8');
+      
+      if (config.includes('X-Frame-Options')) {
+        this.success('X-Frame-Options header is configured');
+      } else {
+        this.warning('X-Frame-Options header not found');
+      }
+
+      if (config.includes('Content-Security-Policy')) {
+        this.success('Content Security Policy is configured');
+      } else {
+        this.warning('Content Security Policy not configured');
+      }
+
+      if (config.includes('Strict-Transport-Security')) {
+        this.success('HSTS header is configured');
+      } else {
+        this.warning('HSTS header not configured');
+      }
+    }
+  }
+
+  // Run all checks
+  async runAllChecks() {
+    this.log('\n🚀 AstralCore Deployment Readiness Check\n', 'cyan');
+    this.log('=' .repeat(50), 'cyan');
+
+    this.checkRequiredFiles();
+    this.checkPackageJson();
+    this.checkNextConfig();
+    this.checkDeploymentConfigs();
+    this.checkTypeScript();
+    this.checkEnvironment();
+    this.checkSecurity();
+
+    this.log('\n' + '=' .repeat(50), 'cyan');
+    this.log('\n📊 SUMMARY:', 'cyan');
+    
+    if (this.errors.length === 0 && this.warnings.length === 0) {
+      this.success('✨ All checks passed! Project is ready for deployment.');
+      return true;
+    } else {
+      if (this.errors.length > 0) {
+        this.log(`\n❌ ERRORS (${this.errors.length}):`, 'red');
+        this.errors.forEach(error => this.log(`   • ${error}`, 'red'));
+      }
+      
+      if (this.warnings.length > 0) {
+        this.log(`\n⚠️  WARNINGS (${this.warnings.length}):`, 'yellow');
+        this.warnings.forEach(warning => this.log(`   • ${warning}`, 'yellow'));
+      }
+
+      if (this.errors.length > 0) {
+        this.error('\n🚫 Project has critical issues that must be fixed before deployment.');
+        return false;
+      } else {
+        this.warning('\n⚠️  Project has warnings but can be deployed. Consider addressing them for optimal performance.');
+        return true;
+      }
+    }
   }
 }
 
-// Run the checker
+// Run the deployment readiness check
 const checker = new DeploymentChecker();
-checker.run();
+const isReady = await checker.runAllChecks();
+
+process.exit(isReady ? 0 : 1);
