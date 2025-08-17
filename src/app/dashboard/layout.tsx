@@ -44,7 +44,7 @@ import { DownloadIcon } from '@/components/icons/nav/download-icon';
 import { SettingsIcon } from '@/components/icons/nav/settings-icon';
 import { LogoutIcon } from '@/components/icons/nav/logout-icon';
 import { InboxIcon } from '@/components/icons/nav/inbox-icon';
-import { MessageSquare, UserPlus, Shield, Lock, Trophy } from 'lucide-react';
+import { MessageSquare, UserPlus, Shield, Lock as LucideLock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
@@ -69,6 +69,9 @@ import { RightSidebar } from '@/components/ui/right-sidebar';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+
+// Wrapper component for Lucide Lock icon to match our type
+const Lock: IconComponent = (props) => <LucideLock {...props} />;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,
