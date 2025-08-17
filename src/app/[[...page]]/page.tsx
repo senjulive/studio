@@ -1,5 +1,5 @@
 import { RenderBuilderContent } from '@/components/builder/render-builder-content';
-import DataRepository from '@/components/data-repository';
+import { redirect } from 'next/navigation';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
@@ -19,9 +19,9 @@ export default async function Page({ params }: PageProps) {
     notFound();
   }
 
-  // For root path, show the comprehensive data repository
+  // For root path, redirect to main landing page
   if (urlPath === '/') {
-    return <DataRepository />;
+    redirect('/');
   }
 
   return <RenderBuilderContent content={content} urlPath={urlPath} />;
