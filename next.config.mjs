@@ -274,7 +274,7 @@ const nextConfig = {
   },
 
   // Output configuration for deployment
-  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+  output: process.env.NETLIFY ? 'export' : process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
 
   // Enable compression
   compress: true,
