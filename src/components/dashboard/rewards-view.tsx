@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -54,8 +53,9 @@ const AchievementItem = ({
   isClaiming: boolean;
   bonus: number;
 }) => {
-    // @ts-ignore
-    const Icon = type === 'rank' ? rankIcons[item.Icon] : tierIcons[item.id];
+    const Icon = type === 'rank'
+      ? (rankIcons[item.Icon as keyof typeof rankIcons] || rankIcons.Lock)
+      : (tierIcons[item.id as keyof typeof tierIcons] || null);
 
     return (
       <div className={cn(

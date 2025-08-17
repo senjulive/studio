@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -87,8 +86,8 @@ export function AdminPanel() {
         }
         for (const section of Object.values(adminSections)) {
             if (typeof section === 'object' && activeView in section) {
-                 // @ts-ignore
-                return section[activeView].component;
+                const sectionObj = section as Record<string, { component: React.ComponentType }>;
+                return sectionObj[activeView].component;
             }
         }
         return null;
