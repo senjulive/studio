@@ -3,48 +3,8 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
-import dynamic from 'next/dynamic';
 
-// Import only essential components
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { logout } from '@/lib/auth';
-
-// Dynamically import complex components to avoid build issues
-const Avatar = dynamic(() => import('@/components/ui/avatar').then(mod => ({ default: mod.Avatar })), {
-  loading: () => <div className="h-10 w-10 rounded-full bg-muted" />,
-  ssr: false
-});
-const AvatarFallback = dynamic(() => import('@/components/ui/avatar').then(mod => ({ default: mod.AvatarFallback })), {
-  loading: () => <div className="h-10 w-10 rounded-full bg-muted" />,
-  ssr: false
-});
-const AvatarImage = dynamic(() => import('@/components/ui/avatar').then(mod => ({ default: mod.AvatarImage })), {
-  loading: () => <div className="h-10 w-10 rounded-full bg-muted" />,
-  ssr: false
-});
-
-const AstralLogo = dynamic(() => import('@/components/icons/astral-logo').then(mod => ({ default: mod.AstralLogo })), {
-  loading: () => <div className="h-8 w-8 bg-primary rounded" />,
-  ssr: false
-});
-
-// Mock user data
-const mockUser = {
-  id: 'mock-user-123',
-  email: 'user@example.com',
-};
-
-function DashboardLoading() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-background text-foreground">
-      <div className="h-16 w-16 rounded-full bg-primary animate-pulse" />
-      <p className="mt-4 text-lg font-semibold">Loading Your Dashboard</p>
-      <p className="text-muted-foreground">Please wait a moment...</p>
-    </div>
-  );
-}
-
+// Completely self-contained layout with no external imports
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -55,8 +15,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   React.useEffect(() => {
     const initializeUser = async () => {
       try {
-        const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
-        const currentUser = { ...mockUser, email: loggedInEmail };
+        const loggedInEmail = sessionStorage.getItem('loggedInEmail') || 'user@example.com';
+        const currentUser = { id: 'mock-user-123', email: loggedInEmail };
         setUser(currentUser);
         setIsInitializing(false);
       } catch (error) {
@@ -80,7 +40,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleLogout = async () => {
     try {
       sessionStorage.removeItem('loggedInEmail');
-      await logout();
       router.push('/');
     } catch (error) {
       console.error('Logout error:', error);
@@ -96,74 +55,170 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   if (isInitializing) {
-    return <DashboardLoading />;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '100vh', 
+        background: '#0a0a0a', 
+        color: '#ffffff' 
+      }}>
+        <div style={{ 
+          width: '60px', 
+          height: '60px', 
+          borderRadius: '50%', 
+          background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', 
+          animation: 'pulse 2s infinite' 
+        }} />
+        <p style={{ marginTop: '16px', fontSize: '18px', fontWeight: '600' }}>Loading Your Dashboard</p>
+        <p style={{ color: '#888', fontSize: '14px' }}>Please wait a moment...</p>
+      </div>
+    );
   }
 
   const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'U';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#ffffff' }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="mr-4 flex">
-            <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
-              <React.Suspense fallback={<div className="h-6 w-6 bg-primary rounded" />}>
-                <AstralLogo className="h-6 w-6" />
-              </React.Suspense>
-              <span className="font-bold">AstralCore</span>
+      <header style={{ 
+        position: 'sticky', 
+        top: 0, 
+        zIndex: 50, 
+        width: '100%', 
+        borderBottom: '1px solid #333', 
+        background: 'rgba(10, 10, 10, 0.95)', 
+        backdropFilter: 'blur(8px)' 
+      }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          display: 'flex', 
+          height: '56px', 
+          alignItems: 'center', 
+          padding: '0 16px' 
+        }}>
+          <div style={{ marginRight: '16px', display: 'flex' }}>
+            <Link 
+              href="/dashboard" 
+              style={{ 
+                marginRight: '24px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px', 
+                textDecoration: 'none', 
+                color: 'inherit' 
+              }}
+            >
+              <div style={{ 
+                width: '24px', 
+                height: '24px', 
+                borderRadius: '50%', 
+                background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)' 
+              }} />
+              <span style={{ fontWeight: 'bold', fontSize: '18px' }}>AstralCore</span>
             </Link>
           </div>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <nav style={{ 
+            display: 'none', 
+            alignItems: 'center', 
+            gap: '24px', 
+            fontSize: '14px', 
+            fontWeight: '500' 
+          }} className="desktop-nav">
             {menuItems.slice(0, 5).map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  "transition-colors hover:text-foreground/80",
-                  pathname === item.href ? "text-foreground" : "text-foreground/60"
-                )}
+                style={{ 
+                  textDecoration: 'none',
+                  color: pathname === item.href ? '#ffffff' : '#888',
+                  transition: 'color 0.2s',
+                  padding: '8px 0'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+                onMouseLeave={(e) => e.currentTarget.style.color = pathname === item.href ? '#ffffff' : '#888'}
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-            <div className="w-full flex-1 md:w-auto md:flex-none">
-              <h1 className="text-lg font-semibold md:hidden">
+          <div style={{ 
+            display: 'flex', 
+            flex: 1, 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            gap: '8px' 
+          }}>
+            <div style={{ width: '100%', flex: 1 }}>
+              <h1 style={{ 
+                fontSize: '18px', 
+                fontWeight: '600', 
+                margin: 0,
+                display: 'block'
+              }} className="mobile-title">
                 {getPageTitle()}
               </h1>
             </div>
             
             {/* User Menu */}
-            <div className="flex items-center space-x-2">
-              <React.Suspense fallback={<div className="h-8 w-8 rounded-full bg-muted" />}>
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="" />
-                  <AvatarFallback>{userInitial}</AvatarFallback>
-                </Avatar>
-              </React.Suspense>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '14px', 
+                fontWeight: 'bold' 
+              }}>
+                {userInitial}
+              </div>
               
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={handleLogout}
-                className="hidden md:inline-flex"
+                style={{ 
+                  background: 'transparent', 
+                  border: '1px solid #333', 
+                  color: '#ffffff', 
+                  padding: '6px 12px', 
+                  borderRadius: '6px', 
+                  fontSize: '14px', 
+                  cursor: 'pointer',
+                  display: 'none'
+                }}
+                className="desktop-button"
+                onMouseEnter={(e) => e.currentTarget.style.background = '#333'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 Logout
-              </Button>
+              </button>
               
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="md:hidden"
+                style={{ 
+                  background: 'transparent', 
+                  border: '1px solid #333', 
+                  color: '#ffffff', 
+                  padding: '6px 12px', 
+                  borderRadius: '6px', 
+                  fontSize: '14px', 
+                  cursor: 'pointer',
+                  display: 'block'
+                }}
+                className="mobile-button"
+                onMouseEnter={(e) => e.currentTarget.style.background = '#333'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 Menu
-              </Button>
+              </button>
             </div>
           </div>
         </div>
@@ -171,39 +226,94 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <div className="fixed right-0 top-0 h-full w-80 bg-background border-l p-6">
-            <div className="flex flex-col space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold">Menu</span>
-                <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50 }} className="mobile-overlay">
+          <div 
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(4px)' }} 
+            onClick={() => setSidebarOpen(false)} 
+          />
+          <div style={{ 
+            position: 'fixed', 
+            right: 0, 
+            top: 0, 
+            height: '100%', 
+            width: '300px', 
+            background: '#111', 
+            borderLeft: '1px solid #333', 
+            padding: '24px' 
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontWeight: '600' }}>Menu</span>
+                <button 
+                  onClick={() => setSidebarOpen(false)}
+                  style={{ 
+                    background: 'transparent', 
+                    border: 'none', 
+                    color: '#ffffff', 
+                    fontSize: '20px', 
+                    cursor: 'pointer' 
+                  }}
+                >
                   ×
-                </Button>
+                </button>
               </div>
-              <nav className="flex flex-col space-y-2">
+              <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {menuItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={cn(
-                      "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                      pathname === item.href
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    )}
+                    style={{ 
+                      padding: '12px 16px', 
+                      borderRadius: '6px', 
+                      fontSize: '14px', 
+                      fontWeight: '500', 
+                      textDecoration: 'none',
+                      background: pathname === item.href ? '#8b5cf6' : 'transparent',
+                      color: pathname === item.href ? '#ffffff' : '#888',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (pathname !== item.href) {
+                        e.currentTarget.style.background = '#333';
+                        e.currentTarget.style.color = '#ffffff';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (pathname !== item.href) {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = '#888';
+                      }
+                    }}
                   >
                     {item.label}
                   </Link>
                 ))}
-                <Button
-                  variant="ghost"
+                <button
                   onClick={handleLogout}
-                  className="justify-start"
+                  style={{ 
+                    padding: '12px 16px', 
+                    borderRadius: '6px', 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    background: 'transparent', 
+                    border: 'none', 
+                    color: '#888', 
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#333';
+                    e.currentTarget.style.color = '#ffffff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#888';
+                  }}
                 >
                   Logout
-                </Button>
+                </button>
               </nav>
             </div>
           </div>
@@ -211,33 +321,79 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Main content */}
-      <main className="container py-6 pb-20">
-        <div className="hidden md:block mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">{getPageTitle()}</h1>
+      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 16px 80px' }}>
+        <div style={{ marginBottom: '24px' }} className="desktop-title">
+          <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0, letterSpacing: '-0.02em' }}>
+            {getPageTitle()}
+          </h1>
         </div>
         {children}
       </main>
 
       {/* Mobile bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t md:hidden">
-        <div className="flex justify-around py-2">
+      <nav style={{ 
+        position: 'fixed', 
+        bottom: 0, 
+        left: 0, 
+        right: 0, 
+        zIndex: 40, 
+        background: '#111', 
+        borderTop: '1px solid #333' 
+      }} className="mobile-nav">
+        <div style={{ display: 'flex', justifyContent: 'space-around', padding: '8px' }}>
           {menuItems.slice(0, 5).map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                "flex flex-col items-center p-2 text-xs transition-colors",
-                pathname === item.href
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              )}
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                padding: '8px', 
+                fontSize: '11px', 
+                textDecoration: 'none',
+                color: pathname === item.href ? '#8b5cf6' : '#888',
+                transition: 'color 0.2s'
+              }}
             >
-              <div className="h-6 w-6 mb-1 bg-current rounded opacity-60" />
+              <div style={{ 
+                width: '24px', 
+                height: '24px', 
+                marginBottom: '4px', 
+                borderRadius: '4px',
+                background: pathname === item.href ? '#8b5cf6' : '#333',
+                opacity: 0.6 
+              }} />
               <span>{item.label}</span>
             </Link>
           ))}
         </div>
       </nav>
+
+      {/* CSS for responsive behavior */}
+      <style jsx>{`
+        @media (min-width: 768px) {
+          .desktop-nav { display: flex !important; }
+          .desktop-button { display: inline-flex !important; }
+          .desktop-title { display: block !important; }
+          .mobile-title { display: none !important; }
+          .mobile-button { display: none !important; }
+          .mobile-nav { display: none !important; }
+          .mobile-overlay { display: none !important; }
+        }
+        @media (max-width: 767px) {
+          .desktop-nav { display: none !important; }
+          .desktop-button { display: none !important; }
+          .desktop-title { display: none !important; }
+          .mobile-title { display: block !important; }
+          .mobile-button { display: block !important; }
+          .mobile-nav { display: block !important; }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
     </div>
   );
 }
