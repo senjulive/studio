@@ -1,29 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Core configuration
+  // Minimal core configuration
   reactStrictMode: true,
 
-  // Explicitly handle Builder.io packages
-  transpilePackages: [],
-  serverExternalPackages: [],
-
-  // Performance optimizations
+  // Basic experimental features only
   experimental: {
-    // Optimize package imports for tree shaking (excluding Builder.io packages)
-    optimizePackageImports: [
-      'lucide-react',
-      '@radix-ui/react-icons',
-      'recharts',
-      'framer-motion',
-      'react-icons',
-      'date-fns',
-      'clsx',
-      'class-variance-authority',
-    ],
-    // Optimize CSS
     optimizeCss: true,
-    // Enable parallel builds
-    workerThreads: true,
   },
 
   // Turbopack configuration (stable)
