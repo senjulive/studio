@@ -3,9 +3,13 @@ const nextConfig = {
   // Core configuration
   reactStrictMode: true,
 
+  // Explicitly handle Builder.io packages
+  transpilePackages: [],
+  serverExternalPackages: [],
+
   // Performance optimizations
   experimental: {
-    // Optimize package imports for tree shaking
+    // Optimize package imports for tree shaking (excluding Builder.io packages)
     optimizePackageImports: [
       'lucide-react',
       '@radix-ui/react-icons',
@@ -15,7 +19,6 @@ const nextConfig = {
       'date-fns',
       'clsx',
       'class-variance-authority',
-      '@builder.io/sdk',
     ],
     // Optimize CSS
     optimizeCss: true,
