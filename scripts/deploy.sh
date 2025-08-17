@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# AstralCore Crypto Trading Platform - Deployment Script
-# Supports both Netlify and Vercel deployments
+# AstralCore Deployment Script
+# Supports Netlify, Vercel, and dual deployment
 
-set -e  # Exit on any error
+set -e
 
 # Colors for output
 RED='\033[0;31m'
@@ -12,261 +12,245 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Functions for colored output
-error() { echo -e "${RED}❌ Error: $1${NC}" >&2; }
-success() { echo -e "${GREEN}✅ $1${NC}"; }
-info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
-warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
+# Default values
+PLATFORM="both"
+ENVIRONMENT="production"
+SKIP_BUILD=false
+SKIP_INSTALL=false
 
-# Script header
-echo -e "${BLUE}"
-echo "================================================"
-echo "  AstralCore Crypto Platform - Deploy Script"
-echo "================================================"
-echo -e "${NC}"
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
 
-# Check if we're in the right directory
-if [ ! -f "package.json" ]; then
-    error "package.json not found. Please run this script from the project root."
-    exit 1
-fi
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to install dependencies
+install_dependencies() {
+    if [ "$SKIP_INSTALL" = false ]; then
+        print_status "Installing dependencies..."
+        if [ -f "package-lock.json" ]; then
+            npm ci
+        else
+            npm install
+        fi
+        print_success "Dependencies installed"
+    else
+        print_warning "Skipping dependency installation"
+    fi
+}
+
+# Function to run build
+run_build() {
+    if [ "$SKIP_BUILD" = false ]; then
+        print_status "Building project..."
+        
+        # Set environment variables for build
+        export NODE_ENV=production
+        export NEXT_TELEMETRY_DISABLED=1
+        export NODE_OPTIONS="--max-old-space-size=4096"
+        
+        npm run build
+        print_success "Build completed successfully"
+    else
+        print_warning "Skipping build step"
+    fi
+}
+
+# Function to validate environment
+validate_environment() {
+    print_status "Validating deployment environment..."
+    
+    # Check Node.js version
+    if command_exists node; then
+        NODE_VERSION=$(node --version)
+        print_status "Node.js version: $NODE_VERSION"
+    else
+        print_error "Node.js is not installed"
+        exit 1
+    fi
+    
+    # Check npm version
+    if command_exists npm; then
+        NPM_VERSION=$(npm --version)
+        print_status "npm version: $NPM_VERSION"
+    else
+        print_error "npm is not installed"
+        exit 1
+    fi
+    
+    # Check package.json exists
+    if [ ! -f "package.json" ]; then
+        print_error "package.json not found"
+        exit 1
+    fi
+    
+    print_success "Environment validation passed"
+}
+
+# Function to deploy to Netlify
+deploy_netlify() {
+    print_status "Deploying to Netlify..."
+    
+    if ! command_exists netlify; then
+        print_warning "Netlify CLI not found, installing..."
+        npm install -g netlify-cli
+    fi
+    
+    # Deploy to Netlify
+    if [ "$ENVIRONMENT" = "production" ]; then
+        netlify deploy --prod --dir=.next
+    else
+        netlify deploy --dir=.next
+    fi
+    
+    print_success "Netlify deployment completed"
+}
+
+# Function to deploy to Vercel
+deploy_vercel() {
+    print_status "Deploying to Vercel..."
+    
+    if ! command_exists vercel; then
+        print_warning "Vercel CLI not found, installing..."
+        npm install -g vercel
+    fi
+    
+    # Deploy to Vercel
+    if [ "$ENVIRONMENT" = "production" ]; then
+        vercel --prod
+    else
+        vercel
+    fi
+    
+    print_success "Vercel deployment completed"
+}
+
+# Function to run deployment checks
+run_deployment_checks() {
+    print_status "Running deployment readiness checks..."
+    
+    if [ -f "scripts/deployment-readiness.mjs" ]; then
+        node scripts/deployment-readiness.mjs
+    else
+        print_warning "Deployment readiness script not found, skipping checks"
+    fi
+}
+
+# Function to display help
+show_help() {
+    echo "AstralCore Deployment Script"
+    echo ""
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  --platform PLATFORM    Deployment platform (netlify, vercel, both) [default: both]"
+    echo "  --environment ENV       Environment (production, staging) [default: production]"
+    echo "  --skip-build           Skip build step"
+    echo "  --skip-install         Skip dependency installation"
+    echo "  --help                 Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0 --platform netlify"
+    echo "  $0 --platform vercel --environment staging"
+    echo "  $0 --platform both --skip-build"
+}
 
 # Parse command line arguments
-PLATFORM=""
-ENVIRONMENT="production"
-FORCE_BUILD=false
-
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -p|--platform)
+        --platform)
             PLATFORM="$2"
             shift 2
             ;;
-        -e|--environment)
+        --environment)
             ENVIRONMENT="$2"
             shift 2
             ;;
-        -f|--force)
-            FORCE_BUILD=true
+        --skip-build)
+            SKIP_BUILD=true
             shift
             ;;
-        -h|--help)
-            echo "Usage: $0 [OPTIONS]"
-            echo ""
-            echo "Options:"
-            echo "  -p, --platform     Platform to deploy to (netlify|vercel|both)"
-            echo "  -e, --environment  Environment (production|staging|preview)"
-            echo "  -f, --force        Force rebuild even if no changes"
-            echo "  -h, --help         Show this help message"
-            echo ""
-            echo "Examples:"
-            echo "  $0 --platform vercel"
-            echo "  $0 --platform netlify --environment staging"
-            echo "  $0 --platform both --force"
+        --skip-install)
+            SKIP_INSTALL=true
+            shift
+            ;;
+        --help)
+            show_help
             exit 0
             ;;
         *)
-            error "Unknown option: $1"
-            echo "Use -h or --help for usage information"
+            print_error "Unknown option: $1"
+            show_help
             exit 1
             ;;
     esac
 done
 
-# Auto-detect platform if not specified
-if [ -z "$PLATFORM" ]; then
-    if [ -n "$VERCEL" ]; then
-        PLATFORM="vercel"
-        info "Detected Vercel environment"
-    elif [ -n "$NETLIFY" ]; then
-        PLATFORM="netlify"
-        info "Detected Netlify environment"
-    else
-        warning "No platform specified and none detected"
-        echo "Available platforms: netlify, vercel, both"
-        read -p "Which platform would you like to deploy to? " PLATFORM
-    fi
-fi
-
-# Validate platform
+# Validate platform argument
 case $PLATFORM in
     netlify|vercel|both)
-        info "Deploying to: $PLATFORM"
         ;;
     *)
-        error "Invalid platform: $PLATFORM. Use 'netlify', 'vercel', or 'both'"
+        print_error "Invalid platform: $PLATFORM. Must be netlify, vercel, or both"
         exit 1
         ;;
 esac
 
-# Pre-deployment checks
-info "Running pre-deployment checks..."
-
-# Check Node.js version
-NODE_VERSION=$(node --version | cut -d'v' -f2)
-REQUIRED_NODE="20"
-if [[ $(echo "$NODE_VERSION < $REQUIRED_NODE" | bc -l) -eq 1 ]]; then
-    error "Node.js version $REQUIRED_NODE or higher required. Current: $NODE_VERSION"
-    exit 1
-fi
-success "Node.js version check passed ($NODE_VERSION)"
-
-# Check if dependencies are installed
-if [ ! -d "node_modules" ] || [ "$FORCE_BUILD" = true ]; then
-    info "Installing dependencies..."
-    npm ci
-    success "Dependencies installed"
-else
-    info "Dependencies already installed"
-fi
-
-# Environment file check
-if [ ! -f ".env.local" ] && [ ! -f ".env" ]; then
-    warning "No environment file found (.env.local or .env)"
-    warning "Make sure environment variables are set in your deployment platform"
-fi
-
-# Type checking
-info "Running TypeScript type check..."
-if npm run typecheck; then
-    success "Type check passed"
-else
-    error "Type check failed"
-    exit 1
-fi
-
-# Linting (if ESLint is configured)
-if command -v npx eslint &> /dev/null; then
-    info "Running ESLint..."
-    if npm run lint; then
-        success "Linting passed"
-    else
-        warning "Linting issues found (not blocking deployment)"
-    fi
-fi
-
-# Build the application
-info "Building application for $ENVIRONMENT..."
-export NODE_ENV=$ENVIRONMENT
-export NEXT_TELEMETRY_DISABLED=1
-
-if npm run build; then
-    success "Build completed successfully"
-else
-    error "Build failed"
-    exit 1
-fi
-
-# Platform-specific deployment
-deploy_to_netlify() {
-    info "Deploying to Netlify..."
-    
-    # Check if Netlify CLI is installed
-    if ! command -v netlify &> /dev/null; then
-        warning "Netlify CLI not found. Installing..."
-        npm install -g netlify-cli
-    fi
-    
-    # Check if site is linked
-    if [ ! -f ".netlify/state.json" ]; then
-        warning "Site not linked to Netlify. Please run 'netlify link' first"
-        return 1
-    fi
-    
-    # Deploy based on environment
-    case $ENVIRONMENT in
-        production)
-            netlify deploy --prod --dir=.next
-            ;;
-        staging|preview)
-            netlify deploy --dir=.next
-            ;;
-        *)
-            netlify deploy --dir=.next
-            ;;
-    esac
-    
-    success "Netlify deployment completed"
-}
-
-deploy_to_vercel() {
-    info "Deploying to Vercel..."
-    
-    # Check if Vercel CLI is installed
-    if ! command -v vercel &> /dev/null; then
-        warning "Vercel CLI not found. Installing..."
-        npm install -g vercel
-    fi
-    
-    # Deploy based on environment
-    case $ENVIRONMENT in
-        production)
-            vercel --prod
-            ;;
-        staging|preview)
-            vercel
-            ;;
-        *)
-            vercel
-            ;;
-    esac
-    
-    success "Vercel deployment completed"
-}
-
-# Execute deployment
-case $PLATFORM in
-    netlify)
-        deploy_to_netlify
+# Validate environment argument
+case $ENVIRONMENT in
+    production|staging)
         ;;
-    vercel)
-        deploy_to_vercel
-        ;;
-    both)
-        deploy_to_netlify
-        deploy_to_vercel
+    *)
+        print_error "Invalid environment: $ENVIRONMENT. Must be production or staging"
+        exit 1
         ;;
 esac
 
-# Post-deployment tasks
-info "Running post-deployment tasks..."
+# Main deployment process
+main() {
+    print_status "Starting AstralCore deployment..."
+    print_status "Platform: $PLATFORM"
+    print_status "Environment: $ENVIRONMENT"
+    echo ""
+    
+    validate_environment
+    install_dependencies
+    run_build
+    run_deployment_checks
+    
+    # Deploy based on platform choice
+    case $PLATFORM in
+        netlify)
+            deploy_netlify
+            ;;
+        vercel)
+            deploy_vercel
+            ;;
+        both)
+            deploy_netlify
+            deploy_vercel
+            ;;
+    esac
+    
+    print_success "Deployment completed successfully!"
+    print_status "Platform: $PLATFORM | Environment: $ENVIRONMENT"
+}
 
-# Warm up the application (optional)
-if [ "$ENVIRONMENT" = "production" ]; then
-    info "Warming up production deployment..."
-    # Add your production URL here when you have one
-    # curl -s "https://your-production-url.com" > /dev/null || true
-fi
-
-# Generate sitemap (if applicable)
-if [ -f "scripts/generate-sitemap.js" ]; then
-    info "Generating sitemap..."
-    node scripts/generate-sitemap.js
-fi
-
-# Success message
-echo -e "${GREEN}"
-echo "================================================"
-echo "🚀 Deployment completed successfully!"
-echo "================================================"
-echo -e "${NC}"
-
-info "Platform: $PLATFORM"
-info "Environment: $ENVIRONMENT"
-info "Build time: $(date)"
-
-# Display URLs if available
-if [ "$PLATFORM" = "vercel" ] || [ "$PLATFORM" = "both" ]; then
-    if [ -n "$VERCEL_URL" ]; then
-        info "Vercel URL: https://$VERCEL_URL"
-    fi
-fi
-
-if [ "$PLATFORM" = "netlify" ] || [ "$PLATFORM" = "both" ]; then
-    if [ -n "$DEPLOY_PRIME_URL" ]; then
-        info "Netlify URL: $DEPLOY_PRIME_URL"
-    fi
-fi
-
-echo ""
-success "🎉 AstralCore is ready for trading!"
+# Run main function
+main
