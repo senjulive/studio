@@ -238,7 +238,7 @@ URL=${window.location.origin}`;
   ];
 
   const getPageTitle = () => {
-    const currentPath = pathname;
+    const currentPath = pathname || '/dashboard';
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
@@ -327,7 +327,7 @@ URL=${window.location.origin}`;
                         <SidebarMenuButton
                           asChild
                           isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
+                            isClient ? ((pathname || '').endsWith(item.href) && !item.download) : false
                           }
                         >
                           <Link href={item.href} download={item.download}>
@@ -491,7 +491,7 @@ URL=${window.location.origin}`;
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-all duration-300 relative rounded-xl',
-                  isClient && pathname.endsWith(item.href)
+                  isClient && (pathname || '').endsWith(item.href)
                     ? 'text-primary font-bold'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
@@ -507,8 +507,8 @@ URL=${window.location.origin}`;
                 ) : (
                   <div className={cn(
                     "p-2 rounded-xl transition-all duration-300",
-                    isClient && pathname.endsWith(item.href)
-                      ? 'bg-primary/20 electric-glow scale-110'
+                    isClient && (pathname || '').endsWith(item.href)
+                      ? 'bg-primary/20 scale-110'
                       : 'hover:bg-primary/10'
                   )}>
                     <item.icon className="h-6 w-6" />
@@ -518,7 +518,7 @@ URL=${window.location.origin}`;
                 <span className={cn(
                   "font-medium transition-all duration-300",
                   item.label === 'CORE' && 'mt-8',
-                  isClient && pathname.endsWith(item.href) && item.label !== 'CORE' && 'text-primary'
+                  isClient && (pathname || '').endsWith(item.href) && item.label !== 'CORE' && 'text-primary'
                 )}>
                   {item.label}
                 </span>
