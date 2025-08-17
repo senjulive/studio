@@ -1,4 +1,3 @@
-
 'use server';
 
 // Mock implementation of chat functionality using a simple JSON structure.
@@ -16,6 +15,8 @@ export type Message = {
   silent?: boolean;
   file_url?: string;
 };
+
+export type ChatMessage = Message;
 
 export type ChatHistory = {
   [userId: string]: Message[];
