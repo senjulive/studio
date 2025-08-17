@@ -1,6 +1,7 @@
 'use client';
 
-import { BuilderComponent } from '@builder.io/react';
+// Temporarily disable Builder.io import
+// import { BuilderComponent } from '@builder.io/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { AstralLogo } from '@/components/icons/astral-logo';
