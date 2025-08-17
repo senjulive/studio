@@ -1,19 +1,17 @@
 # Netlify Configuration for AstralCore Crypto Trading Platform
 [build]
-  publish = ".next"
   command = "npm run build"
 
 [build.environment]
   # Node.js version
   NODE_VERSION = "20"
-  
+
   # Build optimizations
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_OPTIONS = "--max-old-space-size=4096"
-  
+
   # Environment specific settings
   NETLIFY_NEXT_PLUGIN_SKIP = "false"
-  NEXT_PRIVATE_TARGET = "server"
 
 # Next.js plugin for optimal performance
 [[plugins]]
@@ -132,7 +130,7 @@
 # SPA fallback for client-side routing
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/"
   status = 200
 
 # Error pages
