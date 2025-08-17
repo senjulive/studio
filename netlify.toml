@@ -32,8 +32,9 @@
 
 # Production context settings
 [context.production]
-  command = "npm run build"
-  
+  command = "npm ci && npm run build"
+  publish = ".next"
+
   [context.production.environment]
     NODE_ENV = "production"
     NEXT_TELEMETRY_DISABLED = "1"
