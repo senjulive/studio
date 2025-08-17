@@ -94,8 +94,5 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
     prefer_related_applications: false,
-    edge_side_panel: {
-      preferred_width: 480,
-    },
   };
 }
