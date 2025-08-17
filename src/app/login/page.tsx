@@ -38,15 +38,21 @@ export default function LoginPage() {
           {/* Footer links */}
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center space-x-4 text-xs text-muted-foreground">
-              <Link href="/forgot-password" className="text-primary hover:text-primary/80 transition-colors">
+              <Link
+                href="/forgot-password"
+                className="text-primary hover:text-primary/80 transition-colors"
+              >
                 Forgot Password?
               </Link>
             </div>
-            
+
             <div className="pt-4 border-t border-border/50">
               <p className="text-sm text-muted-foreground">
                 New to AstralCore?{' '}
-                <Link href="/register" className="text-primary font-medium hover:text-primary/80 transition-colors">
+                <Link
+                  href="/register"
+                  className="text-primary font-medium hover:text-primary/80 transition-colors"
+                >
                   Create Account
                 </Link>
               </p>

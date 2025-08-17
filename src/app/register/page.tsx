@@ -59,7 +59,10 @@ export default function RegisterPage() {
             <div className="pt-4 border-t border-border/50">
               <p className="text-sm text-muted-foreground">
                 Already have an account?{' '}
-                <Link href="/login" className="text-primary font-medium hover:text-primary/80 transition-colors">
+                <Link
+                  href="/login"
+                  className="text-primary font-medium hover:text-primary/80 transition-colors"
+                >
                   Sign In
                 </Link>
               </p>

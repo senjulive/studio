@@ -28,7 +28,8 @@ export default function WelcomePage() {
             Advanced Crypto Trading Platform
           </h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Trade cryptocurrencies with AI-powered bots, real-time analytics, and professional tools designed for modern traders.
+            Trade cryptocurrencies with AI-powered bots, real-time analytics, and professional tools
+            designed for modern traders.
           </p>
         </div>
 
@@ -100,12 +101,12 @@ export default function WelcomePage() {
           <Button asChild className="w-full h-12 text-base font-medium">
             <Link href="/register">Get Started</Link>
           </Button>
-          
+
           <Button asChild variant="outline" className="w-full h-12 text-base">
             <Link href="/login">Sign In</Link>
           </Button>
         </div>
-        
+
         <div className="text-center">
           <p className="text-xs text-muted-foreground">
             Free to start • No hidden fees • Professional support

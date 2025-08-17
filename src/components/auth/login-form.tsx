@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import Link from "next/link";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
+import * as React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import Link from 'next/link';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -16,12 +16,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
-import { loginSchema } from "@/lib/validators";
-import { login } from "@/lib/auth";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
+import { loginSchema } from '@/lib/validators';
+import { login } from '@/lib/auth';
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -36,51 +36,51 @@ export function LoginForm() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
       rememberMe: false,
     },
   });
-  
+
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-        const rememberedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY);
-        if (rememberedEmail) {
-            form.setValue('email', rememberedEmail);
-            form.setValue('rememberMe', true);
-        }
+      const rememberedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY);
+      if (rememberedEmail) {
+        form.setValue('email', rememberedEmail);
+        form.setValue('rememberMe', true);
+      }
     }
   }, [form]);
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    
+
     if (typeof window !== 'undefined') {
-        if (values.rememberMe) {
-            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
-        } else {
-            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
-        }
-        // Store email in session storage to determine role in dashboard layout
-        sessionStorage.setItem('loggedInEmail', values.email);
+      if (values.rememberMe) {
+        localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
+      } else {
+        localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+      }
+      // Store email in session storage to determine role in dashboard layout
+      sessionStorage.setItem('loggedInEmail', values.email);
     }
-    
+
     const { error } = await login(values);
 
     if (error) {
-        toast({
-            title: "Login Failed",
-            description: error,
-            variant: "destructive",
-        });
+      toast({
+        title: 'Login Failed',
+        description: error,
+        variant: 'destructive',
+      });
     } else {
-        toast({
-          title: "Login Successful",
-          description: "Welcome to AstralCore!",
-        });
-        router.push('/dashboard');
+      toast({
+        title: 'Login Successful',
+        description: 'Welcome to AstralCore!',
+      });
+      router.push('/dashboard');
     }
-    
+
     setIsLoading(false);
   };
 
@@ -104,7 +104,7 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="password"
@@ -122,7 +122,7 @@ export function LoginForm() {
               <FormControl>
                 <div className="relative">
                   <Input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
                     className="h-12 bg-background border-border focus:border-primary transition-colors pr-12"
                     {...field}
@@ -142,7 +142,7 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="rememberMe"
@@ -161,14 +161,14 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        
+
         <Button
           type="submit"
           className="w-full h-12 text-base font-medium bg-primary hover:bg-primary/90 transition-colors"
           disabled={isLoading}
         >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isLoading ? "Signing in..." : "Sign In"}
+          {isLoading ? 'Signing in...' : 'Sign In'}
         </Button>
       </form>
     </Form>

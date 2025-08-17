@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import Link from "next/link";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
+import * as React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import Link from 'next/link';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -16,19 +16,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { registerSchema } from "@/lib/validators";
-import { register } from "@/lib/auth";
-import { countries } from "@/lib/countries";
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { registerSchema } from '@/lib/validators';
+import { register } from '@/lib/auth';
+import { countries } from '@/lib/countries';
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -44,19 +44,19 @@ export function RegisterForm() {
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      country: "MV",
-      contactNumber: "",
-      referralCode: "",
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      country: 'MV',
+      contactNumber: '',
+      referralCode: '',
     },
   });
 
-  const selectedCountryCode = form.watch("country");
+  const selectedCountryCode = form.watch('country');
   const selectedCountry = React.useMemo(
-    () => countries.find((c) => c.code === selectedCountryCode) || MALDIVES_COUNTRY,
+    () => countries.find(c => c.code === selectedCountryCode) || MALDIVES_COUNTRY,
     [selectedCountryCode]
   );
 
@@ -65,7 +65,11 @@ export function RegisterForm() {
 
     const countryInfo = countries.find(c => c.code === values.country);
     if (!countryInfo) {
-      toast({ title: "Invalid Country", description: "Please select a valid country.", variant: "destructive"});
+      toast({
+        title: 'Invalid Country',
+        description: 'Please select a valid country.',
+        variant: 'destructive',
+      });
       setIsLoading(false);
       return;
     }
@@ -77,33 +81,33 @@ export function RegisterForm() {
         email: values.email,
         password: values.password,
         options: {
-            data: {
-                username: values.username,
-                contact_number: fullContactNumber,
-                country: countryInfo.name,
-                referral_code: values.referralCode,
-            }
-        }
+          data: {
+            username: values.username,
+            contact_number: fullContactNumber,
+            country: countryInfo.name,
+            referral_code: values.referralCode,
+          },
+        },
       });
-      
+
       if (error) {
         throw new Error(error);
       }
 
       toast({
-        title: "Registration Successful",
-        description: "Please check your email to verify your account.",
+        title: 'Registration Successful',
+        description: 'Please check your email to verify your account.',
       });
-      
+
       router.push('/login');
     } catch (error) {
       toast({
-        title: "Registration Failed",
-        description: error instanceof Error ? error.message : "Something went wrong",
-        variant: "destructive",
+        title: 'Registration Failed',
+        description: error instanceof Error ? error.message : 'Something went wrong',
+        variant: 'destructive',
       });
     }
-    
+
     setIsLoading(false);
   };
 
@@ -155,7 +159,7 @@ export function RegisterForm() {
               <FormControl>
                 <div className="relative">
                   <Input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Create a password"
                     className="h-12 bg-background border-border focus:border-primary transition-colors pr-12"
                     {...field}
@@ -181,11 +185,13 @@ export function RegisterForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium text-foreground">Confirm Password</FormLabel>
+              <FormLabel className="text-sm font-medium text-foreground">
+                Confirm Password
+              </FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
-                    type={showConfirmPassword ? "text" : "password"}
+                    type={showConfirmPassword ? 'text' : 'password'}
                     placeholder="Confirm your password"
                     className="h-12 bg-background border-border focus:border-primary transition-colors pr-12"
                     {...field}
@@ -197,7 +203,11 @@ export function RegisterForm() {
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </FormControl>
@@ -220,7 +230,7 @@ export function RegisterForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {countries.map((country) => (
+                    {countries.map(country => (
                       <SelectItem key={country.code} value={country.code}>
                         <div className="flex items-center space-x-2">
                           <span>{country.flag}</span>
@@ -266,7 +276,9 @@ export function RegisterForm() {
           name="referralCode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium text-foreground">Referral Code (Optional)</FormLabel>
+              <FormLabel className="text-sm font-medium text-foreground">
+                Referral Code (Optional)
+              </FormLabel>
               <FormControl>
                 <Input
                   placeholder="Enter referral code if you have one"
@@ -285,7 +297,7 @@ export function RegisterForm() {
           disabled={isLoading}
         >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isLoading ? "Creating Account..." : "Create Account"}
+          {isLoading ? 'Creating Account...' : 'Create Account'}
         </Button>
       </form>
     </Form>
