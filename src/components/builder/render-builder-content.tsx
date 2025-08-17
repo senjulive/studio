@@ -34,7 +34,9 @@ export function RenderBuilderContent({ content, urlPath }: RenderBuilderContentP
   }, []);
 
   if (content || isPreviewing) {
-    return <BuilderComponent model="page" content={content} apiKey={BUILDER_API_KEY} />;
+    // Temporarily disabled Builder.io component
+    // return <BuilderComponent model="page" content={content} apiKey={BUILDER_API_KEY} />;
+    return <div>Builder.io content disabled temporarily</div>;
   }
 
   // Modern mobile app welcome page
