@@ -21,15 +21,93 @@ import {
   DollarSign,
 } from 'lucide-react';
 
-// Import all repository data
-import chatsData from '../../data/chats.json';
-import notificationsData from '../../data/notifications.json';
-import settingsData from '../../data/settings.json';
-import walletsData from '../../data/wallets.json';
-import publicChatData from '@/data/public-chat.json';
-import srcWalletsData from '@/data/wallets.json';
-import squadChatsData from '@/data/squad-chats.json';
-import squadClansData from '@/data/squad-clans.json';
+// Mock data - replace with actual imports when data files are available
+const chatsData: Record<string, any[]> = {
+  "mock-user-123": [
+    {
+      "id": "msg_1",
+      "text": "Welcome to support! This is a mock chat system.",
+      "timestamp": 1752503011049,
+      "sender": "admin"
+    }
+  ]
+};
+
+const notificationsData: Record<string, any[]> = {
+  "mock-user-123": [
+    {
+      "title": "🎉 Welcome to AstralCore!",
+      "content": "Welcome to the new AstralCore platform!",
+      "id": "default-announcement-0",
+      "date": 1752192000000,
+      "read": true,
+      "href": "/dashboard/profile"
+    }
+  ]
+};
+
+const settingsData = {
+  "botSettings": {
+    "minGridBalance": 0
+  },
+  "botTierSettings": []
+};
+
+const walletsData: Record<string, any> = {
+  "mock-user-123": {
+    "addresses": {
+      "usdt": "TgBkSNsxjUYOReLooneDs30nQoKUqpAMB1"
+    },
+    "balances": {
+      "usdt": 0,
+      "btc": 0,
+      "eth": 0
+    },
+    "pendingWithdrawals": [],
+    "growth": {
+      "clicksLeft": 4,
+      "lastReset": 1752503271062,
+      "dailyEarnings": 0,
+      "earningsHistory": []
+    },
+    "squad": {
+      "referralCode": "XYS0AR6R",
+      "members": [
+        "mock-member-1",
+        "mock-member-2"
+      ]
+    },
+    "profile": {
+      "username": "DefaultUser",
+      "fullName": "Default User",
+      "idCardNo": "000000000",
+      "contactNumber": "+0000000000",
+      "country": "Default",
+      "avatarUrl": "",
+      "verificationStatus": "unverified"
+    },
+    "security": {
+      "withdrawalAddresses": {}
+    }
+  }
+};
+
+const publicChatData: any[] = [
+  {
+    "id": "msg_1",
+    "userId": "admin-astralcore",
+    "displayName": "AstralCore",
+    "text": "Welcome to the AstralCore public chat!",
+    "timestamp": 1752503011049,
+    "isAdmin": true,
+    "rank": { "name": "Admin", "minBalance": 999999, "Icon": "Shield", "className": "text-primary" },
+    "tier": null
+  }
+];
+
+const srcWalletsData = walletsData;
+const squadChatsData = {};
+const squadClansData = {};
 
 const DataRepository = () => {
   const [selectedUser] = useState('mock-user-123');
