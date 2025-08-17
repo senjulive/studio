@@ -23,86 +23,83 @@ import {
 
 // Mock data - replace with actual imports when data files are available
 const chatsData: Record<string, any[]> = {
-  "mock-user-123": [
+  'mock-user-123': [
     {
-      "id": "msg_1",
-      "text": "Welcome to support! This is a mock chat system.",
-      "timestamp": 1752503011049,
-      "sender": "admin"
-    }
-  ]
+      id: 'msg_1',
+      text: 'Welcome to support! This is a mock chat system.',
+      timestamp: 1752503011049,
+      sender: 'admin',
+    },
+  ],
 };
 
 const notificationsData: Record<string, any[]> = {
-  "mock-user-123": [
+  'mock-user-123': [
     {
-      "title": "🎉 Welcome to AstralCore!",
-      "content": "Welcome to the new AstralCore platform!",
-      "id": "default-announcement-0",
-      "date": 1752192000000,
-      "read": true,
-      "href": "/dashboard/profile"
-    }
-  ]
+      title: '🎉 Welcome to AstralCore!',
+      content: 'Welcome to the new AstralCore platform!',
+      id: 'default-announcement-0',
+      date: 1752192000000,
+      read: true,
+      href: '/dashboard/profile',
+    },
+  ],
 };
 
 const settingsData = {
-  "botSettings": {
-    "minGridBalance": 0
+  botSettings: {
+    minGridBalance: 0,
   },
-  "botTierSettings": []
+  botTierSettings: [],
 };
 
 const walletsData: Record<string, any> = {
-  "mock-user-123": {
-    "addresses": {
-      "usdt": "TgBkSNsxjUYOReLooneDs30nQoKUqpAMB1"
+  'mock-user-123': {
+    addresses: {
+      usdt: 'TgBkSNsxjUYOReLooneDs30nQoKUqpAMB1',
     },
-    "balances": {
-      "usdt": 0,
-      "btc": 0,
-      "eth": 0
+    balances: {
+      usdt: 0,
+      btc: 0,
+      eth: 0,
     },
-    "pendingWithdrawals": [],
-    "growth": {
-      "clicksLeft": 4,
-      "lastReset": 1752503271062,
-      "dailyEarnings": 0,
-      "earningsHistory": []
+    pendingWithdrawals: [],
+    growth: {
+      clicksLeft: 4,
+      lastReset: 1752503271062,
+      dailyEarnings: 0,
+      earningsHistory: [],
     },
-    "squad": {
-      "referralCode": "XYS0AR6R",
-      "members": [
-        "mock-member-1",
-        "mock-member-2"
-      ]
+    squad: {
+      referralCode: 'XYS0AR6R',
+      members: ['mock-member-1', 'mock-member-2'],
     },
-    "profile": {
-      "username": "DefaultUser",
-      "fullName": "Default User",
-      "idCardNo": "000000000",
-      "contactNumber": "+0000000000",
-      "country": "Default",
-      "avatarUrl": "",
-      "verificationStatus": "unverified"
+    profile: {
+      username: 'DefaultUser',
+      fullName: 'Default User',
+      idCardNo: '000000000',
+      contactNumber: '+0000000000',
+      country: 'Default',
+      avatarUrl: '',
+      verificationStatus: 'unverified',
     },
-    "security": {
-      "withdrawalAddresses": {}
-    }
-  }
+    security: {
+      withdrawalAddresses: {},
+    },
+  },
 };
 
 const publicChatData: any[] = [
   {
-    "id": "msg_1",
-    "userId": "admin-astralcore",
-    "displayName": "AstralCore",
-    "text": "Welcome to the AstralCore public chat!",
-    "timestamp": 1752503011049,
-    "isAdmin": true,
-    "rank": { "name": "Admin", "minBalance": 999999, "Icon": "Shield", "className": "text-primary" },
-    "tier": null
-  }
+    id: 'msg_1',
+    userId: 'admin-astralcore',
+    displayName: 'AstralCore',
+    text: 'Welcome to the AstralCore public chat!',
+    timestamp: 1752503011049,
+    isAdmin: true,
+    rank: { name: 'Admin', minBalance: 999999, Icon: 'Shield', className: 'text-primary' },
+    tier: null,
+  },
 ];
 
 const srcWalletsData = walletsData;

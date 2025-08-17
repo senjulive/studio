@@ -3,12 +3,12 @@
   "framework": "nextjs",
   "name": "astralcore-crypto-platform",
   "version": 2,
-  
+
   "buildCommand": "npm ci && npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm ci",
   "outputDirectory": ".next",
-  
+
   "build": {
     "env": {
       "NODE_VERSION": "20",
@@ -16,12 +16,12 @@
       "NODE_OPTIONS": "--max-old-space-size=4096"
     }
   },
-  
+
   "env": {
     "NODE_ENV": "production",
     "NEXT_TELEMETRY_DISABLED": "1"
   },
-  
+
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30,
@@ -34,7 +34,7 @@
       "runtime": "nodejs20.x"
     }
   },
-  
+
   "headers": [
     {
       "source": "/(.*)",
@@ -44,7 +44,7 @@
           "value": "nosniff"
         },
         {
-          "key": "X-Frame-Options", 
+          "key": "X-Frame-Options",
           "value": "DENY"
         },
         {
@@ -108,7 +108,7 @@
           "value": "*"
         },
         {
-          "key": "Access-Control-Allow-Methods", 
+          "key": "Access-Control-Allow-Methods",
           "value": "GET, POST, PUT, DELETE, OPTIONS"
         },
         {
@@ -122,7 +122,7 @@
       ]
     }
   ],
-  
+
   "redirects": [
     {
       "source": "/dashboard/home",
@@ -130,13 +130,13 @@
       "permanent": true
     },
     {
-      "source": "/dashboard/wallet", 
+      "source": "/dashboard/wallet",
       "destination": "/dashboard",
       "permanent": true
     },
     {
       "source": "/dashboard/bot",
-      "destination": "/dashboard/trading", 
+      "destination": "/dashboard/trading",
       "permanent": true
     },
     {
@@ -145,7 +145,7 @@
       "permanent": true
     }
   ],
-  
+
   "rewrites": [
     {
       "source": "/api/health",
@@ -156,9 +156,9 @@
       "destination": "/api/sitemap"
     }
   ],
-  
+
   "regions": ["iad1", "sfo1", "lhr1"],
-  
+
   "crons": [
     {
       "path": "/api/cron/market-data",
@@ -169,20 +169,20 @@
       "schedule": "0 2 * * *"
     }
   ],
-  
+
   "github": {
     "enabled": true,
     "autoAlias": true,
     "autoJobCancelation": true
   },
-  
+
   "cleanUrls": true,
   "trailingSlash": false,
-  
+
   "images": {
     "domains": [
       "assets.coincap.io",
-      "cdn.builder.io", 
+      "cdn.builder.io",
       "images.unsplash.com",
       "placehold.co",
       "cdn.dribbble.com"
@@ -192,15 +192,15 @@
     "dangerouslyAllowSVG": false,
     "contentSecurityPolicy": "default-src 'self'; script-src 'none'; sandbox;"
   },
-  
+
   "analytics": {
     "enable": true
   },
-  
+
   "webAnalytics": {
     "enable": true
   },
-  
+
   "speedInsights": {
     "enable": true
   }

@@ -168,7 +168,7 @@ const nextConfig = {
   ],
 
   // Basic webpack configuration
-  webpack: (config) => {
+  webpack: config => {
     // Handle SVG imports
     config.module.rules.push({
       test: /\.svg$/,
