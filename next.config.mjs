@@ -16,11 +16,23 @@ const nextConfig = {
       'date-fns',
       'clsx',
       'class-variance-authority',
+      '@builder.io/react',
+      '@builder.io/sdk',
     ],
     // Optimize CSS
     optimizeCss: true,
     // Enable parallel builds
     workerThreads: true,
+    // Enable modularize imports for better tree shaking
+    modularizeImports: {
+      'lucide-react': {
+        transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
+        skipDefaultConversion: true,
+      },
+      '@radix-ui/react-icons': {
+        transform: '@radix-ui/react-icons/dist/{{member}}.js',
+      },
+    },
   },
 
   // Turbopack configuration (stable)
