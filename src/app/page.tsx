@@ -3,11 +3,13 @@ import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'AstralCore - Advanced Crypto Trading Platform',
-  description: 'Professional cryptocurrency trading platform with AI-powered bots, real-time analytics, and comprehensive portfolio management.',
+  description:
+    'Professional cryptocurrency trading platform with AI-powered bots, real-time analytics, and comprehensive portfolio management.',
   keywords: 'crypto, trading, bitcoin, cryptocurrency, AI trading, portfolio management',
   openGraph: {
     title: 'AstralCore - Advanced Crypto Trading Platform',
-    description: 'Professional cryptocurrency trading platform with AI-powered bots, real-time analytics, and comprehensive portfolio management.',
+    description:
+      'Professional cryptocurrency trading platform with AI-powered bots, real-time analytics, and comprehensive portfolio management.',
     images: ['/icons/icon-512x512.svg'],
   },
   twitter: {

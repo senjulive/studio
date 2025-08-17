@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'AstralCore - Advanced Crypto Trading Platform',
     short_name: 'AstralCore',
-    description: 'Professional cryptocurrency trading platform with AI-powered bots, real-time analytics, and comprehensive portfolio management.',
+    description:
+      'Professional cryptocurrency trading platform with AI-powered bots, real-time analytics, and comprehensive portfolio management.',
     start_url: '/',
     display: 'standalone',
     background_color: '#0a0a0a',
