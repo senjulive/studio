@@ -223,13 +223,13 @@ const nextConfig = {
             maxSize: 200000, // 200KB limit
           },
 
-          // Builder.io chunks (separate for lazy loading)
+          // Builder.io chunks (handled separately to avoid conflicts)
           builder: {
             test: /[\\/]node_modules[\\/]@builder\.io[\\/]/,
             name: 'builder',
-            chunks: 'async', // Only for dynamic imports to avoid conflicts
+            chunks: 'all',
             priority: 40,
-            enforce: true,
+            enforce: false, // Don't enforce to avoid conflicts
             maxSize: 180000, // 180KB limit
           },
 
