@@ -12,6 +12,10 @@
 
   # Environment specific settings
   NETLIFY_NEXT_PLUGIN_SKIP = "false"
+  NETLIFY = "true"
+
+  # Crypto platform environment
+  CRYPTO_PLATFORM = "true"
 
 # Next.js plugin for optimal performance
 [[plugins]]
