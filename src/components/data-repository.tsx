@@ -8,17 +8,17 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { 
-  User, 
-  Wallet, 
-  MessageCircle, 
-  Bell, 
-  Settings, 
-  TrendingUp, 
+import {
+  User,
+  Wallet,
+  MessageCircle,
+  Bell,
+  Settings,
+  TrendingUp,
   Shield,
   Users,
   Clock,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
 // Import all repository data
@@ -100,14 +100,18 @@ const DataRepository = () => {
                 <div>
                   <h3 className="text-xl font-semibold">{userData.profile?.fullName || 'N/A'}</h3>
                   <p className="text-muted-foreground">@{userData.profile?.username || 'N/A'}</p>
-                  <Badge variant={userData.profile?.verificationStatus === 'verified' ? 'default' : 'secondary'}>
+                  <Badge
+                    variant={
+                      userData.profile?.verificationStatus === 'verified' ? 'default' : 'secondary'
+                    }
+                  >
                     {userData.profile?.verificationStatus || 'unverified'}
                   </Badge>
                 </div>
               </div>
-              
+
               <Separator />
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium">ID Card Number</label>
@@ -115,7 +119,9 @@ const DataRepository = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium">Contact Number</label>
-                  <p className="text-muted-foreground">{userData.profile?.contactNumber || 'N/A'}</p>
+                  <p className="text-muted-foreground">
+                    {userData.profile?.contactNumber || 'N/A'}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Country</label>
@@ -144,7 +150,9 @@ const DataRepository = () => {
                   {Object.entries(userData.balances || {}).map(([currency, balance]) => (
                     <div key={currency} className="flex justify-between items-center">
                       <span className="font-medium">{currency.toUpperCase()}</span>
-                      <span className="text-muted-foreground">{formatCurrency(balance as number, currency)}</span>
+                      <span className="text-muted-foreground">
+                        {formatCurrency(balance as number, currency)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -163,7 +171,9 @@ const DataRepository = () => {
                   {Object.entries(userData.addresses || {}).map(([currency, address]) => (
                     <div key={currency} className="space-y-1">
                       <span className="font-medium text-sm">{currency.toUpperCase()}</span>
-                      <p className="text-xs text-muted-foreground font-mono break-all">{address as string}</p>
+                      <p className="text-xs text-muted-foreground font-mono break-all">
+                        {address as string}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -182,21 +192,29 @@ const DataRepository = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <label className="text-sm font-medium">Clicks Left</label>
-                  <p className="text-2xl font-bold text-primary">{userData.growth?.clicksLeft || 0}</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {userData.growth?.clicksLeft || 0}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Daily Earnings</label>
-                  <p className="text-2xl font-bold text-green-500">${userData.growth?.dailyEarnings || 0}</p>
+                  <p className="text-2xl font-bold text-green-500">
+                    ${userData.growth?.dailyEarnings || 0}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Last Reset</label>
                   <p className="text-sm text-muted-foreground">
-                    {userData.growth?.lastReset ? formatTimestamp(userData.growth.lastReset) : 'N/A'}
+                    {userData.growth?.lastReset
+                      ? formatTimestamp(userData.growth.lastReset)
+                      : 'N/A'}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Earnings History</label>
-                  <p className="text-sm text-muted-foreground">{userData.growth?.earningsHistory?.length || 0} entries</p>
+                  <p className="text-sm text-muted-foreground">
+                    {userData.growth?.earningsHistory?.length || 0} entries
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -248,7 +266,11 @@ const DataRepository = () => {
                           <AvatarFallback>{message.displayName?.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <span className="font-medium text-sm">{message.displayName}</span>
-                        {message.isAdmin && <Badge variant="destructive" className="text-xs">Admin</Badge>}
+                        {message.isAdmin && (
+                          <Badge variant="destructive" className="text-xs">
+                            Admin
+                          </Badge>
+                        )}
                         <span className="text-xs text-muted-foreground ml-auto">
                           {formatTimestamp(message.timestamp)}
                         </span>
@@ -283,7 +305,11 @@ const DataRepository = () => {
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-semibold">{notification.title}</h4>
                       <div className="flex items-center gap-2">
-                        {notification.read && <Badge variant="secondary" className="text-xs">Read</Badge>}
+                        {notification.read && (
+                          <Badge variant="secondary" className="text-xs">
+                            Read
+                          </Badge>
+                        )}
                         <span className="text-xs text-muted-foreground">
                           {formatTimestamp(notification.date)}
                         </span>
@@ -315,7 +341,9 @@ const DataRepository = () => {
                 <div>
                   <h4 className="font-semibold mb-2">Referral Code</h4>
                   <div className="p-3 bg-muted rounded-lg">
-                    <p className="font-mono text-lg text-primary">{userData.squad?.referralCode || 'N/A'}</p>
+                    <p className="font-mono text-lg text-primary">
+                      {userData.squad?.referralCode || 'N/A'}
+                    </p>
                   </div>
                 </div>
                 <div>
@@ -349,11 +377,15 @@ const DataRepository = () => {
                 <div className="space-y-3">
                   <div>
                     <label className="text-sm font-medium">Minimum Grid Balance</label>
-                    <p className="text-lg font-semibold">${settingsData.botSettings?.minGridBalance || 0}</p>
+                    <p className="text-lg font-semibold">
+                      ${settingsData.botSettings?.minGridBalance || 0}
+                    </p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Bot Tier Settings</label>
-                    <p className="text-muted-foreground">{settingsData.botTierSettings?.length || 0} tiers configured</p>
+                    <p className="text-muted-foreground">
+                      {settingsData.botTierSettings?.length || 0} tiers configured
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -371,7 +403,8 @@ const DataRepository = () => {
                   <div>
                     <label className="text-sm font-medium">Withdrawal Addresses</label>
                     <p className="text-muted-foreground">
-                      {Object.keys(userData.security?.withdrawalAddresses || {}).length} saved address(es)
+                      {Object.keys(userData.security?.withdrawalAddresses || {}).length} saved
+                      address(es)
                     </p>
                   </div>
                   <div>
