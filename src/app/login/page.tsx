@@ -1,51 +1,66 @@
 import { LoginForm } from '@/components/auth/login-form';
 import { AstralLogo } from '@/components/icons/astral-logo';
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Sign In - AstralCore',
+  description: 'Sign in to your AstralCore crypto trading account',
+};
 
 export default function LoginPage() {
   return (
-    <div className="min-h-dvh bg-background relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
+    <div className="min-h-dvh bg-background flex flex-col">
+      {/* Header */}
+      <header className="flex items-center justify-between p-6 border-b border-border/50">
+        <Link href="/" className="flex items-center space-x-3">
+          <AstralLogo className="h-8 w-8 text-primary" />
+          <span className="text-lg font-bold text-foreground">AstralCore</span>
+        </Link>
+      </header>
 
-      <main className="relative z-10 flex flex-col min-h-dvh">
-        {/* Header */}
-        <header className="flex items-center justify-between p-6">
-          <Link href="/" className="flex items-center gap-2">
-            <AstralLogo className="h-8 w-8" />
-            <span className="font-bold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              AstralCore
-            </span>
-          </Link>
-        </header>
+      {/* Main content */}
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-sm space-y-8">
+          {/* Welcome section */}
+          <div className="text-center space-y-3">
+            <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
+            <p className="text-muted-foreground text-sm">
+              Sign in to access your trading dashboard
+            </p>
+          </div>
 
-        {/* Main content */}
-        <div className="flex-1 flex items-center justify-center px-6 py-8">
-          <div className="w-full max-w-md">
-            {/* Welcome section */}
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold mb-2">Welcome Back</h1>
-              <p className="text-muted-foreground">Sign in to your AstralCore account</p>
-            </div>
-
-            {/* Login form */}
+          {/* Login form card */}
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-6">
             <LoginForm />
+          </div>
 
-            {/* Footer links */}
-            <div className="mt-8 text-center space-y-4">
+          {/* Footer links */}
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center space-x-4 text-xs text-muted-foreground">
+              <Link href="/forgot-password" className="text-primary hover:text-primary/80 transition-colors">
+                Forgot Password?
+              </Link>
+            </div>
+            
+            <div className="pt-4 border-t border-border/50">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
-                <Link href="/register" className="text-primary font-medium hover:underline">
-                  Sign up
+                New to AstralCore?{' '}
+                <Link href="/register" className="text-primary font-medium hover:text-primary/80 transition-colors">
+                  Create Account
                 </Link>
               </p>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="p-6 text-center">
+        <p className="text-xs text-muted-foreground">
+          © 2024 AstralCore. Advanced Crypto Trading Platform.
+        </p>
+      </footer>
     </div>
   );
 }

@@ -2,25 +2,40 @@ import { AstralLogo } from '@/components/icons/astral-logo';
 
 export default function Loading() {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-6">
-        {/* Animated logo */}
+    <div className="fixed inset-0 bg-background flex flex-col items-center justify-center p-6">
+      {/* Logo section */}
+      <div className="flex flex-col items-center space-y-8">
         <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-full blur-3xl scale-150 animate-pulse"></div>
-          <AstralLogo className="relative h-16 w-16 sm:h-20 sm:w-20 drop-shadow-2xl animate-pulse" />
+          <AstralLogo className="h-20 w-20 text-primary" />
         </div>
         
-        {/* Loading text */}
-        <div className="flex flex-col items-center gap-2">
-          <h2 className="text-lg font-semibold text-foreground">Loading AstralCore</h2>
-          <p className="text-sm text-muted-foreground">Preparing your trading dashboard...</p>
+        {/* Loading content */}
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <h1 className="text-xl font-semibold text-foreground">AstralCore</h1>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Preparing your crypto trading platform...
+          </p>
         </div>
         
-        {/* Loading spinner */}
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-          <div className="w-2 h-2 bg-secondary rounded-full animate-bounce delay-100"></div>
-          <div className="w-2 h-2 bg-accent rounded-full animate-bounce delay-200"></div>
+        {/* Loading animation */}
+        <div className="flex items-center space-x-2">
+          <div 
+            className="w-3 h-3 bg-primary rounded-full animate-bounce"
+            style={{ animationDelay: '0ms' }}
+          ></div>
+          <div 
+            className="w-3 h-3 bg-secondary rounded-full animate-bounce"
+            style={{ animationDelay: '150ms' }}
+          ></div>
+          <div 
+            className="w-3 h-3 bg-accent rounded-full animate-bounce"
+            style={{ animationDelay: '300ms' }}
+          ></div>
+        </div>
+        
+        {/* Progress bar */}
+        <div className="w-48 h-1 bg-muted rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-primary via-secondary to-accent rounded-full animate-pulse"></div>
         </div>
       </div>
     </div>
