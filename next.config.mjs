@@ -2,7 +2,6 @@
 const nextConfig = {
   // Core configuration
   reactStrictMode: true,
-  serverExternalPackages: ['@builder.io/react'],
 
   // Performance optimizations
   experimental: {
@@ -16,7 +15,6 @@ const nextConfig = {
       'date-fns',
       'clsx',
       'class-variance-authority',
-      '@builder.io/react',
       '@builder.io/sdk',
     ],
     // Optimize CSS
