@@ -234,7 +234,7 @@ const nextConfig = {
           builder: {
             test: /[\\/]node_modules[\\/]@builder\.io[\\/]/,
             name: 'builder',
-            chunks: 'all',
+            chunks: 'async', // Only for dynamic imports to avoid conflicts
             priority: 40,
             enforce: true,
             maxSize: 180000, // 180KB limit
