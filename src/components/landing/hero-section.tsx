@@ -14,7 +14,10 @@ export function HeroSection() {
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-conic from-primary/20 via-transparent to-secondary/20 rounded-full blur-3xl animate-spin" style={{ animationDuration: '30s' }} />
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-conic from-primary/20 via-transparent to-secondary/20 rounded-full blur-3xl animate-spin"
+          style={{ animationDuration: '30s' }}
+        />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 text-center space-y-8">
@@ -48,8 +51,8 @@ export function HeroSection() {
 
         {/* Description */}
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Experience the future of crypto trading with our AI-powered platform featuring automated grid trading, 
-          real-time analytics, and comprehensive portfolio management.
+          Experience the future of crypto trading with our AI-powered platform featuring automated
+          grid trading, real-time analytics, and comprehensive portfolio management.
         </p>
 
         {/* Features */}
@@ -77,9 +80,7 @@ export function HeroSection() {
             </Link>
           </Button>
           <Button variant="outline" size="lg" className="px-8 py-3 text-lg" asChild>
-            <Link href="/login">
-              Sign In
-            </Link>
+            <Link href="/login">Sign In</Link>
           </Button>
         </div>
 
