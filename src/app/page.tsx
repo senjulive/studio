@@ -31,7 +31,6 @@ export default function RootPage() {
     redirect('/dashboard');
   }
 
-  // For now, redirect to login since we don't have Builder.io configured
-  // In production, this would show the marketing page
-  redirect('/login');
+  // Redirect to welcome page for new users
+  redirect('/welcome');
 }
