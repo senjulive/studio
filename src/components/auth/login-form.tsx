@@ -118,7 +118,7 @@ export function LoginForm() {
                   <FormControl>
                     <Input
                       placeholder="Enter your email"
-                      className="h-12 bg-background/50 border-primary/30 focus:border-primary/60 focus:electric-glow transition-all"
+                      className="h-12 bg-background border-border focus:border-primary transition-colors"
                       {...field}
                     />
                   </FormControl>
@@ -145,7 +145,7 @@ export function LoginForm() {
                       <Input
                         type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
-                        className="h-12 bg-background/50 border-primary/30 focus:border-primary/60 focus:electric-glow transition-all pr-12"
+                        className="h-12 bg-background border-border focus:border-primary transition-colors pr-12"
                         {...field}
                       />
                       <Button
@@ -172,7 +172,7 @@ export function LoginForm() {
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      className="border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                      className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                   </FormControl>
                   <FormLabel className="text-sm font-medium text-foreground cursor-pointer">
@@ -183,7 +183,7 @@ export function LoginForm() {
             />
             <Button
               type="submit"
-              className="w-full h-12 text-base font-bold bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-all duration-300 electric-glow"
+              className="w-full h-12 text-base font-medium bg-primary hover:bg-primary/90 transition-colors"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
