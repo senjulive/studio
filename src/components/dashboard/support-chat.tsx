@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 import { Send, Paperclip, Users, Bot, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
