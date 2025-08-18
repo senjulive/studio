@@ -294,7 +294,7 @@ export function CommunityBlog({ isFloating = false }: { isFloating?: boolean }) 
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {format(new Date(post.timestamp), "PPp")}
+                  {new Date(post.timestamp).toLocaleString()}
                 </p>
               </div>
             </div>
