@@ -1,7 +1,7 @@
-import { WalletManagementSystem } from '@/components/dashboard/wallet-management-system';
+import { ComprehensivePortfolio } from '@/components/dashboard/comprehensive-portfolio';
 
 export default function DashboardPage() {
   return (
-    <WalletManagementSystem />
+    <ComprehensivePortfolio />
   );
 }
