@@ -479,7 +479,7 @@ export function ProfileView() {
                         <div>
                           <Label className="text-xs text-muted-foreground">Date of Birth</Label>
                           <div className="text-sm font-medium text-foreground mt-1">
-                            {isLoading ? <Skeleton className="h-4 w-24" /> : (profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not set')}
+                            {isLoading ? <Skeleton className="h-4 w-24" /> : (profile?.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : 'Not set')}
                           </div>
                         </div>
                       </div>
