@@ -2,17 +2,6 @@
 
 import * as React from "react";
 import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-  Legend,
-  Line,
-} from "recharts";
-import {
   Card,
   CardContent,
   CardDescription,
@@ -38,57 +27,11 @@ type AllAssetsChartProps = {
   className?: string;
 };
 
-const cryptoColors: { [key: string]: string } = {
-  BTC: "hsl(var(--chart-1))",
-  ETH: "hsl(var(--chart-2))",
-  USDT: "hsl(var(--chart-3))",
-  SOL: "hsl(var(--chart-4))",
-  XRP: "hsl(var(--chart-5))",
-};
-
-
 export function AllAssetsChart({ coins, className }: AllAssetsChartProps) {
   const filteredCoins = React.useMemo(() => {
     const tickersToShow = ['BTC', 'ETH', 'USDT'];
     return coins.filter(coin => tickersToShow.includes(coin.ticker));
   }, [coins]);
-
-
-  const chartData = React.useMemo(() => {
-    if (!filteredCoins || filteredCoins.length === 0) return [];
-    
-    const refCoin = filteredCoins.find(c => c.priceHistory && c.priceHistory.length > 0);
-    if (!refCoin) return [];
-
-    const numPoints = refCoin.priceHistory.length;
-    const data = [];
-    
-    const initialPrices: { [key: string]: number } = {};
-    filteredCoins.forEach(coin => {
-      if (coin.priceHistory && coin.priceHistory.length > 0) {
-        initialPrices[coin.ticker] = coin.priceHistory[0].value;
-      }
-    });
-
-    for (let i = 0; i < numPoints; i++) {
-      const dataPoint: { [key: string]: number | string } = { name: `Point ${i}` };
-      filteredCoins.forEach(coin => {
-        if(coin.priceHistory && coin.priceHistory[i]) {
-            const initialPrice = initialPrices[coin.ticker];
-            if (initialPrice > 0) {
-                const currentValue = coin.priceHistory[i].value;
-                dataPoint[coin.ticker] = ((currentValue / initialPrice) - 1) * 100;
-            } else {
-                dataPoint[coin.ticker] = 0;
-            }
-        }
-      });
-      data.push(dataPoint);
-    }
-    return data;
-  }, [filteredCoins]);
-
-  const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
   if (!filteredCoins || filteredCoins.length === 0) {
     return (
@@ -111,87 +54,82 @@ export function AllAssetsChart({ coins, className }: AllAssetsChartProps) {
       <CardHeader>
         <CardTitle>Key Asset Performance</CardTitle>
         <CardDescription>
-          Normalized performance of BTC, ETH, and USDT over time.
+          Performance overview of BTC, ETH, and USDT.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[350px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={chartData}
-              margin={{
-                top: 5,
-                right: 20,
-                left: 10,
-                bottom: 20,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)" />
-              <XAxis dataKey="name" hide />
-              <YAxis
-                tickFormatter={(value) => `${value.toFixed(0)}%`}
-                domain={['auto', 'auto']}
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  borderColor: "hsl(var(--border))",
-                  borderRadius: "var(--radius)",
-                }}
-                labelStyle={{ fontWeight: "bold" }}
-                formatter={(value: number, name: string) => [formatPercent(value), name]}
-                labelFormatter={() => 'Performance Change'}
-              />
-              <Legend
-                verticalAlign="bottom"
-                wrapperStyle={{ paddingTop: "20px" }}
-              />
-              {filteredCoins.filter(c => c.ticker !== 'USDT').map((coin) => (
-                <defs key={`def-${coin.id}`}>
-                    <linearGradient id={`color-${coin.ticker}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={cryptoColors[coin.ticker] || '#8884d8'} stopOpacity={0.8} />
-                        <stop offset="95%" stopColor={cryptoColors[coin.ticker] || '#8884d8'} stopOpacity={0} />
-                    </linearGradient>
-                </defs>
+        <div className="h-[350px] space-y-6">
+          {filteredCoins.map((coin) => (
+            <div key={coin.id} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                    {coin.ticker.charAt(0)}
+                  </div>
+                  <span className="font-medium">{coin.name}</span>
+                  <span className="text-sm text-muted-foreground">({coin.ticker})</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">${coin.price.toLocaleString()}</div>
+                  <div className={cn(
+                    "text-sm",
+                    coin.change24h >= 0 ? "text-green-600" : "text-red-600"
+                  )}>
+                    {coin.change24h >= 0 ? "+" : ""}{coin.change24h.toFixed(2)}%
+                  </div>
+                </div>
+              </div>
+              
+              {/* Simple progress bar to simulate chart */}
+              <div className="space-y-1">
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className={cn(
+                      "h-full transition-all duration-1000",
+                      coin.change24h >= 0 
+                        ? "bg-gradient-to-r from-green-500 to-green-600" 
+                        : "bg-gradient-to-r from-red-500 to-red-600"
+                    )}
+                    style={{ 
+                      width: `${Math.min(Math.abs(coin.change24h) * 10, 100)}%` 
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>24h Volume: ${(coin.volume24h / 1000000000).toFixed(2)}B</span>
+                  <span>Market Cap: ${(coin.marketCap / 1000000000).toFixed(2)}B</span>
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          {/* Simple trend visualization */}
+          <div className="pt-6 border-t">
+            <div className="text-sm font-medium mb-3">Price Trend Visualization</div>
+            <div className="grid grid-cols-3 gap-4">
+              {filteredCoins.map((coin) => (
+                <div key={`trend-${coin.id}`} className="text-center space-y-2">
+                  <div className="text-xs text-muted-foreground">{coin.ticker}</div>
+                  <div className="h-16 bg-muted rounded flex items-end p-2">
+                    {/* Simulated mini chart bars */}
+                    {Array.from({ length: 7 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "flex-1 mx-0.5 rounded-sm transition-all duration-500",
+                          coin.change24h >= 0 ? "bg-green-500" : "bg-red-500"
+                        )}
+                        style={{
+                          height: `${Math.max(10, Math.random() * 80)}%`,
+                          opacity: 0.3 + (i * 0.1)
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
-              <Area
-                key="BTC"
-                type="monotone"
-                dataKey="BTC"
-                stroke={cryptoColors['BTC']}
-                strokeWidth={2}
-                fillOpacity={0.3}
-                fill="url(#color-BTC)"
-                dot={false}
-                name="Bitcoin"
-              />
-              <Area
-                key="ETH"
-                type="natural"
-                dataKey="ETH"
-                stroke={cryptoColors['ETH']}
-                strokeWidth={2}
-                fillOpacity={0.1}
-                fill="url(#color-ETH)"
-                dot={false}
-                name="Ethereum"
-              />
-              <Line
-                key="USDT"
-                type="monotone"
-                dataKey="USDT"
-                name="Tether"
-                stroke={cryptoColors['USDT']}
-                strokeWidth={2}
-                strokeDasharray="3 3"
-                dot={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
