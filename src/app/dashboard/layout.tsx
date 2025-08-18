@@ -40,6 +40,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleLogout = async () => {
     try {
       sessionStorage.removeItem('loggedInEmail');
+      // Clear authentication cookies
+      document.cookie = 'logged-in-email=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       router.push('/');
     } catch (error) {
       console.error('Logout error:', error);
