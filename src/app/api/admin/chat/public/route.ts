@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import type { Message as ChatMessage } from '@/lib/chat';
+import type { ChatMessage } from '@/lib/chat';
 
 const CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
 
