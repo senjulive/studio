@@ -2,6 +2,7 @@
 [build]
   command = "npm run build"
   base = "code"
+  publish = ".next"
 
 [build.environment]
   # Node.js version
