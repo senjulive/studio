@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 import { getWalletByUserId, updateWalletByUserId } from '@/lib/wallet';
 import { addNotification } from '@/lib/notifications';
@@ -26,7 +25,7 @@ export async function POST(request: Request) {
     }
 
     const newWithdrawalRequest = {
-        id: `wd_${crypto.randomUUID()}`,
+        id: `wd_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         amount: withdrawAmount,
         asset,
         address,
