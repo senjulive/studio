@@ -1,0 +1,210 @@
+{
+  "name": "AstralCore - Advanced Crypto Trading Platform",
+  "short_name": "AstralCore",
+  "description": "Professional crypto trading platform with AI-powered automation and real-time analytics",
+  "version": "2.0.0",
+  "manifest_version": 2,
+  
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#8B5CF6",
+  "background_color": "#0A0A0B",
+  
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  
+  "categories": [
+    "finance",
+    "business",
+    "productivity"
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Quick access to your trading dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icons/dashboard-shortcut.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Trading Bot",
+      "short_name": "Bot",
+      "description": "Control your AI trading bot",
+      "url": "/dashboard/trading",
+      "icons": [
+        {
+          "src": "/icons/bot-shortcut.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Deposit",
+      "short_name": "Deposit",
+      "description": "Add funds to your account",
+      "url": "/dashboard/deposit",
+      "icons": [
+        {
+          "src": "/icons/deposit-shortcut.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Withdraw",
+      "short_name": "Withdraw",
+      "description": "Withdraw your funds",
+      "url": "/dashboard/withdraw",
+      "icons": [
+        {
+          "src": "/icons/withdraw-shortcut.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-dashboard.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard view on mobile"
+    },
+    {
+      "src": "/screenshots/mobile-trading.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Trading bot interface"
+    },
+    {
+      "src": "/screenshots/desktop-dashboard.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard view on desktop"
+    }
+  ],
+  
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.astralcore.trading",
+      "id": "com.astralcore.trading"
+    },
+    {
+      "platform": "ios",
+      "url": "https://apps.apple.com/app/astralcore-trading/id123456789",
+      "id": "123456789"
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  
+  "protocol_handlers": [
+    {
+      "protocol": "bitcoin",
+      "url": "/dashboard/deposit?currency=btc&address=%s"
+    },
+    {
+      "protocol": "ethereum",
+      "url": "/dashboard/deposit?currency=eth&address=%s"
+    }
+  ],
+  
+  "file_handlers": [
+    {
+      "action": "/dashboard/import",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/json": [".json"]
+      }
+    }
+  ],
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  
+  "handle_links": "preferred",
+  
+  "permissions": [
+    "notifications",
+    "background-sync"
+  ],
+  
+  "features": [
+    "Cross Platform",
+    "Background Sync",
+    "Offline Support",
+    "Push Notifications",
+    "Installable",
+    "Share Target"
+  ]
+}

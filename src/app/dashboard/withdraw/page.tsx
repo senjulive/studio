@@ -1,9 +1,7 @@
-import { WithdrawView } from '@/components/dashboard/withdraw-view';
+import { WithdrawViewMobile } from '@/components/dashboard/withdraw-view-mobile';
 
 export default function WithdrawPage() {
   return (
-    <div className="space-y-6">
-      <WithdrawView />
-    </div>
+    <WithdrawViewMobile />
   );
 }

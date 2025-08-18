@@ -1,4 +1,4 @@
-import { AdminPanel } from "@/components/admin/admin-panel";
+import { AdminDashboardMobile } from "@/components/admin/admin-dashboard-mobile";
 import { AdminAuth } from "@/components/admin/admin-auth";
 import type { Metadata } from 'next';
 
@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 
 export default function AdminPage() {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-secondary p-4">
+    <main className="min-h-dvh bg-background p-4">
       <AdminAuth>
-        <AdminPanel />
+        <AdminDashboardMobile />
       </AdminAuth>
     </main>
   );
