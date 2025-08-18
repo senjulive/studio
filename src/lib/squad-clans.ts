@@ -93,7 +93,7 @@ export async function createClan(leaderId: string, name: string, avatarUrl: stri
     }
 
     const newClan: Clan = {
-        id: `clan_${crypto.randomUUID()}`,
+        id: `clan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name,
         avatarUrl,
         leaderId,
