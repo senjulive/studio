@@ -1,8 +1,7 @@
 # Netlify Configuration for AstralCore Crypto Trading Platform
 [build]
-  command = "npm run build"
-  base = "code"
-  publish = ".next"
+  command = "cd code && npm run build"
+  publish = "code/.next"
 
 [build.environment]
   # Node.js version
@@ -25,15 +24,15 @@
 
 # Development settings
 [dev]
-  command = "npm run dev"
+  command = "cd code && npm run dev"
   port = 3000
   targetPort = 3000
-  publish = ".next"
+  publish = "code/.next"
   autoLaunch = false
 
 # Production context settings
 [context.production]
-  command = "npm run build"
+  command = "cd code && npm run build"
   
   [context.production.environment]
     NODE_ENV = "production"
@@ -41,14 +40,14 @@
 
 # Branch deploy context
 [context.branch-deploy]
-  command = "npm run build"
+  command = "cd code && npm run build"
   
   [context.branch-deploy.environment]
     NODE_ENV = "production"
 
 # Deploy preview context
 [context.deploy-preview]
-  command = "npm run build"
+  command = "cd code && npm run build"
   
   [context.deploy-preview.environment]
     NODE_ENV = "production"
@@ -145,18 +144,10 @@
   to = "/not-found"
   status = 301
 
-# Form handling for contact/support
-[forms]
-  # Support form configuration
-  [forms.support]
-    name = "support"
-    action = "/api/support"
-    method = "POST"
-
 # Functions configuration for serverless
 [functions]
   # Directory for Netlify functions
-  directory = "netlify/functions"
+  directory = "code/netlify/functions"
   
   # Runtime settings
   node_bundler = "esbuild"
@@ -165,40 +156,6 @@
   [functions.environment]
     NODE_ENV = "production"
 
-# Edge functions for real-time features
-[[edge_functions]]
-  function = "trading-data"
-  path = "/api/trading-data"
-
-[[edge_functions]]
-  function = "market-updates"
-  path = "/api/market-updates"
-
-# Large Media for asset optimization
-[large_media]
-  lfs = true
-
-# Build processing
-[processing]
-  skip_processing = false
-  
-  [processing.css]
-    bundle = true
-    minify = true
-  
-  [processing.js]
-    bundle = true
-    minify = true
-  
-  [processing.html]
-    pretty_urls = true
-    canonical_urls = true
-  
-  [processing.images]
-    compress = true
-    quality = 85
-    formats = ["webp", "avif"]
-
 # Branch-specific deploys
 [context.feature-branches]
-  command = "npm run build"
+  command = "cd code && npm run build"
