@@ -32,23 +32,23 @@
 
 # Production context settings
 [context.production]
-  command = "cd code && npm run build"
-  
+  command = "npm run build"
+
   [context.production.environment]
     NODE_ENV = "production"
     NEXT_TELEMETRY_DISABLED = "1"
 
 # Branch deploy context
 [context.branch-deploy]
-  command = "cd code && npm run build"
-  
+  command = "npm run build"
+
   [context.branch-deploy.environment]
     NODE_ENV = "production"
 
 # Deploy preview context
 [context.deploy-preview]
-  command = "cd code && npm run build"
-  
+  command = "npm run build"
+
   [context.deploy-preview.environment]
     NODE_ENV = "production"
 
