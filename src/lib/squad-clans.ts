@@ -124,7 +124,7 @@ export async function addClanMessage(clanId: string, messageData: Omit<ClanChatM
     
     const newMessage: ClanChatMessage = {
         ...messageData,
-        id: `cmsg_${crypto.randomUUID()}`,
+        id: `cmsg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         clanId,
         timestamp: Date.now(),
     };
