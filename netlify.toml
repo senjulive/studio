@@ -1,6 +1,7 @@
 # Netlify Configuration for AstralCore Crypto Trading Platform
 [build]
-  command = "npm run build"
+  command = "cd code && npm run build"
+  base = "code"
 
 [build.environment]
   # Node.js version
