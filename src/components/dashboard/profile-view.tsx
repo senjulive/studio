@@ -22,7 +22,7 @@ import { getUserRank } from "@/lib/ranks";
 import { useUser } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { format } from 'date-fns';
+// Removed date-fns dependency - using native date formatting
 import type { SVGProps } from 'react';
 import { Input } from "../ui/input";
 import { useToast } from "@/hooks/use-toast";
