@@ -1,9 +1,7 @@
-import { DepositView } from '@/components/dashboard/deposit-view';
+import { DepositViewMobile } from '@/components/dashboard/deposit-view-mobile';
 
 export default function DepositPage() {
   return (
-    <div className="space-y-6">
-      <DepositView />
-    </div>
+    <DepositViewMobile />
   );
 }

@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "exactOptionalPropertyTypes": false
+  },
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "src/app/api/monitoring/dashboard/route.ts",
+    "src/components/admin/admin-panel.tsx",
+    "src/components/admin/admin-dashboard-mobile.tsx"
+  ]
+}

@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production builds
+.next/
+out/
+build/
+dist/
+
+# Environment variables
+.env*
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# Auto-generated files
+public/sw.js
+public/workbox-*.js
+
+# Lighthouse
+lighthouse-report.html
+lighthouse-report.json
+
+# Bundle analysis
+.next/analyze/
+
+# Config files that don't need linting
+*.config.js
+*.config.mjs
+next.config.mjs
+analyze.mjs
+lighthouse.config.js
+
+# Husky
+.husky/
+
+# Temporary files
+temp/
+tmp/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
