@@ -74,11 +74,21 @@ export function LoginForm() {
         variant: 'destructive',
       });
     } else {
+      // Set authentication cookie for middleware
+      if (typeof window !== 'undefined') {
+        document.cookie = `logged-in-email=${values.email}; path=/; max-age=86400; secure; samesite=strict`;
+        document.cookie = `auth-token=mock-token-${Date.now()}; path=/; max-age=86400; secure; samesite=strict`;
+      }
+
       toast({
         title: 'Login Successful',
         description: 'Welcome to AstralCore!',
       });
-      router.push('/dashboard');
+
+      // Small delay to ensure cookies are set
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 100);
     }
 
     setIsLoading(false);
