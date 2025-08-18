@@ -147,15 +147,15 @@
 # Functions configuration for serverless
 [functions]
   # Directory for Netlify functions
-  directory = "code/netlify/functions"
-  
+  directory = "netlify/functions"
+
   # Runtime settings
   node_bundler = "esbuild"
-  
+
   # Environment for functions
   [functions.environment]
     NODE_ENV = "production"
 
 # Branch-specific deploys
 [context.feature-branches]
-  command = "cd code && npm run build"
+  command = "npm run build"
