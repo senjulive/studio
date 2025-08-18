@@ -3,16 +3,19 @@
 ## Test Accounts
 
 ### Admin Account
+
 - **Email**: `admin@astralcore.io`
 - **Password**: `admin`
 - **Access**: Full admin panel access
 
-### Moderator Account  
+### Moderator Account
+
 - **Email**: `moderator@astralcore.io`
 - **Password**: `moderator`
 - **Access**: Moderator panel access
 
 ### Regular User Account
+
 - **Email**: Any valid email (e.g., `user@example.com`)
 - **Password**: Any password
 - **Access**: Dashboard access
@@ -44,6 +47,7 @@ If login doesn't work:
 ## Features After Login
 
 ### Regular Users Get:
+
 - Portfolio management
 - Trading bot controls
 - Market analysis
@@ -51,6 +55,7 @@ If login doesn't work:
 - Profile management
 
 ### Admins Get:
+
 - All user features +
 - User management
 - Platform analytics
@@ -58,6 +63,7 @@ If login doesn't work:
 - Security monitoring
 
 ### Moderators Get:
+
 - User features +
 - Content moderation
 - User verification
