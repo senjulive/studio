@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Wallet, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  ArrowUpRight, 
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  ArrowUpRight,
   ArrowDownLeft,
   Eye,
   EyeOff,
@@ -22,7 +22,7 @@ import {
   PieChart,
   History,
   Send,
-  Download
+  Download,
 } from 'lucide-react';
 
 interface Asset {
@@ -64,7 +64,7 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
       balance: 0.28394,
       value: 12280.45,
       change24h: 2.4,
-      percentage: 65.2
+      percentage: 65.2,
     },
     {
       symbol: 'ETH',
@@ -72,7 +72,7 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
       balance: 1.5673,
       value: 4156.82,
       change24h: -1.2,
-      percentage: 22.1
+      percentage: 22.1,
     },
     {
       symbol: 'USDT',
@@ -80,7 +80,7 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
       balance: 1847.23,
       value: 1847.23,
       change24h: 0.01,
-      percentage: 9.8
+      percentage: 9.8,
     },
     {
       symbol: 'BNB',
@@ -88,8 +88,8 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
       balance: 1.892,
       value: 596.82,
       change24h: 4.2,
-      percentage: 3.2
-    }
+      percentage: 3.2,
+    },
   ];
 
   const recentTransactions: Transaction[] = [
@@ -101,7 +101,7 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
       value: 1000,
       status: 'completed',
       timestamp: '2024-01-15 14:30:22',
-      hash: '0x1234...5678'
+      hash: '0x1234...5678',
     },
     {
       id: '2',
@@ -110,7 +110,7 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
       amount: 0.02315,
       value: 1000,
       status: 'completed',
-      timestamp: '2024-01-15 14:35:18'
+      timestamp: '2024-01-15 14:35:18',
     },
     {
       id: '3',
@@ -119,8 +119,8 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
       amount: 0.5,
       value: 1325.44,
       status: 'pending',
-      timestamp: '2024-01-15 15:12:05'
-    }
+      timestamp: '2024-01-15 15:12:05',
+    },
   ];
 
   const timeframes = ['1H', '1D', '1W', '1M', '3M', '1Y', 'ALL'];
@@ -130,25 +130,33 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'text-green-500';
-      case 'pending': return 'text-yellow-500';
-      case 'failed': return 'text-red-500';
-      default: return 'text-muted-foreground';
+      case 'completed':
+        return 'text-green-500';
+      case 'pending':
+        return 'text-yellow-500';
+      case 'failed':
+        return 'text-red-500';
+      default:
+        return 'text-muted-foreground';
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'deposit': return <ArrowDownLeft className="w-4 h-4 text-green-500" />;
-      case 'withdrawal': return <ArrowUpRight className="w-4 h-4 text-red-500" />;
-      case 'trade': return <RefreshCw className="w-4 h-4 text-blue-500" />;
-      default: return <DollarSign className="w-4 h-4" />;
+      case 'deposit':
+        return <ArrowDownLeft className="w-4 h-4 text-green-500" />;
+      case 'withdrawal':
+        return <ArrowUpRight className="w-4 h-4 text-red-500" />;
+      case 'trade':
+        return <RefreshCw className="w-4 h-4 text-blue-500" />;
+      default:
+        return <DollarSign className="w-4 h-4" />;
     }
   };
 
@@ -194,13 +202,22 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
                   {isBalanceVisible ? formatCurrency(totalPortfolioValue) : '••••••'}
                 </p>
                 <div className="flex items-center gap-2 mt-2">
-                  <div className={`flex items-center gap-1 ${totalChange24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {totalChange24h >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                  <div
+                    className={`flex items-center gap-1 ${totalChange24h >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                  >
+                    {totalChange24h >= 0 ? (
+                      <TrendingUp className="w-4 h-4" />
+                    ) : (
+                      <TrendingDown className="w-4 h-4" />
+                    )}
                     <span className="font-medium">{Math.abs(totalChange24h)}%</span>
                   </div>
                   <span className="text-muted-foreground">•</span>
-                  <span className={`font-medium ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL)}
+                  <span
+                    className={`font-medium ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                  >
+                    {totalPnL >= 0 ? '+' : ''}
+                    {formatCurrency(totalPnL)}
                   </span>
                   <span className="text-muted-foreground text-sm">24h</span>
                 </div>
@@ -208,10 +225,10 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
 
               {/* Timeframe Selector */}
               <div className="flex gap-1 p-1 bg-muted rounded-lg">
-                {timeframes.map((timeframe) => (
+                {timeframes.map(timeframe => (
                   <Button
                     key={timeframe}
-                    variant={selectedTimeframe === timeframe ? "default" : "ghost"}
+                    variant={selectedTimeframe === timeframe ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setSelectedTimeframe(timeframe)}
                     className="flex-1"
@@ -226,7 +243,9 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
                 <div className="text-center space-y-2">
                   <BarChart3 className="w-8 h-8 mx-auto text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">Portfolio Chart</p>
-                  <p className="text-xs text-muted-foreground">Real-time performance visualization</p>
+                  <p className="text-xs text-muted-foreground">
+                    Real-time performance visualization
+                  </p>
                 </div>
               </div>
             </div>
@@ -242,7 +261,7 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {assets.map((asset) => (
+              {assets.map(asset => (
                 <div key={asset.symbol} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
@@ -297,8 +316,11 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
                 </div>
 
                 {/* Asset Rows */}
-                {assets.map((asset) => (
-                  <div key={asset.symbol} className="grid grid-cols-12 gap-4 py-4 text-sm hover:bg-muted/50 rounded-lg px-2">
+                {assets.map(asset => (
+                  <div
+                    key={asset.symbol}
+                    className="grid grid-cols-12 gap-4 py-4 text-sm hover:bg-muted/50 rounded-lg px-2"
+                  >
                     <div className="col-span-3 flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                         <span className="text-xs font-bold">{asset.symbol.charAt(0)}</span>
@@ -308,24 +330,30 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
                         <p className="text-xs text-muted-foreground">{asset.symbol}</p>
                       </div>
                     </div>
-                    
+
                     <div className="col-span-2 flex flex-col justify-center">
                       <span className="font-medium">
                         {asset.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })}
                       </span>
                     </div>
-                    
+
                     <div className="col-span-2 flex flex-col justify-center">
                       <span className="font-medium">{formatCurrency(asset.value)}</span>
                     </div>
-                    
+
                     <div className="col-span-2 flex items-center">
-                      <div className={`flex items-center gap-1 ${asset.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                        {asset.change24h >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                      <div
+                        className={`flex items-center gap-1 ${asset.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                      >
+                        {asset.change24h >= 0 ? (
+                          <TrendingUp className="w-3 h-3" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3" />
+                        )}
                         <span className="font-medium">{Math.abs(asset.change24h)}%</span>
                       </div>
                     </div>
-                    
+
                     <div className="col-span-2 flex items-center">
                       <div className="flex items-center gap-2 w-full">
                         <div className="flex-1">
@@ -334,7 +362,7 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
                         <span className="text-xs text-muted-foreground">{asset.percentage}%</span>
                       </div>
                     </div>
-                    
+
                     <div className="col-span-1 flex items-center">
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <RefreshCw className="w-4 h-4" />
@@ -360,8 +388,11 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentTransactions.map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between p-4 rounded-lg border">
+                {recentTransactions.map(transaction => (
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between p-4 rounded-lg border"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
                         {getTypeIcon(transaction.type)}
@@ -369,9 +400,14 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-medium capitalize">{transaction.type}</p>
-                          <Badge 
-                            variant={transaction.status === 'completed' ? 'default' : 
-                                   transaction.status === 'pending' ? 'secondary' : 'destructive'}
+                          <Badge
+                            variant={
+                              transaction.status === 'completed'
+                                ? 'default'
+                                : transaction.status === 'pending'
+                                  ? 'secondary'
+                                  : 'destructive'
+                            }
                             className="text-xs"
                           >
                             {transaction.status}
@@ -469,21 +505,29 @@ export function ComprehensivePortfolio({ className }: PortfolioProps) {
                     <p className="font-medium">Hide Small Balances</p>
                     <p className="text-sm text-muted-foreground">Hide assets worth less than $10</p>
                   </div>
-                  <Button variant="outline" size="sm">Toggle</Button>
+                  <Button variant="outline" size="sm">
+                    Toggle
+                  </Button>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Auto-refresh</p>
                     <p className="text-sm text-muted-foreground">Automatically update prices</p>
                   </div>
-                  <Button variant="outline" size="sm">Enable</Button>
+                  <Button variant="outline" size="sm">
+                    Enable
+                  </Button>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Email Notifications</p>
-                    <p className="text-sm text-muted-foreground">Get notified of significant changes</p>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified of significant changes
+                    </p>
                   </div>
-                  <Button variant="outline" size="sm">Configure</Button>
+                  <Button variant="outline" size="sm">
+                    Configure
+                  </Button>
                 </div>
               </div>
             </CardContent>

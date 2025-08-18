@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Search, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Search,
   Star,
   BarChart3,
   DollarSign,
@@ -19,7 +19,7 @@ import {
   Filter,
   RefreshCw,
   Eye,
-  Plus
+  Plus,
 } from 'lucide-react';
 
 interface CryptoCurrency {
@@ -42,7 +42,11 @@ interface MarketProps {
 export function ComprehensiveMarket({ className }: MarketProps) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('all');
-  const [favorites, setFavorites] = React.useState<string[]>(['bitcoin', 'ethereum', 'binancecoin']);
+  const [favorites, setFavorites] = React.useState<string[]>([
+    'bitcoin',
+    'ethereum',
+    'binancecoin',
+  ]);
 
   // Mock cryptocurrency data
   const cryptocurrencies: CryptoCurrency[] = [
@@ -56,7 +60,7 @@ export function ComprehensiveMarket({ className }: MarketProps) {
       marketCap: 847000000000,
       rank: 1,
       sparkline: [42800, 42900, 43100, 43050, 43200, 43250],
-      isFavorite: favorites.includes('bitcoin')
+      isFavorite: favorites.includes('bitcoin'),
     },
     {
       id: 'ethereum',
@@ -68,7 +72,7 @@ export function ComprehensiveMarket({ className }: MarketProps) {
       marketCap: 318000000000,
       rank: 2,
       sparkline: [2680, 2670, 2645, 2655, 2648, 2651],
-      isFavorite: favorites.includes('ethereum')
+      isFavorite: favorites.includes('ethereum'),
     },
     {
       id: 'binancecoin',
@@ -80,7 +84,7 @@ export function ComprehensiveMarket({ className }: MarketProps) {
       marketCap: 47000000000,
       rank: 3,
       sparkline: [310, 312, 318, 316, 314, 315],
-      isFavorite: favorites.includes('binancecoin')
+      isFavorite: favorites.includes('binancecoin'),
     },
     {
       id: 'solana',
@@ -92,7 +96,7 @@ export function ComprehensiveMarket({ className }: MarketProps) {
       marketCap: 42000000000,
       rank: 4,
       sparkline: [92, 94, 96, 98, 99, 99],
-      isFavorite: favorites.includes('solana')
+      isFavorite: favorites.includes('solana'),
     },
     {
       id: 'cardano',
@@ -104,8 +108,8 @@ export function ComprehensiveMarket({ className }: MarketProps) {
       marketCap: 18500000000,
       rank: 5,
       sparkline: [0.53, 0.525, 0.522, 0.524, 0.523, 0.523],
-      isFavorite: favorites.includes('cardano')
-    }
+      isFavorite: favorites.includes('cardano'),
+    },
   ];
 
   const marketStats = {
@@ -114,7 +118,7 @@ export function ComprehensiveMarket({ className }: MarketProps) {
     btcDominance: 51.3,
     activeCoins: 2847,
     markets: 23456,
-    fearGreedIndex: 72
+    fearGreedIndex: 72,
   };
 
   const categories = [
@@ -122,25 +126,24 @@ export function ComprehensiveMarket({ className }: MarketProps) {
     { id: 'favorites', name: 'Favorites', count: favorites.length },
     { id: 'top10', name: 'Top 10', count: 10 },
     { id: 'defi', name: 'DeFi', count: 156 },
-    { id: 'gaming', name: 'Gaming', count: 89 }
+    { id: 'gaming', name: 'Gaming', count: 89 },
   ];
 
   const toggleFavorite = (coinId: string) => {
-    setFavorites(prev => 
-      prev.includes(coinId) 
-        ? prev.filter(id => id !== coinId)
-        : [...prev, coinId]
+    setFavorites(prev =>
+      prev.includes(coinId) ? prev.filter(id => id !== coinId) : [...prev, coinId]
     );
   };
 
   const filteredCoins = cryptocurrencies.filter(coin => {
-    const matchesSearch = coin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         coin.symbol.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch =
+      coin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      coin.symbol.toLowerCase().includes(searchTerm.toLowerCase());
+
     if (selectedCategory === 'favorites') {
       return matchesSearch && favorites.includes(coin.id);
     }
-    
+
     return matchesSearch;
   });
 
@@ -152,11 +155,11 @@ export function ComprehensiveMarket({ className }: MarketProps) {
     return `$${num.toFixed(2)}`;
   };
 
-  const MiniChart = ({ data, isPositive }: { data: number[], isPositive: boolean }) => {
+  const MiniChart = ({ data, isPositive }: { data: number[]; isPositive: boolean }) => {
     const max = Math.max(...data);
     const min = Math.min(...data);
     const range = max - min || 1;
-    
+
     return (
       <div className="w-16 h-8 flex items-end gap-0.5">
         {data.map((value, index) => {
@@ -271,14 +274,14 @@ export function ComprehensiveMarket({ className }: MarketProps) {
                 placeholder="Search cryptocurrencies..."
                 className="pl-10"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="flex gap-2 overflow-x-auto">
-              {categories.map((category) => (
+              {categories.map(category => (
                 <Button
                   key={category.id}
-                  variant={selectedCategory === category.id ? "default" : "outline"}
+                  variant={selectedCategory === category.id ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedCategory(category.id)}
                   className="whitespace-nowrap"
@@ -309,12 +312,15 @@ export function ComprehensiveMarket({ className }: MarketProps) {
                 </div>
 
                 {/* Table Rows */}
-                {filteredCoins.map((coin) => (
-                  <div key={coin.id} className="grid grid-cols-12 gap-4 py-3 text-sm hover:bg-muted/50 rounded-lg px-2">
+                {filteredCoins.map(coin => (
+                  <div
+                    key={coin.id}
+                    className="grid grid-cols-12 gap-4 py-3 text-sm hover:bg-muted/50 rounded-lg px-2"
+                  >
                     <div className="col-span-1 flex items-center">
                       <span className="font-medium">{coin.rank}</span>
                     </div>
-                    
+
                     <div className="col-span-3 flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                         <span className="text-xs font-bold">{coin.symbol.charAt(0)}</span>
@@ -324,26 +330,32 @@ export function ComprehensiveMarket({ className }: MarketProps) {
                         <p className="text-xs text-muted-foreground">{coin.symbol}</p>
                       </div>
                     </div>
-                    
+
                     <div className="col-span-2 flex items-center">
                       <span className="font-medium">${coin.price.toLocaleString()}</span>
                     </div>
-                    
+
                     <div className="col-span-2 flex items-center">
-                      <div className={`flex items-center gap-1 ${coin.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                        {coin.change24h >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                      <div
+                        className={`flex items-center gap-1 ${coin.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                      >
+                        {coin.change24h >= 0 ? (
+                          <TrendingUp className="w-3 h-3" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3" />
+                        )}
                         <span className="font-medium">{Math.abs(coin.change24h).toFixed(2)}%</span>
                       </div>
                     </div>
-                    
+
                     <div className="col-span-2 flex items-center">
                       <span className="text-muted-foreground">{formatNumber(coin.volume24h)}</span>
                     </div>
-                    
+
                     <div className="col-span-1 flex items-center">
                       <MiniChart data={coin.sparkline} isPositive={coin.change24h >= 0} />
                     </div>
-                    
+
                     <div className="col-span-1 flex items-center gap-1">
                       <Button
                         variant="ghost"
@@ -351,7 +363,9 @@ export function ComprehensiveMarket({ className }: MarketProps) {
                         className="h-8 w-8"
                         onClick={() => toggleFavorite(coin.id)}
                       >
-                        <Star className={`w-4 h-4 ${coin.isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground'}`} />
+                        <Star
+                          className={`w-4 h-4 ${coin.isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground'}`}
+                        />
                       </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <Plus className="w-4 h-4" />
