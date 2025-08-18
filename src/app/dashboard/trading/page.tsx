@@ -1,4 +1,4 @@
-import { TradingBotMobile } from '@/components/dashboard/trading-bot-mobile';
+import { ComprehensiveTradingBot } from '@/components/dashboard/comprehensive-trading-bot';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 
 export default function TradingPage() {
   return (
-    <TradingBotMobile />
+    <ComprehensiveTradingBot />
   );
 }
