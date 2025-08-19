@@ -16,7 +16,18 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, Upload, Wallet, AlertCircle, CheckCircle, Clock, TrendingUp, ArrowDownLeft, Shield, Zap } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+// Simple QR code alternative component
+const SimpleQRCode = ({ value, size = 150 }: { value: string; size?: number }) => (
+  <div
+    className="bg-white border-2 border-gray-300 flex items-center justify-center text-black font-mono text-xs p-4 break-all"
+    style={{ width: size, height: size }}
+  >
+    <div className="text-center">
+      <div className="mb-2 text-lg">📱</div>
+      <div className="text-xs leading-tight">{value}</div>
+    </div>
+  </div>
+);
 import { depositRequestSchema } from "@/lib/validators";
 import { cn } from "@/lib/utils";
 
