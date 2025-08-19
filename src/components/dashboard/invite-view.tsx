@@ -200,9 +200,7 @@ export function InviteView() {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="flex justify-center p-6">
-                        <div className="bg-white p-4 rounded-lg">
-                          <QRCodeSVG value={squadCode} size={200} />
-                        </div>
+                        <SimpleQRCode value={squadCode} size={200} />
                       </div>
                     </DialogContent>
                   </Dialog>
@@ -244,9 +242,7 @@ export function InviteView() {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="flex justify-center p-6">
-                        <div className="bg-white p-4 rounded-lg">
-                          <QRCodeSVG value={referralLink} size={200} />
-                        </div>
+                        <SimpleQRCode value={referralLink} size={200} />
                       </div>
                     </DialogContent>
                   </Dialog>
