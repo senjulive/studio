@@ -284,9 +284,7 @@ export function DepositView() {
                 </div>
 
                 <div className="flex flex-col items-center space-y-4">
-                  <div className="p-4 bg-white rounded-xl shadow-lg">
-                    <QRCodeSVG value={currentNetwork.address} size={150} />
-                  </div>
+                  <SimpleQRCode value={currentNetwork.address} size={150} />
                   <p className="text-sm text-muted-foreground text-center">
                     Scan QR code with your wallet app
                   </p>
