@@ -195,7 +195,7 @@ export function SupportChatManager() {
                       <div key={message.id} className="flex flex-col">
                         <div className="text-xs text-muted-foreground flex justify-between">
                           <span className="font-bold">{message.sender === "user" ? displayName : "AstralCore Support"}</span>
-                          <span>{format(new Date(message.timestamp), "PPp")}</span>
+                          <span>{new Date(message.timestamp).toLocaleString()}</span>
                         </div>
                         <div className={cn("rounded-md p-3 text-sm", message.silent ? "bg-accent text-accent-foreground/80 italic" : "bg-muted/50")}>
                           <p>{message.text}</p>

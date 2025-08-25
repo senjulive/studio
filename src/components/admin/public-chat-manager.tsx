@@ -181,7 +181,7 @@ export function PublicChatManager() {
                               tierClassName={tierClassName}
                               className="h-5"
                             />
-                            <span className="text-xs text-muted-foreground">{format(new Date(message.timestamp), "PPp")}</span>
+                            <span className="text-xs text-muted-foreground">{new Date(message.timestamp).toLocaleString()}</span>
                         </div>
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                             <AlertDialog>

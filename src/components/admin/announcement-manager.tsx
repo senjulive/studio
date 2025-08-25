@@ -182,7 +182,7 @@ export function AnnouncementManager() {
                     <Card key={ann.id} className="relative bg-muted/30">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base">{ann.title}</CardTitle>
-                        <CardDescription>{format(new Date(ann.date), "PPP")}</CardDescription>
+                        <CardDescription>{new Date(ann.date).toLocaleDateString()}</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground">{ann.content}</p>
