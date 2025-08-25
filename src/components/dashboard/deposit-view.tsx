@@ -86,6 +86,7 @@ const pendingDeposits = [
 
 export function DepositView() {
   const { toast } = useToast();
+  const { copy } = useClipboard();
   const [selectedAsset, setSelectedAsset] = React.useState(cryptoAssets[0]);
 
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
