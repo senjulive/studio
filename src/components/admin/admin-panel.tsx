@@ -92,12 +92,21 @@ export function AdminPanel() {
         if (activeView === 'Dashboard') {
             return adminSections.Dashboard.component;
         }
-        for (const section of Object.values(adminSections)) {
-            if (typeof section === 'object' && activeView in section) {
-                 // @ts-ignore
-                return section[activeView].component;
-            }
+
+        // Handle nested sections
+        if (activeView in adminSections['User Management']) {
+            return adminSections['User Management'][activeView as keyof typeof adminSections['User Management']].component;
         }
+        if (activeView in adminSections['Platform Activity']) {
+            return adminSections['Platform Activity'][activeView as keyof typeof adminSections['Platform Activity']].component;
+        }
+        if (activeView in adminSections['Content & Engagement']) {
+            return adminSections['Content & Engagement'][activeView as keyof typeof adminSections['Content & Engagement']].component;
+        }
+        if (activeView in adminSections['Platform Settings']) {
+            return adminSections['Platform Settings'][activeView as keyof typeof adminSections['Platform Settings']].component;
+        }
+
         return null;
     };
 
