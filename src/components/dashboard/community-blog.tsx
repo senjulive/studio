@@ -142,6 +142,7 @@ const trendingTags = [
 
 export function CommunityBlog({ isFloating = false }: { isFloating?: boolean }) {
   const { toast } = useToast();
+  const { copy } = useClipboard();
   const { user, wallet, rank } = useUser();
   const [posts, setPosts] = React.useState<BlogPost[]>(mockPosts);
   const [newPost, setNewPost] = React.useState("");
@@ -226,18 +227,23 @@ export function CommunityBlog({ isFloating = false }: { isFloating?: boolean }) 
     ));
   };
 
-  const handleShare = (post: BlogPost) => {
+  const handleShare = async (post: BlogPost) => {
     if (navigator.share) {
-      navigator.share({
-        title: `Post by ${post.authorName}`,
-        text: post.content,
-        url: window.location.href
-      });
+      try {
+        await navigator.share({
+          title: `Post by ${post.authorName}`,
+          text: post.content,
+          url: window.location.href
+        });
+      } catch (err) {
+        // User cancelled sharing or share failed, fallback to clipboard
+        await copy(`${post.content}\n\n- ${post.authorName} on AstralCore`, {
+          successMessage: "Post content copied to clipboard"
+        });
+      }
     } else {
-      navigator.clipboard.writeText(`${post.content}\n\n- ${post.authorName} on AstralCore`);
-      toast({
-        title: "Copied!",
-        description: "Post content copied to clipboard",
+      await copy(`${post.content}\n\n- ${post.authorName} on AstralCore`, {
+        successMessage: "Post content copied to clipboard"
       });
     }
   };
