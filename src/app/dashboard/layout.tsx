@@ -238,7 +238,14 @@ export default function DashboardLayout({
 
   React.useEffect(() => {
     const initializeUser = async () => {
-      const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
+      const loggedInEmail = sessionStorage.getItem('loggedInEmail');
+
+      // If no user is logged in, redirect to login page
+      if (!loggedInEmail) {
+        router.push('/login');
+        return;
+      }
+
       const currentUser = { ...mockUser, email: loggedInEmail };
 
       setUser(currentUser);
@@ -251,7 +258,7 @@ export default function DashboardLayout({
       setIsInitializing(false);
     };
     initializeUser();
-  }, [fetchWalletAndTiers]);
+  }, [fetchWalletAndTiers, router]);
 
 
   React.useEffect(() => {
