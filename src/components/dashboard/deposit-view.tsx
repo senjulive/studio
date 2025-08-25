@@ -120,11 +120,9 @@ export function DepositView() {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: "Address copied to clipboard",
+  const copyToClipboard = async (text: string) => {
+    await copy(text, {
+      successMessage: "Address copied to clipboard"
     });
   };
 
