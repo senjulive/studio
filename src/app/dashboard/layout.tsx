@@ -436,18 +436,12 @@ URL=${window.location.origin}`;
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1 border-opacity-50 bg-opacity-10", rank.className)}>
-                    <RankIcon className="h-3 w-3" />
-                    <span className="font-medium">{rank.name}</span>
-                  </Badge>
-                  {tier && TierIcon && tierClassName && (
-                    <Badge variant="outline" className={cn("text-xs py-1 px-2 flex items-center gap-1 border-opacity-50 bg-opacity-10", tierClassName)}>
-                      <TierIcon className="h-3 w-3" />
-                      <span className="font-medium">{tier.name}</span>
-                    </Badge>
-                  )}
-                </div>
+                <SidebarUserBadge
+                  rank={rank}
+                  tier={tier}
+                  tierIcon={TierIcon}
+                  tierClassName={tierClassName}
+                />
               </div>
             </div>
           </div>
@@ -610,32 +604,12 @@ URL=${window.location.origin}`;
                 </h1>
               </div>
               <div className="flex items-center gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                       <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", rank.className)}>
-                          <RankIcon className="h-4 w-4" />
-                          <span>{rank.name}</span>
-                       </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Account Rank</p>
-                    </TooltipContent>
-                  </Tooltip>
-                   {tier && TierIcon && tierClassName && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                          <Badge variant="outline" className={cn("hidden sm:flex items-center gap-1.5", tierClassName)}>
-                            <TierIcon className="h-4 w-4" />
-                            <span>{tier.name}</span>
-                          </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>VIP CORE Tier</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </TooltipProvider>
+                <HeaderUserBadge
+                  rank={rank}
+                  tier={tier}
+                  tierIcon={TierIcon}
+                  tierClassName={tierClassName}
+                />
 
                 <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
                   <Link href="/dashboard/inbox">
