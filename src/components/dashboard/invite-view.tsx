@@ -67,6 +67,7 @@ const inviteRewards = [
 export function InviteView() {
   const { user, wallet } = useUser();
   const { toast } = useToast();
+  const { copy } = useClipboard();
   const [squadCode, setSquadCode] = React.useState("");
   
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
