@@ -64,7 +64,7 @@ const inviteRewards = [
   { milestone: 100, reward: "$1,200 USDT", description: "100 active squad members" },
 ];
 
-export function InviteView() {
+export default function InviteView() {
   const { user, wallet } = useUser();
   const { toast } = useToast();
   const { copy } = useClipboard();
