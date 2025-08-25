@@ -1,6 +1,3 @@
-
-'use server';
-
 import { NextResponse } from 'next/server';
 import { getChatHistoryForUser, sendMessage, sendAdminMessage, getAllChats } from '@/lib/chat';
 import { type Message } from '@/lib/chat';

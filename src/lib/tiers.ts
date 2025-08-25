@@ -1,12 +1,5 @@
-
-'use server';
-// This is a server-safe module for tier data and logic.
-// It does not contain any client-side code (like React components or hooks).
-
-import * as fs from 'fs/promises';
-import * as path from 'path';
-
-const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
+// Client-safe module for tier data and logic.
+// Contains types and client-side utilities only.
 
 export type TierSetting = {
   id: string; // e.g., 'tier-1'
@@ -18,7 +11,7 @@ export type TierSetting = {
 };
 
 const defaultTierSettings: TierSetting[] = [
-  { id: 'tier-1', name: 'VIP CORE I', balanceThreshold: 0, dailyProfit: 0.02, clicks: 4, locked: false },
+  { id: 'tier-1', name: 'VIP CORE I', balanceThreshold: 100, dailyProfit: 0.02, clicks: 4, locked: false },
   { id: 'tier-2', name: 'VIP CORE II', balanceThreshold: 500, dailyProfit: 0.03, clicks: 5, locked: false },
   { id: 'tier-3', name: 'VIP CORE III', balanceThreshold: 1000, dailyProfit: 0.04, clicks: 6, locked: false },
   { id: 'tier-4', name: 'VIP CORE IV', balanceThreshold: 5000, dailyProfit: 0.055, clicks: 7, locked: false },
@@ -28,32 +21,16 @@ const defaultTierSettings: TierSetting[] = [
   { id: 'tier-8', name: 'VIP CORE VIII', balanceThreshold: 100000, dailyProfit: 0.12, clicks: 15, locked: true },
 ];
 
-async function readSettings() {
-  try {
-    const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {};
-  }
-}
-
-export async function getBotTierSettings(): Promise<TierSetting[]> {
-    try {
-        const settings = await readSettings();
-        const tierSettings = settings['botTierSettings'];
-        if (tierSettings && Array.isArray(tierSettings) && tierSettings.length > 0) {
-            return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
-        }
-    } catch (error) {
-        console.error("Could not read tier settings from file, using defaults.", error);
-    }
+// Client-safe function to get tier settings
+export function getBotTierSettings(): TierSetting[] {
     return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
 
-// Placeholder for the missing function
-export async function getCurrentTier(userId: string): Promise<TierSetting | undefined> {
-  console.warn("getCurrentTier is a placeholder and needs actual implementation.");
-  // TODO: Implement logic to get the current tier for a user
-  return defaultTierSettings[0]; // Return a default tier for now
+// Client-safe function to get current tier based on balance
+export function getCurrentTier(balance: number, tiers?: TierSetting[]): TierSetting | null {
+    const tierList = tiers || defaultTierSettings;
+    const applicableTier = [...tierList].reverse().find(
+        tier => balance >= tier.balanceThreshold && !tier.locked
+    );
+    return applicableTier || tierList.find(t => !t.locked) || null;
 }
-    

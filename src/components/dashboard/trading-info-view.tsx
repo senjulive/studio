@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -56,7 +55,7 @@ export function TradingInfoView() {
     async function fetchSettings() {
         setIsLoading(true);
         try {
-            const settingsData = await getBotTierSettings();
+            const settingsData = getBotTierSettings();
             
             if (settingsData) {
                 const settingsWithComponents = settingsData.map((tier: TierSettingData) => ({

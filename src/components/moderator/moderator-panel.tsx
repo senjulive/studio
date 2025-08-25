@@ -81,18 +81,19 @@ export function ModeratorPanel() {
         <Tabs defaultValue={availableTabs[0].id} className="w-full">
           <TooltipProvider>
             <TabsList
-              className={cn("grid w-full gap-2", {
+              className={cn("grid w-full gap-1 sm:gap-2", {
                 "grid-cols-1": availableTabs.length === 1,
-                "grid-cols-2": availableTabs.length === 2,
-                "grid-cols-3": availableTabs.length === 3,
+                "grid-cols-1 sm:grid-cols-2": availableTabs.length === 2,
+                "grid-cols-1 sm:grid-cols-3": availableTabs.length === 3,
               })}
             >
               {availableTabs.map(tab => (
                 <Tooltip key={tab.id}>
                   <TooltipTrigger asChild>
-                    <TabsTrigger value={tab.id}>
-                      <tab.icon className="h-4 w-4 mr-2" />
-                      <span>{tab.label}</span>
+                    <TabsTrigger value={tab.id} className="text-xs sm:text-sm">
+                      <tab.icon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">{tab.label}</span>
+                      <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
                     </TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent>

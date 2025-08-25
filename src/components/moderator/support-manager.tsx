@@ -1,8 +1,7 @@
-
 'use client';
 
 import * as React from 'react';
-import {format} from 'date-fns';
+// Removed date-fns dependency - using native date formatting
 import {
   sendAdminMessage,
   type ChatHistory,
@@ -335,7 +334,7 @@ export function SupportManager() {
                               : 'AstralCore Support'}
                           </span>
                           <span>
-                            {format(new Date(message.timestamp), 'PPp')}
+                            {new Date(message.timestamp).toLocaleString()}
                           </span>
                         </div>
                         <div

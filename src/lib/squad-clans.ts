@@ -1,4 +1,3 @@
-
 'use server';
 
 import * as fs from 'fs/promises';
@@ -6,7 +5,7 @@ import * as path from 'path';
 import { getAllWallets, getWalletByUserId } from './wallet';
 import { type Rank } from './ranks';
 import { type TierSetting } from './tiers';
-import { getBotTierSettings } from './tiers';
+import { getBotTierSettingsServer } from './tiers-server';
 
 const CLANS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-clans.json');
 const CHATS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-chats.json');
@@ -94,7 +93,7 @@ export async function createClan(leaderId: string, name: string, avatarUrl: stri
     }
 
     const newClan: Clan = {
-        id: `clan_${crypto.randomUUID()}`,
+        id: `clan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name,
         avatarUrl,
         leaderId,
@@ -125,7 +124,7 @@ export async function addClanMessage(clanId: string, messageData: Omit<ClanChatM
     
     const newMessage: ClanChatMessage = {
         ...messageData,
-        id: `cmsg_${crypto.randomUUID()}`,
+        id: `cmsg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         clanId,
         timestamp: Date.now(),
     };

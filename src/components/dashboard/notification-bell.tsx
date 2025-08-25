@@ -1,9 +1,38 @@
-
 "use client";
 
 import * as React from "react";
 import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
+// Helper function to replace formatDistanceToNow from date-fns
+function formatDistanceToNow(date: Date, options?: { addSuffix?: boolean }): string {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return options?.addSuffix ? 'less than a minute ago' : 'less than a minute';
+  }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    const text = diffInMinutes === 1 ? '1 minute' : `${diffInMinutes} minutes`;
+    return options?.addSuffix ? `${text} ago` : text;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    const text = diffInHours === 1 ? '1 hour' : `${diffInHours} hours`;
+    return options?.addSuffix ? `${text} ago` : text;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) {
+    const text = diffInDays === 1 ? '1 day' : `${diffInDays} days`;
+    return options?.addSuffix ? `${text} ago` : text;
+  }
+
+  const diffInMonths = Math.floor(diffInDays / 30);
+  const text = diffInMonths === 1 ? '1 month' : `${diffInMonths} months`;
+  return options?.addSuffix ? `${text} ago` : text;
+}
 import { CheckCheck } from "lucide-react";
 
 import {

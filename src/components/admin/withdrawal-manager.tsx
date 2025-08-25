@@ -1,9 +1,8 @@
-
 "use client";
 
 import * as React from "react";
 import { Loader2, CheckCircle, RefreshCw, Copy, Wallet } from "lucide-react";
-import { format } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -141,7 +140,7 @@ export function WithdrawalManager() {
                                         </Button>
                                     </div>
                                 </TableCell>
-                                <TableCell>{format(new Date(req.timestamp), "PPp")}</TableCell>
+                                <TableCell>{new Date(req.timestamp).toLocaleString()}</TableCell>
                                 <TableCell className="text-right">
                                     <Button size="sm" onClick={() => handleComplete(req)} disabled={isCompleting === req.id}>
                                         {isCompleting === req.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}

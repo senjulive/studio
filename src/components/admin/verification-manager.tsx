@@ -1,9 +1,8 @@
-
 "use client";
 
 import * as React from "react";
 import { Loader2, ShieldCheck, User, RefreshCw } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -125,7 +124,7 @@ export function VerificationManager() {
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
-                                    {v.profile.created_at ? formatDistanceToNow(new Date(v.profile.created_at), { addSuffix: true }) : 'N/A'}
+                                    {v.profile.created_at ? `${Math.floor((Date.now() - new Date(v.profile.created_at).getTime()) / (1000 * 60 * 60 * 24))} days ago` : 'N/A'}
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
                                     <Dialog>

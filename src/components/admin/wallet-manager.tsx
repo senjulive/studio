@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -6,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle, Search } from "lucide-react";
-import { format } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 
 import { Button } from "@/components/ui/button";
 import {
@@ -265,9 +264,9 @@ export function WalletManager() {
         </CardHeader>
         <CardContent>
             <Tabs defaultValue="search">
-                <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="search">Search by Email</TabsTrigger>
-                    <TabsTrigger value="list">Select from List</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 gap-1">
+                    <TabsTrigger value="search" className="text-xs sm:text-sm">Search by Email</TabsTrigger>
+                    <TabsTrigger value="list" className="text-xs sm:text-sm">Select from List</TabsTrigger>
                 </TabsList>
                 <TabsContent value="search" className="pt-4">
                     <Form {...searchForm}>
@@ -369,7 +368,7 @@ export function WalletManager() {
                         <TableBody>
                         {selectedWalletData.pending_withdrawals.map((w) => (
                             <TableRow key={w.id}>
-                            <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
+                            <TableCell>{new Date(w.timestamp).toLocaleString()}</TableCell>
                             <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>
                             <TableCell className="font-mono text-xs truncate max-w-xs">{w.address}</TableCell>
                             <TableCell className="text-right">

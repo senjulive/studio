@@ -1,8 +1,7 @@
-
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 import {
   Trash2,
   Loader2,
@@ -24,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
+import { UserStatusBadge } from "../ui/unified-user-badge";
 import type { Rank } from "@/lib/ranks";
 import type { TierSetting as TierData } from "@/lib/tiers";
 import { tierIcons, tierClassNames } from "@/lib/settings";
@@ -174,17 +174,14 @@ export function PublicChatManager() {
                             <span className="text-sm font-semibold">
                             {message.isAdmin ? "AstralCore" : message.displayName}
                             </span>
-                            {RankIcon && (
-                            <Badge variant="outline" className={cn("h-5 px-1.5", message.rank.className)}>
-                                <RankIcon className="h-3 w-3" />
-                            </Badge>
-                            )}
-                            {TierIcon && tierClassName && (
-                            <Badge variant="outline" className={cn("h-5 px-1.5", tierClassName)}>
-                                <TierIcon className="h-3 w-3" />
-                            </Badge>
-                            )}
-                            <span className="text-xs text-muted-foreground">{format(new Date(message.timestamp), "PPp")}</span>
+                            <UserStatusBadge
+                              rank={message.rank}
+                              tier={message.tier}
+                              tierIcon={TierIcon}
+                              tierClassName={tierClassName}
+                              className="h-5"
+                            />
+                            <span className="text-xs text-muted-foreground">{new Date(message.timestamp).toLocaleString()}</span>
                         </div>
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                             <AlertDialog>

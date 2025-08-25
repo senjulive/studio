@@ -1,11 +1,10 @@
-
 "use client";
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 import { getAnnouncements, type Announcement } from "@/lib/announcements";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -183,7 +182,7 @@ export function AnnouncementManager() {
                     <Card key={ann.id} className="relative bg-muted/30">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base">{ann.title}</CardTitle>
-                        <CardDescription>{format(new Date(ann.date), "PPP")}</CardDescription>
+                        <CardDescription>{new Date(ann.date).toLocaleDateString()}</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground">{ann.content}</p>

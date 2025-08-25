@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 import { getWalletByUserId, updateWalletByUserId } from '@/lib/wallet';
 import { addNotification } from '@/lib/notifications';
@@ -17,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     const newDepositRequest = {
-        id: `dep_${crypto.randomUUID()}`,
+        id: `dep_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         amount: parseFloat(amount),
         asset,
         timestamp: new Date().toISOString(),
