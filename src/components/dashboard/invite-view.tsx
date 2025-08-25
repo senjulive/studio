@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useClipboard } from "@/hooks/use-clipboard";
 import { useUser } from "@/contexts/UserContext";
 import { Copy, Share2, Users, Gift, Trophy, ExternalLink, QrCode } from "lucide-react";
 // Simple QR code alternative component
