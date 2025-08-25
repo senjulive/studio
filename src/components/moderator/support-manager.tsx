@@ -334,7 +334,7 @@ export function SupportManager() {
                               : 'AstralCore Support'}
                           </span>
                           <span>
-                            {format(new Date(message.timestamp), 'PPp')}
+                            {new Date(message.timestamp).toLocaleString()}
                           </span>
                         </div>
                         <div
