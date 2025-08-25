@@ -605,12 +605,6 @@ URL=${window.location.origin}`;
                 </h1>
               </div>
               <div className="flex items-center gap-2">
-                <HeaderUserBadge
-                  rank={rank}
-                  tier={tier}
-                  tierIcon={TierIcon}
-                  tierClassName={tierClassName}
-                />
 
                 <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
                   <Link href="/dashboard/inbox">
