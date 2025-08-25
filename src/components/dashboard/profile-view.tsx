@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { UserStatusBadge } from "@/components/ui/unified-user-badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { User, Mail, BadgeInfo, Phone, MapPin, Users, CheckCircle, Clock, ShieldCheck, AlertCircle, Home, Calendar, Lock, Image as ImageIcon, Loader2, Save, Link as LinkIcon, Edit, Plus, Wallet, TrendingUp, Award, Settings } from "lucide-react";
@@ -278,10 +279,12 @@ export function ProfileView() {
                         </>
                       ) : (
                         <>
-                          <Badge variant="outline" className={cn("flex items-center gap-1.5", rank.className)}>
-                            <RankIcon className="h-4 w-4" />
-                            <span>{rank.name}</span>
-                          </Badge>
+                          <UserStatusBadge
+                            rank={rank}
+                            tier={null}
+                            tierIcon={null}
+                            tierClassName={null}
+                          />
                           <VerificationStatusBadge status={profile?.verificationStatus} />
                         </>
                       )}
