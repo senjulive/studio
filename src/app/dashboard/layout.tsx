@@ -51,7 +51,7 @@ import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
 import { getUserRank } from '@/lib/ranks';
 import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
 import { Badge } from '@/components/ui/badge';
-import { SidebarUserBadge, HeaderUserBadge } from '@/components/ui/unified-user-badge';
+import { SidebarUserBadge } from '@/components/ui/unified-user-badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
 import { PromotionIcon } from '@/components/icons/nav/promotion-icon';
