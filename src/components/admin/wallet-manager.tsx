@@ -368,7 +368,7 @@ export function WalletManager() {
                         <TableBody>
                         {selectedWalletData.pending_withdrawals.map((w) => (
                             <TableRow key={w.id}>
-                            <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
+                            <TableCell>{new Date(w.timestamp).toLocaleString()}</TableCell>
                             <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>
                             <TableCell className="font-mono text-xs truncate max-w-xs">{w.address}</TableCell>
                             <TableCell className="text-right">

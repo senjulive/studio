@@ -129,7 +129,7 @@ export function DepositApprovalManager() {
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right font-mono">{req.amount.toFixed(2)}</TableCell>
-                                <TableCell>{format(new Date(req.timestamp), "PPp")}</TableCell>
+                                <TableCell>{new Date(req.timestamp).toLocaleString()}</TableCell>
                                 <TableCell className="text-right">
                                     <Button size="sm" onClick={() => handleApprove(req)} disabled={isApproving === req.id}>
                                         {isApproving === req.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
