@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import {formatDistanceToNow} from 'date-fns';
+// Removed date-fns dependency - using native date formatting
 import {useToast} from '@/hooks/use-toast';
 import {
   Card,

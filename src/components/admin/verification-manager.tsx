@@ -1,9 +1,8 @@
-
 "use client";
 
 import * as React from "react";
 import { Loader2, ShieldCheck, User, RefreshCw } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 import { Button } from "@/components/ui/button";
 import {
   Card,
