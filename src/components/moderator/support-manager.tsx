@@ -1,8 +1,7 @@
-
 'use client';
 
 import * as React from 'react';
-import {format} from 'date-fns';
+// Removed date-fns dependency - using native date formatting
 import {
   sendAdminMessage,
   type ChatHistory,
