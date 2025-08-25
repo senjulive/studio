@@ -29,6 +29,7 @@ import {
   FileText,
   Database,
   Smartphone,
+  Calculator,
   Headphones,
   MessageCircle,
   Heart,
