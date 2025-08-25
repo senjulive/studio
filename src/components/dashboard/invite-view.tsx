@@ -87,11 +87,9 @@ export function InviteView() {
   const completedMilestones = inviteRewards.filter(reward => squadMembers.length >= reward.milestone);
   const nextMilestone = inviteRewards.find(reward => squadMembers.length < reward.milestone);
 
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: `${label} copied to clipboard`,
+  const copyToClipboard = async (text: string, label: string) => {
+    await copy(text, {
+      successMessage: `${label} copied to clipboard`
     });
   };
 
