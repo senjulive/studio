@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, PlusCircle, MinusCircle, Save, User, CheckCircle, AlertTriangle, Search } from "lucide-react";
-import { format } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 
 import { Button } from "@/components/ui/button";
 import {
