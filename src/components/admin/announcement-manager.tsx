@@ -1,11 +1,10 @@
-
 "use client";
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+// Removed date-fns dependency - using native date formatting
 import { getAnnouncements, type Announcement } from "@/lib/announcements";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
