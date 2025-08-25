@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useClipboard } from "@/hooks/use-clipboard";
 import { Copy, Upload, Wallet, AlertCircle, CheckCircle, Clock, TrendingUp, ArrowDownLeft, Shield, Zap } from "lucide-react";
 // Simple QR code alternative component
 const SimpleQRCode = ({ value, size = 150 }: { value: string; size?: number }) => (
