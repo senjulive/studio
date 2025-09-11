@@ -2,16 +2,14 @@
 'use server';
 
 import { NextResponse } from 'next/server';
-import * as fs from 'fs/promises';
-import * as path from 'path';
 import { getWalletByUserId } from '@/lib/wallet';
 import { getUserRank, getCurrentTier } from '@/lib/ranks';
 import { getBotTierSettings } from '@/lib/tiers';
 import type { Rank } from '@/lib/ranks';
 import type { TierSetting } from '@/lib/tiers';
+import { readJson, writeJson } from '@/lib/storage';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const CHAT_FILE_PATH = path.join(DATA_DIR, 'public-chat.json');
+const CHAT_KEY = 'public-chat.json';
 
 type ChatMessage = {
     id: string;
@@ -25,32 +23,12 @@ type ChatMessage = {
     isAdmin?: boolean;
 };
 
-async function ensureDataDir() {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-  } catch {
-    // ignore
-  }
-}
-
 async function readChatHistory(): Promise<ChatMessage[]> {
-  try {
-    const data = await fs.readFile(CHAT_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    // If the file doesn't exist or cannot be read (e.g., read-only FS), return an empty array
-    return [];
-  }
+  return readJson<ChatMessage[]>(CHAT_KEY, []);
 }
 
 async function writeChatHistory(data: ChatMessage[]) {
-  try {
-    await ensureDataDir();
-    await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(data, null, 4), 'utf-8');
-  } catch {
-    // In serverless/read-only environments (like Netlify), writing may fail.
-    // We silently ignore to avoid 500s; chat just won't persist.
-  }
+  await writeJson(CHAT_KEY, data);
 }
 
 export async function GET(request: Request) {
