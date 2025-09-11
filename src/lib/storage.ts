@@ -12,7 +12,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { getPool, query } from './db';
+import { query } from './db';
 
 type JsonValue = any;
 
@@ -28,8 +28,6 @@ function keyToPath(key: string) {
 let dbInited = false;
 async function ensureDbKv() {
   if (dbInited) return;
-  const pool = getPool();
-  if (!pool) return;
   try {
     await query(`
       CREATE TABLE IF NOT EXISTS app_kv (
@@ -38,8 +36,10 @@ async function ensureDbKv() {
         updated_at TIMESTAMPTZ DEFAULT now()
       )
     `);
+    dbInited = true;
   } catch {
     // ignore init failure, fallback to other backends
+allback to other backends
     return;
   }
   dbInited = true;
@@ -78,18 +78,15 @@ async function ensureDataDir() {
 }
 
 export async function readJson<T extends JsonValue>(key: string, fallback: T): Promise<T> {
-  // Try Postgres KV first if configured
-  const pool = getPool();
-  if (pool) {
-    try {
-      await ensureDbKv();
-      const res = await query<{ v: T }>('SELECT v FROM app_kv WHERE k = $1 LIMIT 1', [key]);
-      if (res.rows.length > 0) {
-        return res.rows[0].v as T;
-      }
-    } catch {
-      // ignore and continue
+  // Try Postgres KV first
+  try {
+    await ensureDbKv();
+    const res = await query<{ v: T }>('SELECT v FROM app_kv WHERE k = $1 LIMIT 1', [key]);
+    if (res.rows.length > 0) {
+      return res.rows[0].v as T;
     }
+  } catch {
+    // ignore and continue
   }
 
   // Try Vercel Blob
@@ -134,22 +131,19 @@ export async function readJson<T extends JsonValue>(key: string, fallback: T): P
 }
 
 export async function writeJson<T extends JsonValue>(key: string, data: T): Promise<void> {
-  // Try Postgres KV first if configured
-  const pool = getPool();
-  if (pool) {
-    try {
-      await ensureDbKv();
-      await query(
-        `INSERT INTO app_kv (k, v, updated_at)
-         VALUES ($1, $2::jsonb, now())
-         ON CONFLICT (k)
-         DO UPDATE SET v = EXCLUDED.v, updated_at = now()`,
-        [key, JSON.stringify(data)]
-      );
-      return;
-    } catch {
-      // ignore and continue
-    }
+  // Try Postgres KV first
+  try {
+    await ensureDbKv();
+    await query(
+      `INSERT INTO app_kv (k, v, updated_at)
+       VALUES ($1, $2::jsonb, now())
+       ON CONFLICT (k)
+       DO UPDATE SET v = EXCLUDED.v, updated_at = now()`,
+      [key, JSON.stringify(data)]
+    );
+    return;
+  } catch {
+    // ignore and continue
   }
 
   // Try Vercel Blob

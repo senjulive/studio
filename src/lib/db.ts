@@ -31,7 +31,7 @@ function createPool(): Pool | null {
   return pool;
 }
 
-export function getPool(): Pool | null {
+function getPool(): Pool | null {
   if (!globalThis.__pgPool) {
     const p = createPool();
     if (!p) return null;
