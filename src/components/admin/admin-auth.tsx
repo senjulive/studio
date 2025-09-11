@@ -11,20 +11,46 @@ import {
 import { AdminProvider } from "@/contexts/AdminContext";
 import { AdminLoginForm } from "./admin-login-form";
 import { UserProvider } from "@/contexts/UserContext";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 export function AdminAuth({ children }: { children: React.ReactNode }) {
   const [authStatus, setAuthStatus] = React.useState<"loading" | "authed" | "unauthed">("loading");
   const [user, setUser] = React.useState<any>(null);
 
   React.useEffect(() => {
-    // Check session storage to see if admin was logged in
-    const loggedInEmail = sessionStorage.getItem('loggedInEmail');
-    if (loggedInEmail === 'admin@astralcore.io') {
-      setAuthStatus("authed");
-      setUser({ id: 'mock-admin-id', email: loggedInEmail });
-    } else {
-      setAuthStatus("unauthed");
-    }
+    const checkAuth = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        // Try Supabase user first
+        // @ts-ignore - getUser may throw if not configured
+        const { data: userData } = await supabase.auth.getUser();
+        const supaUser = userData?.user;
+
+        let email: string | null = supaUser?.email || null;
+
+        // Fallback to session storage email for local mock usage
+        if (!email && typeof window !== "undefined") {
+          email = sessionStorage.getItem("loggedInEmail");
+        }
+
+        if (email === "admin@astralcore.io") {
+          setUser({ id: supaUser?.id || "mock-admin-id", email });
+          setAuthStatus("authed");
+        } else {
+          setAuthStatus("unauthed");
+        }
+      } catch {
+        // If Supabase isn't configured, fallback to sessionStorage
+        const email = typeof window !== "undefined" ? sessionStorage.getItem("loggedInEmail") : null;
+        if (email === "admin@astralcore.io") {
+          setUser({ id: "mock-admin-id", email });
+          setAuthStatus("authed");
+        } else {
+          setAuthStatus("unauthed");
+        }
+      }
+    };
+    checkAuth();
   }, []);
 
 

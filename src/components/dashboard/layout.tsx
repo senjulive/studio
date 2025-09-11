@@ -24,7 +24,6 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { logout } from '@/lib/auth';
 import * as React from 'react';
 import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
@@ -66,6 +65,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AvatarUploadDialog } from './profile-view';
 import { RightSidebar } from '../ui/right-sidebar';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -125,12 +125,31 @@ export default function DashboardLayout({
 
   React.useEffect(() => {
     const initializeUser = async () => {
-      const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
-      const currentUser = { ...mockUser, email: loggedInEmail };
+      let email = mockUser.email;
+      let id = mockUser.id;
+
+      try {
+        const supabase = getSupabaseClient();
+        // @ts-ignore
+        const { data: session } = await supabase.auth.getUser();
+        if (session?.user) {
+          email = session.user.email || email;
+          id = session.user.id || id;
+        }
+      } catch {
+        // ignore, fallback
+      }
+
+      if (typeof window !== 'undefined') {
+        const storedEmail = sessionStorage.getItem('loggedInEmail');
+        if (storedEmail) email = storedEmail;
+      }
+
+      const currentUser = { id, email };
 
       setUser(currentUser);
-      setIsAdmin(loggedInEmail === 'admin@astralcore.io');
-      setIsModerator(loggedInEmail === 'moderator@astralcore.io');
+      setIsAdmin(email === 'admin@astralcore.io');
+      setIsModerator(email === 'moderator@astralcore.io');
 
       if (currentUser.id) {
         await fetchWalletAndTiers(currentUser.id);
@@ -217,8 +236,12 @@ URL=${window.location.origin}`;
 
 
   const handleLogout = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      // @ts-ignore
+      await supabase.auth.signOut();
+    } catch {}
     sessionStorage.removeItem('loggedInEmail');
-    await logout();
     router.push('/');
   };
 
@@ -378,7 +401,16 @@ URL=${window.location.origin}`;
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem onClick={async () => {
+                  try {
+                    const { getSupabaseClient } = await import('@/lib/supabaseClient');
+                    const supabase = getSupabaseClient();
+                    // @ts-ignore
+                    await supabase.auth.signOut();
+                  } catch {}
+                  sessionStorage.removeItem('loggedInEmail');
+                  router.push('/');
+                }}>
                   <LogoutIcon className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>

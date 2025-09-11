@@ -42,7 +42,7 @@ import { WithdrawalManager } from './withdrawal-manager';
 import { PublicChatManager } from './public-chat-manager';
 import { SquadRewardSettingsManager } from './squad-reward-settings-manager';
 import { UserManager } from './user-manager';
-
+import { ClanManager } from './clan-manager';
 
 const adminSections = {
     'Dashboard': { component: <AnalyticsManager />, icon: LayoutDashboard },
@@ -57,6 +57,7 @@ const adminSections = {
         'Withdrawals': { component: <WithdrawalManager />, icon: ArrowUpFromLine },
         'Support Messages': { component: <SupportChatManager />, icon: Mail },
         'Public Chat': { component: <PublicChatManager />, icon: Users },
+        'Clans': { component: <ClanManager />, icon: GitBranch },
         'Action Log': { component: <ActionLogViewer />, icon: Activity },
     },
     'Content & Engagement': {
@@ -70,13 +71,11 @@ const adminSections = {
     }
 } as const;
 
-
 type AdminView = keyof (typeof adminSections)['User Management'] | 
                  keyof (typeof adminSections)['Platform Activity'] |
                  keyof (typeof adminSections)['Content & Engagement'] |
                  keyof (typeof adminSections)['Platform Settings'] |
                  'Dashboard';
-
 
 export function AdminPanel() {
     const [activeView, setActiveView] = React.useState<AdminView>('Dashboard');

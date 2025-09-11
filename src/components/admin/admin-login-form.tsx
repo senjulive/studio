@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { login } from "@/lib/auth";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 const adminLoginSchema = z.object({
   email: z.string().email(),
@@ -48,25 +48,29 @@ export function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (email: str
 
   const onSubmit = async (values: AdminLoginFormValues) => {
     setIsLoading(true);
-    
-    const { error } = await login(values);
-
-    if (error) {
-       toast({
-        title: "Login Failed",
-        description: error,
-        variant: "destructive",
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
       });
-    } else {
+      if (error) throw error;
+
       sessionStorage.setItem('loggedInEmail', values.email);
       toast({
         title: "Admin Login Successful",
         description: "Welcome to the AstralCore AI panel.",
       });
       onLoginSuccess(values.email);
+    } catch (err: any) {
+      toast({
+        title: "Login Failed",
+        description: err?.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

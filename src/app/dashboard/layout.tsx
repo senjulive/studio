@@ -25,7 +25,6 @@ import {
   SidebarInset,
 }
 from '@/components/ui/sidebar';
-import { logout } from '@/lib/auth';
 import * as React from 'react';
 import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
@@ -68,6 +67,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
 import { RightSidebar } from '@/components/ui/right-sidebar';
 import { ModeToggle } from '@/components/ui/mode-toggle';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 
 type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
 
@@ -127,12 +127,31 @@ export default function DashboardLayout({
 
   React.useEffect(() => {
     const initializeUser = async () => {
-      const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
-      const currentUser = { ...mockUser, email: loggedInEmail };
+      let email = mockUser.email;
+      let id = mockUser.id;
+
+      try {
+        const supabase = getSupabaseClient();
+        // @ts-ignore
+        const { data: session } = await supabase.auth.getUser();
+        if (session?.user) {
+          email = session.user.email || email;
+          id = session.user.id || id;
+        }
+      } catch {
+        // ignore; fallback to sessionStorage or mock
+      }
+
+      if (typeof window !== 'undefined') {
+        const storedEmail = sessionStorage.getItem('loggedInEmail');
+        if (storedEmail) email = storedEmail;
+      }
+
+      const currentUser = { id, email };
 
       setUser(currentUser);
-      setIsAdmin(loggedInEmail === 'admin@astralcore.io');
-      setIsModerator(loggedInEmail === 'moderator@astralcore.io');
+      setIsAdmin(email === 'admin@astralcore.io');
+      setIsModerator(email === 'moderator@astralcore.io');
 
       if (currentUser.id) {
         await fetchWalletAndTiers(currentUser.id);
@@ -219,8 +238,14 @@ URL=${window.location.origin}`;
 
 
   const handleLogout = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      // @ts-ignore
+      await supabase.auth.signOut();
+    } catch {
+      // ignore
+    }
     sessionStorage.removeItem('loggedInEmail');
-    await logout();
     router.push('/');
   };
 

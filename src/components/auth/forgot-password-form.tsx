@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
-import { Loader2, ArrowLeft, KeyRound } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,8 +27,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { forgotPasswordSchema } from "@/lib/validators";
-import { resetPasswordForEmail } from "@/lib/auth";
 import { AstralLogo } from "../icons/astral-logo";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
@@ -46,10 +46,15 @@ export function ForgotPasswordForm() {
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     setIsLoading(true);
     try {
-      const error = await resetPasswordForEmail(values.email);
-      if (error) {
-        throw new Error(error);
-      }
+      const supabase = getSupabaseClient();
+      const redirectTo =
+        typeof window !== "undefined" ? `${window.location.origin}/login` : undefined;
+      // @ts-ignore
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+        redirectTo,
+      });
+      if (error) throw error;
+
       toast({
         title: "Password Reset Email Sent",
         description:
@@ -59,7 +64,7 @@ export function ForgotPasswordForm() {
     } catch (error: any) {
       toast({
         title: "Request Failed",
-        description: "An unexpected error occurred. Please try again.",
+        description: error?.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
