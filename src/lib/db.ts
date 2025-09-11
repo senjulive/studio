@@ -7,6 +7,11 @@ declare global {
   var __pgPool: Pool | undefined;
 }
 
+function needsSSL(url: string) {
+  // Supabase requires SSL in production; also respect ?sslmode=require if present
+  return /supabase\.co|supabase\.com/.test(url) || /sslmode=require/.test(url);
+}
+
 function createPool(): Pool | null {
   const url = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL || '';
   if (!url) return null;
@@ -15,9 +20,12 @@ function createPool(): Pool | null {
   const pool = new Pool({
     connectionString: url,
     max: 5,
-    idleTimeoutMillis: 30_000,
+    idleTimeoutMillis: 20_000,
     connectionTimeoutMillis: 10_000,
     allowExitOnIdle: true,
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 5_000,
+    ssl: needsSSL(url) ? { rejectUnauthorized: false } : undefined,
   });
 
   return pool;
