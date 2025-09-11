@@ -1,15 +1,14 @@
 
 'use server';
 
-import * as fs from 'fs/promises';
-import * as path from 'path';
 import { getAllWallets, getWalletByUserId } from './wallet';
 import { type Rank } from './ranks';
 import { type TierSetting } from './tiers';
 import { getBotTierSettings } from './tiers';
+import { readJson, writeJson } from './storage';
 
-const CLANS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-clans.json');
-const CHATS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-chats.json');
+const CLANS_KEY = 'squad-clans.json';
+const CHATS_KEY = 'squad-chats.json';
 
 export type Clan = {
     id: string;
@@ -32,40 +31,24 @@ export type ClanChatMessage = {
 };
 
 async function readClans(): Promise<Record<string, Clan>> {
-    try {
-        const data = await fs.readFile(CLANS_FILE_PATH, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return {};
-    }
+    return readJson<Record<string, Clan>>(CLANS_KEY, {});
 }
 
 async function writeClans(data: Record<string, Clan>): Promise<void> {
-    await fs.writeFile(CLANS_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    await writeJson(CLANS_KEY, data);
 }
 
 async function readChats(): Promise<Record<string, ClanChatMessage[]>> {
-    try {
-        const data = await fs.readFile(CHATS_FILE_PATH, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return {};
-    }
+    return readJson<Record<string, ClanChatMessage[]>>(CHATS_KEY, {});
 }
 
 async function writeChats(data: Record<string, ClanChatMessage[]>): Promise<void> {
-    await fs.writeFile(CHATS_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    await writeJson(CHATS_KEY, data);
 }
 
 async function getMinClanCreateBalance(): Promise<number> {
-    const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
-    try {
-        const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
-        const settings = JSON.parse(data);
-        return settings?.botSettings?.minClanCreateBalance || 100;
-    } catch {
-        return 100;
-    }
+    const settings = await readJson<any>('settings.json', {});
+    return settings?.botSettings?.minClanCreateBalance || 100;
 }
 
 export async function createClan(leaderId: string, name: string, avatarUrl: string): Promise<Clan | null> {
@@ -144,7 +127,7 @@ export async function getClanMessages(clanId: string): Promise<ClanChatMessage[]
     
     if (recentMessages.length < clanMessages.length) {
         allChats[clanId] = recentMessages;
-        await writeChats(allChats); // Clean up the old messages from the file
+        await writeChats(allChats); // Clean up the old messages from the store
     }
 
     return recentMessages;

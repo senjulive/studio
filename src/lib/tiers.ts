@@ -38,22 +38,15 @@ async function readSettings() {
 }
 
 export async function getBotTierSettings(): Promise<TierSetting[]> {
-    try {
-        const settings = await readSettings();
-        const tierSettings = settings['botTierSettings'];
-        if (tierSettings && Array.isArray(tierSettings) && tierSettings.length > 0) {
-            return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
-        }
-    } catch (error) {
-        console.error("Could not read tier settings from file, using defaults.", error);
+  try {
+    const settings = await readSettings();
+    const tierSettings = settings['botTierSettings'];
+    if (tierSettings && Array.isArray(tierSettings) && tierSettings.length > 0) {
+      return tierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
     }
-    return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
-}
-
-// Placeholder for the missing function
-export async function getCurrentTier(userId: string): Promise<TierSetting | undefined> {
-  console.warn("getCurrentTier is a placeholder and needs actual implementation.");
-  // TODO: Implement logic to get the current tier for a user
-  return defaultTierSettings[0]; // Return a default tier for now
+  } catch (error) {
+    console.error("Could not read tier settings from file, using defaults.", error);
+  }
+  return defaultTierSettings.sort((a, b) => a.balanceThreshold - b.balanceThreshold);
 }
     

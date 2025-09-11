@@ -9,7 +9,8 @@ import { Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BotAnimationPreview } from "./bot-animation-preview";
 import { AstralLogo } from "../icons/astral-logo";
-import { type TierSetting, getCurrentTier } from "@/lib/tiers";
+import { type TierSetting } from "@/lib/tiers";
+import { getCurrentTier } from "@/lib/ranks";
 import { GridTradingAnimation } from "./grid-trading-animation";
 
 export function TradingBotCard({
@@ -26,7 +27,8 @@ export function TradingBotCard({
   tierSettings: TierSetting[];
 }) {
   const [isAnimating, setIsAnimating] = React.useState(false);
-  const [minGridBalance, setMinGridBalance] = React.useState(100);
+  const [minGridBalance, setMinGridBalance] = React.useState(0);
+
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -35,7 +37,7 @@ export function TradingBotCard({
         const response = await fetch('/api/public-settings?key=botSettings');
         if (response.ok) {
           const data = await response.json();
-          if (data && data.minGridBalance) {
+          if (data && data.minGridBalance !== undefined) {
             setMinGridBalance(data.minGridBalance);
           }
         }
@@ -48,13 +50,22 @@ export function TradingBotCard({
 
   const currentTier = getCurrentTier(totalBalance, tierSettings);
   
-  const profitPerTrade = currentTier && totalBalance > 0 
-    ? (totalBalance * currentTier.dailyProfit) / currentTier.clicks 
-    : 0;
+  const profitPerTrade = React.useMemo(() => {
+    if (!currentTier) return 0;
+    if (totalBalance > 0) {
+      return (totalBalance * currentTier.dailyProfit) / currentTier.clicks;
+    }
+    // Provide a small base earning for $0 balance users to see it work
+    return 0.05; 
+  }, [totalBalance, currentTier]);
   
-  const profitPercentagePerTrade = currentTier && totalBalance > 0 
-    ? (currentTier.dailyProfit / currentTier.clicks) * 100
-    : 0;
+  const profitPercentagePerTrade = React.useMemo(() => {
+    if (!currentTier) return 0;
+    if (totalBalance > 0) {
+        return (currentTier.dailyProfit / currentTier.clicks) * 100
+    }
+    return 0; // Percentage is irrelevant for the base amount
+  }, [totalBalance, currentTier]);
 
   const canStart =
     totalBalance >= minGridBalance && (walletData?.growth?.clicksLeft ?? 0) > 0 && !isAnimating;
@@ -67,7 +78,7 @@ export function TradingBotCard({
       } else if (totalBalance < minGridBalance) {
         toast({
           title: "Insufficient Balance",
-          description: `You need at least $${minGridBalance} to run the bot.`,
+          description: `You need at least ${minGridBalance.toFixed(2)} to run the bot.`,
           variant: "destructive"
         });
       } else if ((walletData?.growth?.clicksLeft ?? 0) <= 0) {
@@ -82,6 +93,7 @@ export function TradingBotCard({
 
     setIsAnimating(true);
     
+    // Simulate the animation and trading process
     setTimeout(() => {
         const usdtEarnings = profitPerTrade;
         
@@ -105,11 +117,11 @@ export function TradingBotCard({
 
         toast({
           title: "Trade Successful!",
-          description: `You've earned $${usdtEarnings.toFixed(2)} USDT.`,
+          description: `You've earned ${usdtEarnings.toFixed(2)} USDT.`,
         });
 
         setIsAnimating(false);
-    }, 10000); // Shorter animation for demo
+    }, 60000); // Animation duration
   };
 
   return (
@@ -140,7 +152,7 @@ export function TradingBotCard({
                         "p-2 rounded-lg bg-muted transition-all",
                         isAnimating && "bg-primary/20 animate-bot-pulse"
                     )}>
-                        <Bot className={cn(
+                        <AstralLogo className={cn(
                             "h-6 w-6 text-foreground/80 transition-colors",
                             isAnimating && "text-primary"
                         )} />
@@ -156,7 +168,7 @@ export function TradingBotCard({
                             <AstralLogo className="h-10 w-10 mb-2 text-muted-foreground" />
                         )}
                         <p className="font-semibold text-card-foreground mt-2">
-                        {canStart ? 'START GRID' : totalBalance < minGridBalance ? `Minimum $${minGridBalance} balance required` : 'No grids remaining'}
+                        {canStart ? 'START GRID' : totalBalance < minGridBalance ? `Minimum ${minGridBalance.toFixed(2)} balance required` : 'No grids remaining'}
                         </p>
                         <p className="text-xs text-muted-foreground">
                             {canStart && currentTier ? `Earn up to ${(currentTier.dailyProfit * 100).toFixed(1)}% daily.` : ''}

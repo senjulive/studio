@@ -48,8 +48,8 @@ import { MessageSquare, UserPlus, Shield, Lock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProvider } from '@/contexts/UserContext';
 import { getOrCreateWallet, type WalletData } from '@/lib/wallet';
-import { getUserRank } from '@/lib/ranks';
-import { type TierSetting as TierData, getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+import { getUserRank, getCurrentTier } from '@/lib/ranks';
+import { type TierSetting as TierData, getBotTierSettings } from '@/lib/tiers';
 import { Badge } from '@/components/ui/badge';
 import { countries } from '@/lib/countries';
 import { tierIcons, tierClassNames } from '@/lib/settings';
@@ -198,7 +198,7 @@ URL=${window.location.origin}`;
       },
     ];
 
-    if (isAdmin || isModerator) {
+  if (isAdmin || isModerator) {
       const adminItems = [];
       if (isAdmin) {
         adminItems.push({ href: '/admin', label: 'Admin Panel', icon: Shield });

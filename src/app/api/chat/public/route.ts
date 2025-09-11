@@ -2,15 +2,14 @@
 'use server';
 
 import { NextResponse } from 'next/server';
-import * as fs from 'fs/promises';
-import * as path from 'path';
 import { getWalletByUserId } from '@/lib/wallet';
-import { getUserRank } from '@/lib/ranks';
-import { getBotTierSettings, getCurrentTier } from '@/lib/tiers';
+import { getUserRank, getCurrentTier } from '@/lib/ranks';
+import { getBotTierSettings } from '@/lib/tiers';
 import type { Rank } from '@/lib/ranks';
 import type { TierSetting } from '@/lib/tiers';
+import { readJson, writeJson } from '@/lib/storage';
 
-const CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
+const CHAT_KEY = 'public-chat.json';
 
 type ChatMessage = {
     id: string;
@@ -25,17 +24,11 @@ type ChatMessage = {
 };
 
 async function readChatHistory(): Promise<ChatMessage[]> {
-  try {
-    const data = await fs.readFile(CHAT_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    // If the file doesn't exist, return an empty array
-    return [];
-  }
+  return readJson<ChatMessage[]>(CHAT_KEY, []);
 }
 
 async function writeChatHistory(data: ChatMessage[]) {
-  await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(data, null, 4), 'utf-8');
+  await writeJson(CHAT_KEY, data);
 }
 
 export async function GET(request: Request) {
@@ -68,7 +61,7 @@ export async function POST(request: Request) {
         }
 
         const rank = getUserRank(wallet.balances.usdt || 0);
-        const tier = await getCurrentTier(wallet.balances.usdt || 0, tierSettings);
+        const tier = getCurrentTier(wallet.balances.usdt || 0, tierSettings);
 
         const newMessage: ChatMessage = {
             id: `msg_${Date.now()}_${Math.random()}`,
