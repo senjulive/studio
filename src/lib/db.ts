@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { Pool, PoolClient, QueryResult } from 'pg';
 
