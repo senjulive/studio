@@ -39,10 +39,7 @@ async function ensureDbKv() {
     dbInited = true;
   } catch {
     // ignore init failure, fallback to other backends
-allback to other backends
-    return;
   }
-  dbInited = true;
 }
 
 // Dynamically import Vercel Blob only when available
