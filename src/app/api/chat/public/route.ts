@@ -10,7 +10,8 @@ import { getBotTierSettings } from '@/lib/tiers';
 import type { Rank } from '@/lib/ranks';
 import type { TierSetting } from '@/lib/tiers';
 
-const CHAT_FILE_PATH = path.join(process.cwd(), 'data', 'public-chat.json');
+const DATA_DIR = path.join(process.cwd(), 'data');
+const CHAT_FILE_PATH = path.join(DATA_DIR, 'public-chat.json');
 
 type ChatMessage = {
     id: string;
@@ -24,18 +25,32 @@ type ChatMessage = {
     isAdmin?: boolean;
 };
 
+async function ensureDataDir() {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+  } catch {
+    // ignore
+  }
+}
+
 async function readChatHistory(): Promise<ChatMessage[]> {
   try {
     const data = await fs.readFile(CHAT_FILE_PATH, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
-    // If the file doesn't exist, return an empty array
+    // If the file doesn't exist or cannot be read (e.g., read-only FS), return an empty array
     return [];
   }
 }
 
 async function writeChatHistory(data: ChatMessage[]) {
-  await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(data, null, 4), 'utf-8');
+  try {
+    await ensureDataDir();
+    await fs.writeFile(CHAT_FILE_PATH, JSON.stringify(data, null, 4), 'utf-8');
+  } catch {
+    // In serverless/read-only environments (like Netlify), writing may fail.
+    // We silently ignore to avoid 500s; chat just won't persist.
+  }
 }
 
 export async function GET(request: Request) {

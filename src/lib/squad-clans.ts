@@ -8,8 +8,9 @@ import { type Rank } from './ranks';
 import { type TierSetting } from './tiers';
 import { getBotTierSettings } from './tiers';
 
-const CLANS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-clans.json');
-const CHATS_FILE_PATH = path.join(process.cwd(), 'data', 'squad-chats.json');
+const DATA_DIR = path.join(process.cwd(), 'data');
+const CLANS_FILE_PATH = path.join(DATA_DIR, 'squad-clans.json');
+const CHATS_FILE_PATH = path.join(DATA_DIR, 'squad-chats.json');
 
 export type Clan = {
     id: string;
@@ -31,6 +32,14 @@ export type ClanChatMessage = {
     tier: TierSetting | null;
 };
 
+async function ensureDataDir() {
+    try {
+        await fs.mkdir(DATA_DIR, { recursive: true });
+    } catch {
+        // ignore
+    }
+}
+
 async function readClans(): Promise<Record<string, Clan>> {
     try {
         const data = await fs.readFile(CLANS_FILE_PATH, 'utf-8');
@@ -41,7 +50,12 @@ async function readClans(): Promise<Record<string, Clan>> {
 }
 
 async function writeClans(data: Record<string, Clan>): Promise<void> {
-    await fs.writeFile(CLANS_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    try {
+        await ensureDataDir();
+        await fs.writeFile(CLANS_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    } catch {
+        // ignore write failures in read-only environments
+    }
 }
 
 async function readChats(): Promise<Record<string, ClanChatMessage[]>> {
@@ -54,11 +68,16 @@ async function readChats(): Promise<Record<string, ClanChatMessage[]>> {
 }
 
 async function writeChats(data: Record<string, ClanChatMessage[]>): Promise<void> {
-    await fs.writeFile(CHATS_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    try {
+        await ensureDataDir();
+        await fs.writeFile(CHATS_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    } catch {
+        // ignore write failures in read-only environments
+    }
 }
 
 async function getMinClanCreateBalance(): Promise<number> {
-    const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
+    const SETTINGS_FILE_PATH = path.join(DATA_DIR, 'settings.json');
     try {
         const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
         const settings = JSON.parse(data);
