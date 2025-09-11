@@ -25,7 +25,6 @@ import { useUser } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from 'date-fns';
-import type { SVGProps } from 'react';
 import { Input } from "../ui/input";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,7 +36,7 @@ import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
 import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ElementType;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,

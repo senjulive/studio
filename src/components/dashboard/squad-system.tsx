@@ -3,7 +3,6 @@
 
 import * as React from "react";
 import { Users, UserCheck, Lock } from "lucide-react";
-import type { SVGProps } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +40,7 @@ import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { tierIcons, tierClassNames } from '@/lib/settings';
 
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ElementType;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,

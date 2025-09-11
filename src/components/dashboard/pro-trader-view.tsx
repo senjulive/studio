@@ -2,7 +2,6 @@
 'use client';
 
 import * as React from 'react';
-import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
 import { SlidersHorizontal, PlayCircle, Bot, Lock, Trophy, Wallet } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -30,7 +29,7 @@ import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
 import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ElementType;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,

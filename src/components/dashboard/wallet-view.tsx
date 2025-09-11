@@ -4,7 +4,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { Repeat, Lock, LineChart, Wallet as WalletIcon, User, HeartHandshake, Users, ArrowLeftRight } from "lucide-react";
-import type { SVGProps } from 'react';
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -39,7 +38,7 @@ import { GoldRankIcon } from '@/components/icons/ranks/gold-rank-icon';
 import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ElementType;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,

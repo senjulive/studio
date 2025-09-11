@@ -26,7 +26,6 @@ import {
 }
 from '@/components/ui/sidebar';
 import * as React from 'react';
-import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
@@ -69,7 +68,7 @@ import { RightSidebar } from '@/components/ui/right-sidebar';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ElementType;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,
