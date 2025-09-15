@@ -77,7 +77,7 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
 
   if (authStatus === "authed") {
     return (
-      <UserProvider value={{ user }}>
+      <UserProvider value={{ user, wallet: null, rank: null, tier: null, tierSettings: [] }}>
         <AdminProvider>{children}</AdminProvider>
       </UserProvider>
     );
