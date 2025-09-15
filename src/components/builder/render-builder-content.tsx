@@ -3,8 +3,8 @@
 
 import { BuilderComponent, useIsPreviewing } from '@builder.io/react';
 
-// Replace with your public API key
-const BUILDER_API_KEY = 'your-builder-io-api-key-here';
+// Use public env var so CMS pages work when NEXT_PUBLIC_BUILDER_API_KEY is set
+const BUILDER_API_KEY = process.env.NEXT_PUBLIC_BUILDER_API_KEY || 'your-builder-io-api-key-here';
 
 interface RenderBuilderContentProps {
   content?: any;
