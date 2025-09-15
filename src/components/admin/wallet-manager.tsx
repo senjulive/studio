@@ -60,6 +60,7 @@ import { addNotification } from "@/lib/notifications";
 import { Badge } from "../ui/badge";
 
 type MappedWallet = WalletData & { user_id: string };
+type PendingWithdrawal = { id: string; amount: number; address: string; timestamp: number };
 
 const userSearchSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
@@ -230,7 +231,9 @@ export function WalletManager() {
     if (!selectedWalletData) return;
     setIsCompleting(withdrawalId);
 
-    const withdrawal = selectedWalletData.pending_withdrawals.find(w => w.id === withdrawalId);
+    const withdrawal = (selectedWalletData.pending_withdrawals as PendingWithdrawal[]).find(
+      (w: PendingWithdrawal) => w.id === withdrawalId
+    );
     if (!withdrawal) {
         toast({ title: "Error", description: "Withdrawal not found.", variant: "destructive" });
         setIsCompleting(null);
