@@ -40,14 +40,17 @@ export function ClanManager() {
     setIsLoading(true);
     try {
       const res = await fetch("/api/admin/squad/clans");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch clans");
-      setClans(data.clans || {});
-      setEditing(
-        Object.fromEntries(
-          Object.values(data.clans || {}).map((c: Clan) => [c.id, { name: c.name, avatarUrl: c.avatarUrl }])
-        )
-      );
+      const data = (await res.json()) as { clans?: Record<string, Clan>; error?: string };
+      if (!res.ok) throw new Error(data?.error || "Failed to fetch clans");
+      const clansMap: Record<string, Clan> = data?.clans ?? {};
+      setClans(clansMap);
+
+      // Build a strongly-typed editing map without relying on Object.fromEntries inference.
+      const editingMap: Record<string, { name: string; avatarUrl: string }> = {};
+      (Object.values(clansMap) as Clan[]).forEach((c) => {
+        editingMap[c.id] = { name: c.name, avatarUrl: c.avatarUrl ?? "" };
+      });
+      setEditing(editingMap);
     } catch (e: any) {
       toast({ title: "Error", description: e.message || "Failed to fetch clans", variant: "destructive" });
     } finally {
