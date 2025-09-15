@@ -110,8 +110,8 @@ export function AdminPanel() {
                 <div className="grid grid-cols-12 gap-6">
                     <div className="col-span-12 md:col-span-3 lg:col-span-2 space-y-4">
                         {Object.entries(adminSections).map(([sectionName, items]) => {
-                             if(sectionName === 'Dashboard') {
-                                const Icon = items.icon;
+                             if (sectionName === 'Dashboard') {
+                                const Icon = (items as typeof adminSections['Dashboard']).icon;
                                 return (
                                     <Button
                                         key={sectionName}
@@ -129,7 +129,8 @@ export function AdminPanel() {
                                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">{sectionName}</h3>
                                     <div className="space-y-1">
                                     {Object.entries(items).map(([itemName, itemDetails]) => {
-                                        const Icon = itemDetails.icon;
+                                        // itemDetails in these sections always has an icon field
+                                        const Icon = (itemDetails as { icon: React.ElementType }).icon;
                                         return (
                                             <Button
                                                 key={itemName}
