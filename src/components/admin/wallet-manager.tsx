@@ -372,7 +372,7 @@ export function WalletManager() {
                         </TableRow>
                         </TableHeader>
                         <TableBody>
-                        {selectedWalletData.pending_withdrawals.map((w) => (
+                        {(selectedWalletData.pending_withdrawals as PendingWithdrawal[]).map((w: PendingWithdrawal) => (
                             <TableRow key={w.id}>
                             <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
                             <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>
