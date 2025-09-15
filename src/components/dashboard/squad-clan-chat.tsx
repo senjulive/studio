@@ -2,10 +2,15 @@
 
 import React from 'react';
 
-const SquadClanChat = () => {
+type Props = {
+  clanId: string;
+};
+
+const SquadClanChat: React.FC<Props> = ({ clanId }) => {
   return (
     <div>
       <h2>Squad Clan Chat</h2>
+      <p>Clan ID: {clanId}</p>
       {/* Add your component logic here */}
     </div>
   );
