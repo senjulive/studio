@@ -241,7 +241,9 @@ export function WalletManager() {
     }
 
     const newWalletData: Partial<WalletData> = {
-        pending_withdrawals: selectedWalletData.pending_withdrawals.filter(w => w.id !== withdrawalId),
+        pending_withdrawals: (selectedWalletData.pending_withdrawals as PendingWithdrawal[]).filter(
+          (w: PendingWithdrawal) => w.id !== withdrawalId
+        ),
     };
 
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedWalletData.user_id, newWalletData }, searchForm.getValues("email"));
