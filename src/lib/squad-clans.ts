@@ -132,3 +132,12 @@ export async function getClanMessages(clanId: string): Promise<ClanChatMessage[]
 
     return recentMessages;
 }
+
+// Shared API response types to keep clients and routes in sync.
+export type ClansResponse = {
+    clans: Record<string, Clan>;
+};
+
+export type ClanChatListResponse = {
+    messages: ClanChatMessage[];
+};

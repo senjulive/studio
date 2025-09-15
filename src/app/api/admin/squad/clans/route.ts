@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { readJson, writeJson } from '@/lib/storage';
-import type { Clan } from '@/lib/squad-clans';
+import type { Clan, ClansResponse } from '@/lib/squad-clans';
 
 const CLANS_KEY = 'squad-clans.json';
 const CHATS_KEY = 'squad-chats.json';
