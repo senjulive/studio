@@ -30,6 +30,8 @@ export type ClanChatMessage = {
     tier: TierSetting | null;
 };
 
+export type ClansMap = Record<string, Clan>;
+
 async function readClans(): Promise<Record<string, Clan>> {
     return readJson<Record<string, Clan>>(CLANS_KEY, {});
 }
