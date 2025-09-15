@@ -260,14 +260,14 @@ URL=${window.location.origin}`;
   ];
 
   const getPageTitle = () => {
-    const currentPath = pathname;
+    const currentPath = pathname ?? '/dashboard';
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
     const currentItem = menuConfig.flatMap(g => g.items).find((item) => {
-        return simplePath.startsWith(item.href) && item.href !== '/dashboard' || simplePath === item.href;
+        return (simplePath.startsWith(item.href) && item.href !== '/dashboard') || simplePath === item.href;
     });
-     if (simplePath === '/dashboard') return 'Home';
+    if (simplePath === '/dashboard') return 'Home';
     return currentItem
       ? currentItem.label
       : simplePath.split('/').pop()?.replace('-', ' ') || 'Home';
