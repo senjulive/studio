@@ -22,6 +22,14 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    // Silence handlebars require.extensions warning by aliasing to a browser-safe build
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      handlebars: false, // prevent bundling handlebars on client; dotprompt will not use it in our environment
+    };
+    return config;
+  },
 };
 
 export default nextConfig;
