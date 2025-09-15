@@ -37,8 +37,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema } from "@/lib/validators";
 import { AstralLogo } from "../icons/astral-logo";
-import { register } from "@/lib/auth";
 import { countries } from "@/lib/countries";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 const MALDIVES_COUNTRY = countries.find(c => c.code === "MV")!;
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -82,26 +82,33 @@ export function RegisterForm() {
     const fullContactNumber = `${countryInfo.dial_code}${values.contactNumber}`;
 
     try {
-      const { error } = await register({
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
-            data: {
-                username: values.username,
-                contact_number: fullContactNumber,
-                country: countryInfo.name,
-                referral_code: values.referralCode,
-            }
-        }
+          data: {
+            username: values.username,
+            contact_number: fullContactNumber,
+            country: countryInfo.name,
+            referral_code: values.referralCode,
+          },
+          emailRedirectTo:
+            typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined,
+        },
       });
-      
-      if (error) {
-        throw new Error(error);
+
+      if (error) throw error;
+
+      // Compatibility with existing role checks
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("loggedInEmail", values.email);
       }
-      
+
       toast({
         title: "Account Created",
-        description: "Your account has been created successfully. You can now log in.",
+        description:
+          "Your account has been created successfully. Check your inbox to confirm your email if required.",
       });
       router.push("/dashboard");
     } catch (error: any) {

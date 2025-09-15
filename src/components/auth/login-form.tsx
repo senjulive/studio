@@ -30,9 +30,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema } from "@/lib/validators";
-import { login } from "@/lib/auth";
 import { AstralLogo } from "../icons/astral-logo";
 import { Separator } from "../ui/separator";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 const REMEMBERED_EMAIL_KEY = 'astral-remembered-email';
 
@@ -65,45 +65,95 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    
-    if (typeof window !== 'undefined') {
-        if (values.rememberMe) {
-            localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
-        } else {
-            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
-        }
-        // Store email in session storage to determine role in dashboard layout
-        sessionStorage.setItem('loggedInEmail', values.email);
-    }
-    
-    const { error } = await login(values);
+    try {
+      const supabase = getSupabaseClient();
 
-    if (error) {
-        toast({
-            title: "Login Failed",
-            description: error,
-            variant: "destructive",
-        });
-    } else {
-        toast({
-          title: "Login Successful",
-          description: "Welcome to AstralCore!",
-        });
-        router.push('/dashboard');
+      if (values.rememberMe) {
+        localStorage.setItem(REMEMBERED_EMAIL_KEY, values.email);
+      } else {
+        localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Retain existing UX for role checks elsewhere
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("loggedInEmail", values.email);
+      }
+
+      toast({
+        title: "Login Successful",
+        description: "Welcome to AstralCore!",
+      });
+      router.push("/dashboard");
+    } catch (err: any) {
+      toast({
+        title: "Login Failed",
+        description: err?.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
-  const handleGoogleSignIn = () => {
-    console.log("UI: Google sign-in clicked");
-    // Placeholder for Google sign-in logic
+  const handleGoogleSignIn = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      const redirectTo =
+        typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      toast({
+        title: "Google Sign-in Failed",
+        description: err?.message || "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleEmailSignIn = () => {
-    console.log("UI: Email sign-in clicked");
-    // Placeholder for email sign-in logic
-  }
+  const handleEmailSignIn = async () => {
+    try {
+      const email = form.getValues("email");
+      if (!email) {
+        toast({
+          title: "Missing Email",
+          description: "Enter your email above before requesting a magic link.",
+          variant: "destructive",
+        });
+        return;
+      }
+      const supabase = getSupabaseClient();
+      const redirectTo =
+        typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: redirectTo },
+      });
+      if (error) throw error;
+      toast({
+        title: "Magic Link Sent",
+        description: "Check your inbox for a sign-in link.",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Email Sign-in Failed",
+        description: err?.message || "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Card className="w-full max-w-sm">

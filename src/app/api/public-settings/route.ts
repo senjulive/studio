@@ -1,17 +1,7 @@
 import { NextResponse } from 'next/server';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import { readJson } from '@/lib/storage';
 
-const SETTINGS_FILE_PATH = path.join(process.cwd(), 'data', 'settings.json');
-
-async function readSettings() {
-  try {
-    const data = await fs.readFile(SETTINGS_FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {};
-  }
-}
+const SETTINGS_KEY = 'settings.json';
 
 export async function GET(request: Request) {
   try {
@@ -22,8 +12,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'A settings key is required.' }, { status: 400 });
     }
 
-    const settings = await readSettings();
-    const value = settings[key] || null;
+    const settings = await readJson<any>(SETTINGS_KEY, {});
+    const value = settings[key] ?? null;
 
     return NextResponse.json(value);
   } catch (error: any) {

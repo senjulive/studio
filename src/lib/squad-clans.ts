@@ -30,6 +30,8 @@ export type ClanChatMessage = {
     tier: TierSetting | null;
 };
 
+export type ClansMap = Record<string, Clan>;
+
 async function readClans(): Promise<Record<string, Clan>> {
     return readJson<Record<string, Clan>>(CLANS_KEY, {});
 }
@@ -132,3 +134,12 @@ export async function getClanMessages(clanId: string): Promise<ClanChatMessage[]
 
     return recentMessages;
 }
+
+// Shared API response types to keep clients and routes in sync.
+export type ClansResponse = {
+    clans: Record<string, Clan>;
+};
+
+export type ClanChatListResponse = {
+    messages: ClanChatMessage[];
+};

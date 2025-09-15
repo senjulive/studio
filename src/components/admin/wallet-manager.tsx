@@ -60,6 +60,7 @@ import { addNotification } from "@/lib/notifications";
 import { Badge } from "../ui/badge";
 
 type MappedWallet = WalletData & { user_id: string };
+type PendingWithdrawal = { id: string; amount: number; address: string; timestamp: number };
 
 const userSearchSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
@@ -230,7 +231,9 @@ export function WalletManager() {
     if (!selectedWalletData) return;
     setIsCompleting(withdrawalId);
 
-    const withdrawal = selectedWalletData.pending_withdrawals.find(w => w.id === withdrawalId);
+    const withdrawal = (selectedWalletData.pending_withdrawals as PendingWithdrawal[]).find(
+      (w: PendingWithdrawal) => w.id === withdrawalId
+    );
     if (!withdrawal) {
         toast({ title: "Error", description: "Withdrawal not found.", variant: "destructive" });
         setIsCompleting(null);
@@ -238,7 +241,9 @@ export function WalletManager() {
     }
 
     const newWalletData: Partial<WalletData> = {
-        pending_withdrawals: selectedWalletData.pending_withdrawals.filter(w => w.id !== withdrawalId),
+        pending_withdrawals: (selectedWalletData.pending_withdrawals as PendingWithdrawal[]).filter(
+          (w: PendingWithdrawal) => w.id !== withdrawalId
+        ),
     };
 
     await postAdminUpdate('/api/admin/update-wallet', { userId: selectedWalletData.user_id, newWalletData }, searchForm.getValues("email"));
@@ -367,7 +372,7 @@ export function WalletManager() {
                         </TableRow>
                         </TableHeader>
                         <TableBody>
-                        {selectedWalletData.pending_withdrawals.map((w) => (
+                        {(selectedWalletData.pending_withdrawals as PendingWithdrawal[]).map((w: PendingWithdrawal) => (
                             <TableRow key={w.id}>
                             <TableCell>{format(new Date(w.timestamp), "PPp")}</TableCell>
                             <TableCell className="font-mono">${w.amount.toFixed(2)}</TableCell>

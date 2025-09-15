@@ -2,7 +2,6 @@
 'use client';
 
 import * as React from 'react';
-import type { SVGProps } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -23,7 +22,7 @@ import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 import { tierIcons } from '@/lib/settings';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ElementType;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon, BronzeRankIcon, SilverRankIcon, GoldRankIcon, PlatinumRankIcon, DiamondRankIcon, Lock,

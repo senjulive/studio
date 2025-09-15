@@ -25,9 +25,7 @@ import {
   SidebarInset,
 }
 from '@/components/ui/sidebar';
-import { logout } from '@/lib/auth';
 import * as React from 'react';
-import type { SVGProps } from 'react';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/dashboard/notification-bell';
 import { AstralLogo } from '@/components/icons/astral-logo';
@@ -68,8 +66,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AvatarUploadDialog } from '@/components/dashboard/profile-view';
 import { RightSidebar } from '@/components/ui/right-sidebar';
 import { ModeToggle } from '@/components/ui/mode-toggle';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ElementType;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,
@@ -127,12 +126,31 @@ export default function DashboardLayout({
 
   React.useEffect(() => {
     const initializeUser = async () => {
-      const loggedInEmail = sessionStorage.getItem('loggedInEmail') || mockUser.email;
-      const currentUser = { ...mockUser, email: loggedInEmail };
+      let email = mockUser.email;
+      let id = mockUser.id;
+
+      try {
+        const supabase = getSupabaseClient();
+        // @ts-ignore
+        const { data: session } = await supabase.auth.getUser();
+        if (session?.user) {
+          email = session.user.email || email;
+          id = session.user.id || id;
+        }
+      } catch {
+        // ignore; fallback to sessionStorage or mock
+      }
+
+      if (typeof window !== 'undefined') {
+        const storedEmail = sessionStorage.getItem('loggedInEmail');
+        if (storedEmail) email = storedEmail;
+      }
+
+      const currentUser = { id, email };
 
       setUser(currentUser);
-      setIsAdmin(loggedInEmail === 'admin@astralcore.io');
-      setIsModerator(loggedInEmail === 'moderator@astralcore.io');
+      setIsAdmin(email === 'admin@astralcore.io');
+      setIsModerator(email === 'moderator@astralcore.io');
 
       if (currentUser.id) {
         await fetchWalletAndTiers(currentUser.id);
@@ -219,8 +237,14 @@ URL=${window.location.origin}`;
 
 
   const handleLogout = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      // @ts-ignore
+      await supabase.auth.signOut();
+    } catch {
+      // ignore
+    }
     sessionStorage.removeItem('loggedInEmail');
-    await logout();
     router.push('/');
   };
 
@@ -236,14 +260,14 @@ URL=${window.location.origin}`;
   ];
 
   const getPageTitle = () => {
-    const currentPath = pathname;
+    const currentPath = pathname ?? '/dashboard';
     const simplePath = currentPath.startsWith('/dashboard') ? currentPath : `/dashboard${currentPath}`;
 
     if (simplePath === '/dashboard/trading') return 'Astral Core Trading';
     const currentItem = menuConfig.flatMap(g => g.items).find((item) => {
-        return simplePath.startsWith(item.href) && item.href !== '/dashboard' || simplePath === item.href;
+        return (simplePath.startsWith(item.href) && item.href !== '/dashboard') || simplePath === item.href;
     });
-     if (simplePath === '/dashboard') return 'Home';
+    if (simplePath === '/dashboard') return 'Home';
     return currentItem
       ? currentItem.label
       : simplePath.split('/').pop()?.replace('-', ' ') || 'Home';
@@ -325,7 +349,7 @@ URL=${window.location.origin}`;
                         <SidebarMenuButton
                           asChild
                           isActive={
-                            isClient ? (pathname.endsWith(item.href) && !item.download) : false
+                            isClient ? (((pathname ?? '').endsWith(item.href)) && !item.download) : false
                           }
                         >
                           <Link href={item.href} download={item.download}>
@@ -445,7 +469,7 @@ URL=${window.location.origin}`;
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 text-xs w-full h-full transition-colors relative',
-                  isClient && pathname.endsWith(item.href)
+                  isClient && (pathname ?? '').endsWith(item.href)
                     ? 'text-primary font-medium'
                     : 'text-muted-foreground hover:text-foreground'
                 )}

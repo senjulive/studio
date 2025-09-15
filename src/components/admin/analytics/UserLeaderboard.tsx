@@ -2,7 +2,6 @@
 'use client';
 
 import * as React from 'react';
-import type { SVGProps } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { AnalyticsData } from './AnalyticsManager';
@@ -20,7 +19,7 @@ import { PlatinumRankIcon } from '@/components/icons/ranks/platinum-rank-icon';
 import { DiamondRankIcon } from '@/components/icons/ranks/diamond-rank-icon';
 
 
-type IconComponent = (props: SVGProps<SVGSVGElement>) => JSX.Element;
+type IconComponent = React.ElementType;
 
 const rankIcons: Record<string, IconComponent> = {
     RecruitRankIcon,
@@ -36,7 +35,7 @@ const rankIcons: Record<string, IconComponent> = {
 export function UserLeaderboard({ data }: { data: AnalyticsData }) {
     const { leaderboard } = data;
 
-    const formatCurrency = (value: number) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const formatCurrency = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     return (
         <Card>
