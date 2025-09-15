@@ -11,8 +11,13 @@ export async function POST(request: Request) {
     );
   }
   try {
-    const mod = await import('@/ai/flows/support-agent-flow');
-    const { analyzeSupportThread } = mod;
+    // Use eval('import(...)') so webpack cannot statically analyze or bundle the flow (avoids handlebars warnings).
+    const loadFlow = () =>
+      eval('import("@/ai/flows/support-agent-flow")') as Promise<
+        typeof import('@/ai/flows/support-agent-flow')
+      >;
+
+    const { analyzeSupportThread } = await loadFlow();
     const input = await request.json();
     const result = await analyzeSupportThread(input as any);
     return NextResponse.json(result);

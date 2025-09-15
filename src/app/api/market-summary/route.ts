@@ -11,8 +11,13 @@ export async function POST(request: Request) {
     );
   }
   try {
-    const mod = await import('@/ai/flows/market-summary-flow');
-    const { summarizeMarket } = mod;
+    // Use eval('import(...)') so webpack cannot statically analyze or bundle the flow (avoids handlebars warnings).
+    const loadFlow = () =>
+      eval('import("@/ai/flows/market-summary-flow")') as Promise<
+        typeof import('@/ai/flows/market-summary-flow')
+      >;
+
+    const { summarizeMarket } = await loadFlow();
     const input = await request.json();
     const result = await summarizeMarket(input as any);
     return NextResponse.json(result);
