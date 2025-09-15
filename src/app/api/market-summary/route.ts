@@ -11,7 +11,8 @@ export async function POST(request: Request) {
     );
   }
   try {
-    const { summarizeMarket, type: { MarketSummaryInput } = {} } = await import('@/ai/flows/market-summary-flow');
+    const mod = await import('@/ai/flows/market-summary-flow');
+    const { summarizeMarket } = mod;
     const input = await request.json();
     const result = await summarizeMarket(input as any);
     return NextResponse.json(result);
