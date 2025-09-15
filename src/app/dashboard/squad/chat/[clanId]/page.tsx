@@ -7,10 +7,11 @@ export const metadata: Metadata = {
   description: 'Private chat for your squad.',
 };
 
-export default function ClanChatPage({ params }: { params: { clanId: string } }) {
+// Use a loose type for Next.js generated props to avoid mismatches with generated PageProps on CI
+export default function ClanChatPage({ params }: any) {
   return (
     <div className="space-y-6">
-      <SquadClanChat clanId={params.clanId} />
+      <SquadClanChat clanId={params?.clanId as string} />
     </div>
   );
 }
